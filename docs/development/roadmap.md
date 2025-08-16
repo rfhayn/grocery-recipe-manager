@@ -1,4 +1,4 @@
-# Grocery & Recipe Manager - Development Roadmap
+# Development Roadmap - Grocery & Recipe Manager
 
 ## 🎯 Learning Goals
 By the end of this project, you'll understand:
@@ -10,368 +10,317 @@ By the end of this project, you'll understand:
 
 ---
 
-## 📚 Phase 1: Foundation & Setup (Week 1-2)
+## 🏗️ Milestone 1: MVP (Grocery Automation) - Weeks 1-3
 
 ### Story 1.1: Environment Setup
-**Goal**: Get your development environment ready
+**Goal**: Get development environment ready  
 **Time Estimate**: 2-3 hours
 
 **Tasks:**
+- [x] VS Code setup and GitHub repository
 - [ ] Install Xcode 14+ from App Store
-- [ ] Create Apple Developer account (free is fine to start)
 - [ ] Create new iOS project in Xcode
-- [ ] Set up GitHub repository
-- [ ] Learn basic Xcode navigation
+- [ ] Set up Core Data model
+- [ ] Basic app structure with tab navigation
 
-**Learning Focus**: Xcode IDE, project structure, version control
+**Learning Focus**: Xcode IDE, project structure, SwiftUI basics
 
 **Acceptance Criteria:**
 - ✅ Xcode project builds and runs in simulator
-- ✅ GitHub repo created with initial commit
+- ✅ GitHub repo with proper structure
 - ✅ Can navigate Xcode interface confidently
 
-**Resources Needed:**
-- Mac with macOS 12.0+
-- Apple ID for developer account
-
 ---
 
-### Story 1.2: Basic App Structure
-**Goal**: Create the foundation SwiftUI app with tab navigation
-**Time Estimate**: 3-4 hours
-
-**Tasks:**
-- [ ] Create main TabView with 4 tabs (Lists, Recipes, Staples, Settings)
-- [ ] Add placeholder views for each tab
-- [ ] Configure tab icons and labels
-- [ ] Test navigation between tabs
-- [ ] Commit changes to GitHub
-
-**Learning Focus**: SwiftUI basics, navigation, project organization
-
-**Code Files to Create:**
-```
-- ContentView.swift (main tab view)
-- Views/GroceryListsView.swift (placeholder)
-- Views/RecipesView.swift (placeholder)  
-- Views/StaplesView.swift (placeholder)
-- Views/SettingsView.swift (placeholder)
-```
-
-**Acceptance Criteria:**
-- ✅ App shows 4 tabs with correct icons
-- ✅ Tapping tabs navigates properly
-- ✅ Each tab shows placeholder content
-- ✅ App runs without crashes
-
----
-
-## 📊 Phase 2: Core Data Foundation (Week 2-3)
-
-### Story 2.1: Core Data Model Setup
-**Goal**: Design and create the database structure
+### Story 1.2: Core Data Foundation
+**Goal**: Set up data persistence layer  
 **Time Estimate**: 4-5 hours
 
 **Tasks:**
-- [ ] Open .xcdatamodeld file in Xcode
-- [ ] Create GroceryItem entity with attributes
-- [ ] Create Recipe entity with attributes
-- [ ] Create RecipeIngredient entity
-- [ ] Set up entity relationships
-- [ ] Generate NSManagedObject subclasses
-
-**Learning Focus**: Core Data concepts, entity relationships, data modeling
-
-**Entities to Create:**
-1. **GroceryItem** (id, name, category, isStaple, dateCreated, lastPurchased)
-2. **Recipe** (id, name, instructions, servings, prepTime, cookTime, dateCreated, lastUsed, usageCount, tags, isFavorite)
-3. **RecipeIngredient** (id, name, quantity, unit, notes)
-
-**Acceptance Criteria:**
-- ✅ All entities created with correct attributes
-- ✅ Recipe ↔ RecipeIngredient relationship established
-- ✅ Core Data model validates without errors
-- ✅ NSManagedObject classes generated
-
----
-
-### Story 2.2: Core Data Stack
-**Goal**: Set up the persistence layer
-**Time Estimate**: 2-3 hours
-
-**Tasks:**
-- [ ] Create PersistenceController class
-- [ ] Configure Core Data stack
+- [ ] Create Core Data model (.xcdatamodeld)
+- [ ] Design GroceryItem entity (id, name, category, isStaple, dateCreated, lastPurchased)
+- [ ] Set up PersistenceController
 - [ ] Add preview data for development
-- [ ] Inject managed context into app
-- [ ] Test Core Data setup
+- [ ] Test Core Data stack
 
-**Learning Focus**: Core Data stack, dependency injection, preview data
-
-**Files to Create/Modify:**
-- PersistenceController.swift
-- Update App.swift with Core Data environment
+**Learning Focus**: Core Data concepts, entity design, data modeling
 
 **Acceptance Criteria:**
-- ✅ Core Data stack initializes properly
-- ✅ Preview data loads in SwiftUI previews
-- ✅ No Core Data startup errors
-- ✅ Memory management working correctly
+- ✅ Core Data model validates without errors
+- ✅ Can save and fetch grocery items
+- ✅ Preview data loads correctly
 
 ---
 
-## 🥖 Phase 3: Staples Management (Week 3-4)
-
-### Story 3.1: View Staples List
-**Goal**: Display existing staple items
-**Time Estimate**: 3-4 hours
+### Story 1.3: Staples Management (CRUD)
+**Goal**: Build complete staples management system  
+**Time Estimate**: 6-8 hours
 
 **Tasks:**
-- [ ] Create @FetchRequest for staples
-- [ ] Build StaplesView with List
-- [ ] Create StapleRowView component
-- [ ] Add search functionality
-- [ ] Group staples by category
-- [ ] Test with sample data
+- [ ] Create StaplesView with @FetchRequest
+- [ ] Build StapleRowView component
+- [ ] Implement Add New Staple form
+- [ ] Add search and category filtering
+- [ ] Enable edit/delete operations
+- [ ] Track last purchased dates
 
-**Learning Focus**: @FetchRequest, SwiftUI List, search implementation
-
-**SwiftUI Concepts:**
-- @FetchRequest for automatic Core Data integration
-- List and ForEach for data display
-- SearchBar implementation
-- Sectioned lists
+**Learning Focus**: @FetchRequest, SwiftUI Lists, forms, CRUD operations
 
 **Acceptance Criteria:**
-- ✅ Staples display in categorized list
-- ✅ Search filters results correctly
-- ✅ Empty state shows appropriate message
-- ✅ Smooth scrolling performance
+- ✅ Can create, read, update, delete staples
+- ✅ Search and filtering works
+- ✅ Data persists between app launches
 
 ---
 
-### Story 3.2: Add New Staples
-**Goal**: Create interface to add staple items
-**Time Estimate**: 3-4 hours
-
-**Tasks:**
-- [ ] Create NewStapleView as sheet
-- [ ] Add form for name and category
-- [ ] Implement category picker/suggestions
-- [ ] Add save functionality
-- [ ] Handle form validation
-- [ ] Test add/cancel flows
-
-**Learning Focus**: Sheet presentation, forms, data validation
-
-**SwiftUI Concepts:**
-- Sheet presentation
-- Form and TextField
-- Data binding with @State
-- Core Data object creation
-
-**Acceptance Criteria:**
-- ✅ Modal sheet presents correctly
-- ✅ Form validation works
-- ✅ New staples save to Core Data
-- ✅ List updates automatically after save
-
----
-
-### Story 3.3: Edit/Delete Staples
-**Goal**: Manage existing staple items
-**Time Estimate**: 2-3 hours
-
-**Tasks:**
-- [ ] Add swipe actions for delete
-- [ ] Implement edit functionality
-- [ ] Add toggle staple status
-- [ ] Track last purchased date
-- [ ] Test edge cases
-
-**Learning Focus**: Swipe actions, data updates, user interactions
-
-**Acceptance Criteria:**
-- ✅ Swipe to delete works
-- ✅ Can toggle staple status
-- ✅ Edit changes persist
-- ✅ UI updates reflect changes
-
----
-
-## 📖 Phase 4: Basic Recipe Management (Week 4-5)
-
-### Story 4.1: Recipe List View
-**Goal**: Display and search recipes
-**Time Estimate**: 4-5 hours
-
-**Tasks:**
-- [ ] Create RecipesView with @FetchRequest
-- [ ] Build RecipeRowView component
-- [ ] Add search and tag filtering
-- [ ] Show recipe metadata (usage, time, etc.)
-- [ ] Add favorites indicator
-- [ ] Test with various data
-
-**Learning Focus**: Complex list views, filtering, search
-
-**Acceptance Criteria:**
-- ✅ Recipes display with metadata
-- ✅ Search works across name and tags
-- ✅ Tag filtering functions correctly
-- ✅ Favorites highlighted properly
-
----
-
-### Story 4.2: Recipe Detail View
-**Goal**: Show full recipe information
-**Time Estimate**: 3-4 hours
-
-**Tasks:**
-- [ ] Create RecipeDetailView
-- [ ] Display recipe info and ingredients
-- [ ] Add favorite toggle
-- [ ] Implement "Mark as Used" function
-- [ ] Show usage statistics
-- [ ] Navigation setup
-
-**Learning Focus**: Navigation, data relationships, user interactions
-
-**Acceptance Criteria:**
-- ✅ All recipe data displays correctly
-- ✅ Ingredients list properly formatted
-- ✅ Usage tracking works
-- ✅ Navigation flows smoothly
-
----
-
-### Story 4.3: Add New Recipe
-**Goal**: Create interface for recipe entry
-**Time Estimate**: 5-6 hours
-
-**Tasks:**
-- [ ] Create NewRecipeView form
-- [ ] Build dynamic ingredients list
-- [ ] Add recipe metadata fields
-- [ ] Implement tags input
-- [ ] Add form validation
-- [ ] Test complex scenarios
-
-**Learning Focus**: Complex forms, dynamic content, data relationships
-
-**Acceptance Criteria:**
-- ✅ Can add multiple ingredients dynamically
-- ✅ All recipe data saves correctly
-- ✅ Form validation prevents errors
-- ✅ Ingredients relationship created properly
-
----
-
-## 📝 Phase 5: Grocery Lists (Week 5-6)
-
-### Story 5.1: List Management
-**Goal**: Create and manage grocery lists
+### Story 1.4: Auto-Populate Grocery Lists
+**Goal**: Generate weekly lists from staples  
 **Time Estimate**: 4-5 hours
 
 **Tasks:**
 - [ ] Create GroceryList and GroceryListItem entities
-- [ ] Build list creation interface
-- [ ] Auto-populate with staples option
-- [ ] Show list progress/completion
-- [ ] Test list management
+- [ ] Build grocery list creation interface
+- [ ] Implement auto-populate from staples
+- [ ] Add manual item addition
+- [ ] Show completion progress
+- [ ] Enable check-off functionality
 
-**Learning Focus**: Entity relationships, data aggregation
+**Learning Focus**: Entity relationships, data aggregation, UI state management
+
+**Acceptance Criteria:**
+- ✅ New lists auto-include all staple items
+- ✅ Can check off items while shopping
+- ✅ Progress tracking displays correctly
 
 ---
 
-### Story 5.2: List Items Management
-**Goal**: Add, edit, and check off list items
+## 📚 Milestone 2: Recipe Integration - Weeks 4-5
+
+### Story 2.1: Recipe Catalog Foundation
+**Goal**: Build recipe storage and display  
+**Time Estimate**: 5-6 hours
+
+**Tasks:**
+- [ ] Create Recipe and RecipeIngredient entities
+- [ ] Design recipe data model (title, instructions, prep/cook time, servings)
+- [ ] Build RecipesView with list display
+- [ ] Create RecipeDetailView
+- [ ] Add recipe search functionality
+
+**Learning Focus**: Complex data relationships, navigation, detailed views
+
+**Acceptance Criteria:**
+- ✅ Can store recipes with multiple ingredients
+- ✅ Recipe list displays properly
+- ✅ Detail view shows all recipe information
+
+---
+
+### Story 2.2: Recipe Creation & Editing
+**Goal**: Full recipe management interface  
+**Time Estimate**: 6-7 hours
+
+**Tasks:**
+- [ ] Create NewRecipeView with dynamic ingredient list
+- [ ] Build recipe editing interface
+- [ ] Add form validation
+- [ ] Handle ingredient additions/removals
+- [ ] Test complex recipe scenarios
+
+**Learning Focus**: Complex forms, dynamic content, data validation
+
+**Acceptance Criteria:**
+- ✅ Can add multiple ingredients dynamically
+- ✅ Form validation prevents errors
+- ✅ Edit functionality works properly
+
+---
+
+### Story 2.3: Recipe → Grocery List Pipeline
+**Goal**: Connect recipes to grocery list generation  
 **Time Estimate**: 4-5 hours
 
 **Tasks:**
-- [ ] Build list detail view
-- [ ] Implement check/uncheck functionality
-- [ ] Add manual items
-- [ ] Add items from recipes
-- [ ] Track item sources
+- [ ] Add "Add to Grocery List" functionality
+- [ ] Create recipe selection interface
+- [ ] Implement bulk ingredient addition
+- [ ] Track item sources (staples vs. recipes)
+- [ ] Test multi-recipe list generation
 
-**Learning Focus**: Interactive lists, state management
+**Learning Focus**: Data integration, user workflows, source tracking
+
+**Acceptance Criteria:**
+- ✅ Can add recipe ingredients to grocery lists
+- ✅ Source tracking works (staples vs. recipes)
+- ✅ Multiple recipes can contribute to one list
 
 ---
 
-## ☁️ Phase 6: CloudKit Integration (Week 6-8)
+## 📊 Milestone 3: Usage Insights - Week 6
 
-### Story 6.1: Basic CloudKit Setup
-**Goal**: Enable cloud sync
+### Story 3.1: Recipe Usage Tracking
+**Goal**: Track and display recipe usage patterns  
+**Time Estimate**: 3-4 hours
+
+**Tasks:**
+- [ ] Add usage tracking to Recipe entity (usageCount, lastUsed)
+- [ ] Implement "Mark as Used" functionality
+- [ ] Create recipe statistics view
+- [ ] Build "most used" and "recently used" queries
+- [ ] Display usage data in recipe lists
+
+**Learning Focus**: Data analytics, Core Data queries, date handling
+
+**Acceptance Criteria:**
+- ✅ Usage count increments when recipes are used
+- ✅ Last used date updates correctly
+- ✅ Statistics view displays insights
+
+---
+
+### Story 3.2: Usage Insights UI
+**Goal**: Display meaningful usage analytics  
+**Time Estimate**: 2-3 hours
+
+**Tasks:**
+- [ ] Create usage statistics dashboard
+- [ ] Show "Most Popular Recipes"
+- [ ] Display "Recently Used" section
+- [ ] Add usage indicators to recipe lists
+- [ ] Test with various usage patterns
+
+**Learning Focus**: Data visualization, user insights, UI design
+
+**Acceptance Criteria:**
+- ✅ Clear usage statistics display
+- ✅ Intuitive navigation to popular recipes
+- ✅ Usage data helps meal planning
+
+---
+
+## 🏷️ Milestone 4: Tagging & Discovery - Week 7
+
+### Story 4.1: Recipe Tagging System
+**Goal**: Add categorization and search capabilities  
+**Time Estimate**: 4-5 hours
+
+**Tasks:**
+- [ ] Add tags field to Recipe entity
+- [ ] Create tag input interface
+- [ ] Implement tag suggestions (common tags)
+- [ ] Build tag display components
+- [ ] Add tag management (add/remove)
+
+**Learning Focus**: Text processing, UI components, user input
+
+**Acceptance Criteria:**
+- ✅ Can add multiple tags to recipes
+- ✅ Tag suggestions work properly
+- ✅ Tags display consistently
+
+---
+
+### Story 4.2: Search & Filter Enhancement
+**Goal**: Advanced recipe discovery features  
+**Time Estimate**: 3-4 hours
+
+**Tasks:**
+- [ ] Implement tag-based filtering
+- [ ] Add search by recipe name and ingredients
+- [ ] Create filter combinations
+- [ ] Build discovery flows
+- [ ] Test search performance
+
+**Learning Focus**: Search algorithms, filtering logic, performance optimization
+
+**Acceptance Criteria:**
+- ✅ Filter by single or multiple tags
+- ✅ Search works across all recipe fields
+- ✅ Fast search performance
+
+---
+
+## 🚀 Milestone 5: Cloud Integration - Weeks 8-9
+
+### Story 5.1: CloudKit Setup
+**Goal**: Enable cloud sync and sharing  
 **Time Estimate**: 6-8 hours
 
 **Tasks:**
-- [ ] Configure CloudKit capability
+- [ ] Configure CloudKit capability in Xcode
 - [ ] Update Core Data model for CloudKit
+- [ ] Set up CloudKit container
 - [ ] Test basic sync functionality
 - [ ] Handle sync conflicts
-- [ ] Test offline/online scenarios
 
-**Learning Focus**: CloudKit basics, data sync
+**Learning Focus**: CloudKit basics, cloud data synchronization
+
+**Acceptance Criteria:**
+- ✅ Data syncs across devices
+- ✅ Offline/online scenarios work
+- ✅ Conflict resolution handles edge cases
 
 ---
 
-### Story 6.2: Sharing Implementation
-**Goal**: Enable family sharing
+### Story 5.2: Family Sharing
+**Goal**: Enable collaborative editing  
 **Time Estimate**: 8-10 hours
 
 **Tasks:**
 - [ ] Implement CloudKit sharing
-- [ ] Create sharing UI
-- [ ] Test invitation flow
-- [ ] Handle share acceptance
+- [ ] Create sharing UI and invitations
 - [ ] Test collaborative editing
+- [ ] Handle permission management
+- [ ] Add sharing status indicators
 
-**Learning Focus**: CloudKit sharing, collaboration
+**Learning Focus**: CloudKit sharing, collaborative features, user permissions
+
+**Acceptance Criteria:**
+- ✅ Can invite family members
+- ✅ Real-time collaborative editing works
+- ✅ Proper permission handling
 
 ---
 
-## 🚀 Phase 7: Polish & Deployment (Week 8-9)
+## 🎨 Milestone 6: Polish & Deployment - Week 10
 
-### Story 7.1: UI/UX Polish
-**Goal**: Improve app experience
+### Story 6.1: UI/UX Polish
+**Goal**: Professional app experience  
 **Time Estimate**: 4-6 hours
 
 **Tasks:**
-- [ ] Add app icons
-- [ ] Improve visual design
-- [ ] Add loading states
+- [ ] Add app icons and branding
+- [ ] Improve visual design consistency
+- [ ] Add loading states and animations
 - [ ] Enhance error handling
 - [ ] Accessibility improvements
 
+**Learning Focus**: UI design, user experience, accessibility
+
 ---
 
-### Story 7.2: App Store Preparation
-**Goal**: Prepare for release
+### Story 6.2: App Store Preparation
+**Goal**: Prepare for release  
 **Time Estimate**: 3-4 hours
 
 **Tasks:**
-- [ ] App Store metadata
-- [ ] Screenshots
-- [ ] Privacy policy
+- [ ] App Store metadata and screenshots
+- [ ] Privacy policy and terms
 - [ ] TestFlight testing
+- [ ] Final testing and bug fixes
 - [ ] App Store submission
+
+**Learning Focus**: App Store process, deployment, testing
 
 ---
 
-## 📋 Development Best Practices
+## 🎓 Learning Resources & Best Practices
 
 ### Daily Workflow:
 1. **Start Small**: Complete one story/task at a time
 2. **Test Frequently**: Run app after each significant change
 3. **Commit Often**: Save progress to GitHub regularly
-4. **Ask Questions**: Don't hesitate to ask for help with concepts
-
-### Learning Resources:
-- **Apple Documentation**: SwiftUI and Core Data guides
-- **WWDC Videos**: Especially CloudKit and Core Data sessions
-- **Stack Overflow**: For specific coding questions
-- **GitHub Examples**: Look at other iOS projects
+4. **Ask Questions**: Don't hesitate to ask for help
 
 ### When to Ask for Help:
 - ✅ Stuck on a concept for more than 30 minutes
@@ -379,8 +328,15 @@ By the end of this project, you'll understand:
 - ✅ Want to understand "why" something works a certain way
 - ✅ Need code review before moving to next story
 
+### Success Metrics:
+- **Week 3**: Working grocery list app with staples
+- **Week 5**: Recipe integration complete
+- **Week 7**: Full search and discovery features
+- **Week 9**: Cloud sharing functional
+- **Week 10**: App Store ready
+
 ---
 
-This roadmap will take approximately 8-9 weeks working part-time. Each phase builds on the previous one, teaching you iOS development incrementally while building a real, useful app.
+**Current Status**: Story 1.1 Environment Setup ✅ (VS Code & GitHub complete, Xcode installation next)
 
-**Ready to start with Story 1.1: Environment Setup?**
+**Ready to continue with Xcode installation and iOS project creation?**
