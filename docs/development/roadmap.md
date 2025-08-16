@@ -12,16 +12,16 @@ By the end of this project, you'll understand:
 
 ## 🏗️ Milestone 1: MVP (Grocery Automation) - Weeks 1-3
 
-### Story 1.1: Environment Setup
+### Story 1.1: Environment Setup ✅ **COMPLETED 8/16/25**
 **Goal**: Get development environment ready  
-**Time Estimate**: 2-3 hours
+**Time Estimate**: 2-3 hours | **Actual**: ~4 hours
 
 **Tasks:**
 - [x] VS Code setup and GitHub repository
-- [ ] Install Xcode 14+ from App Store
-- [ ] Create new iOS project in Xcode
-- [ ] Set up Core Data model
-- [ ] Basic app structure with tab navigation
+- [x] Install Xcode 14+ from App Store *(Installed 16.4)*
+- [x] Create new iOS project in Xcode
+- [x] Set up Core Data model *(Template created)*
+- [x] Basic app structure with tab navigation *(Template foundation)*
 
 **Learning Focus**: Xcode IDE, project structure, SwiftUI basics
 
@@ -29,6 +29,13 @@ By the end of this project, you'll understand:
 - ✅ Xcode project builds and runs in simulator
 - ✅ GitHub repo with proper structure
 - ✅ Can navigate Xcode interface confidently
+- ✅ Core Data + CloudKit integration verified
+
+**Key Achievements:**
+- iOS project with Core Data + CloudKit template working
+- iPhone 16 Pro simulator functional with iOS 18.6
+- Professional GitHub repository structure maintained
+- Comprehensive learning documentation established
 
 ---
 
@@ -337,6 +344,4 @@ By the end of this project, you'll understand:
 
 ---
 
-**Current Status**: Story 1.1 Environment Setup ✅ (VS Code & GitHub complete, Xcode installation next)
-
-**Ready to continue with Xcode installation and iOS project creation?**
+**Current Status**: Story 1.2 Core Data Foundation 🎯 (Story 1.1 complete, ready for data model design)

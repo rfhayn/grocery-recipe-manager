@@ -1,23 +1,42 @@
-# Current Story: Environment Setup
+# Current Story: Core Data Foundation
 
-**Story ID**: 1.1
-**Goal**: Set up development environment and project structure
-**Status**: In Progress
+**Story ID**: 1.2
+**Goal**: Set up data persistence layer and design entities
+**Status**: Ready to Start
 
-## Tasks Completed:
-- [x] GitHub repository created
-- [x] VS Code configured
-- [x] Initial project structure created
-- [ ] Xcode project creation
-- [ ] First commit to GitHub
+## Previous Story Completed ✅
+**Story 1.1: Environment Setup** - COMPLETED 8/16/25
+- [x] GitHub repository created and organized
+- [x] VS Code configured with extensions
+- [x] Xcode 16.4 installed and configured
+- [x] iOS project created with Core Data + CloudKit
+- [x] Project builds and runs successfully in simulator
+- [x] Core Data template verified working
+
+## Current Story Tasks:
+- [ ] Design Core Data model for grocery app
+- [ ] Create GroceryItem entity (staples)
+- [ ] Create Recipe entity with relationships
+- [ ] Create RecipeIngredient entity
+- [ ] Set up GroceryList and GroceryListItem entities
+- [ ] Configure entity relationships
+- [ ] Test Core Data model validation
 
 ## Next Steps:
-1. Install Xcode from App Store
-2. Create new iOS project in Xcode
-3. Configure project settings
-4. Make first commit
+1. Open .xcdatamodeld file in Xcode
+2. Design entities and attributes
+3. Set up relationships between entities
+4. Generate NSManagedObject subclasses
+5. Test Core Data stack with custom entities
 
-## Learning Notes:
-- GitHub repository best practices
-- VS Code extensions for iOS development
-- Project organization strategies
+## Learning Focus:
+- Core Data entity design
+- Entity relationships (one-to-many, many-to-many)
+- Attribute types and optionality
+- CloudKit compatibility considerations
+
+## Success Criteria:
+- ✅ All entities created with correct attributes
+- ✅ Relationships properly configured
+- ✅ Core Data model validates without errors
+- ✅ CloudKit sync compatibility maintained
