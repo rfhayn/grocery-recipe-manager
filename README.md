@@ -68,8 +68,8 @@ This project uses a dual-environment approach:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/grocery-recipe-manager-ios.git
-   cd grocery-recipe-manager-ios
+   git clone https://github.com/yourusername/grocery-recipe-manager.git
+   cd grocery-recipe-manager
    ```
 
 2. **Install Xcode Command Line Tools:**
