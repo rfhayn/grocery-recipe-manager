@@ -1,65 +1,55 @@
-# PROJECT_INDEX.md
+# 📌 Project Index — Grocery Recipe Manager
 
-## 📌 Project Overview
-**Grocery & Recipe Manager (Mobile App)**  
-A mobile-first application that helps users manage grocery staples, plan recipes, and streamline weekly shopping.  
+## 🧭 Project Vision
+A mobile-first application to:
+- Maintain a list of staple grocery purchases (auto-populated into weekly lists).  
+- Build and manage a recipe catalog.  
+- Track recipe usage frequency and last used date.  
+- Tag recipes with categories like *leftovers* or *quick and easy*.  
 
-**Core Value:** Reduce friction in grocery planning by:  
-- Auto-populating weekly grocery lists with staple items  
-- Linking recipes directly to grocery lists  
-- Tracking recipe usage history and tags  
+## 📂 Repository Structure
+- `/docs/requirements/requirements.md` → Functional requirements.  
+- `/docs/development/roadmap.md` → Development roadmap & milestones.  
+- `/learning-notes/` → Setup and Core Data learning steps.  
+- `/planning/` → Stories, wireframes, and current progress.  
+- `/GroceryRecipeManager/` → iOS app implementation (Swift, Core Data, UI).  
+- `/project-index.md` → **You are here: canonical tracker of modules & status.**
 
----
+## 🚦 Current Story Status
+- **Story 1.1: Environment Setup** → ✅ Completed  
+  - Xcode environment configured.  
+  - Initial Core Data `GroceryItem` entity created.  
 
-## 🧭 Domains
-1. **Grocery Management**  
-   - Staple list maintenance  
-   - Weekly grocery list generation (auto + manual)  
+- **Story 1.2: Core Data Foundation** → 🚧 In Progress  
+  - `GroceryItem` entity complete.  
+  - `Recipe` entity started.  
+  - Pending: `Ingredient`, `WeeklyList`, `Tag`.  
+  - CloudKit integration pending.  
 
-2. **Recipe Management**  
-   - Recipe catalog storage  
-   - Ingredient-to-grocery-list integration  
-   - Tagging system for recipes  
+Next focus: finalize entities + relationships, test persistence layer.  
 
-3. **Meal Planning Insights**  
-   - Recipe usage tracking (last used, frequency)  
-   - Filtering/search by tags, recency, or frequency  
+## 📊 Domain Model Progress
+| Entity        | Status  | Notes |
+|---------------|---------|-------|
+| GroceryItem   | ✅ Done | Core entity for staples & individual groceries. |
+| Recipe        | 🚧 In Progress | Title, instructions, usageCount. Needs CloudKit flag. |
+| Ingredient    | ⏳ Not Started | Will connect Recipes → GroceryItems. |
+| WeeklyList    | ⏳ Not Started | Represents weekly shopping list. |
+| Tag           | ⏳ Not Started | Many-to-many relationship with Recipe. |
 
----
+## 📅 Roadmap Sync
+- [x] **1.1 Environment Setup**  
+- [ ] **1.2 Core Data Foundation** *(active)*  
+- [ ] 1.3 Recipe & Grocery List UI  
+- [ ] 1.4 iCloud / CloudKit sync  
+- [ ] 1.5 Testing, edge cases & polish  
 
-## 📦 Modules
-### Grocery Management Domain
-- **staples/**: CRUD for recurring grocery items  
-- **weekly-list/**: Generation and customization of weekly grocery lists  
+👉 Full details in [`docs/development/roadmap.md`](./docs/development/roadmap.md).  
 
-### Recipe Management Domain
-- **recipes/**: Catalog of recipes (title, steps, ingredients)  
-- **ingredients/**: Ingredient mapping to grocery items  
-- **tags/**: Tagging system (e.g., “leftovers”, “quick & easy”)  
+## ✅ Requirements Coverage
+- Staple grocery list → **covered in GroceryItem**.  
+- Recipe catalog + ingredients → **partially covered in Recipe (needs Ingredient)**.  
+- Usage tracking → **covered in Recipe.usageCount & lastUsed**.  
+- Tagging system → **not yet implemented**.  
 
-### Meal Planning Insights Domain
-- **usage-tracking/**: Store usage events (when recipe was cooked)  
-- **history/**: Query last-used and frequency  
-
----
-
-## 📚 Epics
-- **Epic 1: Grocery Automation** → Auto-populate weekly lists with staple items  
-- **Epic 2: Recipe Integration** → Recipes push ingredients into shopping lists  
-- **Epic 3: Usage Insights** → Track and display recipe usage patterns  
-- **Epic 4: Tagging & Discovery** → Flexible recipe categorization for filtering/search  
-
----
-
-## 📂 Documentation Map
-- `/docs/requirements/` → Business requirements (PRD-style)  
-- `/docs/design/` → UX flows & wireframes (Claude-generated artifacts)  
-- `/docs/development/` → Tech specs (to be generated here with Architect GPT)  
-- `/planning/stories/` → User stories (Claude artifacts)  
-- `/planning/wireframes/` → UI wireframes (Claude artifacts)  
-- `/learning-notes/` → Research & technical references  
-
----
-
-## 🛠 Implementation Plan
-### Backend (to be scaffolded under `/backend/`)
+👉 Full requirements in [`docs/requirements/requirements.md`](./docs/requirements/requirements.md).  
