@@ -7,13 +7,59 @@ A mobile-first application to:
 - Track recipe usage frequency and last used date
 - Tag recipes with categories like *leftovers* or *quick and easy*
 
+## 🏗️ Architecture & Domain Design
+
+### Domain Boundaries (DDD)
+**Bounded Contexts:**
+- **Catalog Context**: Recipe, Ingredient, GroceryItem, Tag management with business rules
+- **Shopping Context**: WeeklyList, GroceryListItem, list generation, shopping workflows
+- **Sharing Context**: CloudKit collaboration, permissions, conflict resolution, family coordination
+
+**Aggregates & Entities:**
+- **Recipe** (Aggregate Root) with Ingredient children and usage tracking
+- **WeeklyList** (Aggregate Root) with GroceryListItem children and completion state
+- **GroceryItem** (Entity) referenced by both aggregates with staple classification
+
+**Value Objects:**
+- Quantity (amount + unit), ItemCategory, TagName, RecipeTitle, StapleFlag
+- Rule: Make illegal states unrepresentable (e.g., negative quantities, invalid units)
+
+### Technology Decisions
+- **iOS-First**: Native SwiftUI with Core Data + CloudKit for family sharing
+- **Clean Architecture**: Domain/Application/Infrastructure/Presentation separation
+- **MVVM + Clean**: ViewModels depend on Use Cases, not Core Data directly
+- **Event-Driven**: Domain events with Combine for loose coupling and coordination
+- **Test-Driven**: Domain-first testing strategy with repository contracts
+
+### Mobile Architecture Choice
+```
+/App
+  /Presentation    // SwiftUI Views, ViewModels (MVVM)
+  /Application     // Use Cases, DTOs, Application Services
+  /Domain          // Entities, Value Objects, Aggregates, Repository Protocols, Domain Services
+  /Infrastructure  // Core Data, CloudKit, Concrete Repository Implementations
+  /Support         // DI Container, Logging, Utilities
+```
+
+**Key Patterns:**
+- **Repository Pattern**: Abstract data access behind protocols
+- **Use Case/Interactor Pattern**: Encapsulate business operations
+- **Domain Events**: Coordinate between bounded contexts
+- **Dependency Injection**: Loose coupling between layers
+
+### CloudKit Design Strategy
+- **Zones**: Private database for personal data, shared zones for family collaboration
+- **CKShare**: Family recipe collections and shared grocery lists
+- **Conflict Resolution**: Domain-driven merge policies (last-writer-wins vs business rules)
+- **Sync Policy**: Interpret CloudKit conflicts with domain knowledge
+
 ## 📂 Repository Structure
-- `/docs/requirements/requirements.md` → [Functional requirements](docs/requirements/requirements.md)
-- `/docs/development/roadmap.md` → [Development roadmap & milestones](docs/development/roadmap.md)  
-- `/learning-notes/` → Setup and Core Data learning steps
-- `/planning/` → Stories, wireframes, and current progress
-- `/GroceryRecipeManager/` → iOS app implementation (Swift, Core Data, UI)
-- `/project-index.md` → **You are here: canonical tracker of modules & status**
+- `/docs/requirements/requirements.md` → [Functional & non-functional requirements](docs/requirements/requirements.md)
+- `/docs/development/roadmap.md` → [Architecture-driven development roadmap](docs/development/roadmap.md)  
+- `/learning-notes/` → Architecture and Core Data learning progression
+- `/planning/` → Stories, wireframes, and DDD design decisions
+- `/GroceryRecipeManager/` → iOS app implementation with Clean Architecture
+- `/project-index.md` → **You are here: canonical architecture & progress tracker**
 
 ## 🚦 Current Story Status
 
@@ -32,97 +78,103 @@ A mobile-first application to:
   - ✅ Core Data classes generated and functional
   - ✅ Working iOS app displaying grocery items with categories
   - ✅ Professional UI with staple indicators and native design
+  - ✅ Complete test suite validating all entities (all tests passing ✅)
 
 ### 🎯 Next Story  
-- **Story 1.3: Staples Management (CRUD)** → ⏳ Ready to Start
-  - Build dedicated staples management interface
-  - Implement add/edit/delete operations
-  - Add search and filtering capabilities
-  - Create category management system
+- **Story 1.3: Clean Architecture Foundation** → ⏳ Ready to Start (PRIORITY SHIFT)
+  - Establish Domain layer with entities, value objects, and aggregates
+  - Define Repository protocols and Use Case interfaces
+  - Implement Domain Services (ListGenerationService, ShoppingHeuristics)
+  - Add Domain Events with Combine for coordination
+  - Create proper folder structure and dependency injection
 
 ### 📅 Upcoming Stories
-- **Story 1.4: Auto-Populate Grocery Lists** → ⏳ Planned
-- **Story 2.1: Recipe Catalog Foundation** → ⏳ Planned
-- **Story 2.2: Recipe Creation & Editing** → ⏳ Planned
+- **Story 1.4: Repository Implementation & Infrastructure** → ⏳ Planned
+- **Story 2.1: Staples CRUD with Clean Architecture** → ⏳ Planned  
+- **Story 2.2: List Generation Service & Domain Logic** → ⏳ Planned
 
-👉 Full roadmap details in [`docs/development/roadmap.md`](docs/development/roadmap.md)
+👉 Full architecture-driven roadmap in [`docs/development/roadmap.md`](docs/development/roadmap.md)
 
-## 📊 Domain Model Status - ✅ COMPLETE
+## 📊 Domain Model Status - ✅ COMPLETE (Infrastructure)
 
-| Entity          | Status         | Attributes | Relationships | CloudKit | Core Data Classes | Notes |
-|-----------------|----------------|------------|---------------|-----------|-------------------|--------|
-| GroceryItem     | ✅ Complete    | ✅ Done    | ✅ Complete   | ✅ Yes   | ✅ Generated     | Core entity for staples & groceries |
-| Recipe          | ✅ Complete    | ✅ Done    | ✅ Complete   | ✅ Yes   | ✅ Generated     | Title, instructions, usage tracking, sourceURL |
-| Ingredient      | ✅ Complete    | ✅ Done    | ✅ Complete   | ✅ Yes   | ✅ Generated     | Links recipes → grocery items with quantities |
-| WeeklyList      | ✅ Complete    | ✅ Done    | ✅ Complete   | ✅ Yes   | ✅ Generated     | Weekly shopping list container |
-| GroceryListItem | ✅ Complete    | ✅ Done    | ✅ Complete   | ✅ Yes   | ✅ Generated     | Individual items in weekly lists |
-| Tag             | ✅ Complete    | ✅ Done    | ✅ Complete   | ✅ Yes   | ✅ Generated     | Recipe categorization system |
+| Entity          | Core Data | Relationships | CloudKit | Domain Model | Use Cases | Repository |
+|-----------------|-----------|---------------|-----------|--------------|-----------|------------|
+| GroceryItem     | ✅ Complete | ✅ Complete | ✅ Yes   | ⏳ Next     | ⏳ Next  | ⏳ Next   |
+| Recipe          | ✅ Complete | ✅ Complete | ✅ Yes   | ⏳ Next     | ⏳ Next  | ⏳ Next   |
+| Ingredient      | ✅ Complete | ✅ Complete | ✅ Yes   | ⏳ Next     | ⏳ Next  | ⏳ Next   |
+| WeeklyList      | ✅ Complete | ✅ Complete | ✅ Yes   | ⏳ Next     | ⏳ Next  | ⏳ Next   |
+| GroceryListItem | ✅ Complete | ✅ Complete | ✅ Yes   | ⏳ Next     | ⏳ Next  | ⏳ Next   |
+| Tag             | ✅ Complete | ✅ Complete | ✅ Yes   | ⏳ Next     | ⏳ Next  | ⏳ Next   |
 
-### Relationship Map - ✅ IMPLEMENTED
-```
-Recipe ←→ Ingredient ←→ GroceryItem
-Recipe ←→ Tag (many-to-many)
-Recipe → GroceryListItem
-WeeklyList ←→ GroceryListItem ←→ GroceryItem
-GroceryListItem → Recipe (sourceRecipe)
-```
+### Domain Services to Implement
+- **ListGenerationService**: Generate WeeklyList from staples + selected recipes
+- **ShoppingHeuristics**: Merge duplicates, sort by category/aisle, optimize shopping flow
+- **RecipeRecommendationService**: Suggest recipes based on available staples
+- **UsageTrackingService**: Update recipe usage patterns and analytics
 
-**Data Model Achievements:**
-- ✅ **6 sophisticated entities** with proper Core Data design
-- ✅ **Bidirectional relationships** all configured correctly
-- ✅ **CloudKit compatibility** enabled for family sharing
-- ✅ **Sample data system** with realistic grocery and recipe data
-- ✅ **Manual class generation** mastered for reliability
+### Use Cases to Implement
+- **CreateStaple**, **UpdateStaple**, **RemoveStaple**
+- **GenerateWeeklyList**, **UpdateListCompletion**, **OptimizeShoppingOrder**
+- **TrackRecipeUsage**, **MarkRecipeAsFavorite**, **SearchRecipesByIngredients**
+- **ShareRecipeCollection**, **SyncWithCloudKit**, **ResolveConflicts**
 
 ## ✅ Requirements Coverage
 
-| Requirement | Implementation | Status | Validation |
-|-------------|----------------|--------|------------|
-| Staple grocery list | `GroceryItem.isStaple` | ✅ Complete | Working in UI with staple indicators |
-| Recipe catalog + ingredients | `Recipe` + `Ingredient` entities | ✅ Complete | Sample recipes with ingredients loaded |
-| Usage tracking | `Recipe.usageCount` & `lastUsed` | ✅ Complete | Data model ready for tracking |
-| Tagging system | `Tag` entity with many-to-many | ✅ Complete | Sample tags created and linked |
-| Weekly list generation | `WeeklyList` + `GroceryListItem` | ✅ Complete | Sample weekly list with items |
-| Auto-populate from staples | Logic in list generation | ⏳ Ready for Story 1.4 | Data model supports this feature |
-| Recipe source URLs | `Recipe.sourceURL` | ✅ Complete | Added attribute for web recipe links |
+| Requirement | Implementation | Status | Domain Service |
+|-------------|----------------|--------|----------------|
+| Staple grocery list | `GroceryItem.isStaple` + StapleManagementService | ✅ Ready | StapleManagementService |
+| Recipe catalog + ingredients | `Recipe` + `Ingredient` entities + RecipeService | ✅ Ready | RecipeManagementService |
+| Usage tracking | `Recipe.usageCount` & `lastUsed` + UsageTrackingService | ✅ Ready | UsageTrackingService |
+| Tagging system | `Tag` entity + TaggingService | ✅ Ready | TaggingService |
+| Weekly list generation | `WeeklyList` + `GroceryListItem` + ListGenerationService | ✅ Ready | ListGenerationService |
+| Auto-populate from staples | ListGenerationService with business rules | ⏳ Story 1.4 | ListGenerationService |
+| Recipe source URLs | `Recipe.sourceURL` + RecipeImportService | ✅ Ready | RecipeImportService |
 
-👉 Full requirements in [`docs/requirements/requirements.md`](docs/requirements/requirements.md)
+👉 Full requirements with DDD language in [`docs/requirements/requirements.md`](docs/requirements/requirements.md)
 
 ## 🎯 Technical Achievements
 
-### Core Data & CloudKit Mastery
-- **Sophisticated Entity Design**: 6 entities with complex relationships
-- **CloudKit Integration**: Ready for real-time family collaboration
-- **Relationship Debugging**: Learned inverse relationship configuration
-- **Class Generation**: Manual generation when automatic fails
-- **Sample Data Strategy**: Conditional loading with realistic test data
+### Infrastructure Layer (Complete ✅)
+- **6 sophisticated entities** with proper Core Data design patterns
+- **Complex relationship web** supporting grocery-recipe-list workflows  
+- **CloudKit compatibility** ready for family sharing features
+- **Manual class generation** mastered when automatic methods fail
+- **Realistic sample data** demonstrating all entity relationships
+- **Complete test suite** validating all entities and data model integrity
 
-### iOS Development Skills
-- **SwiftUI Data Binding**: @FetchRequest integration with Core Data
-- **Professional UI Design**: Native iOS interface with list navigation
-- **Error Resolution**: Systematic debugging of Core Data compilation issues
-- **Project Architecture**: Clean separation of data model and presentation
+### Next: Domain & Application Layers
+- **Domain Models**: Rich entities with business rules and invariants
+- **Value Objects**: Type-safe, immutable data structures  
+- **Repository Contracts**: Clean data access abstractions
+- **Use Case Orchestration**: Business logic coordination
+- **Domain Events**: Loose coupling between contexts
 
-### Development Workflow
-- **Documentation-Driven Development**: Comprehensive learning capture
+### Development Workflow Mastery
+- **Documentation-Driven Development**: Comprehensive architecture capture
 - **Git Workflow**: Professional branching and commit practices
 - **Problem-Solving**: Methodical approach to technical challenges
-- **Learning Documentation**: Real-time capture of discoveries and solutions
+- **Learning Documentation**: Real-time capture of architectural decisions
 
-### Testing & Validation
-- **Complete Test Suite**: Core Data entity creation and persistence validation
-- **All Tests Passing**: 6 test methods covering entity creation and data model integrity
-- **Professional Testing Practices**: In-memory test database with proper setup/teardown
+## 🏆 Architecture Milestones
 
-## 🏆 Milestone 1 Progress: 50% Complete
-
-**Milestone 1 Goal**: MVP Grocery Automation
+### ✅ Milestone 1: Infrastructure Foundation (50% Complete)
 - ✅ **Story 1.1**: Environment Setup (Complete)
 - ✅ **Story 1.2**: Core Data Foundation (Complete)
-- ⏳ **Story 1.3**: Staples Management UI (Ready)
-- ⏳ **Story 1.4**: Auto-populate Lists (Planned)
+- 🎯 **Story 1.3**: Clean Architecture Foundation (Ready)
+- ⏳ **Story 1.4**: Repository Implementation (Planned)
 
-**Target**: Working grocery list app with staples management
+**Target**: Solid Clean Architecture foundation with proper domain boundaries
+
+### ⏳ Milestone 2: Domain-Driven Features
+- **Story 2.1**: Staples CRUD with Use Cases
+- **Story 2.2**: List Generation Service  
+- **Story 2.3**: Recipe Management with Domain Logic
+- **Story 2.4**: Usage Analytics & Insights
+
+### ⏳ Milestone 3: Advanced Architecture  
+- **Story 3.1**: CloudKit Sharing with Domain Events
+- **Story 3.2**: Conflict Resolution with Business Rules
+- **Story 3.3**: Performance Optimization & Caching
 
 ## 📚 Learning Journey Documentation
 
@@ -131,28 +183,32 @@ GroceryListItem → Recipe (sourceRecipe)
 - ✅ **Xcode & iOS Project**: [`learning-notes/02-xcode-and-ios-project.md`](learning-notes/02-xcode-and-ios-project.md)
 - ✅ **Core Data Fundamentals**: [`learning-notes/03-core-data-fundamentals.md`](learning-notes/03-core-data-fundamentals.md)
 
+### Next Learning Modules
+- 🎯 **Clean Architecture Patterns**: Domain modeling, Use Cases, Repository pattern
+- ⏳ **Domain-Driven Design**: Aggregates, Value Objects, Domain Services
+- ⏳ **Advanced SwiftUI**: Feature-oriented architecture with dependency injection
+
 ### Skills Developed
-- **Xcode IDE proficiency** with project management and simulators
-- **Core Data expertise** including entity design and relationships
-- **CloudKit integration** for cloud sync and sharing
+- **Core Data & CloudKit expertise** including entity design and relationships
 - **SwiftUI fundamentals** with data binding and navigation
 - **iOS debugging** with systematic error resolution
+- **Professional workflow** with Git integration and documentation
 
 ## 🚀 Next Development Session
 
-**Story 1.3 Focus**: Staples Management (CRUD)
-- Build `StaplesView` with enhanced grocery item management
-- Implement add/edit forms with category selection
-- Add search and filtering capabilities
-- Create swipe-to-delete and bulk operations
-- Professional iOS interaction patterns
+**Story 1.3 Focus**: Clean Architecture Foundation
+- Define Domain models with proper business rules and invariants
+- Create Repository protocols and Use Case interfaces
+- Implement Domain Services for business logic coordination
+- Add Domain Events with Combine for loose coupling
+- Establish proper folder structure and dependency injection
 
-**Estimated Duration**: 6-8 hours of development
-**Key Learning**: SwiftUI forms, navigation, and user interactions
+**Estimated Duration**: 6-8 hours of focused architecture work
+**Key Learning**: Clean Architecture, DDD patterns, iOS dependency injection
 
 ---
 
-**Last Updated**: August 16, 2025 - Story 1.2 complete, ready for Story 1.3  
-**Major Achievement**: Working iOS app with complete Core Data + CloudKit foundation! 🎉
+**Last Updated**: August 16, 2025 - Story 1.2 complete, pivoting to architecture-first approach  
+**Major Achievement**: Complete infrastructure foundation ready for Clean Architecture! 🎉
 
-**Status**: 📱 **Functional iOS App** | 🗄️ **Complete Data Model** | ☁️ **CloudKit Ready** | 👥 **Family Sharing Prepared**
+**Status**: 📱 **Functional iOS App** | 🗄️ **Complete Data Model** | ☁️ **CloudKit Ready** | 🧪 **Fully Tested** | 🏗️ **Architecture-Ready**
