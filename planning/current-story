@@ -1,42 +1,127 @@
-# Current Story: Core Data Foundation
+# Current Story: Staples Management (CRUD)
 
-**Story ID**: 1.2
-**Goal**: Set up data persistence layer and design entities
+**Story ID**: 1.3
+**Goal**: Build complete staples management system with professional iOS interface
 **Status**: Ready to Start
+**Estimated Duration**: 6-8 hours
 
-## Previous Story Completed ✅
-**Story 1.1: Environment Setup** - COMPLETED 8/16/25
+## Previous Stories Completed ✅
+
+### Story 1.1: Environment Setup - COMPLETED 8/16/25 ✅
 - [x] GitHub repository created and organized
-- [x] VS Code configured with extensions
+- [x] VS Code configured with Swift extensions
 - [x] Xcode 16.4 installed and configured
 - [x] iOS project created with Core Data + CloudKit
 - [x] Project builds and runs successfully in simulator
 - [x] Core Data template verified working
 
-## Current Story Tasks:
-- [ ] Design Core Data model for grocery app
-- [ ] Create GroceryItem entity (staples)
-- [ ] Create Recipe entity with relationships
-- [ ] Create RecipeIngredient entity
-- [ ] Set up GroceryList and GroceryListItem entities
-- [ ] Configure entity relationships
-- [ ] Test Core Data model validation
+### Story 1.2: Core Data Foundation - COMPLETED 8/16/25 ✅
+- [x] **Sophisticated data model** designed with 6 entities
+- [x] **GroceryItem entity** (id, name, category, isStaple, dates)
+- [x] **Recipe entity** (title, instructions, usage tracking, sourceURL)
+- [x] **Ingredient entity** (recipe-grocery bridge with quantities)
+- [x] **WeeklyList entity** (shopping list container)
+- [x] **GroceryListItem entity** (individual list items with completion)
+- [x] **Tag entity** (recipe categorization)
+- [x] **All entity relationships** configured with proper inverse relationships
+- [x] **CloudKit integration** enabled on all entities
+- [x] **Core Data classes** generated manually (mastered troubleshooting)
+- [x] **Comprehensive sample data** with realistic grocery items and recipes
+- [x] **Working iOS app** with professional UI displaying staples with indicators
+- [x] **Project validation** - 0 compilation errors, functional app
 
-## Next Steps:
-1. Open .xcdatamodeld file in Xcode
-2. Design entities and attributes
-3. Set up relationships between entities
-4. Generate NSManagedObject subclasses
-5. Test Core Data stack with custom entities
+**Major Technical Achievement**: Complete Core Data + CloudKit foundation ready for advanced UI development!
+
+---
+
+## Current Story 1.3 Tasks:
+
+### Phase 1: Enhanced Staples View (2-3 hours)
+- [ ] Create dedicated `StaplesView` replacing current ContentView functionality
+- [ ] Implement enhanced `@FetchRequest` with sorting and filtering options
+- [ ] Build professional `StapleRowView` component with:
+  - Category badges with color coding
+  - Last purchased date display
+  - Staple status toggle
+  - Professional iOS styling
+- [ ] Add search bar with real-time filtering
+- [ ] Implement category-based filtering with picker interface
+
+### Phase 2: Add/Edit Forms (2-3 hours)
+- [ ] Create `AddStapleView` with professional form design:
+  - Name input field with validation
+  - Category picker with predefined grocery categories
+  - Staple status toggle
+  - Date picker for last purchased (optional)
+  - Form validation and error handling
+- [ ] Build `EditStapleView` reusing form components
+- [ ] Implement proper navigation between views
+- [ ] Add form validation and user feedback
+
+### Phase 3: Professional iOS Interactions (1-2 hours)
+- [ ] Implement swipe-to-delete functionality
+- [ ] Add context menus for quick actions
+- [ ] Enable bulk selection and operations
+- [ ] Add "Mark as Staple" / "Remove from Staples" bulk actions
+- [ ] Implement search with category combination filtering
+
+### Phase 4: Polish & Testing (1-2 hours)
+- [ ] Add loading states and smooth animations
+- [ ] Implement proper error handling with user-friendly messages
+- [ ] Test all CRUD operations thoroughly
+- [ ] Verify data persistence across app launches
+- [ ] Test with large datasets for performance
+
+---
 
 ## Learning Focus:
-- Core Data entity design
-- Entity relationships (one-to-many, many-to-many)
-- Attribute types and optionality
-- CloudKit compatibility considerations
+- **SwiftUI Forms**: Advanced form design with validation and user experience
+- **Navigation Patterns**: Professional iOS navigation between list, detail, and form views
+- **User Interactions**: Swipe actions, context menus, bulk operations
+- **Search & Filtering**: Real-time search with multiple filter criteria
+- **Data Management**: Advanced @FetchRequest usage with predicates and sorting
+- **Professional UI**: Native iOS design patterns and interaction conventions
+
+## Technical Components to Build:
+
+### Core Views:
+- `StaplesView` - Main staples management interface
+- `StapleRowView` - Individual staple item component  
+- `AddStapleView` - New staple creation form
+- `EditStapleView` - Existing staple editing form
+- `CategoryPickerView` - Grocery category selection
+
+### Data Management:
+- Enhanced fetch requests with sorting and filtering
+- Search predicates for real-time filtering
+- Category management with predefined options
+- Bulk operation handling
+
+### User Experience:
+- Professional iOS form design patterns
+- Native navigation and presentation styles
+- Intuitive search and filtering interface
+- Accessibility support and VoiceOver compatibility
 
 ## Success Criteria:
-- ✅ All entities created with correct attributes
-- ✅ Relationships properly configured
-- ✅ Core Data model validates without errors
-- ✅ CloudKit sync compatibility maintained
+- ✅ **Complete CRUD Operations**: Create, read, update, delete staples with professional UI
+- ✅ **Search & Filtering**: Real-time search with category filtering works smoothly
+- ✅ **Professional Interface**: Native iOS design patterns and interactions
+- ✅ **Data Persistence**: All changes save and persist between app launches
+- ✅ **Performance**: Smooth operation with large datasets
+- ✅ **User Experience**: Intuitive interface requiring no instruction to use
+
+## Expected Outcomes:
+After completing Story 1.3, users will have:
+- **Dedicated staples management** section in the app
+- **Easy staple creation** with categories and metadata
+- **Quick editing** of existing staples with inline operations
+- **Powerful search and filtering** for staple discovery
+- **Professional iOS experience** matching native app quality
+
+---
+
+## Story 1.4 Preview (Next Session):
+**Auto-Populate Grocery Lists** - Using the staples management system to automatically create weekly shopping lists, connecting the staples to the grocery list workflow.
+
+**Current Status**: 🎯 **Ready to Start Story 1.3** - Core Data foundation complete, professional UI development phase begins!
