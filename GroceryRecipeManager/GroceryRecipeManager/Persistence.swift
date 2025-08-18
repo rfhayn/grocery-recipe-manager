@@ -1,0 +1,175 @@
+import CoreData
+
+// MARK: - DateFormatter Extension
+extension DateFormatter {
+    static let shortDate: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter
+    }()
+}
+
+struct PersistenceController {
+    static let shared = PersistenceController()
+
+    static var preview: PersistenceController = {
+        let result = PersistenceController(inMemory: true)
+        let viewContext = result.container.viewContext
+        
+        // Create comprehensive sample data
+        addSampleData(to: viewContext)
+        
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+        return result
+    }()
+    
+    // Add sample data method for both preview and main app
+    private static func addSampleData(to context: NSManagedObjectContext) {
+        // Sample Grocery Items (Staples)
+        let groceryItems = [
+            ("Bananas", "Produce", true),
+            ("Milk", "Dairy", true),
+            ("Bread", "Bakery", true),
+            ("Eggs", "Dairy", true),
+            ("Chicken Breast", "Meat", true),
+            ("Onions", "Produce", true),
+            ("Rice", "Pantry", true),
+            ("Olive Oil", "Pantry", true),
+            ("Tomatoes", "Produce", false),
+            ("Cheese", "Dairy", false),
+            ("Pasta", "Pantry", false),
+            ("Garlic", "Produce", true)
+        ]
+        
+        var groceryItemsDict: [String: GroceryItem] = [:]
+        
+        for (name, category, isStaple) in groceryItems {
+            let item = GroceryItem(context: context)
+            item.id = UUID()
+            item.name = name
+            item.category = category
+            item.isStaple = isStaple
+            item.dateCreated = Date().addingTimeInterval(-Double.random(in: 0...30) * 24 * 60 * 60) // Random dates within last 30 days
+            if isStaple {
+                item.lastPurchased = Date().addingTimeInterval(-Double.random(in: 1...14) * 24 * 60 * 60) // Random recent purchases
+            }
+            groceryItemsDict[name] = item
+        }
+        
+        // Sample Tags
+        let tagData = [
+            ("Quick & Easy", "#FF6B6B"),
+            ("Healthy", "#4ECDC4"),
+            ("Comfort Food", "#45B7D1"),
+            ("Vegetarian", "#96CEB4"),
+            ("30 Minutes", "#FECA57"),
+            ("Leftovers", "#FF9FF3")
+        ]
+        
+        var tagsDict: [String: Tag] = [:]
+        
+        for (name, color) in tagData {
+            let tag = Tag(context: context)
+            tag.id = UUID()
+            tag.name = name
+            tag.color = color
+            tag.dateCreated = Date()
+            tagsDict[name] = tag
+        }
+        
+        // Sample Recipes with realistic data
+        let recipeData = [
+            ("Chicken Stir Fry", "Heat oil in wok. Add chicken and cook until done. Add vegetables and stir fry for 5 minutes. Season with soy sauce.", 4, 15, 10, 5, ["Quick & Easy", "Healthy"]),
+            ("Spaghetti Carbonara", "Cook pasta. In pan, cook eggs and cheese mixture. Combine with hot pasta. Add pepper and serve.", 2, 10, 20, 8, ["Quick & Easy", "Comfort Food"]),
+            ("Banana Bread", "Preheat oven to 350°F. Mix dry ingredients. In separate bowl, mash bananas and mix with wet ingredients. Combine and bake for 1 hour.", 8, 20, 60, 2, ["Comfort Food"]),
+            ("Fried Rice", "Cook rice day before. Heat oil, scramble eggs, add rice and vegetables. Season with soy sauce.", 4, 10, 15, 12, ["Quick & Easy", "Leftovers"])
+        ]
+        
+        for (title, instructions, servings, prepTime, cookTime, usageCount, tagNames) in recipeData {
+            let recipe = Recipe(context: context)
+            recipe.id = UUID()
+            recipe.title = title
+            recipe.instructions = instructions
+            recipe.servings = Int16(servings)
+            recipe.prepTime = Int16(prepTime)
+            recipe.cookTime = Int16(cookTime)
+            recipe.usageCount = Int32(usageCount)
+            recipe.dateCreated = Date().addingTimeInterval(-Double.random(in: 0...60) * 24 * 60 * 60)
+            recipe.lastUsed = Date().addingTimeInterval(-Double.random(in: 0...30) * 24 * 60 * 60)
+            recipe.isFavorite = usageCount > 5
+            recipe.sourceURL = "https://example.com/recipe/\(title.lowercased().replacingOccurrences(of: " ", with: "-"))"
+            
+            // Add tags to recipe (many-to-many relationship will be added when we configure relationships)
+        }
+        
+        // Sample Weekly List
+        let weeklyList = WeeklyList(context: context)
+        weeklyList.id = UUID()
+        weeklyList.name = "Weekly Shopping - \(DateFormatter.shortDate.string(from: Date()))"
+        weeklyList.dateCreated = Date()
+        weeklyList.isCompleted = false
+        weeklyList.notes = "Don't forget to check for coupons!"
+        
+        // Sample Grocery List Items
+        let listItems = [
+            ("Bananas", "2 bunches", false, "staples"),
+            ("Milk", "1 gallon", false, "staples"),
+            ("Tomatoes", "1 lb", true, "recipe"),
+            ("Special Ice Cream", "1 pint", false, "manual")
+        ]
+        
+        for (name, quantity, isCompleted, source) in listItems {
+            let listItem = GroceryListItem(context: context)
+            listItem.id = UUID()
+            listItem.name = name
+            listItem.quantity = quantity
+            listItem.isCompleted = isCompleted
+            listItem.source = source
+            listItem.sortOrder = Int16(listItems.firstIndex(where: { $0.0 == name }) ?? 0)
+            if isCompleted {
+                listItem.dateCompleted = Date().addingTimeInterval(-Double.random(in: 0...7) * 24 * 60 * 60)
+            }
+        }
+    }
+
+    let container: NSPersistentContainer
+
+    init(inMemory: Bool = false) {
+        container = NSPersistentContainer(name: "GroceryRecipeManager")
+        if inMemory {
+            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+        }
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        
+        // Add sample data if database is empty (only on first run)
+        if !inMemory {
+            addSampleDataIfNeeded()
+        }
+    }
+    
+    // Add sample data only if database is empty
+    private func addSampleDataIfNeeded() {
+        let context = container.viewContext
+        let request: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
+        
+        do {
+            let count = try context.count(for: request)
+            if count == 0 {
+                PersistenceController.addSampleData(to: context)
+                try context.save()
+            }
+        } catch {
+            print("Error checking for existing data: \(error)")
+        }
+    }
+}
