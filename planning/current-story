@@ -1,9 +1,30 @@
-# Current Story: Staples Management (CRUD)
+# Current Story: Story 1.3 - Staples Management (CRUD) - FOUNDATION COMPLETE
 
 **Story ID**: 1.3
 **Goal**: Build complete staples management system with professional iOS interface
-**Status**: Ready to Start
-**Estimated Duration**: 6-8 hours
+**Status**: Foundation Complete - 25% Done
+**Estimated Duration**: 6-8 hours | **Foundation Time**: ~1 hour
+**Development Machine**: MacBook Air (fully configured and tested)
+
+## Story 1.3 Progress: Foundation Phase ✅ COMPLETE
+
+### ✅ Foundation Phase Complete (8/18/25):
+- [x] **StaplesView created** with dedicated staples-only interface
+- [x] **Filtering implemented** - Only displays `isStaple == true` items
+- [x] **Professional UI design** with staple indicators and category display
+- [x] **Add functionality working** - Can create new staples with unique names
+- [x] **Delete functionality working** - Swipe-to-delete with Core Data persistence
+- [x] **List scrolling functional** - Fixed NavigationView conflicts
+- [x] **Core Data integration** - Proper @FetchRequest with filtering
+- [x] **Data persistence verified** - Changes save and load correctly
+- [x] **Professional iOS patterns** - Native toolbar, edit mode, animations
+
+### Foundation Achievements:
+- ✅ **Dedicated staples management** replacing general grocery view
+- ✅ **Filtered data display** showing only staple items from comprehensive sample data
+- ✅ **Working CRUD operations** (Create, Read, Delete implemented)
+- ✅ **Professional iOS interface** with native design patterns
+- ✅ **Smooth user experience** with proper scrolling and animations
 
 ## Previous Stories Completed ✅
 
@@ -15,113 +36,149 @@
 - [x] Project builds and runs successfully in simulator
 - [x] Core Data template verified working
 
-### Story 1.2: Core Data Foundation - COMPLETED 8/16/25 ✅
-- [x] **Sophisticated data model** designed with 6 entities
-- [x] **GroceryItem entity** (id, name, category, isStaple, dates)
-- [x] **Recipe entity** (title, instructions, usage tracking, sourceURL)
-- [x] **Ingredient entity** (recipe-grocery bridge with quantities)
-- [x] **WeeklyList entity** (shopping list container)
-- [x] **GroceryListItem entity** (individual list items with completion)
-- [x] **Tag entity** (recipe categorization)
-- [x] **All entity relationships** configured with proper inverse relationships
-- [x] **CloudKit integration** enabled on all entities
-- [x] **Core Data classes** generated manually (mastered troubleshooting)
-- [x] **Comprehensive sample data** with realistic grocery items and recipes
-- [x] **Working iOS app** with professional UI displaying staples with indicators
-- [x] **Project validation** - 0 compilation errors, functional app
+### Story 1.2: Core Data Foundation - COMPLETED 8/18/25 ✅
+**Major Achievement: Complete Project Recreation on MacBook Air**
 
-**Major Technical Achievement**: Complete Core Data + CloudKit foundation ready for advanced UI development!
+#### MacBook Air Recreation (8/18/25):
+- [x] **Complete environment setup** (Homebrew, Git, Xcode CLI, VS Code)
+- [x] **Repository cloned** and GitHub authentication configured
+- [x] **New Xcode project created** with Core Data + CloudKit integration
+- [x] **6 entities recreated** exactly matching documented specifications
+- [x] **All Core Data classes generated** manually to avoid conflicts
+- [x] **Comprehensive sample data** with realistic scenarios:
+  - 12 grocery items (8 staples) across 5 categories
+  - 4 sample recipes with usage tracking and source URLs
+  - 6 recipe tags with color coding
+  - Sample weekly shopping list with mixed sources
+- [x] **Professional iOS UI** with staple indicators and category display
+- [x] **Git repository issues resolved** (submodule conflicts fixed)
+- [x] **All files properly tracked** in version control
+- [x] **Working iOS app** builds and runs with sample data
+- [x] **CloudKit integration** configured (ready when developer account available)
 
 ---
 
-## Current Story 1.3 Tasks:
+## Story 1.3 Remaining Tasks (75% remaining):
 
-### Phase 1: Enhanced Staples View (2-3 hours)
-- [ ] Create dedicated `StaplesView` replacing current ContentView functionality
-- [ ] Implement enhanced `@FetchRequest` with sorting and filtering options
-- [ ] Build professional `StapleRowView` component with:
-  - Category badges with color coding
-  - Last purchased date display
-  - Staple status toggle
-  - Professional iOS styling
-- [ ] Add search bar with real-time filtering
-- [ ] Implement category-based filtering with picker interface
-
-### Phase 2: Add/Edit Forms (2-3 hours)
+### Phase 2: Professional Forms (2-3 hours) - PLANNED
 - [ ] Create `AddStapleView` with professional form design:
   - Name input field with validation
-  - Category picker with predefined grocery categories
-  - Staple status toggle
+  - Category picker with predefined grocery categories:
+    - Produce, Dairy, Bakery, Meat, Pantry, Beverages, Snacks, Frozen
+  - Staple status toggle (default: true for add staple view)
   - Date picker for last purchased (optional)
   - Form validation and error handling
 - [ ] Build `EditStapleView` reusing form components
-- [ ] Implement proper navigation between views
-- [ ] Add form validation and user feedback
+- [ ] Implement proper navigation between views with SwiftUI NavigationView
+- [ ] Add form validation and user feedback with alerts and visual indicators
 
-### Phase 3: Professional iOS Interactions (1-2 hours)
-- [ ] Implement swipe-to-delete functionality
-- [ ] Add context menus for quick actions
-- [ ] Enable bulk selection and operations
-- [ ] Add "Mark as Staple" / "Remove from Staples" bulk actions
-- [ ] Implement search with category combination filtering
+### Phase 3: Search & Filtering (1-2 hours) - PLANNED
+- [ ] Add search bar with real-time filtering using NSPredicate
+- [ ] Implement category-based filtering with picker interface
+- [ ] Enable combined search and category filtering
+- [ ] Add sorting options (name, category, last purchased)
+- [ ] Performance optimization for large datasets
 
-### Phase 4: Polish & Testing (1-2 hours)
-- [ ] Add loading states and smooth animations
+### Phase 4: Advanced Interactions (1-2 hours) - PLANNED
+- [ ] Implement context menus for quick actions:
+  - Edit, Delete, Toggle Staple Status, Mark as Purchased
+- [ ] Enable bulk selection and operations:
+  - Select multiple items with edit mode
+  - Bulk actions: Mark as staples, Remove from staples, Delete
+- [ ] Add "Mark as Purchased" functionality updating lastPurchased date
+- [ ] Implement pull-to-refresh for data updates
+
+### Phase 5: Polish & Testing (1 hour) - PLANNED
+- [ ] Add loading states and smooth animations for all interactions
 - [ ] Implement proper error handling with user-friendly messages
-- [ ] Test all CRUD operations thoroughly
-- [ ] Verify data persistence across app launches
-- [ ] Test with large datasets for performance
+- [ ] Test all CRUD operations thoroughly with various data scenarios
+- [ ] Verify data persistence across app launches and device rotations
+- [ ] Add accessibility support (VoiceOver labels, dynamic type)
 
 ---
 
-## Learning Focus:
-- **SwiftUI Forms**: Advanced form design with validation and user experience
-- **Navigation Patterns**: Professional iOS navigation between list, detail, and form views
-- **User Interactions**: Swipe actions, context menus, bulk operations
-- **Search & Filtering**: Real-time search with multiple filter criteria
-- **Data Management**: Advanced @FetchRequest usage with predicates and sorting
-- **Professional UI**: Native iOS design patterns and interaction conventions
+## Technical Architecture Implemented:
 
-## Technical Components to Build:
+### ✅ Current StaplesView Structure:
+```
+StaplesView (Main Interface) ✅ WORKING
+├── @FetchRequest with filtering ✅ IMPLEMENTED
+├── Computed property for staples filter ✅ WORKING
+├── List with ForEach staples display ✅ FUNCTIONAL
+├── StapleRowView components ✅ PROFESSIONAL DESIGN
+├── Add button in toolbar ✅ WORKING
+├── Edit/Delete functionality ✅ FUNCTIONAL
+└── NavigationView structure ✅ SCROLLING FIXED
+```
 
-### Core Views:
-- `StaplesView` - Main staples management interface
-- `StapleRowView` - Individual staple item component  
-- `AddStapleView` - New staple creation form
-- `EditStapleView` - Existing staple editing form
-- `CategoryPickerView` - Grocery category selection
+### ✅ Data Management Patterns Working:
+- **@FetchRequest** with Core Data integration ✅
+- **@Environment(\.managedObjectContext)** for Core Data operations ✅
+- **Computed property filtering** for staples-only display ✅
+- **Proper error handling** with do-catch blocks and console logging ✅
 
-### Data Management:
-- Enhanced fetch requests with sorting and filtering
-- Search predicates for real-time filtering
-- Category management with predefined options
-- Bulk operation handling
+### ✅ User Experience Achieved:
+- **Native iOS interaction patterns** (toolbar, edit mode, swipe-to-delete) ✅
+- **Professional design** with staple indicators and category display ✅
+- **Smooth animations** with SwiftUI withAnimation blocks ✅
+- **Proper scrolling** with fixed NavigationView hierarchy ✅
 
-### User Experience:
-- Professional iOS form design patterns
-- Native navigation and presentation styles
-- Intuitive search and filtering interface
-- Accessibility support and VoiceOver compatibility
+---
 
-## Success Criteria:
-- ✅ **Complete CRUD Operations**: Create, read, update, delete staples with professional UI
-- ✅ **Search & Filtering**: Real-time search with category filtering works smoothly
+## Learning Focus Achieved for Story 1.3 Foundation:
+- ✅ **SwiftUI List Management**: @FetchRequest, computed properties, ForEach with Core Data
+- ✅ **Core Data Filtering**: Practical filtering with computed properties and predicates
+- ✅ **Navigation Debugging**: Fixed NavigationView conflicts for proper scrolling
+- ✅ **Professional UI Components**: StapleRowView with native iOS design patterns
+- ✅ **CRUD Operations**: Create and Delete implemented with proper Core Data persistence
+
+## Success Criteria Achieved:
+- ✅ **Functional CRUD Operations**: Create and delete working with Core Data persistence
+- ✅ **Filtered Display**: Only staples shown, no non-staple items visible
 - ✅ **Professional Interface**: Native iOS design patterns and interactions
 - ✅ **Data Persistence**: All changes save and persist between app launches
-- ✅ **Performance**: Smooth operation with large datasets
-- ✅ **User Experience**: Intuitive interface requiring no instruction to use
+- ✅ **User Experience**: Intuitive interface with proper scrolling and feedback
 
-## Expected Outcomes:
-After completing Story 1.3, users will have:
-- **Dedicated staples management** section in the app
-- **Easy staple creation** with categories and metadata
-- **Quick editing** of existing staples with inline operations
-- **Powerful search and filtering** for staple discovery
-- **Professional iOS experience** matching native app quality
+## Current Outcomes Achieved:
+- ✅ **Dedicated staples management** section replacing basic grocery item display
+- ✅ **Working add/delete functionality** for basic staple management
+- ✅ **Filtered data display** showing only staple items from sample data
+- ✅ **Professional iOS interface** with native design patterns
 
 ---
 
-## Story 1.4 Preview (Next Session):
-**Auto-Populate Grocery Lists** - Using the staples management system to automatically create weekly shopping lists, connecting the staples to the grocery list workflow.
+## Development Environment Status:
 
-**Current Status**: 🎯 **Ready to Start Story 1.3** - Core Data foundation complete, professional UI development phase begins!
+### ✅ MacBook Air Development Ready:
+- **Xcode 16.4**: Fully configured with iOS 18.6 simulators
+- **Core Data Project**: Working with 6 entities and sample data
+- **Git Repository**: All files tracked, connected to GitHub
+- **VS Code Integration**: Documentation and planning workflow established
+- **StaplesView**: Foundation complete and functional
+
+### 🔗 Repository Status:
+- **GitHub Repo**: https://github.com/rfhayn/grocery-recipe-manager
+- **Current Branch**: main
+- **Last Major Commit**: Core Data foundation + comprehensive sample data
+- **Current Progress**: Story 1.3 foundation ready for advanced development
+
+---
+
+## Next Development Session Preview:
+
+**Story 1.3 Phase 2**: Professional Forms
+- Build `AddStapleView` with category picker and validation
+- Create `EditStapleView` for updating existing staples
+- Implement proper form navigation and user feedback
+- Add category management with predefined grocery categories
+
+**Estimated Time for Phase 2**: 2-3 hours
+**Key Learning**: SwiftUI forms, navigation, category management, data validation
+
+---
+
+**Current Status**: 🎯 **Story 1.3 Foundation Complete** - Ready for Phase 2 Professional Forms
+
+**Foundation Achievement**: Working staples management interface with filtering, add/delete, and professional iOS design! 🎉
+
+**Next Session Goal**: Build professional add/edit forms with category pickers and validation to complete the staples management CRUD interface.
