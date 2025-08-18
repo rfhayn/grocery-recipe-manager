@@ -84,13 +84,13 @@ struct PersistenceController {
         
         // Sample Recipes with realistic data
         let recipeData = [
-            ("Chicken Stir Fry", "Heat oil in wok. Add chicken and cook until done. Add vegetables and stir fry for 5 minutes. Season with soy sauce.", 4, 15, 10, 5, ["Quick & Easy", "Healthy"]),
-            ("Spaghetti Carbonara", "Cook pasta. In pan, cook eggs and cheese mixture. Combine with hot pasta. Add pepper and serve.", 2, 10, 20, 8, ["Quick & Easy", "Comfort Food"]),
-            ("Banana Bread", "Preheat oven to 350°F. Mix dry ingredients. In separate bowl, mash bananas and mix with wet ingredients. Combine and bake for 1 hour.", 8, 20, 60, 2, ["Comfort Food"]),
-            ("Fried Rice", "Cook rice day before. Heat oil, scramble eggs, add rice and vegetables. Season with soy sauce.", 4, 10, 15, 12, ["Quick & Easy", "Leftovers"])
+            ("Chicken Stir Fry", "Heat oil in wok. Add chicken and cook until done. Add vegetables and stir fry for 5 minutes. Season with soy sauce.", 4, 15, 10, 5),
+            ("Spaghetti Carbonara", "Cook pasta. In pan, cook eggs and cheese mixture. Combine with hot pasta. Add pepper and serve.", 2, 10, 20, 8),
+            ("Banana Bread", "Preheat oven to 350°F. Mix dry ingredients. In separate bowl, mash bananas and mix with wet ingredients. Combine and bake for 1 hour.", 8, 20, 60, 2),
+            ("Fried Rice", "Cook rice day before. Heat oil, scramble eggs, add rice and vegetables. Season with soy sauce.", 4, 10, 15, 12)
         ]
         
-        for (title, instructions, servings, prepTime, cookTime, usageCount, tagNames) in recipeData {
+        for (title, instructions, servings, prepTime, cookTime, usageCount) in recipeData {
             let recipe = Recipe(context: context)
             recipe.id = UUID()
             recipe.title = title
@@ -103,8 +103,6 @@ struct PersistenceController {
             recipe.lastUsed = Date().addingTimeInterval(-Double.random(in: 0...30) * 24 * 60 * 60)
             recipe.isFavorite = usageCount > 5
             recipe.sourceURL = "https://example.com/recipe/\(title.lowercased().replacingOccurrences(of: " ", with: "-"))"
-            
-            // Add tags to recipe (many-to-many relationship will be added when we configure relationships)
         }
         
         // Sample Weekly List
