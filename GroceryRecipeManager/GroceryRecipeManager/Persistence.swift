@@ -30,6 +30,7 @@ struct PersistenceController {
     
     // Add sample data method for both preview and main app
     private static func addSampleData(to context: NSManagedObjectContext) {
+        #if DEBUG
         // Sample Grocery Items (Staples)
         let groceryItems = [
             ("Bananas", "Produce", true),
@@ -133,6 +134,10 @@ struct PersistenceController {
                 listItem.dateCompleted = Date().addingTimeInterval(-Double.random(in: 0...7) * 24 * 60 * 60)
             }
         }
+        #else
+        // Production builds: no sample data created
+        print("Production build: Sample data creation skipped")
+        #endif
     }
 
     let container: NSPersistentContainer
@@ -148,6 +153,7 @@ struct PersistenceController {
             }
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
+        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
         // Add sample data if database is empty (only on first run)
         if !inMemory {
@@ -155,8 +161,30 @@ struct PersistenceController {
         }
     }
     
+    // MARK: - Background Operations
+    /// Performs Core Data write operations on a background context to prevent UI blocking.
+    /// Automatically handles context setup, merge policy, and error handling.
+    /// Use this for all create, update, and delete operations in the app.
+    func performWrite(_ block: @escaping (NSManagedObjectContext) -> Void, onError: ((Error) -> Void)? = nil) {
+        container.performBackgroundTask { ctx in
+            ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            block(ctx)
+            if ctx.hasChanges {
+                do {
+                    try ctx.save()
+                } catch {
+                    print("❌ Background save failed: \(error)")
+                    DispatchQueue.main.async {
+                        onError?(error)
+                    }
+                }
+            }
+        }
+    }
+    
     // Add sample data only if database is empty
     private func addSampleDataIfNeeded() {
+        #if DEBUG
         let context = container.viewContext
         let request: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
         
@@ -169,5 +197,9 @@ struct PersistenceController {
         } catch {
             print("Error checking for existing data: \(error)")
         }
+        #else
+        // Production builds: no sample data loaded
+        print("Production build: Sample data loading skipped")
+        #endif
     }
 }

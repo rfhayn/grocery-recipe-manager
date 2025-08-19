@@ -7,6 +7,11 @@
         <attribute name="isStaple" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="lastPurchased" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="isStaple" type="Binary" order="ascending"/>
+            <fetchIndexElement property="category" type="Binary" order="ascending"/>
+            <fetchIndexElement property="dateCreated" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="GroceryListItem" representedClassName="GroceryListItem" syncable="YES">
         <attribute name="dateCompleted" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -37,6 +42,11 @@
         <attribute name="sourceURL" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="usageCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="usageCount" type="Binary" order="ascending"/>
+            <fetchIndexElement property="lastUsed" type="Binary" order="ascending"/>
+            <fetchIndexElement property="isFavorite" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="Tag" representedClassName="Tag" syncable="YES">
         <attribute name="color" optional="YES" attributeType="String"/>

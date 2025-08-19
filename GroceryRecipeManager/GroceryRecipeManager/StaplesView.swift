@@ -4,15 +4,18 @@ import CoreData
 struct StaplesView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
+    // Predicate-based FetchRequest for better performance with indexed queries
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \GroceryItem.name, ascending: true)],
-        animation: .default)
-    private var allItems: FetchedResults<GroceryItem>
-
-    // Filter staples in computed property
-    private var staples: [GroceryItem] {
-        allItems.filter { $0.isStaple }
-    }
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \GroceryItem.category, ascending: true),
+            NSSortDescriptor(keyPath: \GroceryItem.name, ascending: true)
+        ],
+        predicate: NSPredicate(format: "isStaple == YES"),
+        animation: .default
+    ) private var staples: FetchedResults<GroceryItem>
+    
+    @State private var showingError = false
+    @State private var errorMessage = ""
 
     var body: some View {
         List {
@@ -32,37 +35,49 @@ struct StaplesView: View {
             }
         }
         .navigationTitle("Staples")
+        
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
+        }
     }
 
     private func addStaple() {
         withAnimation {
-            let newStaple = GroceryItem(context: viewContext)
-            newStaple.id = UUID()
-            newStaple.name = "New Staple \(Int(Date().timeIntervalSince1970))"
-            newStaple.category = "Grocery"
-            newStaple.dateCreated = Date()
-            newStaple.isStaple = true
-
-            do {
-                try viewContext.save()
+            // Use background context for non-blocking operations
+            PersistenceController.shared.performWrite({ context in
+                let newStaple = GroceryItem(context: context)
+                newStaple.id = UUID()
+                newStaple.name = "New Staple \(Int(Date().timeIntervalSince1970))"
+                newStaple.category = "Grocery"
+                newStaple.dateCreated = Date()
+                newStaple.isStaple = true
+                
                 print("✅ Added new staple: \(newStaple.name ?? "Unknown")")
-            } catch {
-                print("❌ Error adding staple: \(error)")
-            }
+            }, onError: { error in
+                errorMessage = "Failed to add staple: \(error.localizedDescription)"
+                showingError = true
+            })
         }
     }
 
     private func deleteStaples(offsets: IndexSet) {
         withAnimation {
-            let staplesToDelete = offsets.map { staples[$0] }
-            staplesToDelete.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-                print("✅ Deleted \(staplesToDelete.count) staple(s)")
-            } catch {
-                print("❌ Error deleting staples: \(error)")
-            }
+            // Get object IDs for background context operations
+            let objectIDs = offsets.map { staples[$0].objectID }
+            
+            // Use background context for non-blocking operations
+            PersistenceController.shared.performWrite({ context in
+                for objectID in objectIDs {
+                    let object = context.object(with: objectID)
+                    context.delete(object)
+                }
+                print("✅ Deleted \(objectIDs.count) staple(s)")
+            }, onError: { error in
+                errorMessage = "Failed to delete staples: \(error.localizedDescription)"
+                showingError = true
+            })
         }
     }
 }
