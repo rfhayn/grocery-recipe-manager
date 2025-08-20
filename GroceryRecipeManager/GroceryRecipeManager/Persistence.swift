@@ -34,17 +34,17 @@ struct PersistenceController {
         // Sample Grocery Items (Staples)
         let groceryItems = [
             ("Bananas", "Produce", true),
-            ("Milk", "Dairy", true),
-            ("Bread", "Bakery", true),
-            ("Eggs", "Dairy", true),
-            ("Chicken Breast", "Meat", true),
-            ("Onions", "Produce", true),
-            ("Rice", "Pantry", true),
-            ("Olive Oil", "Pantry", true),
-            ("Tomatoes", "Produce", false),
-            ("Cheese", "Dairy", false),
-            ("Pasta", "Pantry", false),
-            ("Garlic", "Produce", true)
+            ("Apples", "Produce", true),
+            ("Strawberries", "Produce", true),
+            ("Grapes", "Produce", true),
+            ("Cucumbers", "Produce", true),
+            ("Peppers", "Produce", true),
+            ("Ham", "Deli & Meat", true),
+            ("Bologna", "Deli & Meat", true),
+            ("Bread", "Bread & Frozen", true),
+            ("Kids Yogurt", "Dairy & Fridge", true),
+            ("Milk 2%", "Dairy & Fridge", true),
+            ("Milk 1%", "Dairy & Fridge", true)
         ]
         
         var groceryItemsDict: [String: GroceryItem] = [:]
