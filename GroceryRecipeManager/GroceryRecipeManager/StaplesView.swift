@@ -16,6 +16,9 @@ struct StaplesView: View {
     
     @State private var showingError = false
     @State private var errorMessage = ""
+    
+    // Add form presentation
+    @State private var showingAddForm = false
 
     var body: some View {
         List {
@@ -29,36 +32,21 @@ struct StaplesView: View {
                 EditButton()
             }
             ToolbarItem {
-                Button(action: addStaple) {
+                Button(action: {
+                    showingAddForm = true
+                }) {
                     Label("Add Staple", systemImage: "plus")
                 }
             }
         }
         .navigationTitle("Staples")
-        
+        .sheet(isPresented: $showingAddForm) {
+            AddStapleView()
+        }
         .alert("Error", isPresented: $showingError) {
             Button("OK") { }
         } message: {
             Text(errorMessage)
-        }
-    }
-
-    private func addStaple() {
-        withAnimation {
-            // Use background context for non-blocking operations
-            PersistenceController.shared.performWrite({ context in
-                let newStaple = GroceryItem(context: context)
-                newStaple.id = UUID()
-                newStaple.name = "New Staple \(Int(Date().timeIntervalSince1970))"
-                newStaple.category = "Grocery"
-                newStaple.dateCreated = Date()
-                newStaple.isStaple = true
-                
-                print("✅ Added new staple: \(newStaple.name ?? "Unknown")")
-            }, onError: { error in
-                errorMessage = "Failed to add staple: \(error.localizedDescription)"
-                showingError = true
-            })
         }
     }
 

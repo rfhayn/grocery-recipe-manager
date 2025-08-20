@@ -22,6 +22,8 @@
 | FR-SM-004 | Auto-populate grocery lists | New grocery lists automatically include all current staple items |
 | FR-SM-005 | Track purchase history | Record when staple items were last purchased |
 | FR-SM-006 | Remove from staples | User can remove items from staples list without deleting them |
+| FR-SM-007 | **Custom category management** | Users can create, edit, and delete custom grocery categories |
+| FR-SM-008 | **Category-based filtering** | Filter staples list by selected category for organized shopping |
 
 ### 1.2 Recipe Management
 **Priority**: High
@@ -52,6 +54,7 @@
 | FR-GM-007 | Item source tracking | Identify if items came from staples, recipes, or manual entry |
 | FR-GM-008 | Delete completed items | Bulk remove all completed items from list |
 | FR-GM-009 | Edit list items | Modify item names, quantities, or remove items |
+| FR-GM-010 | **Category-based list organization** | Organize grocery lists by category sections for efficient shopping |
 
 ### 1.4 Cloud Synchronization & Sharing
 **Priority**: High
@@ -101,6 +104,7 @@
 | NFR-PR-003 | CloudKit sync time | < 5 seconds for typical data changes |
 | NFR-PR-004 | List rendering | Smooth 60fps scrolling for lists up to 500 items |
 | NFR-PR-005 | Memory usage | < 100MB RAM usage under normal operation |
+| NFR-PR-006 | **Category filtering response** | < 0.5 seconds for category-based list filtering |
 
 ### 2.2 Usability Requirements
 
@@ -111,6 +115,7 @@
 | NFR-UR-003 | Error handling | Clear error messages with suggested actions |
 | NFR-UR-004 | Onboarding | First-time users can set up sharing within 5 minutes |
 | NFR-UR-005 | Offline functionality | Core features work without internet connection |
+| NFR-UR-006 | **Category customization** | Users can easily manage categories without confusion |
 
 ### 2.3 Reliability Requirements
 
@@ -148,6 +153,7 @@
 | NFR-SC-002 | Grocery list size | Support lists with up to 200 items |
 | NFR-SC-003 | Sharing participants | Support up to 6 family members per shared library |
 | NFR-SC-004 | Concurrent users | Handle 5 simultaneous editors on shared content |
+| NFR-SC-005 | **Custom categories** | Support up to 50 custom categories per user |
 
 ---
 
@@ -176,12 +182,14 @@
 - Share my entire recipe library with my spouse so we can both add and edit recipes
 - Create a grocery list from selected recipes so I don't forget ingredients
 - See which recipes I use most often so I can plan favorites more frequently
+- **Organize my staples by custom categories that match my shopping habits**
 
 **As a grocery shopper, I want to:**
 - Check off items as I shop so I can track my progress
 - See what was added from recipes vs. staples so I understand list sources
 - Access my list offline in case of poor cell service in the store
 - Have my spouse add items to the list in real-time so we don't miss anything
+- **View my shopping list organized by store layout categories for efficient shopping**
 
 ### 4.2 Secondary User Stories
 
@@ -190,6 +198,11 @@
 - Track how often I make each recipe to identify favorites
 - Export my recipe collection for backup purposes
 - View cooking statistics to understand my meal patterns
+
+**As an organized household manager, I want to:**
+- **Create custom categories that match my family's specific needs (Baby Items, Pet Supplies, etc.)**
+- **Filter my staples list by category to quickly find what I need**
+- **Organize grocery lists by store sections for more efficient shopping trips**
 
 ---
 
@@ -231,13 +244,19 @@
    - Share recipes with broader community
    - Import recipes from popular cooking websites
 
+7. **Enhanced Category Management** ✅ **Planned for Story 1.3+**
+   - Custom category creation and editing
+   - Category-based list organization and filtering
+   - Visual category indicators (colors, icons)
+   - Store layout mapping to categories
+
 #### Low Priority Missing Features:
-7. **Advanced Analytics**
+8. **Advanced Analytics**
    - Cost analysis of meals
    - Waste tracking and reduction suggestions
    - Seasonal eating pattern analysis
 
-8. **Automation Features**
+9. **Automation Features**
    - Recurring grocery list generation
    - Automatic staple replenishment suggestions
    - Smart home integration (Siri shortcuts)
@@ -295,16 +314,19 @@
 - 90% of users create at least 5 recipes within first month
 - 80% of users set up sharing within first week
 - 70% of users create grocery lists weekly
+- **60% of users customize default categories within first two weeks**
 
 ### 6.2 Technical Performance Metrics
 - 99.5% app uptime
 - < 2% CloudKit sync failure rate
 - 4.5+ App Store rating average
+- **< 0.5 seconds for category filtering operations**
 
 ### 6.3 Feature Usage Metrics
 - 60% of grocery lists include staple items
 - 40% of grocery lists include recipe ingredients
 - 50% of recipes used at least once per month
+- **80% of users utilize category filtering for list organization**
 
 ---
 
@@ -323,10 +345,11 @@ This requirements document defines the specification for the Grocery & Recipe Ma
 - ✅ **Performance Optimization**: Compound indexes, background operations, predicate-based queries
 - ✅ **Professional Error Handling**: User-facing error messages and recovery patterns
 - ✅ **Production Safety**: DEBUG conditionals and proper build configurations
-- ✅ **Staples Management**: Working interface with add/delete functionality
-- 🎯 **Next**: Professional forms with category management and real-time search
+- ✅ **Staples Management**: Working interface with add/delete functionality and professional forms
+- 🎯 **Next**: Edit functionality and search features for Story 1.3 completion
+- 📋 **Future**: Custom category management system (Post Story 1.3)
 
-**Current Status**: Story 1.2.5 complete, advancing to Story 1.3 professional forms development.
+**Current Status**: Story 1.3 in progress - professional forms complete, advancing to edit functionality and category management system.
 
 ---
 
