@@ -8,6 +8,15 @@ struct EditStapleView: View {
     // The staple item being edited
     let staple: GroceryItem
     
+    // Dynamic categories fetch (sorted by custom order)
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true),
+            NSSortDescriptor(keyPath: \Category.name, ascending: true)
+        ],
+        animation: .default
+    ) private var categories: FetchedResults<Category>
+    
     // Form state - initialized from existing staple
     @State private var name: String
     @State private var selectedCategory: String
@@ -20,39 +29,29 @@ struct EditStapleView: View {
     
     // Validation
     private var isFormValid: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !selectedCategory.isEmpty
     }
     
     // Check if form has changes
     private var hasChanges: Bool {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmedName != (staple.name ?? "") ||
-               selectedCategory != (staple.category ?? "") ||
+               selectedCategory != staple.effectiveCategory ||
                lastPurchased != staple.lastPurchased ||
                includeLastPurchased != (staple.lastPurchased != nil)
     }
-    
-    // Predefined grocery categories (matches your updated categories)
-    private let groceryCategories = [
-        "Produce",
-        "Deli & Meat",
-        "Dairy & Fridge",
-        "Bread & Frozen",
-        "Boxed & Canned",
-        "Snacks, Drinks, & Other"
-    ]
     
     // Initialize form state from existing staple
     init(staple: GroceryItem) {
         self.staple = staple
         // Ensure we have valid data or provide defaults
         self._name = State(initialValue: staple.name ?? "")
-        self._selectedCategory = State(initialValue: staple.category ?? "Produce")
+        self._selectedCategory = State(initialValue: staple.effectiveCategory)
         self._lastPurchased = State(initialValue: staple.lastPurchased)
         self._includeLastPurchased = State(initialValue: staple.lastPurchased != nil)
         
         // Debug logging to see what data we're getting
-        print("📝 EditStapleView init - Name: \(staple.name ?? "nil"), Category: \(staple.category ?? "nil")")
+        print("📝 EditStapleView init - Name: \(staple.name ?? "nil"), Category: \(staple.effectiveCategory)")
     }
     
     var body: some View {
@@ -62,10 +61,21 @@ struct EditStapleView: View {
                     TextField("Staple Name", text: $name)
                         .textInputAutocapitalization(.words)
                     
-                    Picker("Category", selection: $selectedCategory) {
-                        ForEach(groceryCategories, id: \.self) { category in
-                            Text(category).tag(category)
+                    if !categories.isEmpty {
+                        Picker("Category", selection: $selectedCategory) {
+                            ForEach(categories, id: \.self) { category in
+                                HStack {
+                                    Circle()
+                                        .fill(Color(hex: category.displayColor))
+                                        .frame(width: 16, height: 16)
+                                    Text(category.displayName)
+                                }
+                                .tag(category.displayName)
+                            }
                         }
+                    } else {
+                        Text("Loading categories...")
+                            .foregroundColor(.secondary)
                     }
                 }
                 
@@ -107,12 +117,29 @@ struct EditStapleView: View {
                     }
                 }
             }
+            .onAppear {
+                ensureCategoryIsValid()
+            }
             .alert("Error", isPresented: $showingError) {
                 Button("OK") { }
             } message: {
                 Text(errorMessage)
             }
         }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func ensureCategoryIsValid() {
+        // Make sure the selected category still exists in the current categories
+        if !categories.isEmpty && !categories.contains(where: { $0.displayName == selectedCategory }) {
+            // If the current category doesn't exist, default to the first available
+            selectedCategory = categories.first?.displayName ?? "Produce"
+        }
+    }
+    
+    private func findCategoryEntity(named categoryName: String) -> Category? {
+        return categories.first { $0.displayName == categoryName }
     }
     
     private func saveChanges() {
@@ -130,7 +157,7 @@ struct EditStapleView: View {
             let existingItems = try viewContext.fetch(request)
             if !existingItems.isEmpty {
                 let existingItem = existingItems.first!
-                errorMessage = "A staple with this name already exists in '\(existingItem.category ?? "Unknown")' category. IsStaple: \(existingItem.isStaple)"
+                errorMessage = "A staple with this name already exists in '\(existingItem.effectiveCategory)' category. IsStaple: \(existingItem.isStaple)"
                 showingError = true
                 return
             }
@@ -148,7 +175,13 @@ struct EditStapleView: View {
             
             // Update the staple properties
             stapleToUpdate.name = trimmedName
-            stapleToUpdate.category = selectedCategory
+            stapleToUpdate.category = selectedCategory // Keep for legacy compatibility
+            
+            // Set category relationship
+            if let categoryEntity = findCategoryEntity(named: selectedCategory) {
+                let categoryInContext = context.object(with: categoryEntity.objectID) as! Category
+                stapleToUpdate.categoryEntity = categoryInContext
+            }
             
             if includeLastPurchased {
                 stapleToUpdate.lastPurchased = lastPurchased
@@ -168,6 +201,8 @@ struct EditStapleView: View {
         dismiss()
     }
 }
+
+// Color extension moved to Color+Extensions.swift
 
 #Preview {
     // Create a sample staple for preview

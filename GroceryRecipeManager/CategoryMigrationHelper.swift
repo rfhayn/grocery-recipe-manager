@@ -16,13 +16,16 @@ struct CategoryMigrationHelper {
         print("🔄 Starting category migration...")
         #endif
         
-        // Step 1: Ensure default categories exist
+        // Step 1: Clean up any duplicates first
+        cleanupDuplicateCategories(in: context)
+        
+        // Step 2: Ensure default categories exist
         Category.ensureDefaultCategories(in: context)
         
-        // Step 2: Migrate existing GroceryItems from string categories to relationships
+        // Step 3: Migrate existing GroceryItems from string categories to relationships
         migrateGroceryItemCategories(in: context)
         
-        // Step 3: Save changes
+        // Step 4: Save changes
         do {
             if context.hasChanges {
                 try context.save()
@@ -32,8 +35,39 @@ struct CategoryMigrationHelper {
             }
         } catch {
             #if DEBUG
-            print("❌ Category migration failed: \\(error)")
+            print("❌ Category migration failed: \(error)")
             #endif
+        }
+    }
+    
+    private static func cleanupDuplicateCategories(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        
+        do {
+            let allCategories = try context.fetch(request)
+            let groupedCategories = Dictionary(grouping: allCategories) { $0.displayName }
+            
+            for (categoryName, categories) in groupedCategories {
+                if categories.count > 1 {
+                    #if DEBUG
+                    print("🧹 Found \(categories.count) duplicate categories named '\(categoryName)'")
+                    #endif
+                    
+                    // Keep the first one (with lowest sortOrder)
+                    let sortedCategories = categories.sorted { $0.sortOrder < $1.sortOrder }
+                    let categoryToKeep = sortedCategories.first!
+                    
+                    // Delete the rest
+                    for category in sortedCategories.dropFirst() {
+                        #if DEBUG
+                        print("🗑️ Deleting duplicate category: \(category.displayName)")
+                        #endif
+                        context.delete(category)
+                    }
+                }
+            }
+        } catch {
+            print("❌ Error cleaning up duplicate categories: \(error)")
         }
     }
     
@@ -44,7 +78,7 @@ struct CategoryMigrationHelper {
         do {
             let itemsToMigrate = try context.fetch(request)
             #if DEBUG
-            print("🔄 Migrating \\(itemsToMigrate.count) grocery items to category relationships")
+            print("🔄 Migrating \(itemsToMigrate.count) grocery items to category relationships")
             #endif
             
             for item in itemsToMigrate {
@@ -52,7 +86,7 @@ struct CategoryMigrationHelper {
             }
             
         } catch {
-            print("Error fetching items for migration: \\(error)")
+            print("Error fetching items for migration: \(error)")
         }
     }
     
