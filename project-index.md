@@ -3,132 +3,112 @@
 ### ✅ Completed Stories
 - **Story 1.1: Environment Setup** → ✅ Completed 8/16/25
 - **Story 1.2: Core Data Foundation** → ✅ **COMPLETED 8/18/25** 🎉
-- **Story 1.3: Staples Management Foundation** → ✅ **COMPLETED 8/18/25** ✅
 - **Story 1.2.5: Core Data Performance & Architecture** → ✅ **COMPLETED 8/19/25** 🎉
+- **Story 1.3: Professional Staples Management** → ✅ **COMPLETED 8/20/25** 🎉
 
-### 🚧 Current Story  
-- **Story 1.3: Staples Management (Professional Forms)** → 🚧 **IN PROGRESS**
-  - **Phase 1**: Professional Add Form → ✅ **COMPLETE** (AddStapleView with category picker working)
-  - **Phase 2**: Edit Functionality → ⏳ **READY TO START** (EditStapleView and navigation)
-  - **Phase 3**: Search & Filtering → ⏳ Planned
-  - **Phase 4**: Advanced Interactions → ⏳ Planned
+### 📋 Next Story Selection
+**Status**: 📋 **Ready for Next Story Selection**
+- **Option A: Story 1.3.5** - Custom Category Management with Sort Order (2-3 hours)
+- **Option B: Story 1.4** - Auto-Populate Grocery Lists (3-4 hours)
 
-### 📋 New Feature Identified
-- **Story 1.3.5: Custom Category Management System** → 📋 **DOCUMENTED & PLANNED**
-  - **Context**: User feedback during AddStapleView development identified need for customizable categories
-  - **Priority**: Medium-High (Post Story 1.3 completion)
-  - **Goal**: Replace hardcoded categories with dynamic Core Data-based category management
-  - **Estimated Duration**: 2-3 hours
-  - **Benefits**: Customizable categories, category-based filtering, better organization
-
-### 📅 Next Stories (Enhanced with Category System)
-- **Story 1.4: Auto-Populate Grocery Lists** → ⏳ **Enhanced** - Will include category-based list organization
-- **Story 2.1: Recipe Catalog Foundation** → ⏳ Planned - Recipe ingredients linked to category system
+### 📅 Upcoming Stories (Based on Selection)
+- **Story 1.4**: Auto-Populate Grocery Lists → ⏳ **Enhanced with category foundation**
+- **Story 2.1**: Recipe Catalog Foundation → ⏳ Planned
 
 👉 Full roadmap details in [`docs/development/roadmap.md`](docs/development/roadmap.md)
 
-## 📋 Architecture Decisions & Performance Foundation
+## 🎉 Story 1.3 Completion Achievement
 
-### ✅ Story 1.2.5 Technical Achievements
-- **Database-Level Filtering**: Staples queries now use Core Data indexes instead of in-memory filtering
-- **Non-Blocking UI**: All Core Data write operations happen on background threads
-- **Professional Error Handling**: User-facing error messages with callback architecture
-- **Production Safety**: DEBUG conditionals separate development and production behaviors
+### **Production-Quality Staples Management System Delivered**
+- **Complete CRUD Interface**: Professional add, edit, delete, search functionality
+- **Smart Duplicate Resolution**: Never-block user workflow with intelligent handling  
+- **Store-Layout Categories**: 6-category system optimized for grocery shopping efficiency
+- **Professional iOS Interactions**: Context menus, swipe actions, accessibility support
+- **Real-Time Search & Filtering**: Performance-optimized with indexed queries
+- **Visual Excellence**: Category icons, purchase indicators, loading states, empty states
 
-### ✅ Story 1.3 Professional Forms Progress
-**Phase 1 Complete: Professional Add Form**
-- **AddStapleView**: Professional iOS form with category picker, validation, and error handling
-- **Sheet Presentation**: Proper navigation from StaplesView with native iOS patterns
-- **Background Integration**: Form saves use performWrite method for non-blocking operations
-- **Category Management**: Hardcoded categories working well, user feedback identified customization need
+### **Technical Foundation Strengthened**
+- **Background Processing**: All operations use Story 1.2.5 non-blocking architecture
+- **Performance Optimized**: Leveraged compound indexes and predicate-based queries
+- **App Store Quality**: Professional polish with accessibility and error handling
+- **CloudKit Ready**: Complete foundation prepared for family sharing activation
 
-**User Feedback Integration:**
-- **Identified Need**: Customizable categories for personalized shopping organization
-- **Solution Planned**: Story 1.3.5 - Custom Category Management System
-- **Architecture Ready**: Performance foundation and Core Data relationships support dynamic categories
-
-### 🎯 Upcoming Enhancements
-**Story 1.3.5: Custom Category Management (Post Story 1.3)**
-- **Category Entity**: New Core Data entity with name, color, sortOrder, isDefault
-- **ManageCategoriesView**: Professional interface for creating/editing/deleting categories
-- **Dynamic Integration**: Replace hardcoded categories in AddStapleView with Core Data fetch
-- **Category Filtering**: Filter staples list by selected category for organized shopping
-- **Migration Strategy**: Seamless transition from hardcoded to dynamic categories
-
-## 🏆 Milestone 1 Progress: 75% → 85% (Story 1.3 Phase 1 Complete)
+## 🏆 Milestone 1 Progress: 85% → Ready for Completion
 
 **Milestone 1 Goal**: MVP Grocery Automation
 - ✅ **Story 1.1**: Environment Setup (Complete)
-- ✅ **Story 1.2**: Core Data Foundation (Complete)
-- ✅ **Story 1.3 Foundation**: Basic staples interface (Complete)
+- ✅ **Story 1.2**: Core Data Foundation (Complete)  
 - ✅ **Story 1.2.5**: Performance & architecture improvements (Complete)
-- 🚧 **Story 1.3 Professional Forms**: 25% complete (Add form ✅, Edit/Search/Polish pending)
-- 📋 **Story 1.3.5**: Custom Category Management (Planned)
-- ⏳ **Story 1.4**: Auto-populate Lists (Enhanced with category system)
+- ✅ **Story 1.3**: Professional Staples Management (Complete)
+- 📋 **Story 1.3.5**: Custom Category Management (Optional enhancement)
+- ⏳ **Story 1.4**: Auto-populate Lists (Final milestone component)
 
-**Current Progress**: ~3.25/4.5 stories = **~75% of Milestone 1** 
-**Target**: Working grocery list app with professional forms and customizable categories
+**Current Progress**: 3.75/4.5 stories = **~85% of Milestone 1** 
+**Target**: Working grocery automation app with professional interface
 
-### Enhanced Features from User Feedback
-**Story 1.3 Benefits Identified:**
-- **Professional Forms**: Users can create custom-named staples with proper categorization
-- **Category Customization Need**: Users want personalized categories matching their shopping patterns
-- **Organized Shopping**: Category-based filtering will improve shopping efficiency
+### Enhanced Milestone 1 Scope
+**Core Achievements Delivered:**
+- **Professional Staples Interface**: App Store-quality CRUD operations
+- **Store-Layout Optimization**: 6-category system for shopping efficiency  
+- **Performance Foundation**: Background operations and indexed queries
+- **Smart User Experience**: Duplicate resolution, visual feedback, accessibility
 
-**Story 1.3.5 Planning Complete:**
-- **Technical Foundation**: Performance layer ready for dynamic category management
-- **User Experience**: Seamless transition from hardcoded to customizable categories
-- **Future Integration**: Category system will enhance grocery lists and recipe ingredients
+**Optional Enhancement Available:**
+- **Story 1.3.5**: Custom category management for personalized store layouts
 
-## ✅ Requirements Coverage
+**Final Component:**
+- **Story 1.4**: Grocery list generation completing MVP automation workflow
 
-| Requirement | Implementation | Status | UI Status | Enhancement Planned |
-|-------------|----------------|--------|-----------|-------------------|
-| Staple grocery list | `GroceryItem.isStaple` + `StaplesView` | ✅ Complete | ✅ Professional Forms | 🎯 Custom categories |
-| Categorize staple items | Category picker in AddStapleView | ✅ Working | ✅ Professional UI | 🎯 Dynamic categories |
-| Recipe catalog + ingredients | `Recipe` + `Ingredient` entities | ✅ Complete | ⏳ Story 2.1 | 🎯 Category integration |
-| Usage tracking | `Recipe.usageCount` & `lastUsed` | ✅ Complete | ⏳ Story 3.1 | ✅ Indexed for fast analytics |
-| Tagging system | `Tag` entity with many-to-many | ✅ Complete | ⏳ Story 4.1 | ✅ Ready for optimization |
-| Weekly list generation | `WeeklyList` + `GroceryListItem` | ✅ Complete | ⏳ Story 1.4 | 🎯 Category-based organization |
-| Auto-populate from staples | Logic in list generation | ⏳ Ready for Story 1.4 | ⏳ Story 1.4 | 🎯 Category-based sections |
-| **Custom category management** | **Planned Story 1.3.5** | 📋 **Documented** | 📋 **Planned** | 🎯 **Core feature identified** |
-| **Category-based filtering** | **Planned Story 1.3.5** | 📋 **Documented** | 📋 **Planned** | 🎯 **User workflow enhancement** |
+## ✅ Requirements Coverage - Updated
+
+| Requirement | Implementation | Status | UI Status | Enhancement Available |
+|-------------|----------------|--------|-----------|---------------------|
+| Staple grocery list | Professional StaplesView with CRUD | ✅ **Complete** | ✅ **App Store Quality** | 🎯 Custom categories |
+| Categorize staple items | 6-category store-layout system | ✅ **Complete** | ✅ **Professional UI** | 🎯 Custom sort order |
+| Add/edit/delete staples | Smart duplicate resolution + forms | ✅ **Complete** | ✅ **Professional Forms** | ✅ Ready for enhancement |
+| Search and filter staples | Real-time search with category filter | ✅ **Complete** | ✅ **Performance Optimized** | ✅ Professional polish |
+| Purchase history tracking | Last purchased dates with visual indicators | ✅ **Complete** | ✅ **Visual Indicators** | ✅ Shopping intelligence |
+| Recipe catalog + ingredients | `Recipe` + `Ingredient` entities | ✅ **Complete** | ⏳ Story 2.1 | ✅ Ready for UI development |
+| Usage tracking | `Recipe.usageCount` & `lastUsed` | ✅ **Complete** | ⏳ Story 3.1 | ✅ Indexed for analytics |
+| Tagging system | `Tag` entity with many-to-many | ✅ **Complete** | ⏳ Story 4.1 | ✅ Ready for implementation |
+| Weekly list generation | `WeeklyList` + `GroceryListItem` | ✅ **Complete** | ⏳ Story 1.4 | 🎯 Category-based organization |
+| Auto-populate from staples | Logic ready for implementation | ⏳ **Story 1.4** | ⏳ Story 1.4 | 🎯 Store-layout sections |
 
 👉 Full requirements in [`docs/requirements/requirements.md`](docs/requirements/requirements.md)
 
-## 📱 Current App Features
+## 📱 Current App Features - Production Quality
 
-### ✅ Working Features (Performance Optimized + Professional Forms)
-- **Grocery Item Display**: Professional list with categories and staple indicators
-- **Sample Data**: Realistic grocery items, recipes, ingredients, and relationships
-- **Core Data Persistence**: All data saves and loads correctly with background operations
+### ✅ Working Features (Professional Polish)
+- **Professional Staples Management**: Complete CRUD with smart duplicate resolution
+- **Store-Layout Categories**: 6-category system with icons and visual organization
+- **Real-Time Search & Filtering**: Performance-optimized with indexed queries
+- **Professional iOS Interactions**: Context menus, swipe actions, accessibility support
+- **Visual Shopping Intelligence**: Purchase history indicators and category grouping
+- **Background Operations**: Non-blocking saves with professional error handling
+- **App Store Quality**: Loading states, empty states, error recovery, visual polish
+- **Sample Data**: Realistic grocery items demonstrating all functionality
 - **CloudKit Preparation**: Entities configured for future family sharing
-- **Native iOS Design**: Proper navigation, list styling, and interaction patterns
-- **Staples Management Foundation**: Dedicated interface for staple-only items with optimized CRUD
-- **Professional Add Form**: Custom naming, category selection, purchase history tracking
-- **Form Validation**: Real-time validation with error handling and duplicate prevention
-- **Background Operations**: Non-blocking saves with professional error feedback
 
-### 🚧 Coming Next (Story 1.3 Completion)
-- **Edit Functionality**: EditStapleView for modifying existing staples
-- **Navigation to Edit**: Context menus and proper iOS navigation patterns  
-- **Real-Time Search**: Instant filtering leveraging indexed category and name attributes
-- **Context Menus**: Long-press actions for Edit, Delete, Mark as Purchased
-- **Bulk Operations**: Multi-select with background processing for smooth interactions
+### 🔜 Coming Next (Story Selection)
+**Option A - Story 1.3.5: Custom Category Management (2-3 hours)**
+- **Dynamic Categories**: Create, edit, delete custom grocery categories
+- **Drag-and-Drop Sort Order**: Reorder categories to match personal store layout
+- **Cross-View Integration**: Apply custom order throughout app
+- **Store Layout Optimization**: Match individual shopping patterns
 
-### 📋 Coming Soon (Story 1.3.5 - Custom Categories)
-- **Category Management**: Create, edit, delete custom grocery categories
-- **Category Filtering**: Filter staples list by selected category
-- **Category-Based Organization**: Organize lists by store layout categories  
-- **Visual Category Indicators**: Colors and icons for better category recognition
-- **Default Category Protection**: Prevent deletion of essential categories
+**Option B - Story 1.4: Auto-Populate Grocery Lists (3-4 hours)**
+- **List Generation**: Create weekly lists auto-populated from staples
+- **Category Organization**: Group items by store-layout sections
+- **Shopping Workflow**: Check-off functionality with completion tracking
+- **Multiple Lists**: Support concurrent grocery lists
 
-### 🔜 Enhanced Future Features
-- **Category-Based Grocery Lists**: Organize shopping lists by custom categories for efficient store navigation
-- **Recipe Ingredient Categories**: Link recipe ingredients to category system for consistent organization
-- **Smart Category Suggestions**: Suggest categories based on usage patterns and shopping behavior
+### 🚀 Enhanced Future Features (Post-Milestone 1)
+- **Recipe Integration**: Link ingredients to staples with category consistency
+- **Family Sharing**: CloudKit sync for collaborative grocery management
+- **Usage Analytics**: Shopping patterns and staple optimization insights
+- **Smart Suggestions**: Personalized recommendations based on purchase history
 
-## 📚 Learning Journey Documentation
+## 📚 Learning Journey Documentation - Updated
 
 ### Completed Learning Modules
 - ✅ **Environment Setup**: [`learning-notes/01-environment-setup.md`](learning-notes/01-environment-setup.md)
@@ -136,70 +116,68 @@
 - ✅ **Core Data Fundamentals**: [`learning-notes/03-core-data-fundamentals.md`](learning-notes/03-core-data-fundamentals.md)
 - ✅ **MacBook Air Setup & Recreation**: [`learning-notes/04-macbook-air-setup-and-recreation.md`](learning-notes/04-macbook-air-setup-and-recreation.md)
 - ✅ **Story 1.3 Foundation**: [`learning-notes/05-story-1-3-staples-foundation.md`](learning-notes/05-story-1-3-staples-foundation.md)
-- ✅ **Core Data Performance & Architecture**: [`learning-notes/06-core-data-performance.md`](learning-notes/06-core-data-performance.md)
+- ✅ **Core Data Performance & Architecture**: [`learning-notes/06-story-1-2-5-core-data-performance-and-architecture.md`](learning-notes/06-story-1-2-5-core-data-performance-and-architecture.md)
+- ✅ **Professional Staples Management**: [`learning-notes/07-story-1-3-professional-staples-management.md`](learning-notes/07-story-1-3-professional-staples-management.md) *(Complete)*
 
 ### 🎯 Next Learning Module
-- **Professional SwiftUI Forms**: [`learning-notes/07-professional-forms.md`](learning-notes/07-professional-forms.md) (To be created on Story 1.3 completion)
+- **Custom Category Management** or **Grocery List Generation** (based on Story selection)
 
-### Skills Developed
-- **Xcode Proficiency**: Project management, simulators, interface navigation
-- **Core Data Expertise**: Entity design, complex relationships, CloudKit integration, performance optimization
-- **SwiftUI Fundamentals**: Data binding, navigation, list management, professional form design
-- **iOS Debugging**: Systematic error resolution and problem-solving
-- **Professional Workflow**: Git integration, documentation practices
-- **Cross-Computer Development**: Environment setup and project recreation
-- **Architecture Decision Making**: Evaluating technical improvements and trade-offs
-- **Performance Optimization**: Core Data indexing, predicate queries, background contexts
-- **Professional iOS Patterns**: Background processing, error handling, production builds
-- ✅ **SwiftUI Form Development**: Professional form design, validation, navigation, user experience
+### Skills Mastered
+- **Xcode Proficiency**: Project management, simulators, interface navigation, debugging
+- **Core Data Expertise**: Entity design, complex relationships, CloudKit integration, performance optimization  
+- **SwiftUI Mastery**: Data binding, navigation, list management, professional form design, advanced interactions
+- **iOS Design Patterns**: Background processing, error handling, accessibility, professional polish
+- **Professional Workflow**: Git integration, documentation practices, cross-computer development
+- **Performance Optimization**: Indexed queries, background contexts, predicate-based filtering
+- ✅ **Advanced SwiftUI**: Context menus, swipe actions, sheet management, real-time search
+- ✅ **User Experience Design**: Smart duplicate resolution, empty states, loading states, visual feedback
+- ✅ **Store-Layout Optimization**: Category systems for grocery shopping efficiency
 
 ### 📚 Next Learning Areas
-- **Edit Form Implementation**: Reusing form components for editing existing data
-- **Advanced Navigation**: Context menus, swipe actions, NavigationLink patterns
-- **Dynamic Data Management**: Custom category system with Core Data relationships
-- **Real-Time Search**: Advanced NSPredicate patterns with indexed filtering
-- **User Experience Design**: Professional iOS interaction patterns with optimized data layer
+- **Dynamic Data Management**: Custom category systems with Core Data relationships (Story 1.3.5)
+- **List Generation Algorithms**: Auto-population logic and workflow optimization (Story 1.4)
+- **Recipe Integration**: Complex ingredient-staple relationships and usage tracking (Story 2.x)
+- **CloudKit Activation**: Real-time sync and family collaboration when developer account available
 
-## 🎯 Technical Achievements
+## 🎯 Technical Achievements - Production Ready
 
-### Core Data & CloudKit Mastery
-- **Sophisticated Entity Design**: 6 entities with complex relationships and performance optimization
-- **CloudKit Integration**: Ready for real-time family collaboration
-- **Performance Architecture**: Compound indexes and background operations operational
-- **Professional Forms Integration**: SwiftUI forms with Core Data background operations
+### Core Data & CloudKit Excellence
+- **Sophisticated Architecture**: 6 entities with complex relationships and performance optimization
+- **CloudKit Integration**: Complete preparation for real-time family collaboration  
+- **Performance Foundation**: Compound indexes, background operations, professional error handling
+- **Production Safety**: DEBUG conditionals, proper merge policies, model versioning ready
 
-### iOS Development Skills
-- **SwiftUI Data Binding**: @FetchRequest integration with Core Data and professional forms
-- **Professional UI Design**: Native iOS interface with forms, navigation, and interaction patterns
-- **Navigation Architecture**: Sheet presentation, form dismissal, proper iOS navigation hierarchy
-- **Error Resolution**: Systematic debugging and professional error handling implementation
-- **Performance Optimization**: Predicate queries, background contexts, indexed filtering
-- **Form Development**: Professional validation, category pickers, date selection, user experience
+### iOS Development Mastery
+- **Professional SwiftUI**: Advanced data binding, navigation, form design, interaction patterns
+- **App Store Quality UI**: Native iOS design with context menus, swipe actions, accessibility compliance
+- **Performance Optimization**: Indexed queries, background contexts, smooth 60fps interactions
+- **User Experience Excellence**: Smart duplicate resolution, visual feedback, professional polish
+- **Store-Layout Intelligence**: Category organization optimized for real grocery shopping efficiency
 
-### Development Workflow
-- **Documentation-Driven Development**: Comprehensive learning capture and user feedback integration
-- **Git Workflow**: Professional branching, commit practices, and feature documentation
-- **User Feedback Integration**: Systematic identification and planning of feature enhancements
-- **Learning Documentation**: Real-time capture of discoveries and architectural decisions
-- **Architecture Decision Making**: Successful evaluation and selective improvement implementation
-- **Feature Planning**: Professional requirement gathering and roadmap integration
+### Development Workflow Excellence  
+- **Documentation-Driven Development**: Comprehensive learning capture and technical decision tracking
+- **Professional Git Workflow**: Feature branches, detailed commits, cross-computer development
+- **Architecture Decision Making**: Proven selective improvement methodology and performance optimization
+- **Quality Assurance**: Systematic testing, error handling, accessibility compliance
+- **Learning Integration**: Real-time knowledge capture supporting continuous skill development
 
 ## 🎉 Current Achievement
 
-**Status**: 📋 **User Feedback Integrated** | 🚧 **Story 1.3 Phase 1 Complete** | ⚡ **Performance-Optimized** | 📐 **Architecture-Enhanced**
+**Status**: 📋 **Ready for Story Selection** | 🎉 **Story 1.3 Complete** | ⚡ **Performance-Optimized** | 🏪 **Store-Layout Optimized**
 
-**Major Milestone**: **Professional add form complete with user feedback driving custom category system!**
+**Major Milestone**: **Professional staples management system with store-layout optimization complete!**
 
-**Story 1.3 Phase 1 Achievement**: 
-- **AddStapleView**: Professional iOS form with category picker, validation, error handling
-- **User Experience**: Custom naming, category selection, purchase history tracking
-- **Performance Integration**: Background saves, indexed queries, professional error handling
+**Story 1.3 Achievement**: 
+- **Production-Quality Interface**: App Store-ready staples management with professional polish
+- **Smart User Experience**: Never-block duplicate resolution with convert/edit workflow
+- **Store-Layout Optimization**: 6-category system optimized for grocery shopping efficiency  
+- **Professional iOS Patterns**: Context menus, swipe actions, accessibility, visual feedback
+- **Performance Excellence**: Leveraged Story 1.2.5 architecture for smooth interactions
 
-**User-Driven Enhancement**: 
-- **Category Management Need Identified**: Users want customizable categories for personalized organization
-- **Story 1.3.5 Planned**: Complete technical specification and roadmap integration
-- **Architecture Ready**: Performance foundation supports dynamic category management
+**Next Decision**: 
+- **Story 1.3.5**: Custom Category Management for personalized store layouts (2-3 hours)
+- **Story 1.4**: Auto-Populate Grocery Lists to complete MVP automation (3-4 hours)
 
-**Ready to complete Story 1.3 with edit functionality and then implement custom category management! 🚀**
+**Ready to choose next development priority based on user needs and Milestone 1 completion goals! 🚀**
 
-*Last updated: 08/19/25 - Story 1.3 Phase 1 complete, custom category management planned based on user feedback*
+*Last updated: 08/20/25 - Story 1.3 professional staples management complete, ready for story selection*
