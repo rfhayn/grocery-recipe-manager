@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G84" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Category" representedClassName="Category" syncable="YES">
+        <attribute name="color" optional="YES" attributeType="String"/>
+        <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isDefault" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="groceryItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryItem" inverseName="categoryEntity" inverseEntity="GroceryItem"/>
+        <fetchIndex name="byCategorySortOrder">
+            <fetchIndexElement property="sortOrder" type="Binary" order="ascending"/>
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+            <fetchIndexElement property="isDefault" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
     <entity name="GroceryItem" representedClassName="GroceryItem" syncable="YES">
         <attribute name="category" optional="YES" attributeType="String"/>
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -7,10 +21,12 @@
         <attribute name="isStaple" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="lastPurchased" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <fetchIndex name="byPropertyIndex">
+        <relationship name="categoryEntity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="groceryItems" inverseEntity="Category"/>
+        <fetchIndex name="byStaplesCategoryOrder">
             <fetchIndexElement property="isStaple" type="Binary" order="ascending"/>
             <fetchIndexElement property="category" type="Binary" order="ascending"/>
-            <fetchIndexElement property="dateCreated" type="Binary" order="ascending"/>
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+            <fetchIndexElement property="lastPurchased" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
     <entity name="GroceryListItem" representedClassName="GroceryListItem" syncable="YES">

@@ -16,7 +16,7 @@ struct PersistenceController {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-        // Create comprehensive sample data
+        // Create comprehensive sample data with categories
         addSampleData(to: viewContext)
         
         do {
@@ -28,10 +28,18 @@ struct PersistenceController {
         return result
     }()
     
-    // Add sample data method for both preview and main app
+    // Enhanced sample data method with category relationships
     private static func addSampleData(to context: NSManagedObjectContext) {
         #if DEBUG
-        // Sample Grocery Items (Staples)
+        // First ensure categories exist
+        Category.ensureDefaultCategories(in: context)
+        
+        // Fetch categories for relationship assignment
+        let categoryRequest: NSFetchRequest<Category> = Category.fetchRequest()
+        let categories = (try? context.fetch(categoryRequest)) ?? []
+        let categoryDict = Dictionary(uniqueKeysWithValues: categories.map { ($0.displayName, $0) })
+        
+        // Sample Grocery Items (Staples) with category relationships
         let groceryItems = [
             ("Bananas", "Produce", true),
             ("Apples", "Produce", true),
@@ -49,15 +57,16 @@ struct PersistenceController {
         
         var groceryItemsDict: [String: GroceryItem] = [:]
         
-        for (name, category, isStaple) in groceryItems {
+        for (name, categoryName, isStaple) in groceryItems {
             let item = GroceryItem(context: context)
             item.id = UUID()
             item.name = name
-            item.category = category
+            item.category = categoryName // Keep for legacy compatibility
+            item.categoryEntity = categoryDict[categoryName] // Set relationship
             item.isStaple = isStaple
-            item.dateCreated = Date().addingTimeInterval(-Double.random(in: 0...30) * 24 * 60 * 60) // Random dates within last 30 days
+            item.dateCreated = Date().addingTimeInterval(-Double.random(in: 0...30) * 24 * 60 * 60)
             if isStaple {
-                item.lastPurchased = Date().addingTimeInterval(-Double.random(in: 1...14) * 24 * 60 * 60) // Random recent purchases
+                item.lastPurchased = Date().addingTimeInterval(-Double.random(in: 1...14) * 24 * 60 * 60)
             }
             groceryItemsDict[name] = item
         }
@@ -155,8 +164,9 @@ struct PersistenceController {
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
-        // Add sample data if database is empty (only on first run)
+        // Perform category migration and add sample data if needed
         if !inMemory {
+            performCategoryMigrationIfNeeded()
             addSampleDataIfNeeded()
         }
     }
@@ -182,6 +192,14 @@ struct PersistenceController {
         }
     }
     
+    // MARK: - Category Migration
+    /// Performs category migration after container loads
+    private func performCategoryMigrationIfNeeded() {
+        container.performBackgroundTask { backgroundContext in
+            CategoryMigrationHelper.performMigration(in: backgroundContext)
+        }
+    }
+    
     // Add sample data only if database is empty
     private func addSampleDataIfNeeded() {
         #if DEBUG
@@ -193,12 +211,12 @@ struct PersistenceController {
             if count == 0 {
                 PersistenceController.addSampleData(to: context)
                 try context.save()
+                print("✅ Sample data with categories added successfully")
             }
         } catch {
             print("Error checking for existing data: \(error)")
         }
         #else
-        // Production builds: no sample data loaded
         print("Production build: Sample data loading skipped")
         #endif
     }

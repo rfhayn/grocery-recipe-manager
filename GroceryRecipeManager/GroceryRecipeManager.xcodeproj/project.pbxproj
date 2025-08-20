@@ -19,6 +19,9 @@
 		9B731C882E5364A300CE26F0 /* Tag+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B731C7B2E5364A300CE26F0 /* Tag+CoreDataClass.swift */; };
 		9B731C892E5364A300CE26F0 /* Recipe+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B731C7A2E5364A300CE26F0 /* Recipe+CoreDataProperties.swift */; };
 		9B731C8A2E5364A300CE26F0 /* WeeklyList+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B731C7D2E5364A300CE26F0 /* WeeklyList+CoreDataClass.swift */; };
+		9BF1F8CA2E566BCC00E79B3F /* Category+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1F8C92E566BC100E79B3F /* Category+CoreDataClass.swift */; };
+		9BF1F8CC2E566BFF00E79B3F /* Category+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1F8CB2E566BF200E79B3F /* Category+CoreDataProperties.swift */; };
+		9BF1F8CE2E566C3700E79B3F /* CategoryMigrationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1F8CD2E566C1500E79B3F /* CategoryMigrationHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +57,9 @@
 		9B731C7C2E5364A300CE26F0 /* Tag+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tag+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		9B731C7D2E5364A300CE26F0 /* WeeklyList+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WeeklyList+CoreDataClass.swift"; sourceTree = "<group>"; };
 		9B731C7E2E5364A300CE26F0 /* WeeklyList+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WeeklyList+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		9BF1F8C92E566BC100E79B3F /* Category+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+CoreDataClass.swift"; sourceTree = "<group>"; };
+		9BF1F8CB2E566BF200E79B3F /* Category+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		9BF1F8CD2E566C1500E79B3F /* CategoryMigrationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryMigrationHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -115,6 +121,9 @@
 		9B731C202E535C3100CE26F0 = {
 			isa = PBXGroup;
 			children = (
+				9BF1F8CD2E566C1500E79B3F /* CategoryMigrationHelper.swift */,
+				9BF1F8CB2E566BF200E79B3F /* Category+CoreDataProperties.swift */,
+				9BF1F8C92E566BC100E79B3F /* Category+CoreDataClass.swift */,
 				9B731C732E5364A300CE26F0 /* GroceryItem+CoreDataClass.swift */,
 				9B731C742E5364A300CE26F0 /* GroceryItem+CoreDataProperties.swift */,
 				9B731C752E5364A300CE26F0 /* GroceryListItem+CoreDataClass.swift */,
@@ -290,11 +299,14 @@
 			files = (
 				9B731C7F2E5364A300CE26F0 /* WeeklyList+CoreDataProperties.swift in Sources */,
 				9B731C802E5364A300CE26F0 /* GroceryItem+CoreDataProperties.swift in Sources */,
+				9BF1F8CC2E566BFF00E79B3F /* Category+CoreDataProperties.swift in Sources */,
 				9B731C812E5364A300CE26F0 /* Recipe+CoreDataClass.swift in Sources */,
+				9BF1F8CE2E566C3700E79B3F /* CategoryMigrationHelper.swift in Sources */,
 				9B731C822E5364A300CE26F0 /* GroceryListItem+CoreDataProperties.swift in Sources */,
 				9B731C832E5364A300CE26F0 /* Ingredient+CoreDataProperties.swift in Sources */,
 				9B731C842E5364A300CE26F0 /* GroceryListItem+CoreDataClass.swift in Sources */,
 				9B731C852E5364A300CE26F0 /* GroceryItem+CoreDataClass.swift in Sources */,
+				9BF1F8CA2E566BCC00E79B3F /* Category+CoreDataClass.swift in Sources */,
 				9B731C862E5364A300CE26F0 /* Tag+CoreDataProperties.swift in Sources */,
 				9B731C872E5364A300CE26F0 /* Ingredient+CoreDataClass.swift in Sources */,
 				9B731C882E5364A300CE26F0 /* Tag+CoreDataClass.swift in Sources */,
