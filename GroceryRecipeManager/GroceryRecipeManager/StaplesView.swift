@@ -1,4 +1,4 @@
-// Complete StaplesView.swift with Duplicate Category Cleanup
+// Fixed StaplesView.swift - No Duplicate Categories
 import SwiftUI
 import CoreData
 
@@ -39,7 +39,201 @@ struct StaplesView: View {
         animation: .default
     ) private var staples: FetchedResults<GroceryItem>
     
-    // Computed filtered staples
+    var body: some View {
+        contentView
+    }
+    
+    private var contentView: some View {
+        VStack(spacing: 0) {
+            categoryFilterSection
+            mainContentArea
+        }
+        .searchable(text: $searchText, prompt: "Search staples...")
+        .navigationTitle("Staples")
+        .toolbar {
+            toolbarContent
+        }
+        .sheet(isPresented: $showingAddForm) {
+            AddStapleView()
+        }
+        .sheet(item: $stapleToEdit) { staple in
+            EditStapleView(staple: staple)
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
+        }
+    }
+    
+    // MARK: - View Components
+    private var categoryFilterSection: some View {
+        HStack {
+            Text("Category:")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            Menu {
+                Button("All Categories") {
+                    selectedCategory = nil
+                }
+                
+                Divider()
+                
+                ForEach(categories, id: \.self) { category in
+                    Button(action: {
+                        selectedCategory = category
+                    }) {
+                        HStack {
+                            Circle()
+                                .fill(Color(hex: category.displayColor))
+                                .frame(width: 12, height: 12)
+                            Text(category.displayName)
+                        }
+                    }
+                }
+            } label: {
+                HStack {
+                    if let selectedCategory = selectedCategory {
+                        Circle()
+                            .fill(Color(hex: selectedCategory.displayColor))
+                            .frame(width: 12, height: 12)
+                    }
+                    Text(selectedCategory?.displayName ?? "All Categories")
+                        .foregroundColor(.primary)
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+                }
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color(.systemGroupedBackground))
+    }
+    
+    private var mainContentArea: some View {
+        ZStack {
+            if filteredStaples.isEmpty {
+                emptyStateView
+            } else {
+                staplesListView
+            }
+            
+            if isLoading {
+                loadingOverlay
+            }
+        }
+    }
+    
+    private var emptyStateView: some View {
+        VStack(spacing: 24) {
+            Image(systemName: "cart.badge.plus")
+                .font(.system(size: 60))
+                .foregroundColor(.secondary)
+            
+            VStack(spacing: 12) {
+                Text("No Staples Found")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text("Add some staples to get started!")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            
+            Button(action: { showingAddForm = true }) {
+                Label("Add Staple", systemImage: "plus.circle.fill")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(Color.blue)
+                    .cornerRadius(12)
+            }
+        }
+        .padding(.horizontal, 40)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private var staplesListView: some View {
+        List {
+            ForEach(groupedStaples, id: \.key) { category, items in
+                Section(header: categoryHeader(category: category, count: items.count)) {
+                    ForEach(items, id: \.self) { item in
+                        stapleRow(item: item)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                editStaple(item)
+                            }
+                            .contextMenu {
+                                contextMenuButtons(for: item)
+                            }
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    deleteStaple(item)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                
+                                Button {
+                                    editStaple(item)
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+                                .tint(.blue)
+                            }
+                            .swipeActions(edge: .leading) {
+                                Button {
+                                    markAsPurchased(item)
+                                } label: {
+                                    Label("Purchased", systemImage: "cart.badge.plus")
+                                }
+                                .tint(.green)
+                            }
+                    }
+                }
+            }
+        }
+        .listStyle(InsetGroupedListStyle())
+    }
+    
+    private var loadingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.2)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.2)
+                Text("Updating...")
+                    .font(.headline)
+            }
+            .padding(24)
+            .background(Color(.systemBackground))
+            .cornerRadius(16)
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            EditButton()
+        }
+        
+        ToolbarItem {
+            Button(action: {
+                showingAddForm = true
+            }) {
+                Label("Add Staple", systemImage: "plus")
+            }
+        }
+    }
+    
+    // MARK: - Computed Properties
     private var filteredStaples: [GroceryItem] {
         var filtered = Array(staples)
         
@@ -63,189 +257,14 @@ struct StaplesView: View {
         return filtered
     }
     
-    // Group filtered staples by category (using custom sort order)
     private var groupedStaples: [(key: Category, value: [GroceryItem])] {
-        // First, ensure all items have category relationships
         ensureItemsHaveCategoryRelationships()
         
         let grouped = Dictionary(grouping: filteredStaples) { staple in
             staple.categoryEntity ?? findOrCreateCategory(for: staple)
         }
         
-        // Sort by category sort order
         return grouped.sorted { $0.key.sortOrder < $1.key.sortOrder }
-    }
-
-    var body: some View {
-        let _ = debugCategoryData() // Debug logging
-        
-        VStack(spacing: 0) {
-            // Category Filter Section
-            HStack {
-                Text("Category:")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Menu {
-                    Button("All Categories") {
-                        selectedCategory = nil
-                    }
-                    
-                    Divider()
-                    
-                    ForEach(categories, id: \.self) { category in
-                        Button(action: {
-                            selectedCategory = category
-                        }) {
-                            HStack {
-                                Circle()
-                                    .fill(Color(hex: category.displayColor))
-                                    .frame(width: 12, height: 12)
-                                Text(category.displayName)
-                            }
-                        }
-                    }
-                } label: {
-                    HStack {
-                        if let selectedCategory = selectedCategory {
-                            Circle()
-                                .fill(Color(hex: selectedCategory.displayColor))
-                                .frame(width: 12, height: 12)
-                        }
-                        Text(selectedCategory?.displayName ?? "All Categories")
-                            .foregroundColor(.primary)
-                        Image(systemName: "chevron.down")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                    }
-                }
-                
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(Color(.systemGroupedBackground))
-            
-            // Main Content
-            ZStack {
-                if filteredStaples.isEmpty {
-                    // Empty State
-                    VStack(spacing: 24) {
-                        Image(systemName: "cart.badge.plus")
-                            .font(.system(size: 60))
-                            .foregroundColor(.secondary)
-                        
-                        VStack(spacing: 12) {
-                            Text("No Staples Found")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            
-                            Text("Add some staples to get started!")
-                                .font(.body)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        
-                        Button(action: { showingAddForm = true }) {
-                            Label("Add Staple", systemImage: "plus.circle.fill")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 12)
-                                .background(Color.blue)
-                                .cornerRadius(12)
-                        }
-                    }
-                    .padding(.horizontal, 40)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List {
-                        // Group by category using custom sort order
-                        ForEach(groupedStaples, id: \.key) { category, items in
-                            Section(header: categoryHeader(category: category, count: items.count)) {
-                                ForEach(items, id: \.self) { item in
-                                    stapleRow(item: item)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            editStaple(item)
-                                        }
-                                        .contextMenu {
-                                            contextMenuButtons(for: item)
-                                        }
-                                        .swipeActions(edge: .trailing) {
-                                            Button(role: .destructive) {
-                                                deleteStaple(item)
-                                            } label: {
-                                                Label("Delete", systemImage: "trash")
-                                            }
-                                            
-                                            Button {
-                                                editStaple(item)
-                                            } label: {
-                                                Label("Edit", systemImage: "pencil")
-                                            }
-                                            .tint(.blue)
-                                        }
-                                        .swipeActions(edge: .leading) {
-                                            Button {
-                                                markAsPurchased(item)
-                                            } label: {
-                                                Label("Purchased", systemImage: "cart.badge.plus")
-                                            }
-                                            .tint(.green)
-                                        }
-                                }
-                            }
-                        }
-                    }
-                    .listStyle(InsetGroupedListStyle())
-                }
-                
-                // Loading overlay
-                if isLoading {
-                    ZStack {
-                        Color.black.opacity(0.2)
-                            .ignoresSafeArea()
-                        
-                        VStack(spacing: 16) {
-                            ProgressView()
-                                .scaleEffect(1.2)
-                            Text("Updating...")
-                                .font(.headline)
-                        }
-                        .padding(24)
-                        .background(Color(.systemBackground))
-                        .cornerRadius(16)
-                    }
-                }
-            }
-        }
-        .searchable(text: $searchText, prompt: "Search staples...")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                EditButton()
-            }
-            
-            ToolbarItem {
-                Button(action: {
-                    showingAddForm = true
-                }) {
-                    Label("Add Staple", systemImage: "plus")
-                }
-            }
-        }
-        .navigationTitle("Staples")
-        .sheet(isPresented: $showingAddForm) {
-            AddStapleView()
-        }
-        .sheet(item: $stapleToEdit) { staple in
-            EditStapleView(staple: staple)
-        }
-        .alert("Error", isPresented: $showingError) {
-            Button("OK") { }
-        } message: {
-            Text(errorMessage)
-        }
     }
     
     // MARK: - View Builders
@@ -344,12 +363,46 @@ struct StaplesView: View {
     
     // MARK: - Helper Methods
     private func createUncategorizedCategory() -> Category {
+        // First try to find existing uncategorized category
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        request.predicate = NSPredicate(format: "name ==[c] 'Uncategorized'")
+        
+        if let existing = try? viewContext.fetch(request).first {
+            return existing
+        }
+        
+        // Only create if one doesn't exist
         let category = Category(context: viewContext)
         category.name = "Uncategorized"
         category.color = "#757575"
         category.sortOrder = 999
         category.isDefault = false
+        category.id = UUID()
+        category.dateCreated = Date()
+        
+        // Save immediately to prevent duplicates
+        try? viewContext.save()
+        
         return category
+    }
+    
+    private func cleanupUncategorizedDuplicates() {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        request.predicate = NSPredicate(format: "name ==[c] 'Uncategorized'")
+        
+        do {
+            let uncategorizedCategories = try viewContext.fetch(request)
+            if uncategorizedCategories.count > 1 {
+                // Keep the first one, delete the rest
+                for i in 1..<uncategorizedCategories.count {
+                    viewContext.delete(uncategorizedCategories[i])
+                }
+                try viewContext.save()
+                print("🧹 Cleaned up \(uncategorizedCategories.count - 1) duplicate uncategorized categories")
+            }
+        } catch {
+            print("❌ Error cleaning up uncategorized duplicates: \(error)")
+        }
     }
     
     private func categoryEmoji(for categoryName: String) -> String {
@@ -364,9 +417,7 @@ struct StaplesView: View {
         }
     }
     
-    // Helper method to find or create category for an item
     private func findOrCreateCategory(for item: GroceryItem) -> Category {
-        // Try to find existing category by name
         if let categoryName = item.category {
             let request: NSFetchRequest<Category> = Category.fetchRequest()
             request.predicate = NSPredicate(format: "name ==[c] %@", categoryName)
@@ -376,12 +427,13 @@ struct StaplesView: View {
             }
         }
         
-        // Fallback: create uncategorized
         return createUncategorizedCategory()
     }
     
-    // Helper method to ensure items have category relationships
     private func ensureItemsHaveCategoryRelationships() {
+        // Clean up any duplicate uncategorized categories first
+        cleanupUncategorizedDuplicates()
+        
         let itemsNeedingMigration = staples.filter { $0.categoryEntity == nil }
         
         if !itemsNeedingMigration.isEmpty {
@@ -391,71 +443,6 @@ struct StaplesView: View {
             
             try? viewContext.save()
         }
-    }
-    
-    // Clean up duplicate categories
-    private func cleanupDuplicateCategories() {
-        let request: NSFetchRequest<Category> = Category.fetchRequest()
-        request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \Category.name, ascending: true),
-            NSSortDescriptor(keyPath: \Category.dateCreated, ascending: true)
-        ]
-        
-        do {
-            let allCategories = try viewContext.fetch(request)
-            var categoryNames: Set<String> = []
-            var categoriesToDelete: [Category] = []
-            
-            for category in allCategories {
-                let name = category.displayName
-                if categoryNames.contains(name) {
-                    // This is a duplicate - mark for deletion
-                    categoriesToDelete.append(category)
-                    print("🗑️ Marking duplicate category for deletion: \(name)")
-                } else {
-                    categoryNames.insert(name)
-                    print("✅ Keeping category: \(name)")
-                }
-            }
-            
-            // Delete duplicates
-            for category in categoriesToDelete {
-                viewContext.delete(category)
-            }
-            
-            if !categoriesToDelete.isEmpty {
-                try viewContext.save()
-                print("🧹 Cleaned up \(categoriesToDelete.count) duplicate categories")
-            }
-            
-        } catch {
-            print("❌ Error cleaning up categories: \(error)")
-        }
-    }
-    
-    // Debug method to see what's happening
-    private func debugCategoryData() {
-        cleanupDuplicateCategories() // Clean up duplicates first
-        
-        print("=== CATEGORY DEBUG ===")
-        print("Total categories: \(categories.count)")
-        for category in categories {
-            print("Category: \(category.displayName), sortOrder: \(category.sortOrder), items: \(category.groceryItemsArray.count)")
-        }
-        
-        print("\nTotal staples: \(staples.count)")
-        for staple in staples {
-            print("Staple: \(staple.name ?? "nil"), category string: \(staple.category ?? "nil"), categoryEntity: \(staple.categoryEntity?.displayName ?? "nil")")
-        }
-        
-        print("\nGrouped staples:")
-        for (category, items) in groupedStaples {
-            print("Group \(category.displayName): \(items.count) items")
-            for item in items {
-                print("  - \(item.name ?? "nil")")
-            }
-        }
-        print("=== END DEBUG ===")
     }
     
     // MARK: - Action Methods
