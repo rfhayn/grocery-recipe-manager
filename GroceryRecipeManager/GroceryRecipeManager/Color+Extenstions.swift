@@ -1,10 +1,3 @@
-//
-//  Color+Extensions.swift
-//  GroceryRecipeManager
-//
-//  Created by Rich Hayn on 8/20/25.
-//
-
 import SwiftUI
 
 extension Color {

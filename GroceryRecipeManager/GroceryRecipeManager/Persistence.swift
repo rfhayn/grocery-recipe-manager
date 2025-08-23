@@ -31,7 +31,7 @@ struct PersistenceController {
     // Enhanced sample data method with category relationships
     private static func addSampleData(to context: NSManagedObjectContext) {
         #if DEBUG
-        // First ensure categories exist
+        // ONLY ensure categories exist in sample data - don't call migration here
         Category.ensureDefaultCategories(in: context)
         
         // Fetch categories for relationship assignment
@@ -164,17 +164,131 @@ struct PersistenceController {
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
-        // Perform category migration and add sample data if needed
+        // FIXED: Only perform setup once, in the right order
         if !inMemory {
-            performCategoryMigrationIfNeeded()
-            addSampleDataIfNeeded()
+            performOneTimeSetup()
         }
+    }
+    
+    // MARK: - One-Time Setup (FIXED)
+    /// Performs all setup operations in the correct order to prevent duplicates
+    private func performOneTimeSetup() {
+        // Use a single background context for all setup operations
+        container.performBackgroundTask { backgroundContext in
+            // Step 1: Ensure categories exist first (only once)
+            self.ensureCategoriesExist(in: backgroundContext)
+            
+            // Step 2: Migrate existing data to use category relationships
+            self.migrateExistingData(in: backgroundContext)
+            
+            // Step 3: Add sample data only if database is empty
+            self.addSampleDataIfNeeded(in: backgroundContext)
+            
+            // Save all changes at once
+            do {
+                if backgroundContext.hasChanges {
+                    try backgroundContext.save()
+                    print("✅ One-time setup completed successfully")
+                }
+            } catch {
+                print("❌ Setup failed: \(error)")
+            }
+        }
+    }
+    
+    /// Ensures categories exist (called only once)
+    private func ensureCategoriesExist(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        
+        do {
+            let existingCategories = try context.fetch(request)
+            if existingCategories.isEmpty {
+                Category.createDefaultCategories(in: context)
+                print("✅ Created default categories")
+            } else {
+                print("ℹ️ Categories already exist (\(existingCategories.count) found)")
+            }
+        } catch {
+            print("❌ Error checking categories: \(error)")
+            Category.createDefaultCategories(in: context)
+        }
+    }
+    
+    /// Migrates existing grocery items to use category relationships
+    private func migrateExistingData(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
+        request.predicate = NSPredicate(format: "categoryEntity == nil AND category != nil")
+        
+        do {
+            let itemsToMigrate = try context.fetch(request)
+            if !itemsToMigrate.isEmpty {
+                print("🔄 Migrating \(itemsToMigrate.count) items to category relationships")
+                for item in itemsToMigrate {
+                    item.migrateToCategory(in: context)
+                }
+            }
+        } catch {
+            print("❌ Migration failed: \(error)")
+        }
+    }
+    
+    /// Add sample data only if database is completely empty
+    private func addSampleDataIfNeeded(in context: NSManagedObjectContext) {
+        #if DEBUG
+        let request: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
+        
+        do {
+            let count = try context.count(for: request)
+            if count == 0 {
+                // DON'T call ensureDefaultCategories here - categories already exist
+                print("📦 Adding sample data to empty database")
+                PersistenceController.addSampleDataWithoutCategories(to: context)
+            } else {
+                print("ℹ️ Database has data (\(count) items), skipping sample data")
+            }
+        } catch {
+            print("❌ Error checking for existing data: \(error)")
+        }
+        #endif
+    }
+    
+    /// Sample data creation that doesn't create categories (they already exist)
+    private static func addSampleDataWithoutCategories(to context: NSManagedObjectContext) {
+        // Fetch existing categories
+        let categoryRequest: NSFetchRequest<Category> = Category.fetchRequest()
+        let categories = (try? context.fetch(categoryRequest)) ?? []
+        let categoryDict = Dictionary(uniqueKeysWithValues: categories.map { ($0.displayName, $0) })
+        
+        // Only create grocery items and other data - categories already exist
+        let groceryItems = [
+            ("Bananas", "Produce", true),
+            ("Apples", "Produce", true),
+            ("Strawberries", "Produce", true),
+            ("Ham", "Deli & Meat", true),
+            ("Bologna", "Deli & Meat", true),
+            ("Milk 2%", "Dairy & Fridge", true),
+            ("Kids Yogurt", "Dairy & Fridge", true),
+            ("Bread", "Bread & Frozen", true)
+        ]
+        
+        for (name, categoryName, isStaple) in groceryItems {
+            let item = GroceryItem(context: context)
+            item.id = UUID()
+            item.name = name
+            item.category = categoryName
+            item.categoryEntity = categoryDict[categoryName]
+            item.isStaple = isStaple
+            item.dateCreated = Date().addingTimeInterval(-Double.random(in: 0...30) * 24 * 60 * 60)
+            if isStaple {
+                item.lastPurchased = Date().addingTimeInterval(-Double.random(in: 1...14) * 24 * 60 * 60)
+            }
+        }
+        
+        print("✅ Sample data added with existing categories")
     }
     
     // MARK: - Background Operations
     /// Performs Core Data write operations on a background context to prevent UI blocking.
-    /// Automatically handles context setup, merge policy, and error handling.
-    /// Use this for all create, update, and delete operations in the app.
     func performWrite(_ block: @escaping (NSManagedObjectContext) -> Void, onError: ((Error) -> Void)? = nil) {
         container.performBackgroundTask { ctx in
             ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
@@ -190,34 +304,5 @@ struct PersistenceController {
                 }
             }
         }
-    }
-    
-    // MARK: - Category Migration
-    /// Performs category migration after container loads
-    private func performCategoryMigrationIfNeeded() {
-        container.performBackgroundTask { backgroundContext in
-            CategoryMigrationHelper.performMigration(in: backgroundContext)
-        }
-    }
-    
-    // Add sample data only if database is empty
-    private func addSampleDataIfNeeded() {
-        #if DEBUG
-        let context = container.viewContext
-        let request: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
-        
-        do {
-            let count = try context.count(for: request)
-            if count == 0 {
-                PersistenceController.addSampleData(to: context)
-                try context.save()
-                print("✅ Sample data with categories added successfully")
-            }
-        } catch {
-            print("Error checking for existing data: \(error)")
-        }
-        #else
-        print("Production build: Sample data loading skipped")
-        #endif
     }
 }

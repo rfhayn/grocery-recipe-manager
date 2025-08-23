@@ -8,15 +8,6 @@ struct EditStapleView: View {
     // The staple item being edited
     let staple: GroceryItem
     
-    // Dynamic categories fetch (sorted by custom order)
-    @FetchRequest(
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true),
-            NSSortDescriptor(keyPath: \Category.name, ascending: true)
-        ],
-        animation: .default
-    ) private var categories: FetchedResults<Category>
-    
     // Form state - initialized from existing staple
     @State private var name: String
     @State private var selectedCategory: String
@@ -27,9 +18,18 @@ struct EditStapleView: View {
     @State private var showingError = false
     @State private var errorMessage = ""
     
+    // Dynamic categories fetch (sorted by custom order)
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true),
+            NSSortDescriptor(keyPath: \Category.name, ascending: true)
+        ],
+        animation: .default
+    ) private var categories: FetchedResults<Category>
+    
     // Validation
     private var isFormValid: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !selectedCategory.isEmpty
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
     // Check if form has changes
@@ -61,21 +61,15 @@ struct EditStapleView: View {
                     TextField("Staple Name", text: $name)
                         .textInputAutocapitalization(.words)
                     
-                    if !categories.isEmpty {
-                        Picker("Category", selection: $selectedCategory) {
-                            ForEach(categories, id: \.self) { category in
-                                HStack {
-                                    Circle()
-                                        .fill(Color(hex: category.displayColor))
-                                        .frame(width: 16, height: 16)
-                                    Text(category.displayName)
-                                }
-                                .tag(category.displayName)
-                            }
+                    Picker("Category", selection: $selectedCategory) {
+                        ForEach(categories, id: \.self) { category in
+                            HStack {
+                                Circle()
+                                    .fill(Color(hex: category.displayColor))
+                                    .frame(width: 12, height: 12)
+                                Text(category.displayName)
+                            }.tag(category.displayName)
                         }
-                    } else {
-                        Text("Loading categories...")
-                            .foregroundColor(.secondary)
                     }
                 }
                 
@@ -117,29 +111,12 @@ struct EditStapleView: View {
                     }
                 }
             }
-            .onAppear {
-                ensureCategoryIsValid()
-            }
             .alert("Error", isPresented: $showingError) {
                 Button("OK") { }
             } message: {
                 Text(errorMessage)
             }
         }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func ensureCategoryIsValid() {
-        // Make sure the selected category still exists in the current categories
-        if !categories.isEmpty && !categories.contains(where: { $0.displayName == selectedCategory }) {
-            // If the current category doesn't exist, default to the first available
-            selectedCategory = categories.first?.displayName ?? "Produce"
-        }
-    }
-    
-    private func findCategoryEntity(named categoryName: String) -> Category? {
-        return categories.first { $0.displayName == categoryName }
     }
     
     private func saveChanges() {
@@ -177,10 +154,11 @@ struct EditStapleView: View {
             stapleToUpdate.name = trimmedName
             stapleToUpdate.category = selectedCategory // Keep for legacy compatibility
             
-            // Set category relationship
-            if let categoryEntity = findCategoryEntity(named: selectedCategory) {
-                let categoryInContext = context.object(with: categoryEntity.objectID) as! Category
-                stapleToUpdate.categoryEntity = categoryInContext
+            // Update category relationship
+            let categoryRequest: NSFetchRequest<Category> = Category.fetchRequest()
+            categoryRequest.predicate = NSPredicate(format: "name ==[c] %@", selectedCategory)
+            if let matchingCategory = try? context.fetch(categoryRequest).first {
+                stapleToUpdate.categoryEntity = matchingCategory
             }
             
             if includeLastPurchased {
@@ -201,8 +179,6 @@ struct EditStapleView: View {
         dismiss()
     }
 }
-
-// Color extension moved to Color+Extensions.swift
 
 #Preview {
     // Create a sample staple for preview

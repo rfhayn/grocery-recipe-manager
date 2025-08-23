@@ -1,4 +1,4 @@
-// Fixed StaplesView.swift - No Duplicate Categories
+// Fixed StaplesView.swift - Updated with Category Management Navigation
 import SwiftUI
 import CoreData
 
@@ -12,7 +12,7 @@ struct StaplesView: View {
     // Form presentation states
     @State private var showingAddForm = false
     @State private var stapleToEdit: GroceryItem?
-    @State private var showingManageCategories = false
+    @State private var showingCategoryManagement = false
     
     // Error handling
     @State private var showingError = false
@@ -60,16 +60,13 @@ struct StaplesView: View {
         .sheet(item: $stapleToEdit) { staple in
             EditStapleView(staple: staple)
         }
-        .sheet(isPresented: $showingManageCategories) {
+        .sheet(isPresented: $showingCategoryManagement) {
             ManageCategoriesView()
         }
         .alert("Error", isPresented: $showingError) {
             Button("OK") { }
         } message: {
             Text(errorMessage)
-        }
-        .onAppear {
-            cleanupDuplicateCategories()
         }
     }
     
@@ -87,7 +84,6 @@ struct StaplesView: View {
                 
                 Divider()
                 
-                // Use ONLY the dynamic categories, not hardcoded ones
                 ForEach(categories, id: \.self) { category in
                     Button(action: {
                         selectedCategory = category
@@ -229,10 +225,8 @@ struct StaplesView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
-            Button(action: {
-                showingManageCategories = true
-            }) {
-                Label("Organize Categories", systemImage: "slider.horizontal.3")
+            Button("Categories") {
+                showingCategoryManagement = true
             }
         }
         
@@ -378,48 +372,6 @@ struct StaplesView: View {
     }
     
     // MARK: - Helper Methods
-    private func cleanupDuplicateCategories() {
-        let context = viewContext
-        
-        // Group categories by name to find duplicates
-        let categoryNames = Set(categories.map { $0.displayName })
-        
-        for categoryName in categoryNames {
-            let request: NSFetchRequest<Category> = Category.fetchRequest()
-            request.predicate = NSPredicate(format: "name ==[c] %@", categoryName)
-            
-            do {
-                let duplicateCategories = try context.fetch(request)
-                if duplicateCategories.count > 1 {
-                    print("🧹 Found \(duplicateCategories.count) categories named '\(categoryName)'")
-                    
-                    // Keep the first one (usually the one with the lowest sortOrder)
-                    let categoryToKeep = duplicateCategories.sorted { $0.sortOrder < $1.sortOrder }.first!
-                    
-                    // Delete the rest
-                    for category in duplicateCategories {
-                        if category != categoryToKeep {
-                            print("🗑️ Deleting duplicate category: \(category.displayName)")
-                            context.delete(category)
-                        }
-                    }
-                }
-            } catch {
-                print("❌ Error cleaning up categories: \(error)")
-            }
-        }
-        
-        // Save changes
-        do {
-            if context.hasChanges {
-                try context.save()
-                print("✅ Category cleanup completed")
-            }
-        } catch {
-            print("❌ Failed to save category cleanup: \(error)")
-        }
-    }
-    
     private func createUncategorizedCategory() -> Category {
         // First try to find existing uncategorized category
         let request: NSFetchRequest<Category> = Category.fetchRequest()
@@ -442,6 +394,25 @@ struct StaplesView: View {
         try? viewContext.save()
         
         return category
+    }
+    
+    private func cleanupUncategorizedDuplicates() {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        request.predicate = NSPredicate(format: "name ==[c] 'Uncategorized'")
+        
+        do {
+            let uncategorizedCategories = try viewContext.fetch(request)
+            if uncategorizedCategories.count > 1 {
+                // Keep the first one, delete the rest
+                for i in 1..<uncategorizedCategories.count {
+                    viewContext.delete(uncategorizedCategories[i])
+                }
+                try viewContext.save()
+                print("🧹 Cleaned up \(uncategorizedCategories.count - 1) duplicate uncategorized categories")
+            }
+        } catch {
+            print("❌ Error cleaning up uncategorized duplicates: \(error)")
+        }
     }
     
     private func categoryEmoji(for categoryName: String) -> String {
@@ -470,6 +441,9 @@ struct StaplesView: View {
     }
     
     private func ensureItemsHaveCategoryRelationships() {
+        // Clean up any duplicate uncategorized categories first
+        cleanupUncategorizedDuplicates()
+        
         let itemsNeedingMigration = staples.filter { $0.categoryEntity == nil }
         
         if !itemsNeedingMigration.isEmpty {
