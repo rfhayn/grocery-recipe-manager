@@ -12,7 +12,6 @@ struct StaplesView: View {
     // Form presentation states
     @State private var showingAddForm = false
     @State private var stapleToEdit: GroceryItem?
-    @State private var showingCategoryManagement = false
     
     // Error handling
     @State private var showingError = false
@@ -59,9 +58,6 @@ struct StaplesView: View {
         }
         .sheet(item: $stapleToEdit) { staple in
             EditStapleView(staple: staple)
-        }
-        .sheet(isPresented: $showingCategoryManagement) {
-            ManageCategoriesView()
         }
         .alert("Error", isPresented: $showingError) {
             Button("OK") { }
@@ -224,12 +220,6 @@ struct StaplesView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            Button("Categories") {
-                showingCategoryManagement = true
-            }
-        }
-        
         ToolbarItem(placement: .navigationBarTrailing) {
             EditButton()
         }

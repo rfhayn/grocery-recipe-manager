@@ -26,36 +26,39 @@ struct ManageCategoriesView: View {
     @State private var errorMessage = ""
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                headerSection
-                categoriesListSection
-            }
-            .navigationTitle("Manage Categories")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                toolbarContent
-            }
-            .sheet(isPresented: $showingAddCategory) {
-                AddCategoryView()
-            }
-            .alert("Delete Category", isPresented: $showingDeleteAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Delete", role: .destructive) {
-                    if let category = categoryToDelete {
-                        deleteCategory(category)
-                    }
-                }
-            } message: {
+        VStack(spacing: 0) {
+            headerSection
+            categoriesListSection
+        }
+        .navigationTitle("Manage Categories")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            toolbarContent
+        }
+        .sheet(isPresented: $showingAddCategory) {
+            AddCategoryView()
+        }
+        .alert("Delete Category", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
                 if let category = categoryToDelete {
-                    Text("Delete '\(category.displayName)'? Items in this category will be moved to 'Uncategorized'.")
+                    deleteCategory(category)
                 }
             }
-            .alert("Error", isPresented: $showingError) {
-                Button("OK") { }
-            } message: {
-                Text(errorMessage)
+        } message: {
+            if let category = categoryToDelete {
+                let itemCount = category.groceryItemsArray.count
+                if itemCount > 0 {
+                    Text("Delete '\(category.displayName)'?\n\n\(itemCount) item\(itemCount == 1 ? "" : "s") in this category will keep their category name for existing lists, but new items will need a different category.")
+                } else {
+                    Text("Delete '\(category.displayName)'?\n\nThis category will no longer be available for new items.")
+                }
             }
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
         }
     }
     
@@ -91,7 +94,10 @@ struct ManageCategoriesView: View {
                 CategoryRowView(
                     category: category,
                     position: index + 1,
-                    onDelete: { deleteCategory(category) }
+                    onDelete: {
+                        categoryToDelete = category
+                        showingDeleteAlert = true
+                    }
                 )
                 .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             }
@@ -116,12 +122,6 @@ struct ManageCategoriesView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            Button("Done") {
-                dismiss()
-            }
-        }
-        
         ToolbarItem(placement: .navigationBarTrailing) {
             Button(isReordering ? "Done" : "Reorder") {
                 withAnimation(.easeInOut(duration: 0.3)) {
@@ -171,30 +171,37 @@ struct ManageCategoriesView: View {
     }
     
     private func deleteCategory(_ category: Category) {
-        guard !category.isDefault else {
-            errorMessage = "Cannot delete default categories"
-            showingError = true
-            return
-        }
-        
         let categoryID = category.objectID
+        let itemCount = category.groceryItemsArray.count
+        let categoryName = category.displayName
+        
         PersistenceController.shared.performWrite({ context in
             let categoryToDelete = context.object(with: categoryID) as! Category
             
-            // Move items to uncategorized
+            // Update grocery items to remove the relationship but keep the category name
+            // This ensures existing list items maintain their category display
             if let items = categoryToDelete.groceryItems {
                 for case let item as GroceryItem in items {
+                    // Remove the relationship but preserve the category string
                     item.categoryEntity = nil
-                    item.category = "Uncategorized"
+                    // Keep the original category name so existing lists still show it
+                    item.category = categoryName
+                }
+                
+                if itemCount > 0 {
+                    print("📝 Updated \(itemCount) item\(itemCount == 1 ? "" : "s") - removed category relationship but preserved category name '\(categoryName)'")
                 }
             }
             
             context.delete(categoryToDelete)
-            print("✅ Deleted category: \(categoryToDelete.displayName)")
+            print("✅ Deleted category: \(categoryName)")
         }, onError: { error in
             errorMessage = "Failed to delete category: \(error.localizedDescription)"
             showingError = true
         })
+        
+        // Clear the categoryToDelete after successful deletion
+        categoryToDelete = nil
     }
     
     private func resetToDefaultOrder() {
@@ -258,15 +265,33 @@ struct CategoryRowView: View {
                             .padding(.vertical, 2)
                             .background(Color.blue.opacity(0.1))
                             .cornerRadius(4)
+                    } else {
+                        Text("Custom")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.green)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.green.opacity(0.1))
+                            .cornerRadius(4)
                     }
                     
-                    Text("\(category.groceryItemsArray.count) items")
+                    let itemCount = category.groceryItemsArray.count
+                    Text("\(itemCount) item\(itemCount == 1 ? "" : "s")")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
             
             Spacer()
+            
+            // Delete button for all categories
+            Button(action: onDelete) {
+                Image(systemName: "trash")
+                    .foregroundColor(.red)
+                    .font(.title3)
+            }
+            .buttonStyle(BorderlessButtonStyle())
             
             // Drag handle
             Image(systemName: "line.3.horizontal")
@@ -291,6 +316,8 @@ struct CategoryRowView: View {
 }
 
 #Preview {
-    ManageCategoriesView()
-        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    NavigationView {
+        ManageCategoriesView()
+    }
+    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

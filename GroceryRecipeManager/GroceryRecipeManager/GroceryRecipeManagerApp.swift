@@ -6,8 +6,27 @@ struct GroceryRecipeManagerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                StaplesView()
+            TabView {
+                NavigationView {
+                    WeeklyListsView()
+                }
+                .tabItem {
+                    Label("Lists", systemImage: "list.clipboard")
+                }
+                
+                NavigationView {
+                    StaplesView()
+                }
+                .tabItem {
+                    Label("Staples", systemImage: "cart.badge.plus")
+                }
+                
+                NavigationView {
+                    ManageCategoriesView()
+                }
+                .tabItem {
+                    Label("Categories", systemImage: "folder.badge.gearshape")
+                }
             }
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
