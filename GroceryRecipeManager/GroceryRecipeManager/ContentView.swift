@@ -1,107 +1,111 @@
+//
+//  ContentView.swift
+//  GroceryRecipeManager
+//
+//  Working version with Phase 0 Step 2 test button
+//
+
 import SwiftUI
 import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \GroceryItem.dateCreated, ascending: true)],
-        animation: .default)
-    private var groceryItems: FetchedResults<GroceryItem>
-
+    
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(groceryItems) { item in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(item.name ?? "Unknown Item")
-                                .fontWeight(.medium)
-                            Spacer()
-                            if item.isStaple {
-                                Text("📌 Staple")
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 2)
-                                    .background(Color.blue.opacity(0.1))
-                                    .cornerRadius(4)
-                            }
-                        }
-                        
-                        if let category = item.category {
-                            Text(category)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        if let dateCreated = item.dateCreated {
-                            Text("Added: \(dateCreated, formatter: itemFormatter)")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
+        TabView {
+            WeeklyListsView()
+                .tabItem {
+                    Label("Lists", systemImage: "list.bullet")
+                }
+            
+            StaplesView()
+                .tabItem {
+                    Label("Staples", systemImage: "cart")
+                }
+            
+            CategoriesView()
+                .tabItem {
+                    Label("Categories", systemImage: "tag")
+                }
+            
+            // Test tab for Phase 0 Step 2
+            NavigationView {
+                VStack(spacing: 30) {
+                    Text("Phase 0 Testing")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+                    Text("Test the new performance services from Phase 0 Step 2")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    
+                    Button("🧪 Test Phase 0 Services") {
+                        testServices()
                     }
-                    .padding(.vertical, 2)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    .font(.headline)
+                    
+                    Spacer()
                 }
-                .onDelete(perform: deleteItems)
+                .padding()
+                .navigationTitle("Testing")
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            .navigationTitle("Grocery Items")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = GroceryItem(context: viewContext)
-            newItem.id = UUID()
-            newItem.name = "New Grocery Item"
-            newItem.category = "Grocery"
-            newItem.dateCreated = Date()
-            newItem.isStaple = false
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            .tabItem {
+                Label("Test", systemImage: "wrench.and.screwdriver")
             }
         }
     }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { groceryItems[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+    
+    // Test function for Phase 0 Step 2
+    private func testServices() {
+        print("🚀 Starting Phase 0 Step 2 Service Test...")
+        
+        Task {
+            let recipeService = OptimizedRecipeDataService(context: viewContext)
+            let templateService = IngredientTemplateService(context: viewContext)
+            let validator = ArchitectureValidator(context: viewContext, recipeService: recipeService, templateService: templateService)
+            
+            let (isPassing, summary) = await validator.quickPerformanceCheck()
+            print("🎯 Phase 0 Step 2 Result: \(summary)")
+            
+            // Also run the integration test
+            let report = await validator.testServiceIntegration()
+            print(report)
         }
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
+// MARK: - Temporary Categories View (if it doesn't exist)
+struct CategoriesView: View {
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("Categories Coming Soon")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text("Category management will be enhanced in future updates")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Categories")
+        }
+    }
+}
 
+// MARK: - Preview
 #Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    ContentView()
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
