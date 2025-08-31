@@ -22,6 +22,7 @@
         <attribute name="lastPurchased" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="categoryEntity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="groceryItems" inverseEntity="Category"/>
+        <relationship name="ingredientTemplate" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IngredientTemplate" inverseName="stapleItems" inverseEntity="IngredientTemplate"/>
         <fetchIndex name="byStaplesCategoryOrder">
             <fetchIndexElement property="isStaple" type="Binary" order="ascending"/>
             <fetchIndexElement property="category" type="Binary" order="ascending"/>
@@ -34,10 +35,13 @@
         <attribute name="dateCompleted" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isCompleted" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isFromRecipe" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="quantity" optional="YES" attributeType="String"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="source" optional="YES" attributeType="String"/>
+        <attribute name="sourceRecipeID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="sourceType" optional="YES" attributeType="String"/>
         <relationship name="weeklyList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WeeklyList" inverseName="items" inverseEntity="WeeklyList"/>
     </entity>
     <entity name="Ingredient" representedClassName="Ingredient" syncable="YES">
@@ -47,6 +51,22 @@
         <attribute name="quantity" optional="YES" attributeType="String"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="unit" optional="YES" attributeType="String"/>
+        <relationship name="ingredientTemplate" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IngredientTemplate" inverseName="ingredients" inverseEntity="IngredientTemplate"/>
+        <relationship name="recipe" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recipe" inverseName="ingredients" inverseEntity="Recipe"/>
+    </entity>
+    <entity name="IngredientTemplate" representedClassName="IngredientTemplate" syncable="YES" codeGenerationType="class">
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="usageCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Ingredient" inverseName="ingredientTemplate" inverseEntity="Ingredient"/>
+        <relationship name="stapleItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryItem" inverseName="ingredientTemplate" inverseEntity="GroceryItem"/>
+        <fetchIndex name="byTemplateSearch">
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+            <fetchIndexElement property="category" type="Binary" order="ascending"/>
+            <fetchIndexElement property="usageCount" type="Binary" order="descending"/>
+        </fetchIndex>
     </entity>
     <entity name="Recipe" representedClassName="Recipe" syncable="YES">
         <attribute name="cookTime" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -60,6 +80,7 @@
         <attribute name="sourceURL" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="usageCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ingredient" inverseName="recipe" inverseEntity="Ingredient"/>
         <fetchIndex name="byPropertyIndex">
             <fetchIndexElement property="usageCount" type="Binary" order="ascending"/>
             <fetchIndexElement property="lastUsed" type="Binary" order="ascending"/>
