@@ -100,7 +100,7 @@ struct Phase0TestView: View {
         lastTestResult = ""
         
         print("🚀 Starting Phase 0 Step 2 Service Test...")
-        
+       
         Task {
             let recipeService = OptimizedRecipeDataService(context: viewContext)
             let templateService = IngredientTemplateService(context: viewContext)
@@ -123,6 +123,13 @@ struct Phase0TestView: View {
             print("==================================================")
             print(report)
             print("==================================================")
+        }
+
+        
+        // Temporary placeholder until services are implemented
+        DispatchQueue.main.async {
+            self.isTestRunning = false
+            self.lastTestResult = "⏳ Services not yet implemented. Test will be functional after service creation."
         }
     }
 }

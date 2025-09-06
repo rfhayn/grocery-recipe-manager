@@ -62,10 +62,10 @@ struct ContentView: View {
         }
     }
     
-    // Test function for Phase 0 Step 2
+
     private func testServices() {
         print("🚀 Starting Phase 0 Step 2 Service Test...")
-        
+
         Task {
             let recipeService = OptimizedRecipeDataService(context: viewContext)
             let templateService = IngredientTemplateService(context: viewContext)
@@ -78,6 +78,7 @@ struct ContentView: View {
             let report = await validator.testServiceIntegration()
             print(report)
         }
+
     }
 }
 
