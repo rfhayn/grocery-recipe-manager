@@ -2,7 +2,7 @@
 //  Recipe+CoreDataClass.swift
 //  GroceryRecipeManager
 //
-//  Created by Rich Hayn on 8/18/25.
+//  Created by Richard Hayn on 9/7/25.
 //
 //
 

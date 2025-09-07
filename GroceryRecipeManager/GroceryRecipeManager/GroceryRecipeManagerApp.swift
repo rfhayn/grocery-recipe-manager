@@ -21,6 +21,12 @@ struct GroceryRecipeManagerApp: App {
                     Label("Staples", systemImage: "cart.badge.plus")
                 }
                 
+                // 🆕 NEW RECIPES TAB - Milestone 2 Phase 2 Step 1
+                RecipeListView()
+                .tabItem {
+                    Label("Recipes", systemImage: "book.pages")
+                }
+                
                 NavigationView {
                     ManageCategoriesView()
                 }
@@ -28,7 +34,7 @@ struct GroceryRecipeManagerApp: App {
                     Label("Categories", systemImage: "folder.badge.gearshape")
                 }
                 
-                // Phase 0 Step 2 Test Tab
+                // Phase 1 Test Tab (can remove after Step 1 testing complete)
                 NavigationView {
                     Phase0TestView()
                 }
@@ -41,7 +47,7 @@ struct GroceryRecipeManagerApp: App {
     }
 }
 
-// MARK: - Phase 0 Step 2 Test View
+// MARK: - Phase 1 Test View (Keep for validation)
 struct Phase0TestView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var isTestRunning = false
@@ -49,11 +55,11 @@ struct Phase0TestView: View {
     
     var body: some View {
         VStack(spacing: 30) {
-            Text("Phase 0 Step 2 Testing")
+            Text("Phase 1 Architecture Testing")
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("Test the new performance services and architecture optimizations")
+            Text("Validates the performance services from Phase 1 Critical Architecture Enhancements")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -63,7 +69,7 @@ struct Phase0TestView: View {
                 ProgressView("Running tests...")
                     .scaleEffect(1.2)
             } else {
-                Button("🧪 Test Phase 0 Services") {
+                Button("🧪 Test Phase 1 Services") {
                     runPhase0Test()
                 }
                 .padding(.horizontal, 20)
@@ -92,16 +98,16 @@ struct Phase0TestView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Phase 0 Testing")
+        .navigationTitle("Phase 1 Testing")
     }
     
     private func runPhase0Test() {
         isTestRunning = true
         lastTestResult = ""
         
-        print("🚀 Starting Phase 0 Step 2 Service Test...")
+        print("🚀 Starting Phase 1 Service Test...")
        
-        Task {
+        Task { @MainActor in
             let recipeService = OptimizedRecipeDataService(context: viewContext)
             let templateService = IngredientTemplateService(context: viewContext)
             let validator = ArchitectureValidator(context: viewContext, recipeService: recipeService, templateService: templateService)
@@ -112,24 +118,15 @@ struct Phase0TestView: View {
             // Run integration test
             let report = await validator.testServiceIntegration()
             
-            DispatchQueue.main.async {
-                self.isTestRunning = false
-                self.lastTestResult = "✅ \(summary)\n\nCheck Xcode console for detailed report."
-            }
+            self.isTestRunning = false
+            self.lastTestResult = "✅ \(summary)\n\nCheck Xcode console for detailed report."
             
-            print("🎯 Phase 0 Step 2 Final Result: \(summary)")
+            print("🎯 Phase 1 Final Result: \(summary)")
             print("\n==================================================")
             print("📋 DETAILED INTEGRATION REPORT:")
             print("==================================================")
             print(report)
             print("==================================================")
-        }
-
-        
-        // Temporary placeholder until services are implemented
-        DispatchQueue.main.async {
-            self.isTestRunning = false
-            self.lastTestResult = "⏳ Services not yet implemented. Test will be functional after service creation."
         }
     }
 }

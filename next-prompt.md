@@ -1,76 +1,71 @@
-# MILESTONE 2 Phase 2 Development Prompt
+# MILESTONE 2 Phase 2 Step 2 Development Prompt
 
-**Copy and paste this prompt when ready to start Phase 2 implementation:**
+**Copy and paste this prompt when ready to start Step 2 implementation:**
 
 ---
 
-I'm ready to begin **MILESTONE 2: ENHANCED RECIPE INTEGRATION - Phase 2: Recipe Core Development** for my Grocery & Recipe Manager iOS app.
+I'm ready to begin **MILESTONE 2: ENHANCED RECIPE INTEGRATION - Phase 2: Recipe Core Development - Step 2: Add RecipeDetailView** for my Grocery & Recipe Manager iOS app.
 
 ## 🎯 **Current Status:**
 - ✅ **Phase 1 COMPLETE**: Critical Architecture Enhancements successfully implemented and validated
+- ✅ **Step 1 COMPLETE**: Basic RecipeListView successfully implemented and tested
 - ✅ **Performance Services**: OptimizedRecipeDataService, IngredientTemplateService, ArchitectureValidator all operational
-- ✅ **Architecture Validation**: All services tested with performance targets met (0.000s response times)
-- ✅ **Foundation Ready**: Custom category system, Core Data optimization, professional UI patterns established
+- ✅ **Recipe Navigation**: Recipes tab functional with create/read/delete operations working
 
-## 🚀 **Phase 2 Implementation Goals:**
+## 🚀 **Step 1 Accomplishments Validated:**
+- **RecipeListView.swift**: Created with Core Data integration and professional SwiftUI patterns
+- **Recipe Creation**: Sample recipe generation working with realistic data
+- **Recipe Display**: List view with usage tracking, favorites, timing indicators
+- **Navigation**: Recipe detail view with basic information display
+- **Search Functionality**: Real-time recipe filtering operational
+- **Delete Operations**: Swipe-to-delete working with Core Data persistence
+- **UI Integration**: Recipes tab added to main TabView navigation
 
-### **Story 2.1: Recipe Catalog Foundation (3-4 hours total):**
+## 🎯 **Step 2 Implementation Goals (45 minutes):**
 
-**Implementation Sequence (following new development guidelines):**
+### **Enhance RecipeDetailView with:**
 
-1. **Create Basic RecipeListView** (30 minutes)
-   - Simple recipe list using `OptimizedRecipeDataService.fetchRecipes()`
-   - Test compilation and basic display before proceeding
-   - Follow established SwiftUI patterns from Milestone 1
+1. **Better Ingredient Display** (15 minutes)
+   - Enhanced ingredients section with organized layout
+   - Integration with IngredientTemplate system preparation
+   - Category-aware ingredient organization foundation
 
-2. **Add RecipeDetailView** (45 minutes)
-   - Recipe detail view with navigation from list
-   - Display recipe properties (title, instructions, servings, etc.)
-   - Test navigation and data display functionality
+2. **Enhanced Recipe Timing Information** (10 minutes)
+   - Display cook time in addition to prep time
+   - Total time calculation and display
+   - Professional timing layout with icons
 
-3. **Integrate IngredientTemplate System** (60 minutes)
-   - Connect recipe ingredients to `IngredientTemplateService`
-   - Implement template normalization preventing duplication
-   - Test template connections and autocomplete functionality
+3. **Improved Usage Analytics** (10 minutes)
+   - Enhanced usage statistics display
+   - Usage tracking with better visual design
+   - Mark as used functionality preparation
 
-4. **Apply Custom Category Organization** (45 minutes)
-   - Recipe ingredients organized by established custom category system
-   - Leverage existing category personalization from Milestone 1
-   - Test category integration and store-layout consistency
+4. **Navigation Enhancement** (10 minutes)
+   - Better toolbar actions and menus
+   - Improved detail view navigation flow
+   - Professional iOS detail view patterns
 
-5. **Implement Recipe Search** (30 minutes)
-   - Recipe search using performance-optimized patterns
-   - Target < 0.1s response times with established search patterns
-   - Test search performance and result accuracy
+## 📋 **Technical Foundation Ready:**
+- **Core Data Model**: Recipe entity with all properties operational (servings: Int16, prepTime: Int16, cookTime: Int16)
+- **Generated Classes**: Recipe+CoreDataClass.swift and Recipe+CoreDataProperties.swift working correctly
+- **Performance Services**: OptimizedRecipeDataService integrated and functional
+- **UI Patterns**: Professional SwiftUI patterns established from Milestone 1
 
-6. **Add Usage Tracking Foundation** (30 minutes)
-   - Basic recipe usage analytics using existing patterns
-   - Usage count and last-used tracking preparation
-   - Test analytics foundation for future insights
+## 🔧 **Known Technical Details:**
+- Recipe properties are non-optional Int16 (servings, prepTime, cookTime)
+- Core Data class generation resolved with Manual/None → Class Definition approach
+- Search bar visibility is correct iOS behavior (always visible)
+- Edit functionality correctly shows "Story 2.2" placeholder
 
-## 📋 **Architecture Foundation Available:**
-- **OptimizedRecipeDataService**: N+1 prevention, batch fetching, 0.000s performance validated
-- **IngredientTemplateService**: Template normalization, autocomplete, duplication prevention
-- **ArchitectureValidator**: Performance monitoring and integration testing
-- **Custom Category System**: Revolutionary store-layout optimization ready for recipe integration
-- **Professional UI Patterns**: Form components, navigation, error handling from Milestone 1
+## ✅ **Success Criteria for Step 2:**
+- Enhanced recipe detail view with comprehensive information display
+- Better ingredient section layout and organization
+- Timing information display (prep + cook + total time)
+- Improved usage analytics with professional design
+- Enhanced navigation and toolbar functionality
+- All existing Step 1 functionality preserved and working
 
-## ✅ **Success Criteria for Story 2.1:**
-- Recipe list displays using performance-optimized data service
-- Recipe details show ingredients organized by custom categories
-- Recipe search operational with < 0.1s response times
-- IngredientTemplate integration preventing ingredient duplication
-- Usage tracking foundation operational
-- All existing functionality preserved (staples, categories, lists)
+## 🎯 **After Step 2 Complete:**
+Ready for **Step 3: Integrate IngredientTemplate System** (60 minutes) with established detail view patterns and enhanced display foundation.
 
-## 🎯 **Development Guidelines to Follow:**
-- **Start Minimal, Build Incrementally**: Test after each 30-60 minute implementation
-- **3-Error Rule**: Stop and reassess if more than 3 build errors occur
-- **Preserve Working Functionality**: Never break existing Milestone 1 features
-- **Performance First**: Maintain < 0.1s response times throughout
-- **Use Proven Patterns**: Follow successful patterns from Milestone 1
-
-## 🎯 **After Story 2.1 Complete:**
-Ready for **Story 2.2: Recipe Creation & Editing** (4-5 hours) with established display patterns, proven IngredientTemplate integration, and performance-optimized foundation.
-
-**Please help me implement Story 2.1 step by step, starting with the basic RecipeListView, following the incremental approach that proved successful in Phase 1.**
+**Please help me implement Step 2 enhancements to RecipeDetailView, building on the successfully validated Step 1 foundation.**
