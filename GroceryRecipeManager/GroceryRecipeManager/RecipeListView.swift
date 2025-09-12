@@ -6,6 +6,7 @@
 //  MILESTONE 2 - Phase 2: Recipe Core Development
 //  Story 2.1: Recipe Catalog Foundation - Step 1: Basic RecipeListView
 //  Updated September 8, 2025 - Step 2: Enhanced RecipeDetailView with Working Favorite Toggle
+//  Updated September 12, 2025 - Step 3: IngredientTemplate Integration with Core Data Publishing Fix
 //
 
 import SwiftUI
@@ -129,59 +130,72 @@ struct RecipeListView: View {
         }
     }
     
-    // MARK: - Actions
+    // MARK: - Actions - FIXED Core Data Publishing Issue
     
     private func addSampleRecipe() {
-        print("🍴 Add Recipe tapped - Creating sample recipe for Step 2 testing")
+        print("Add Recipe tapped - Creating sample recipe with template integration")
         
-        withAnimation {
-            let newRecipe = Recipe(context: viewContext)
+        // Use background context to avoid SwiftUI publishing conflicts
+        let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
+        
+        backgroundContext.perform {
+            let newRecipe = Recipe(context: backgroundContext)
             newRecipe.id = UUID()
             newRecipe.title = "Sample Recipe \(Int(Date().timeIntervalSince1970) % 1000)"
             newRecipe.instructions = "Sample instructions for this delicious recipe. This will be replaced with proper recipe creation in Story 2.2."
             newRecipe.dateCreated = Date()
-            newRecipe.usageCount = Int32.random(in: 0...5) // Random usage for testing
-            newRecipe.isFavorite = Bool.random() // Random favorite for testing
-            newRecipe.servings = Int16.random(in: 2...6) // Random servings
-            newRecipe.prepTime = Int16.random(in: 15...45) // Random prep time
-            newRecipe.cookTime = Int16.random(in: 20...60) // Random cook time
-            
-            // Add sample ingredients using proper Core Data relationships
-            addSampleIngredients(to: newRecipe)
+            newRecipe.usageCount = Int32.random(in: 0...5)
+            newRecipe.isFavorite = Bool.random()
+            newRecipe.servings = Int16.random(in: 2...6)
+            newRecipe.prepTime = Int16.random(in: 15...45)
+            newRecipe.cookTime = Int16.random(in: 20...60)
             
             // Occasionally set lastUsed for testing
             if newRecipe.usageCount > 0 {
-                newRecipe.lastUsed = Date().addingTimeInterval(-Double.random(in: 86400...604800)) // 1-7 days ago
+                newRecipe.lastUsed = Date().addingTimeInterval(-Double.random(in: 86400...604800))
             }
             
+            // Add sample ingredients with template integration
+            self.addSampleIngredientsWithTemplates(to: newRecipe, in: backgroundContext)
+            
             do {
-                try viewContext.save()
-                print("✅ Sample recipe '\(newRecipe.title ?? "Unknown")' created successfully")
+                try backgroundContext.save()
+                print("Sample recipe '\(newRecipe.title ?? "Unknown")' created successfully with template integration")
             } catch {
-                print("❌ Error creating sample recipe: \(error)")
+                print("Error creating sample recipe: \(error)")
             }
         }
     }
     
-    private func addSampleIngredients(to recipe: Recipe) {
-        // Add sample ingredients for testing
-        let sampleIngredients = [
-            ("2 cups", "flour", ""),
-            ("1 cup", "sugar", ""),
-            ("2 large", "eggs", ""),
-            ("1 tsp", "vanilla extract", ""),
-            ("1/2 cup", "butter", "melted")
+    private func addSampleIngredientsWithTemplates(to recipe: Recipe, in context: NSManagedObjectContext) {
+        // Initialize services for background context
+        let templateService = IngredientTemplateService(context: context)
+        let parsingService = IngredientParsingService(context: context, templateService: templateService)
+        
+        // Sample ingredients with realistic variety for template testing
+        let ingredientTexts = [
+            "2 cups all-purpose flour",
+            "1 cup granulated sugar",
+            "2 large eggs",
+            "1 tsp vanilla extract",
+            "1/2 cup butter, melted",
+            "1 tsp baking powder",
+            "1/2 tsp salt",
+            "1/4 cup milk"
         ]
         
-        for (index, ingredientData) in sampleIngredients.enumerated() {
-            let ingredient = Ingredient(context: viewContext)
-            ingredient.id = UUID()
-            ingredient.quantity = ingredientData.0
-            ingredient.name = ingredientData.1
-            ingredient.notes = ingredientData.2
-            ingredient.sortOrder = Int16(index)
+        // Use parsing service to create ingredients with templates
+        let ingredients = parsingService.parseAndConnectIngredients(
+            for: recipe,
+            ingredientTexts: ingredientTexts
+        )
+        
+        // Add ingredients to recipe using Core Data relationship
+        for ingredient in ingredients {
             recipe.addToIngredients(ingredient)
         }
+        
+        print("Created \(ingredients.count) ingredients with parsing success rate: \(String(format: "%.1f", parsingService.parseSuccessRate * 100))%")
     }
     
     private func deleteRecipes(offsets: IndexSet) {
@@ -190,9 +204,9 @@ struct RecipeListView: View {
             
             do {
                 try viewContext.save()
-                print("✅ Recipe(s) deleted successfully")
+                print("Recipe(s) deleted successfully")
             } catch {
-                print("❌ Error deleting recipes: \(error)")
+                print("Error deleting recipes: \(error)")
             }
         }
     }
@@ -281,14 +295,23 @@ struct RecipeRowView: View {
     }
 }
 
-// MARK: - Enhanced Recipe Detail View (Step 2)
+// MARK: - Enhanced Recipe Detail View (Step 2 + Step 3 Integration) - FIXED
 
 struct RecipeDetailView: View {
     @ObservedObject var recipe: Recipe
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var recipeService = OptimizedRecipeDataService(context: PersistenceController.shared.container.viewContext)
     
-    // State for enhanced functionality
+    // Step 3: Template service only - parsing service created later to avoid init conflicts
+    @StateObject private var templateService = IngredientTemplateService(context: PersistenceController.shared.container.viewContext)
+    
+    // Create parsing service lazily to avoid init-time Core Data conflicts
+    @State private var parsingService: IngredientParsingService?
+    
+    // UI state for Add to List functionality
+    @State private var showingAddToListSheet = false
+    @State private var selectedIngredients: Set<UUID> = []
+    @State private var isProcessingAddToList = false
     @State private var showingMarkUsedConfirmation = false
     
     var body: some View {
@@ -303,7 +326,7 @@ struct RecipeDetailView: View {
                 // Improved Usage Analytics Section
                 enhancedUsageAnalyticsSection
                 
-                // Enhanced Ingredients Section
+                // Enhanced Ingredients Section with Template Integration
                 enhancedIngredientsSection
                 
                 // Instructions Section
@@ -311,9 +334,7 @@ struct RecipeDetailView: View {
                     instructionsSection(instructions)
                 }
                 
-                // Recipe Notes Section will be added in Story 2.2
-                
-                Spacer(minLength: 100) // Bottom padding for scroll
+                Spacer(minLength: 100)
             }
             .padding(.horizontal)
         }
@@ -323,6 +344,13 @@ struct RecipeDetailView: View {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 enhancedToolbarActions
             }
+        }
+        .sheet(isPresented: $showingAddToListSheet) {
+            AddIngredientsToListView(
+                recipe: recipe,
+                selectedIngredients: $selectedIngredients,
+                templateService: templateService
+            )
         }
         .confirmationDialog(
             "Mark Recipe as Used",
@@ -335,6 +363,12 @@ struct RecipeDetailView: View {
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("This will update the usage count and last used date for this recipe.")
+        }
+        .onAppear {
+            // Create parsing service after view appears to avoid init-time conflicts
+            if parsingService == nil {
+                parsingService = IngredientParsingService(context: viewContext, templateService: templateService)
+            }
         }
     }
     
@@ -535,7 +569,7 @@ struct RecipeDetailView: View {
         .cornerRadius(12)
     }
     
-    // MARK: - Enhanced Ingredients Section
+    // MARK: - Enhanced Ingredients Section with Template Integration
     
     private var enhancedIngredientsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -546,25 +580,25 @@ struct RecipeDetailView: View {
                 
                 Spacer()
                 
-                // Preparation for IngredientTemplate integration (Step 3)
+                // Enhanced Add to List button - NOW FUNCTIONAL
                 Button(action: {
-                    // TODO: Implement in Step 3 - Add to Grocery List
+                    showingAddToListSheet = true
                 }) {
                     HStack(spacing: 4) {
-                        Image(systemName: "cart.badge.plus")
-                        Text("Add to List")
+                        Image(systemName: isProcessingAddToList ? "arrow.triangle.2.circlepath" : "cart.badge.plus")
+                        Text(isProcessingAddToList ? "Processing..." : "Add to List")
                     }
                     .font(.caption)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.green)
+                    .background(hasIngredients ? Color.green : Color.gray)
                     .foregroundColor(.white)
                     .cornerRadius(16)
                 }
-                .disabled(recipe.ingredients?.count == 0) // Enable when ingredients exist
+                .disabled(!hasIngredients || isProcessingAddToList)
             }
             
-            // Enhanced ingredients display using Core Data relationship
+            // Enhanced ingredients display with template matching
             if let ingredientsSet = recipe.ingredients, ingredientsSet.count > 0 {
                 let ingredientsList = Array(ingredientsSet) as! [Ingredient]
                 let sortedIngredients = ingredientsList.sorted { ($0.sortOrder) < ($1.sortOrder) }
@@ -612,14 +646,57 @@ struct RecipeDetailView: View {
                 .background(Color.blue)
                 .clipShape(Circle())
             
-            // Ingredient text with enhanced formatting
+            // Ingredient text with enhanced formatting and parsing - FIXED
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(ingredient.name ?? "Unknown ingredient")
-                        .font(.body)
-                        .lineLimit(nil)
+                    // Parse and display ingredient with smart formatting - safely handle optional parsing service
+                    if let parsingService = parsingService {
+                        let parsed = parsingService.parseIngredient(text: ingredient.name ?? "Unknown ingredient")
+                        
+                        HStack {
+                            // Display parsed components
+                            if let quantity = parsed.quantity {
+                                Text(quantity)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                
+                                if let unit = parsed.unit {
+                                    Text(unit)
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            
+                            // Ingredient name
+                            Text(parsed.name)
+                                .font(.body)
+                                .foregroundColor(.primary)
+                            
+                            Spacer()
+                        }
+                        
+                        // Notes (if any)
+                        if let notes = parsed.notes {
+                            Text("(\(notes))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .italic()
+                        }
+                    } else {
+                        // Fallback display while parsing service loads
+                        Text(ingredient.name ?? "Unknown ingredient")
+                            .font(.body)
+                            .foregroundColor(.primary)
+                    }
                     
-                    // Show unit and notes if available (on separate line for additional info)
+                    // Show Core Data fields if available
+                    if let originalQuantity = ingredient.quantity, !originalQuantity.isEmpty {
+                        Text("Original: \(originalQuantity)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
                     if let unit = ingredient.unit, !unit.isEmpty {
                         Text("Unit: \(unit)")
                             .font(.caption)
@@ -635,26 +712,30 @@ struct RecipeDetailView: View {
                 
                 Spacer()
                 
-                // Quantity right-aligned on same line as ingredient name
-                if let quantity = ingredient.quantity, !quantity.isEmpty {
-                    Text(quantity)
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.trailing)
-                }
+                // Template matching indicator
+                templateMatchingIndicator(for: ingredient)
             }
-            
-            // Preparation for template integration (Step 3)
-            Image(systemName: "checkmark.circle")
-                .font(.caption)
-                .foregroundColor(.green)
-                .opacity(0.3) // Will be functional in Step 3
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
         .background(Color(.systemBackground))
         .cornerRadius(8)
+    }
+    
+    private func templateMatchingIndicator(for ingredient: Ingredient) -> some View {
+        Group {
+            if ingredient.ingredientTemplate != nil {
+                // Template matched
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.caption)
+                    .foregroundColor(.green)
+            } else {
+                // No template match
+                Image(systemName: "questionmark.circle")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+            }
+        }
     }
     
     // MARK: - Instructions Section
@@ -680,7 +761,7 @@ struct RecipeDetailView: View {
         HStack(spacing: 16) {
             // Favorite toggle with @ObservedObject UI refresh
             Button(action: {
-                print("❤️ Heart button tapped - Current favorite status: \(recipe.isFavorite)")
+                print("Heart button tapped - Current favorite status: \(recipe.isFavorite)")
                 toggleFavorite()
             }) {
                 Image(systemName: recipe.isFavorite ? "heart.fill" : "heart")
@@ -691,7 +772,7 @@ struct RecipeDetailView: View {
             
             // Share recipe (placeholder for future implementation)
             Button(action: {
-                print("📤 Share button tapped")
+                print("Share button tapped")
             }) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.body)
@@ -700,7 +781,7 @@ struct RecipeDetailView: View {
             
             // Edit recipe (Story 2.2 placeholder)
             Button(action: {
-                print("✏️ Edit Recipe tapped - Recipe editing coming in Story 2.2")
+                print("Edit Recipe tapped - Recipe editing coming in Story 2.2")
             }) {
                 Text("Edit")
                     .font(.body)
@@ -708,6 +789,12 @@ struct RecipeDetailView: View {
             }
             .buttonStyle(PlainButtonStyle())
         }
+    }
+    
+    // MARK: - Computed Properties
+    
+    private var hasIngredients: Bool {
+        return recipe.ingredients?.count ?? 0 > 0
     }
     
     // MARK: - Helper Methods
@@ -763,28 +850,28 @@ struct RecipeDetailView: View {
     }
     
     private func toggleFavorite() {
-        print("🔧 toggleFavorite() called")
-        print("🔧 Current recipe.isFavorite: \(recipe.isFavorite)")
-        print("🔧 Recipe title: \(recipe.title ?? "nil")")
+        print("toggleFavorite() called")
+        print("Current recipe.isFavorite: \(recipe.isFavorite)")
+        print("Recipe title: \(recipe.title ?? "nil")")
         
         withAnimation(.easeInOut(duration: 0.2)) {
             let oldValue = recipe.isFavorite
             recipe.isFavorite.toggle()
             
-            print("🔧 After toggle - recipe.isFavorite: \(recipe.isFavorite)")
-            print("🔧 Changed from \(oldValue) to \(recipe.isFavorite)")
+            print("After toggle - recipe.isFavorite: \(recipe.isFavorite)")
+            print("Changed from \(oldValue) to \(recipe.isFavorite)")
             
             do {
                 try viewContext.save()
-                print("✅ Core Data save successful - Favorite status: \(recipe.isFavorite ? "Added" : "Removed")")
-                print("🔄 UI should auto-refresh via @ObservedObject")
+                print("Core Data save successful - Favorite status: \(recipe.isFavorite ? "Added" : "Removed")")
+                print("UI should auto-refresh via @ObservedObject")
                 
             } catch {
-                print("❌ Core Data save failed: \(error)")
-                print("❌ Error details: \(error.localizedDescription)")
+                print("Core Data save failed: \(error)")
+                print("Error details: \(error.localizedDescription)")
                 // Revert the change if save failed
                 recipe.isFavorite = oldValue
-                print("🔧 Reverted to original value: \(recipe.isFavorite)")
+                print("Reverted to original value: \(recipe.isFavorite)")
             }
         }
     }

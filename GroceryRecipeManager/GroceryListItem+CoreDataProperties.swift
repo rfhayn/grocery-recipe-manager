@@ -2,13 +2,11 @@
 //  GroceryListItem+CoreDataProperties.swift
 //  GroceryRecipeManager
 //
-//  Created by Richard Hayn on 8/27/25.
-//
+//  Updated September 12, 2025 - Step 3: IngredientTemplate Integration
 //
 
 import Foundation
 import CoreData
-
 
 extension GroceryListItem {
 
@@ -23,9 +21,11 @@ extension GroceryListItem {
     @NSManaged public var quantity: String?
     @NSManaged public var sortOrder: Int16
     @NSManaged public var source: String?
+    @NSManaged public var sourceType: String?        // ← MISSING - ADDED
+    @NSManaged public var sourceRecipeID: UUID?      // ← MISSING - ADDED
     @NSManaged public var categoryName: String?
+    @NSManaged public var isFromRecipe: Bool          // ← MISSING - ADDED
     @NSManaged public var weeklyList: WeeklyList?
-
 }
 
 extension GroceryListItem : Identifiable {
