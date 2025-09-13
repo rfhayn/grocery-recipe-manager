@@ -10,12 +10,12 @@
 ## 🎯 **MILESTONE 2 OVERVIEW**
 
 ### **Strategic Recipe Integration Approach**
-**Enhanced Timeline**: 9-11 hours (Phase 1 complete, Phase 2 active)  
+**Enhanced Timeline**: 10.5-12.5 hours (Phase 1 complete, Phase 2 active)  
 **Status**: 🔄 **PHASE 2 ACTIVE** with Steps 1-3 complete and validated  
 
 #### **Phase Structure:**
 - **✅ Phase 1**: Critical Architecture Enhancements (1 hour) ← **COMPLETE**
-- **🔄 Phase 2**: Recipe Core Development (6-7 hours) ← **ACTIVE - Steps 1-3 COMPLETE**
+- **🔄 Phase 2**: Recipe Core Development (6-7 hours) ← **ACTIVE - Steps 1-3 COMPLETE, Step 3a READY**
 - **⏳ Phase 3**: Recipe-to-Grocery Integration (2-3 hours)
 
 ---
@@ -31,7 +31,7 @@
 
 ---
 
-## 🗗️ **PHASE 2: RECIPE CORE DEVELOPMENT - ACTIVE**
+## 🔨 **PHASE 2: RECIPE CORE DEVELOPMENT - ACTIVE**
 
 ### **Story 2.1: Recipe Catalog Foundation** (Enhanced: 3-4 hours)
 **Status**: 🔄 **IN PROGRESS** - Steps 1-3 Complete, Step 3a Ready
@@ -91,17 +91,49 @@
 
 **Validation Results**: All core functionality working - recipe creation, navigation, ingredient display, and basic add-to-list operations
 
-#### **🔄 Step 3a: Enhanced Add to List Integration (90 minutes) - READY**
+#### **🔄 Step 3a: Enhanced Add to List Integration (90 minutes) - ACTIVE**
 **Goal**: Enhance Add to List functionality with intelligent list selection, improved UX, and comprehensive category management  
 **Status**: ⏳ **NEXT IMPLEMENTATION**  
 **Dependencies**: Step 3 complete ✅, IngredientTemplate system operational ✅
 
-**Implementation Plan:**
-1. **Smart List Selection Logic** (20 minutes) - Find uncompleted lists, prompt for new list creation
-2. **Enhanced Item Display Format** (15 minutes) - Item name primary, quantity secondary with smaller font
-3. **Quantity Merging System** (20 minutes) - Combine quantities for duplicate ingredients
-4. **Category Assignment Modal** (25 minutes) - User interface for assigning categories to uncategorized ingredients
-5. **Category Deletion Protection** (10 minutes) - Warn users and provide reassignment options
+**Current Issues to Address:**
+- Creates new lists instead of using existing uncompleted lists
+- Poor item display prioritization (quantity before item name)
+- No category management or persistence
+- No quantity merging for duplicate items
+- Generic "OTHER" categorization instead of meaningful organization
+
+**Implementation Plan (90 minutes):**
+1. **Smart List Selection Logic** (20 minutes)
+   - Find newest uncompleted WeeklyList first
+   - If no uncompleted lists exist, prompt user: "Create new grocery list for Week of [date]?"
+   - Only create new list if user confirms
+   - Handle edge cases (empty database, multiple uncompleted lists, user cancellation)
+
+2. **Enhanced Item Display Format** (15 minutes)
+   - Change from "2 cups all-purpose flour" to "all-purpose flour" (primary) + "2 cups" (secondary)
+   - Item name as primary text with readable font size
+   - Quantity as secondary text with 75% font size and muted color
+   - Maintain visual hierarchy and readability
+
+3. **Quantity Merging System** (20 minutes)
+   - Detect existing ingredients by name matching in target list
+   - Merge compatible quantities ("1 cup" + "2 cups" = "3 cups")
+   - Handle mixed units gracefully (display both if incompatible)
+   - Update existing GroceryListItem rather than creating duplicates
+
+4. **Category Assignment Modal** (25 minutes)
+   - Show modal when adding uncategorized ingredients (ingredientTemplate.category == nil)
+   - Display all uncategorized ingredients in single modal
+   - Allow selection from existing categories OR creation of new categories
+   - Users can skip assignment (items become "UNKNOWN" not "OTHER")
+   - Store category assignments persistently at IngredientTemplate level
+
+5. **Category Deletion Protection** (10 minutes)
+   - Warn users before deleting categories that have assigned IngredientTemplates
+   - Show count of affected ingredients
+   - Provide options: reassign to different category, move to "UNKNOWN", or cancel
+   - Block deletion until user chooses resolution
 
 **Technical Foundation Ready:**
 - **IngredientTemplateService**: Category persistence and template management operational
@@ -196,6 +228,33 @@
 - **Core Data integrity**: Proper relationship handling and error management
 - **User experience**: Intuitive category management and list selection flows
 
+### **Performance Targets:**
+- **List Selection**: < 0.05s for finding uncompleted lists
+- **Item Display**: Immediate visual hierarchy improvements
+- **Quantity Merging**: < 0.1s for duplicate detection and merging
+- **Category Assignment**: < 0.1s for modal presentation and category loading
+- **Overall Operation**: Maintain < 0.1s response times for all add-to-list operations
+
 ---
 
-**Current Status**: Steps 1-3 successfully completed and validated with 21/21 total test scenarios passed. Step 3a PRD created with comprehensive requirements for enhanced Add to List integration. Project maintaining 100% timeline accuracy with professional quality standards. Ready for Step 3a implementation with proven architecture and operational template system foundation.
+## 🔄 **NEXT IMPLEMENTATION SESSION**
+
+### **Step 3a Implementation Priority:**
+1. **Start with Smart List Selection** (highest UX impact)
+2. **Implement Enhanced Item Display** (visual improvement foundation)
+3. **Add Quantity Merging** (prevents duplicate entries)
+4. **Build Category Assignment Modal** (comprehensive feature)
+5. **Add Category Deletion Protection** (data protection)
+
+### **Implementation Approach:**
+- **Build incrementally**: Test each component before proceeding
+- **Preserve existing functionality**: All Step 3 features must continue working
+- **Maintain professional standards**: iOS design patterns and performance targets
+- **User-centric focus**: Intuitive flows that enhance rather than complicate workflow
+
+### **Post Step 3a:**
+Ready for **Step 4: Apply Custom Category Organization** (45 minutes) with enhanced category system integration for store-layout optimization.
+
+---
+
+**Current Status**: Steps 1-3 successfully completed and validated with 21/21 total test scenarios passed. Step 3a ready for implementation with comprehensive PRD created, proven architecture, established UI patterns, and operational IngredientTemplate service foundation. Project maintaining 100% timeline accuracy with professional quality standards.

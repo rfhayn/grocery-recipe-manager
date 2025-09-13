@@ -115,7 +115,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 
 **Impact**: Technical debt prevention achieved, recipe development accelerated with performance-optimized foundation.
 
-### **📍 Phase 2: Recipe Core Development - ACTIVE** 🔄
+### **📝 Phase 2: Recipe Core Development - ACTIVE** 🔄
 
 #### **Story 2.1: Recipe Catalog Foundation - Steps 1-3 Complete** ✅
 **Progress**: Steps 1-3 Complete (3 of 6 steps), Step 3a Ready  
@@ -179,10 +179,17 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Dependencies**: Step 3 complete ✅, IngredientTemplate system operational ✅
 - **Goal**: Transform basic "Add to List" into production-ready recipe-to-grocery integration
 
+**Current Issues to Address**:
+- **Poor List Selection**: Creates new lists instead of using existing uncompleted lists
+- **Poor Item Display**: Shows "2 cups all-purpose flour" instead of "all-purpose flour (2 cups)"
+- **No Category Management**: Ingredients aren't categorized persistently
+- **No Quantity Merging**: Duplicate ingredients create separate entries
+- **No Category Protection**: Users can delete categories without warning
+
 **Implementation Plan for Step 3a (90 minutes)**:
 1. **Smart List Selection Logic** (20 minutes)
    - Find newest uncompleted WeeklyList first
-   - If no uncompleted lists exist, prompt user to create new "Week of [date]" list
+   - If no uncompleted lists exist, prompt user: "Create new grocery list for Week of [date]?"
    - Only create new list if user confirms
    - Handle edge cases (empty database, multiple uncompleted lists)
 

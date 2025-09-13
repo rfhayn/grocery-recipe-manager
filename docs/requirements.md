@@ -111,6 +111,14 @@
 | **FR-RM-014** | **Category Assignment Modal** | **User interface for persistent category assignment to ingredients** | **25 minutes** | 🎯 **Comprehensive category management** |
 | **FR-RM-015** | **Category Deletion Protection** | **Warning system with reassignment options for category deletion** | **10 minutes** | 🎯 **Data protection and integrity** |
 
+**Current Issues Being Addressed**:
+- Creates new lists instead of using existing uncompleted lists
+- Poor item display prioritization (quantity before item name)
+- No category management or persistence for ingredients
+- No quantity merging for duplicate items
+- Generic "OTHER" categorization instead of "UNKNOWN"
+- No protection against deleting categories with assigned ingredients
+
 **Requirements Validation Summary**:
 - **Total Test Scenarios**: 21/21 passed ✅ (Steps 1-3)
 - **Performance Standards**: Sub-millisecond response times maintained ✅
