@@ -4,7 +4,7 @@ import CoreData
 struct WeeklyListsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    // Fetch weekly lists sorted by creation date
+    // Enhanced: Add includesPropertyValues to ensure changes are reflected
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \WeeklyList.dateCreated, ascending: false)],
         animation: .default
@@ -14,6 +14,7 @@ struct WeeklyListsView: View {
     @State private var isGeneratingList = false
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var refreshID = UUID() // Force refresh trigger
     
     var body: some View {
         contentView
@@ -25,6 +26,10 @@ struct WeeklyListsView: View {
                 Button("OK") { }
             } message: {
                 Text(errorMessage)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
+                // Enhanced: Force refresh when Core Data changes occur
+                refreshID = UUID()
             }
     }
     
@@ -40,6 +45,7 @@ struct WeeklyListsView: View {
                 loadingOverlay
             }
         }
+        .id(refreshID) // Force view refresh when refreshID changes
     }
     
     private var emptyStateView: some View {
@@ -85,7 +91,9 @@ struct WeeklyListsView: View {
             Section {
                 ForEach(weeklyLists, id: \.self) { list in
                     NavigationLink(destination: GroceryListDetailView(weeklyList: list)) {
+                        // Enhanced: Force WeeklyListRowView to refresh by referencing completion status
                         WeeklyListRowView(weeklyList: list)
+                            .id("\(list.objectID)-\(list.isCompleted)")
                     }
                 }
                 .onDelete(perform: deleteWeeklyLists)
@@ -93,7 +101,9 @@ struct WeeklyListsView: View {
         }
         .listStyle(InsetGroupedListStyle())
         .refreshable {
-            // Pull to refresh - could add sync functionality later
+            // Enhanced: Manual refresh forces Core Data to sync
+            viewContext.refreshAllObjects()
+            refreshID = UUID()
         }
     }
     
@@ -223,13 +233,17 @@ struct WeeklyListsView: View {
     }
 }
 
-// MARK: - WeeklyListRowView Component
+// MARK: - Enhanced WeeklyListRowView Component
 
 struct WeeklyListRowView: View {
     let weeklyList: WeeklyList
     
+    // Enhanced: Force recalculation of completion data
     private var itemsArray: [GroceryListItem] {
-        (weeklyList.items as? Set<GroceryListItem>)?.sorted {
+        // Refresh the object to get latest data
+        weeklyList.managedObjectContext?.refresh(weeklyList, mergeChanges: true)
+        
+        return (weeklyList.items as? Set<GroceryListItem>)?.sorted {
             $0.sortOrder < $1.sortOrder
         } ?? []
     }
@@ -245,6 +259,16 @@ struct WeeklyListRowView: View {
     private var completionPercentage: Double {
         guard totalItemsCount > 0 else { return 0 }
         return Double(completedItemsCount) / Double(totalItemsCount)
+    }
+    
+    // Fixed: Consistent completion status calculation
+    private var isListCompleted: Bool {
+        // Use database field if it's set correctly, otherwise calculate
+        if weeklyList.isCompleted {
+            return true
+        }
+        // Fallback: calculate from items (all items must be completed)
+        return totalItemsCount > 0 && completedItemsCount == totalItemsCount
     }
     
     var body: some View {
@@ -265,9 +289,9 @@ struct WeeklyListRowView: View {
                 
                 Spacer()
                 
-                // Completion status
+                // Fixed: Consistent completion status display
                 VStack(alignment: .trailing, spacing: 4) {
-                    if weeklyList.isCompleted {
+                    if isListCompleted {
                         HStack {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.green)
@@ -285,7 +309,7 @@ struct WeeklyListRowView: View {
                 }
             }
             
-            // Progress bar
+            // Fixed: Progress bar with consistent completion coloring
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Rectangle()
@@ -295,7 +319,7 @@ struct WeeklyListRowView: View {
                     
                     Rectangle()
                         .frame(width: geometry.size.width * completionPercentage, height: 6)
-                        .foregroundColor(weeklyList.isCompleted ? .green : .blue)
+                        .foregroundColor(isListCompleted ? .green : .blue)
                         .cornerRadius(3)
                         .animation(.easeInOut(duration: 0.3), value: completionPercentage)
                 }

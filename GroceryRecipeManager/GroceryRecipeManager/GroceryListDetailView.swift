@@ -273,6 +273,8 @@ struct GroceryListDetailView: View {
     
     private func toggleItemCompletion(_ item: GroceryListItem) {
         let itemID = item.objectID
+        let listID = weeklyList.objectID
+        
         PersistenceController.shared.performWrite({ context in
             let itemToUpdate = context.object(with: itemID) as! GroceryListItem
             itemToUpdate.isCompleted.toggle()
@@ -282,6 +284,10 @@ struct GroceryListDetailView: View {
             } else {
                 itemToUpdate.dateCompleted = nil
             }
+            
+            // Enhanced: Update parent list completion status
+            let listToUpdate = context.object(with: listID) as! WeeklyList
+            updateListCompletionStatus(listToUpdate, in: context)
             
             print("✅ Toggled item completion: \(itemToUpdate.name ?? "Unknown") - \(itemToUpdate.isCompleted ? "Complete" : "Incomplete")")
         }, onError: { error in
@@ -293,6 +299,7 @@ struct GroceryListDetailView: View {
     private func markAllItemsComplete() {
         let incompleteItems = Array(listItems).filter { !$0.isCompleted }
         let itemIDs = incompleteItems.map { $0.objectID }
+        let listID = weeklyList.objectID
         
         PersistenceController.shared.performWrite({ context in
             for itemID in itemIDs {
@@ -300,6 +307,11 @@ struct GroceryListDetailView: View {
                 item.isCompleted = true
                 item.dateCompleted = Date()
             }
+            
+            // Enhanced: Update parent list completion status
+            let listToUpdate = context.object(with: listID) as! WeeklyList
+            updateListCompletionStatus(listToUpdate, in: context)
+            
             print("✅ Marked all \(itemIDs.count) items as complete")
         }, onError: { error in
             errorMessage = "Failed to complete all items: \(error.localizedDescription)"
@@ -309,18 +321,48 @@ struct GroceryListDetailView: View {
     
     private func deleteItem(_ item: GroceryListItem) {
         let itemID = item.objectID
+        let listID = weeklyList.objectID
+        
         PersistenceController.shared.performWrite({ context in
             let itemToDelete = context.object(with: itemID)
             context.delete(itemToDelete)
+            
+            // Enhanced: Update parent list completion status after deletion
+            let listToUpdate = context.object(with: listID) as! WeeklyList
+            updateListCompletionStatus(listToUpdate, in: context)
+            
             print("✅ Deleted item: \(item.name ?? "Unknown")")
         }, onError: { error in
             errorMessage = "Failed to delete item: \(error.localizedDescription)"
             showingError = true
         })
     }
+    
+    // MARK: - List Completion Status Management
+    
+    private func updateListCompletionStatus(_ weeklyList: WeeklyList, in context: NSManagedObjectContext) {
+        guard let items = weeklyList.items as? Set<GroceryListItem> else {
+            weeklyList.isCompleted = false
+            return
+        }
+        
+        let itemsArray = Array(items)
+        let totalItems = itemsArray.count
+        let completedItems = itemsArray.filter { $0.isCompleted }.count
+        
+        // List is complete if all items are completed (and there's at least one item)
+        let wasCompleted = weeklyList.isCompleted
+        weeklyList.isCompleted = totalItems > 0 && completedItems == totalItems
+        
+        // Log status change for debugging
+        if wasCompleted != weeklyList.isCompleted {
+            print("📋 List completion status changed: \(weeklyList.name ?? "Unknown") - \(weeklyList.isCompleted ? "COMPLETED" : "INCOMPLETE") (\(completedItems)/\(totalItems))")
+        }
+    }
 }
 
-// MARK: - GroceryListItemRow Component
+// MARK: - Enhanced GroceryListItemRow Component
+// Step 3a Implementation - Step 2: Enhanced Item Display Format
 
 struct GroceryListItemRow: View {
     let item: GroceryListItem
@@ -336,25 +378,30 @@ struct GroceryListItemRow: View {
             }
             .buttonStyle(BorderlessButtonStyle())
             
-            // Item details
+            // Enhanced Item details with improved typography hierarchy
             VStack(alignment: .leading, spacing: 4) {
-                HStack {
+                // Primary: Item name (prominent display) + Secondary: Quantity (smaller, muted)
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(item.name ?? "Unknown Item")
                         .font(.body)
                         .fontWeight(.medium)
                         .strikethrough(item.isCompleted)
                         .foregroundColor(item.isCompleted ? .secondary : .primary)
+                        .lineLimit(2)
                     
+                    // Enhanced: Quantity display (75% font size, muted color as per PRD)
                     if let quantity = item.quantity, !quantity.isEmpty, quantity != "1" {
                         Text("(\(quantity))")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            .font(.caption)  // This is ~75% of body font size
+                            .fontWeight(.regular)
+                            .foregroundColor(.secondary)  // Muted color as specified in PRD
                             .strikethrough(item.isCompleted)
                     }
                     
                     Spacer()
                 }
                 
+                // Tertiary: Source and completion info (unchanged)
                 HStack {
                     // Source indicator
                     if let source = item.source {
