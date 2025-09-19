@@ -41,7 +41,7 @@ struct GroceryListDetailView: View {
     // Group items by category using custom sort order
     private var groupedItems: [(key: String, value: [GroceryListItem])] {
         let grouped = Dictionary(grouping: Array(listItems)) { item in
-            return item.categoryName ?? "Other"
+            return item.categoryName ?? "Unknown"
         }
         
         // Sort categories by custom sort order

@@ -9,6 +9,86 @@ extension DateFormatter {
     }()
 }
 
+// MARK: - Category Extensions for Uncategorized Management
+extension Category {
+    
+    /// Ensures Uncategorized category always appears last in sort order
+    static func updateSortOrderForUncategorized(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true)]
+        
+        do {
+            let categories = try context.fetch(request)
+            var sortOrder: Int16 = 0
+            
+            // Assign sort orders, skipping Uncategorized
+            for category in categories {
+                if category.displayName.lowercased() != "uncategorized" {
+                    category.sortOrder = sortOrder
+                    sortOrder += 1
+                }
+            }
+            
+            // Always put Uncategorized last
+            if let uncategorized = categories.first(where: { $0.displayName.lowercased() == "uncategorized" }) {
+                uncategorized.sortOrder = sortOrder
+                print("✅ Uncategorized category moved to position \(sortOrder)")
+            }
+            
+        } catch {
+            print("❌ Error updating sort order for Uncategorized: \(error)")
+        }
+    }
+    
+    /// Migrates all nil ingredient template assignments to Uncategorized category
+    static func migrateNilAssignmentsToUncategorized(in context: NSManagedObjectContext) {
+        // First, ensure Uncategorized category exists
+        let categoryRequest: NSFetchRequest<Category> = Category.fetchRequest()
+        categoryRequest.predicate = NSPredicate(format: "name ==[c] %@", "Uncategorized")
+        
+        do {
+            let existingUncategorized = try context.fetch(categoryRequest)
+            let uncategorizedCategory: Category
+            
+            if let existing = existingUncategorized.first {
+                uncategorizedCategory = existing
+                print("ℹ️ Found existing Uncategorized category")
+            } else {
+                // Create Uncategorized category if it doesn't exist
+                uncategorizedCategory = Category(context: context)
+                uncategorizedCategory.id = UUID()
+                uncategorizedCategory.name = "Uncategorized"
+                uncategorizedCategory.color = "#9E9E9E" // Gray color
+                uncategorizedCategory.isDefault = false // Custom category, not a default
+                uncategorizedCategory.dateCreated = Date()
+                uncategorizedCategory.sortOrder = Int16.max // Will be corrected by updateSortOrderForUncategorized
+                print("✅ Created Uncategorized category")
+            }
+            
+            // Now migrate all nil assignments
+            let templateRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+            templateRequest.predicate = NSPredicate(format: "category == nil OR category == ''")
+            
+            let templatesWithNilCategory = try context.fetch(templateRequest)
+            
+            if !templatesWithNilCategory.isEmpty {
+                for template in templatesWithNilCategory {
+                    template.category = uncategorizedCategory.displayName
+                }
+                print("✅ Migrated \(templatesWithNilCategory.count) ingredient templates to Uncategorized")
+            } else {
+                print("ℹ️ No ingredient templates needed migration to Uncategorized")
+            }
+            
+            // Update sort orders to ensure Uncategorized is last
+            updateSortOrderForUncategorized(in: context)
+            
+        } catch {
+            print("❌ Error during migration to Uncategorized: \(error)")
+        }
+    }
+}
+
 struct PersistenceController {
     static let shared = PersistenceController()
 
@@ -170,7 +250,7 @@ struct PersistenceController {
         }
     }
     
-    // MARK: - One-Time Setup (FIXED)
+    // MARK: - One-Time Setup (ENHANCED with Uncategorized Migration)
     /// Performs all setup operations in the correct order to prevent duplicates
     private func performOneTimeSetup() {
         // Use a single background context for all setup operations
@@ -181,7 +261,10 @@ struct PersistenceController {
             // Step 2: Migrate existing data to use category relationships
             self.migrateExistingData(in: backgroundContext)
             
-            // Step 3: Add sample data only if database is empty
+            // Step 3: NEW - Migrate nil assignments to Uncategorized
+            self.migrateToUncategorizedCategory(in: backgroundContext)
+            
+            // Step 4: Add sample data only if database is empty
             self.addSampleDataIfNeeded(in: backgroundContext)
             
             // Save all changes at once
@@ -230,6 +313,12 @@ struct PersistenceController {
         } catch {
             print("❌ Migration failed: \(error)")
         }
+    }
+    
+    /// NEW - Migrates nil ingredient template assignments to Uncategorized category
+    private func migrateToUncategorizedCategory(in context: NSManagedObjectContext) {
+        print("🔄 Starting migration to Uncategorized category...")
+        Category.migrateNilAssignmentsToUncategorized(in: context)
     }
     
     /// Add sample data only if database is completely empty
