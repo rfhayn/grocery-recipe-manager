@@ -1,6 +1,13 @@
+// Color+Extensions.swift
+// Color extension to support hex color initialization
+// Required for IngredientsView and other views using Color(hex:)
+
 import SwiftUI
+import Foundation
 
 extension Color {
+    /// Initialize a Color from a hex string
+    /// Supports 3, 6, and 8 character hex strings (with or without #)
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
@@ -16,12 +23,12 @@ extension Color {
         default:
             (a, r, g, b) = (1, 1, 1, 0)
         }
-
+        
         self.init(
             .sRGB,
             red: Double(r) / 255,
             green: Double(g) / 255,
-            blue:  Double(b) / 255,
+            blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
     }

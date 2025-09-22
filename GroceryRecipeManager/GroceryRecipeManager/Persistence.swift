@@ -9,6 +9,136 @@ extension DateFormatter {
     }()
 }
 
+// MARK: - IngredientTemplate Migration Support (STEP 4 - ADDED)
+extension IngredientTemplate {
+    
+    // MARK: - Migration Support
+    
+    /// Migrates existing staples from GroceryItem.isStaple to IngredientTemplate.isStaple
+    /// This is a one-time migration that preserves all existing staple data
+    static func migrateStaplesFromGroceryItems(in context: NSManagedObjectContext) {
+        print("🔄 Starting staples migration from GroceryItem to IngredientTemplate...")
+        
+        // Fetch all staples from GroceryItem
+        let stapleRequest: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
+        stapleRequest.predicate = NSPredicate(format: "isStaple == YES")
+        
+        do {
+            let existingStaples = try context.fetch(stapleRequest)
+            print("📦 Found \(existingStaples.count) existing staples to migrate")
+            
+            var migratedCount = 0
+            var skippedCount = 0
+            
+            for staple in existingStaples {
+                let stapleName = staple.name ?? "Unknown"
+                
+                // Check if IngredientTemplate already exists for this name
+                let templateRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+                templateRequest.predicate = NSPredicate(format: "name ==[c] %@", stapleName)
+                templateRequest.fetchLimit = 1
+                
+                if let existingTemplate = try context.fetch(templateRequest).first {
+                    // Template exists, just mark as staple
+                    existingTemplate.isStaple = true
+                    
+                    // Preserve category if staple has one and template doesn't
+                    if existingTemplate.category?.isEmpty != false,
+                       let stapleCategory = staple.category,
+                       !stapleCategory.isEmpty {
+                        existingTemplate.category = stapleCategory
+                    }
+                    
+                    print("✅ Updated existing template '\(stapleName)' as staple")
+                    migratedCount += 1
+                } else {
+                    // Create new IngredientTemplate from staple
+                    let newTemplate = IngredientTemplate(context: context)
+                    newTemplate.id = UUID()
+                    newTemplate.name = stapleName
+                    newTemplate.isStaple = true
+                    newTemplate.usageCount = 1 // Start with usage count
+                    
+                    // Preserve category assignment
+                    if let stapleCategory = staple.category, !stapleCategory.isEmpty {
+                        newTemplate.category = stapleCategory
+                    } else {
+                        newTemplate.category = "Uncategorized"
+                    }
+                    
+                    print("🆕 Created new template '\(stapleName)' as staple in '\(newTemplate.category ?? "Uncategorized")'")
+                    migratedCount += 1
+                }
+            }
+            
+            // Save the migration
+            if context.hasChanges {
+                try context.save()
+                print("✅ Migration completed: \(migratedCount) migrated, \(skippedCount) skipped")
+                
+                // Mark migration as complete
+                UserDefaults.standard.set(true, forKey: "StaplesMigrationCompleted")
+                UserDefaults.standard.set(Date(), forKey: "StaplesMigrationDate")
+            } else {
+                print("ℹ️ No changes needed during migration")
+            }
+            
+        } catch {
+            print("❌ Migration error: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Migration Status
+    
+    /// Check if staples migration has been completed
+    static var isMigrationCompleted: Bool {
+        return UserDefaults.standard.bool(forKey: "StaplesMigrationCompleted")
+    }
+    
+    /// Get migration completion date
+    static var migrationDate: Date? {
+        return UserDefaults.standard.object(forKey: "StaplesMigrationDate") as? Date
+    }
+    
+    // MARK: - Validation
+    
+    /// Validate migration success
+    static func validateMigration(in context: NSManagedObjectContext) -> (success: Bool, report: String) {
+        var report = "📊 STAPLES MIGRATION VALIDATION\n\n"
+        
+        do {
+            // Count original staples
+            let stapleRequest: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
+            stapleRequest.predicate = NSPredicate(format: "isStaple == YES")
+            let originalStaplesCount = try context.count(for: stapleRequest)
+            
+            // Count migrated templates
+            let templateRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+            templateRequest.predicate = NSPredicate(format: "isStaple == YES")
+            let migratedTemplatesCount = try context.count(for: templateRequest)
+            
+            report += "✅ Original staples: \(originalStaplesCount)\n"
+            report += "✅ Migrated templates: \(migratedTemplatesCount)\n\n"
+            
+            if let migrationDate = migrationDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .short
+                report += "📅 Migration completed: \(formatter.string(from: migrationDate))\n"
+            }
+            
+            let success = migratedTemplatesCount > 0 || originalStaplesCount == 0
+            report += success ? "\n🎯 Migration validation: PASSED" : "\n❌ Migration validation: FAILED"
+            
+            return (success, report)
+            
+        } catch {
+            report += "❌ Validation error: \(error.localizedDescription)"
+            return (false, report)
+        }
+    }
+}
+
 // MARK: - Category Extensions for Uncategorized Management
 extension Category {
     
@@ -250,7 +380,7 @@ struct PersistenceController {
         }
     }
     
-    // MARK: - One-Time Setup (ENHANCED with Uncategorized Migration)
+    // MARK: - One-Time Setup (ENHANCED with Step 4 Migration - UPDATED)
     /// Performs all setup operations in the correct order to prevent duplicates
     private func performOneTimeSetup() {
         // Use a single background context for all setup operations
@@ -261,10 +391,13 @@ struct PersistenceController {
             // Step 2: Migrate existing data to use category relationships
             self.migrateExistingData(in: backgroundContext)
             
-            // Step 3: NEW - Migrate nil assignments to Uncategorized
+            // Step 3: Migrate nil assignments to Uncategorized
             self.migrateToUncategorizedCategory(in: backgroundContext)
             
-            // Step 4: Add sample data only if database is empty
+            // Step 4: NEW - Execute Step 4 staples migration
+            self.executeStaplesMigrationIfNeeded(in: backgroundContext)
+            
+            // Step 5: Add sample data only if database is empty
             self.addSampleDataIfNeeded(in: backgroundContext)
             
             // Save all changes at once
@@ -315,10 +448,30 @@ struct PersistenceController {
         }
     }
     
-    /// NEW - Migrates nil ingredient template assignments to Uncategorized category
+    /// Migrates nil ingredient template assignments to Uncategorized category
     private func migrateToUncategorizedCategory(in context: NSManagedObjectContext) {
         print("🔄 Starting migration to Uncategorized category...")
         Category.migrateNilAssignmentsToUncategorized(in: context)
+    }
+    
+    /// NEW - Execute Step 4 staples migration if needed (ADDED)
+    private func executeStaplesMigrationIfNeeded(in context: NSManagedObjectContext) {
+        // Check if migration has already been completed
+        guard !IngredientTemplate.isMigrationCompleted else {
+            print("ℹ️ Step 4 staples migration already completed, skipping...")
+            return
+        }
+        
+        print("🚀 Executing Step 4 staples migration...")
+        IngredientTemplate.migrateStaplesFromGroceryItems(in: context)
+        
+        // Validate migration
+        let validation = IngredientTemplate.validateMigration(in: context)
+        print(validation.report)
+        
+        if !validation.success {
+            print("⚠️ Step 4 migration validation failed - manual review recommended")
+        }
     }
     
     /// Add sample data only if database is completely empty
@@ -394,4 +547,84 @@ struct PersistenceController {
             }
         }
     }
+}
+
+// MARK: - Step 4 Migration Support Extension (ADDED)
+extension PersistenceController {
+    
+    // MARK: - Step 4 Migration Support
+    
+    /// Execute one-time staples migration during app startup
+    func executeMigrationIfNeeded() {
+        // Check if migration has already been completed
+        guard !IngredientTemplate.isMigrationCompleted else {
+            print("ℹ️ Staples migration already completed, skipping...")
+            return
+        }
+        
+        print("🚀 Executing staples migration on app startup...")
+        
+        // Perform migration in background context
+        container.performBackgroundTask { context in
+            IngredientTemplate.migrateStaplesFromGroceryItems(in: context)
+            
+            // Validate migration
+            let validation = IngredientTemplate.validateMigration(in: context)
+            print(validation.report)
+            
+            if !validation.success {
+                print("⚠️ Migration validation failed - manual review recommended")
+            }
+        }
+    }
+    
+    // MARK: - Migration Testing (Development Only)
+    
+    #if DEBUG
+    /// Reset migration status for testing purposes (DEBUG builds only)
+    func resetMigrationForTesting() {
+        UserDefaults.standard.removeObject(forKey: "StaplesMigrationCompleted")
+        UserDefaults.standard.removeObject(forKey: "StaplesMigrationDate")
+        print("🔄 Migration status reset for testing")
+    }
+    
+    /// Get migration status report for debugging
+    func getMigrationStatusReport() -> String {
+        var report = "🔍 MIGRATION STATUS REPORT\n\n"
+        
+        if IngredientTemplate.isMigrationCompleted {
+            report += "✅ Migration Status: COMPLETED\n"
+            if let date = IngredientTemplate.migrationDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .short
+                report += "📅 Completion Date: \(formatter.string(from: date))\n"
+            }
+        } else {
+            report += "⏳ Migration Status: PENDING\n"
+        }
+        
+        // Get current data counts
+        let context = container.viewContext
+        
+        do {
+            let stapleRequest: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
+            stapleRequest.predicate = NSPredicate(format: "isStaple == YES")
+            let staplesCount = try context.count(for: stapleRequest)
+            
+            let templateRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+            templateRequest.predicate = NSPredicate(format: "isStaple == YES")
+            let templatesCount = try context.count(for: templateRequest)
+            
+            report += "\n📊 Current Data:\n"
+            report += "   GroceryItem staples: \(staplesCount)\n"
+            report += "   IngredientTemplate staples: \(templatesCount)\n"
+            
+        } catch {
+            report += "\n❌ Error fetching counts: \(error.localizedDescription)"
+        }
+        
+        return report
+    }
+    #endif
 }

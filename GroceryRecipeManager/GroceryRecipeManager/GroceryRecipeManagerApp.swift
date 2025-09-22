@@ -1,3 +1,6 @@
+// GroceryRecipeManagerApp.swift
+// Updated to replace StaplesView with IngredientsView for Step 4 implementation
+
 import SwiftUI
 
 @main
@@ -14,14 +17,15 @@ struct GroceryRecipeManagerApp: App {
                     Label("Lists", systemImage: "list.clipboard")
                 }
                 
+                // UPDATED: StaplesView replaced with IngredientsView
                 NavigationView {
-                    StaplesView()
+                    IngredientsView()
                 }
                 .tabItem {
-                    Label("Staples", systemImage: "cart.badge.plus")
+                    Label("Ingredients", systemImage: "leaf.circle")
                 }
                 
-                // 🆕 NEW RECIPES TAB - Milestone 2 Phase 2 Step 1
+                // Recipes tab (from Step 1)
                 RecipeListView()
                 .tabItem {
                     Label("Recipes", systemImage: "book.pages")
@@ -34,12 +38,12 @@ struct GroceryRecipeManagerApp: App {
                     Label("Categories", systemImage: "folder.badge.gearshape")
                 }
                 
-                // Phase 1 Test Tab (can remove after Step 1 testing complete)
+                // Migration Test Tab (for Step 4 testing - can be removed after validation)
                 NavigationView {
-                    Phase0TestView()
+                    MigrationTestView()
                 }
                 .tabItem {
-                    Label("Test", systemImage: "wrench.and.screwdriver")
+                    Label("Migration", systemImage: "arrow.triangle.2.circlepath")
                 }
             }
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
@@ -47,30 +51,38 @@ struct GroceryRecipeManagerApp: App {
     }
 }
 
-// MARK: - Phase 1 Test View (Keep for validation)
-struct Phase0TestView: View {
+// MARK: - Migration Test View (Development/Testing)
+struct MigrationTestView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var isTestRunning = false
-    @State private var lastTestResult = ""
+    @State private var migrationReport = ""
+    @State private var isLoading = false
     
     var body: some View {
-        VStack(spacing: 30) {
-            Text("Phase 1 Architecture Testing")
+        VStack(spacing: 20) {
+            Text("Step 4 Migration Testing")
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("Validates the performance services from Phase 1 Critical Architecture Enhancements")
+            Text("Test and validate the staples migration from GroceryItem to IngredientTemplate")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
-            if isTestRunning {
-                ProgressView("Running tests...")
-                    .scaleEffect(1.2)
-            } else {
-                Button("🧪 Test Phase 1 Services") {
-                    runPhase0Test()
+            VStack(spacing: 12) {
+                Button("Check Migration Status") {
+                    checkMigrationStatus()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                .font(.headline)
+                
+                #if DEBUG
+                Button("Reset Migration (Debug)") {
+                    resetMigration()
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
@@ -78,56 +90,100 @@ struct Phase0TestView: View {
                 .foregroundColor(.white)
                 .cornerRadius(8)
                 .font(.headline)
+                
+                Button("Force Migration") {
+                    forceMigration()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                .font(.headline)
+                #endif
             }
             
-            if !lastTestResult.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Last Test Result:")
-                        .font(.headline)
-                    
-                    Text(lastTestResult)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding()
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(8)
+            if isLoading {
+                ProgressView("Processing...")
+                    .scaleEffect(1.2)
+                    .padding()
+            }
+            
+            if !migrationReport.isEmpty {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Migration Report")
+                            .font(.headline)
+                            .padding(.bottom, 8)
+                        
+                        Text(migrationReport)
+                            .font(.system(.caption, design: .monospaced))
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                    }
+                    .padding()
                 }
-                .padding(.horizontal)
+                .frame(maxHeight: 300)
             }
             
             Spacer()
         }
         .padding()
-        .navigationTitle("Phase 1 Testing")
-    }
-    
-    private func runPhase0Test() {
-        isTestRunning = true
-        lastTestResult = ""
-        
-        print("🚀 Starting Phase 1 Service Test...")
-       
-        Task { @MainActor in
-            let recipeService = OptimizedRecipeDataService(context: viewContext)
-            let templateService = IngredientTemplateService(context: viewContext)
-            let validator = ArchitectureValidator(context: viewContext, recipeService: recipeService, templateService: templateService)
-            
-            // Run performance check
-            let (isPassing, summary) = await validator.quickPerformanceCheck()
-            
-            // Run integration test
-            let report = await validator.testServiceIntegration()
-            
-            self.isTestRunning = false
-            self.lastTestResult = "✅ \(summary)\n\nCheck Xcode console for detailed report."
-            
-            print("🎯 Phase 1 Final Result: \(summary)")
-            print("\n==================================================")
-            print("📋 DETAILED INTEGRATION REPORT:")
-            print("==================================================")
-            print(report)
-            print("==================================================")
+        .navigationTitle("Migration Test")
+        .onAppear {
+            checkMigrationStatus()
         }
     }
+    
+    private func checkMigrationStatus() {
+        isLoading = true
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            #if DEBUG
+            let report = PersistenceController.shared.getMigrationStatusReport()
+            #else
+            let validation = IngredientTemplate.validateMigration(in: viewContext)
+            let report = validation.report
+            #endif
+            
+            DispatchQueue.main.async {
+                self.migrationReport = report
+                self.isLoading = false
+            }
+        }
+    }
+    
+    #if DEBUG
+    private func resetMigration() {
+        isLoading = true
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            PersistenceController.shared.resetMigrationForTesting()
+            
+            DispatchQueue.main.async {
+                self.isLoading = false
+                self.migrationReport = "Migration status reset. Restart app to trigger migration."
+            }
+        }
+    }
+    
+    private func forceMigration() {
+        isLoading = true
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            // Reset and then execute migration
+            PersistenceController.shared.resetMigrationForTesting()
+            PersistenceController.shared.executeMigrationIfNeeded()
+            
+            // Get updated status
+            let report = PersistenceController.shared.getMigrationStatusReport()
+            
+            DispatchQueue.main.async {
+                self.migrationReport = report
+                self.isLoading = false
+            }
+        }
+    }
+    #endif
 }
-
