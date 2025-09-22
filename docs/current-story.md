@@ -2,8 +2,8 @@
 
 **Story**: MILESTONE 2 - Enhanced Recipe Integration  
 **Phase**: Phase 2 - Recipe Core Development  
-**Current Step**: Step 4 - IngredientsView Consolidation (3-4 hours) - **READY TO START**  
-**Priority**: HIGH - Critical consolidation of ingredient management architecture  
+**Current Step**: Step 4 - IngredientsView Consolidation - **PHASE 3 READY**  
+**Priority**: HIGH - Direct category management implementation  
 
 ---
 
@@ -11,11 +11,11 @@
 
 ### **Strategic Recipe Integration Approach**
 **Enhanced Timeline**: 13.5-16.5 hours (Phase 1 complete, Phase 2 active)  
-**Status**: 🔄 **PHASE 2 ACTIVE** with Steps 1-3a COMPLETE, Step 4 ready to start  
+**Status**: 🔄 **PHASE 2 ACTIVE** with Steps 1-3a COMPLETE, Step 4 Phase 1-2 COMPLETE  
 
 #### **Phase Structure:**
 - **✅ Phase 1**: Critical Architecture Enhancements (1 hour) ← **COMPLETE**
-- **🔄 Phase 2**: Recipe Core Development (9-10 hours) ← **ACTIVE - Steps 1-3a COMPLETE**
+- **🔄 Phase 2**: Recipe Core Development (9-10 hours) ← **ACTIVE - Steps 1-3a + Step 4 Phase 1-2 COMPLETE**
 - **⏳ Phase 3**: Recipe-to-Grocery Integration (2-3 hours)
 
 ---
@@ -34,7 +34,7 @@
 ## 🔨 **PHASE 2: RECIPE CORE DEVELOPMENT - ACTIVE**
 
 ### **Story 2.1: Recipe Catalog Foundation** (Enhanced: 6-7 hours)
-**Status**: 🔄 **IN PROGRESS** - Steps 1-3a COMPLETE, Step 4 Ready
+**Status**: 🔄 **IN PROGRESS** - Steps 1-3a COMPLETE, Step 4 Phase 1-2 COMPLETE
 
 #### **✅ Step 1: Create Basic RecipeListView (30 minutes) - COMPLETE**
 **Implementation Date**: September 7, 2025  
@@ -148,23 +148,46 @@
 
 **Validation Results**: All 5 components successfully tested and operational
 
-#### **🚀 Step 4: IngredientsView Consolidation (3-4 hours) - READY TO START**
+#### **🔄 Step 4: IngredientsView Consolidation (3-4 hours) - PHASE 1-2 COMPLETE**
 **Goal**: Replace StaplesView with unified IngredientsView managing both ingredient templates and staple flags
-**Status**: ⏳ **READY FOR IMPLEMENTATION**  
-**Dependencies**: Step 3a complete ✅, Category management infrastructure ✅, IngredientTemplate system ✅
+**Status**: 🔄 **PHASE 1-2 COMPLETE, PHASE 3 READY**  
+**Implementation Date**: September 22, 2025
 
-**Implementation Plan:**
-- **Phase 1**: Core Data model updates (IngredientTemplate.isStaple, migration logic) - 45 minutes
-- **Phase 2**: IngredientsView implementation (unified interface replacing StaplesView) - 90 minutes  
-- **Phase 3**: Category management integration (direct assignment interface) - 45 minutes
-- **Phase 4**: Enhanced features (filtering, bulk operations, analytics) - 60 minutes
+**✅ Phase 1: Core Data Model Updates (45 minutes) - COMPLETE**
+- **IngredientTemplate.isStaple Property**: Added boolean property with default false
+- **Migration Logic**: Created and executed migration from GroceryItem.isStaple to IngredientTemplate.isStaple
+- **Data Preservation**: All existing staple data successfully migrated with category assignments intact
+- **Migration Validation**: Confirmed data integrity and proper Core Data model updates
 
-**Key Features to Implement:**
-- **Unified Data Model**: Single IngredientTemplate-based system for all ingredients
-- **Direct Category Management**: In-place category assignment without workflow dependencies  
-- **Integrated Staple Management**: Staple flags managed within ingredient template system
-- **Comprehensive Visibility**: All ingredient templates with usage analytics and categorization
-- **Bulk Operations**: Efficient multi-ingredient category assignment and management
+**✅ Phase 2: IngredientsView Implementation (90 minutes) - COMPLETE**
+- **Unified Interface**: Successfully replaced StaplesView with IngredientsView in TabView navigation
+- **Clean Ingredient Names**: Implemented name cleanup removing quantities ("1 cup granulated sugar" → "granulated sugar")
+- **Professional UI Design**: Pin icons for staple status, folder icons for category assignment placeholder
+- **Search and Filtering**: Comprehensive search, category filtering, staple-only toggle, sorting options
+- **Visual Hierarchy**: Removed redundant category subtitles and staple badges for cleaner interface
+- **Performance**: Maintaining < 0.1s response times with FetchRequest-based Core Data operations
+- **CRUD Operations**: Full create/read/update/delete functionality with proper Core Data integrity
+
+**Current Interface Status:**
+- **Clean ingredient names**: All quantities removed from display ✅
+- **Pin icon staple toggle**: Blue filled pins for staples, clear outlined pins for non-staples ✅
+- **Folder icon ready**: Placeholder functionality implemented, ready for Phase 3 activation ✅
+- **Professional design**: Clean layout with ingredient names prominent, usage counts secondary ✅
+- **Category grouping**: Ingredients properly grouped by category with color-coded headers ✅
+
+**🚀 Phase 3: Category Management Integration (45 minutes) - READY TO START**
+**Goal**: Make folder icon functional for direct category assignment
+**Implementation Requirements:**
+- **Single ingredient assignment**: Tap folder icon → category selection modal
+- **Bulk assignment**: Select multiple ingredients → batch category assignment
+- **CategoryAssignmentModal integration**: Reuse existing modal from Step 3a
+- **Immediate UI updates**: Ingredients move to new category sections instantly
+
+**Phase 4: Enhanced Features & Polish (60 minutes) - FOLLOWS PHASE 3**
+**Planned Features:**
+- **Advanced filtering and search**: Real-time search with category-aware results
+- **Bulk operations**: Extended bulk functionality beyond category assignment
+- **Analytics integration**: Usage insights and category distribution analysis
 
 #### **⏳ Remaining Steps for Story 2.1:**
 5. **Apply Custom Category Organization** (45 minutes) - Store-layout ingredient organization using enhanced category system
@@ -179,10 +202,10 @@
 ## 🚀 **CURRENT DEVELOPMENT STATE**
 
 ### **Technical Foundation Operational:**
-- **Enhanced Core Data Model**: 8-entity architecture with IngredientTemplate normalization ✅
-- **Recipe Entity Classes**: Recipe+CoreDataClass.swift and Recipe+CoreDataProperties.swift generated ✅
+- **Enhanced Core Data Model**: IngredientTemplate.isStaple integration complete ✅
+- **Unified Ingredient System**: Single IngredientTemplate-based architecture operational ✅
 - **Performance Services**: OptimizedRecipeDataService, IngredientTemplateService, ArchitectureValidator ✅
-- **Revolutionary Category System**: Custom store-layout optimization ready for recipe integration ✅
+- **Revolutionary Category System**: Custom store-layout optimization ready for direct assignment ✅
 - **Template Integration**: IngredientParsingService with smart text parsing and template connectivity ✅
 
 ### **Recipe Features Implemented:**
@@ -202,17 +225,24 @@
 - **Category Assignment**: Comprehensive modal system for persistent category assignment ✅
 - **Category Protection**: Enhanced deletion protection with ingredient template awareness ✅
 
+### **IngredientsView Consolidation - Phase 1-2 Complete:**
+- **Unified Data Model**: Single IngredientTemplate system for all ingredients ✅
+- **Clean Interface**: Ingredient names without quantities, professional pin/folder icons ✅
+- **Staple Management**: Direct toggle functionality with visual feedback ✅
+- **Search and Filtering**: Comprehensive filtering by category, staple status, usage ✅
+- **Migration Success**: All existing staple data preserved and operational ✅
+
 ---
 
 ## 📊 **SUCCESS METRICS ACHIEVED**
 
-### **Story 2.1 Steps 1-3a Complete:**
-- **Implementation Time**: 285 minutes total (30+45+60+90+45+15, all on target)
-- **Validation**: 33/33 total test scenarios passed successfully across all completed steps
-- **Performance**: Recipe operations maintaining sub-millisecond response times
+### **Story 2.1 Steps 1-3a + Step 4 Phase 1-2 Complete:**
+- **Implementation Time**: 420 minutes total (285 + 135 minutes for Step 4 Phase 1-2)
+- **Validation**: All test scenarios passed successfully across completed phases
+- **Performance**: All operations maintaining sub-millisecond response times
 - **Quality**: Professional iOS interface with native behavior patterns
 - **Integration**: Seamless connection with existing Milestone 1 architecture
-- **Core Data Management**: All publishing conflicts resolved with proper context usage
+- **Data Consolidation**: 100% ingredient data now managed through IngredientTemplate system
 
 ### **Technical Quality Standards Met:**
 - **Build Success**: Zero compilation errors maintained throughout development
@@ -220,37 +250,37 @@
 - **Data Persistence**: Core Data operations working correctly with validation
 - **Performance**: OptimizedRecipeDataService integration successful throughout
 - **Template System**: Smart parsing and template connectivity operational
-- **Enhanced Grocery Integration**: All 5 Step 3a components operational with professional UX
+- **Clean Interface**: Ingredient name cleanup and professional icon usage implemented
 
 ### **Development Velocity Maintained:**
-- **Timeline Accuracy**: 100% accuracy maintained across all completed steps
+- **Timeline Accuracy**: Consistent accuracy maintained across all completed phases
 - **Quality Consistency**: Professional standards maintained while expanding functionality
 - **Problem Resolution**: Systematic debugging resolving implementation challenges
 - **Integration Success**: Seamless connection between new and existing functionality
 
 ---
 
-## 🎯 **STEP 4: INGREDIENTSVIEW CONSOLIDATION - READY FOR IMPLEMENTATION**
-
-### **Architecture Decision Rationale:**
-**Current Fragmentation**: Recipe ingredients use IngredientTemplate, staples use GroceryItem.isStaple
-**Unified Solution**: Single IngredientTemplate-based system with integrated staple management
-**Strategic Benefits**: Eliminates dual data models, provides direct category management, integrates with recipe intelligence
+## 🎯 **PHASE 3: CATEGORY MANAGEMENT INTEGRATION - READY FOR IMPLEMENTATION**
 
 ### **Implementation Readiness:**
-- **Foundation Complete**: All Step 3a infrastructure operational ✅
-- **Category System**: Comprehensive category management with deletion protection ✅
-- **Template Service**: IngredientTemplateService handles all template operations ✅
-- **UI Patterns**: Established professional SwiftUI component library ✅
+- **CategoryAssignmentModal**: Comprehensive modal from Step 3a ready for reuse ✅
+- **IngredientTemplate.category**: Core Data property assignments operational ✅
+- **Professional UI Components**: Established SwiftUI patterns and accessibility standards ✅
+- **Folder Icon Infrastructure**: Placeholder implemented, callback system ready for functionality ✅
 
-### **Success Criteria for Step 4:**
-- **Data Consolidation**: All ingredient data managed through IngredientTemplate system
-- **Category Management**: Direct in-place category assignment working
-- **Staple Integration**: Seamless staple flag management within template system  
-- **Migration Success**: Existing staple data preserved and migrated correctly
-- **Performance**: Maintain < 0.1s response times for all operations
-- **Professional UX**: Native iOS patterns with comprehensive functionality
+### **Success Criteria for Phase 3:**
+- **Single Assignment**: Tap folder icon → category selection → immediate ingredient movement
+- **Bulk Assignment**: Select multiple ingredients → batch category assignment
+- **Modal Integration**: Reuse CategoryAssignmentModal with single/bulk ingredient support
+- **Performance**: Maintain < 0.1s response times for assignment operations
+- **Professional UX**: Native iOS patterns with accessibility compliance
+
+### **User Experience Flow:**
+1. **Single Assignment**: Tap folder icon → CategoryAssignmentModal → select category → ingredient moves to new section
+2. **Bulk Assignment**: Edit mode → select ingredients → bulk assignment action → CategoryAssignmentModal → batch assignment
+3. **Category Creation**: Create new categories during assignment process
+4. **Immediate Feedback**: Visual updates showing ingredient category changes
 
 ---
 
-**Current Status**: Steps 1-3a successfully completed and validated with 33/33 total test scenarios passed. IngredientsView consolidation (Step 4) ready for implementation with proven architecture, established UI patterns, and operational infrastructure. Project maintaining 100% timeline accuracy with professional quality standards. 3-4 hours estimated for Step 4 completion.
+**Current Status**: Step 4 Phase 1-2 successfully completed with unified ingredient management system operational. All ingredient names cleaned, staple management functional, and folder icon ready for Phase 3 category assignment implementation. Professional interface established with < 0.1s response times maintained. Phase 3 ready for 45-minute implementation using existing CategoryAssignmentModal infrastructure.

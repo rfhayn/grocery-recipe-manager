@@ -1,6 +1,6 @@
 // IngredientRowView.swift
-// STEP 4 PHASE 2: Professional ingredient row component with comprehensive functionality
-// Displays ingredient info with staple status, category, usage, and interaction options
+// STEP 4 PHASE 2: Clean ingredient row design without redundant category subtitles
+// Simplified design with better staple indication
 
 import SwiftUI
 import CoreData
@@ -59,10 +59,10 @@ struct IngredientRowView: View {
                         .font(.system(size: 12))
                 )
             
-            // Main content
+            // Main content - simplified layout
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    // Ingredient name
+                    // Ingredient name (larger, more prominent)
                     Text(ingredient.name ?? "Unknown Ingredient")
                         .font(.body)
                         .fontWeight(.medium)
@@ -70,36 +70,12 @@ struct IngredientRowView: View {
                     
                     Spacer()
                     
-                    // Staple badge
-                    if ingredient.isStaple {
-                        HStack(spacing: 4) {
-                            Image(systemName: "star.fill")
-                                .font(.caption)
-                            Text("Staple")
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                    }
-                }
-                
-                // Category and usage info
-                HStack {
-                    Text(ingredient.category ?? "Uncategorized")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
+                    // Usage count (smaller, less prominent)
                     if ingredient.usageCount > 0 {
-                        Spacer()
-                        
                         HStack(spacing: 4) {
                             Image(systemName: "chart.line.uptrend.xyaxis")
                                 .font(.caption2)
-                            Text("Used \(ingredient.usageCount) times")
+                            Text("\(ingredient.usageCount)")
                                 .font(.caption2)
                             
                             // Usage frequency indicator
@@ -114,19 +90,19 @@ struct IngredientRowView: View {
             
             // Action buttons (non-edit mode)
             if !isEditMode {
-                HStack(spacing: 8) {
+                HStack(spacing: 12) {
                     // Category assignment button
                     Button(action: onCategoryAssign) {
                         Image(systemName: "folder")
-                            .font(.caption)
+                            .font(.title3)
                             .foregroundColor(.secondary)
                     }
                     .buttonStyle(PlainButtonStyle())
                     
-                    // Staple toggle button
+                    // Staple toggle button - using pin icon for "staple/essential item"
                     Button(action: onStapleToggle) {
-                        Image(systemName: ingredient.isStaple ? "star.fill" : "star")
-                            .font(.caption)
+                        Image(systemName: ingredient.isStaple ? "pin.fill" : "pin")
+                            .font(.title3)
                             .foregroundColor(ingredient.isStaple ? .blue : .secondary)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -138,6 +114,7 @@ struct IngredientRowView: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(isSelected ? Color.blue.opacity(0.1) : Color.clear)
         )
+        .padding(.vertical, 2) // Slightly more compact
     }
     
     private var categoryEmoji: String {
