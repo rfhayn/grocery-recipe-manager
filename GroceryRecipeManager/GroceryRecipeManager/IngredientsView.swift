@@ -1,6 +1,5 @@
 // IngredientsView.swift
-// STEP 4 PHASE 2: Unified ingredient template and staple management system
-// Clean interface without redundant elements
+// STEP 4 PHASE 2: Complete unified ingredient template and staple management system
 
 import SwiftUI
 import CoreData
@@ -34,6 +33,7 @@ struct IngredientsView: View {
     @State private var showingCategoryAssignment = false
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var ingredientForCategoryAssignment: IngredientTemplate?
     
     var body: some View {
         NavigationView {
@@ -52,22 +52,57 @@ struct IngredientsView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add") {
-                        showingAddForm = true
+                    Menu {
+                        Button("Add Ingredient", systemImage: "plus.circle") {
+                            showingAddForm = true
+                        }
+                        
+                        if isEditMode && !selectedIngredients.isEmpty {
+                            Divider()
+                            
+                            Button("Mark as Staples", systemImage: "pin.fill") {
+                                markSelectedAsStaples(true)
+                            }
+                            
+                            Button("Remove Staple Status", systemImage: "pin.slash") {
+                                markSelectedAsStaples(false)
+                            }
+                            
+                            Divider()
+                            
+                            Button("Delete Selected", systemImage: "trash", role: .destructive) {
+                                bulkDeleteSelected()
+                            }
+                        }
+                    } label: {
+                        Image(systemName: isEditMode && !selectedIngredients.isEmpty ? "ellipsis.circle.fill" : "plus")
+                            .foregroundColor(isEditMode && !selectedIngredients.isEmpty ? .blue : .primary)
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarLeading) {
-                    if isEditMode {
-                        Button("Cancel") {
-                            isEditMode = false
-                            selectedIngredients.removeAll()
-                        }
-                    } else {
-                        EditButton()
-                            .onTapGesture {
-                                isEditMode.toggle()
+                    HStack(spacing: 12) {
+                        if isEditMode {
+                            Button("Done") {
+                                withAnimation {
+                                    isEditMode = false
+                                    selectedIngredients.removeAll()
+                                }
                             }
+                        } else {
+                            Button("Edit") {
+                                withAnimation {
+                                    isEditMode = true
+                                }
+                            }
+                            .disabled(ingredients.isEmpty)
+                        }
+                        
+                        if isEditMode {
+                            Text("(\(ingredients.count))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
             }
@@ -121,6 +156,7 @@ struct IngredientsView: View {
                 } label: {
                     HStack {
                         Text(selectedCategory)
+                            .lineLimit(1)
                         Image(systemName: "chevron.down")
                     }
                     .font(.subheadline)
@@ -164,6 +200,14 @@ struct IngredientsView: View {
                 }
             }
             .padding(.horizontal, 4)
+            
+            // Edit Mode Info
+            if isEditMode && !selectedIngredients.isEmpty {
+                Text("\(selectedIngredients.count) selected")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                    .padding(.top, 4)
+            }
         }
         .padding()
         .background(Color(.systemBackground))
@@ -231,7 +275,6 @@ struct IngredientsView: View {
             ingredient.category ?? "Uncategorized"
         }
         
-        // Sort groups by category order, then by category name
         return grouped.sorted { first, second in
             let firstCategory = categories.first { $0.displayName == first.key }
             let secondCategory = categories.first { $0.displayName == second.key }
@@ -326,8 +369,8 @@ struct IngredientsView: View {
                                 toggleStapleStatus(for: ingredient)
                             },
                             onCategoryAssign: {
-                                // TODO: Implement category assignment (Phase 3)
-                                print("Category assignment for \(ingredient.name ?? "ingredient")")
+                                ingredientForCategoryAssignment = ingredient
+                                showingCategoryAssignment = true
                             }
                         )
                     }
@@ -344,7 +387,7 @@ struct IngredientsView: View {
     private func categoryHeader(categoryName: String, count: Int) -> some View {
         HStack {
             Circle()
-                .fill(Color(hex: findCategory(named: categoryName)?.color ?? "#999999"))
+                .fill(categoryColor(for: categoryName))
                 .frame(width: 16, height: 16)
                 .overlay(
                     Text(categoryEmoji(for: categoryName))
@@ -380,6 +423,43 @@ struct IngredientsView: View {
             } catch {
                 errorMessage = "Failed to update staple status: \(error.localizedDescription)"
                 showingError = true
+                ingredient.isStaple.toggle()
+            }
+        }
+    }
+    
+    private func markSelectedAsStaples(_ isStaple: Bool) {
+        withAnimation {
+            for ingredient in selectedIngredients {
+                ingredient.isStaple = isStaple
+            }
+            
+            do {
+                try viewContext.save()
+                selectedIngredients.removeAll()
+                isEditMode = false
+            } catch {
+                errorMessage = "Failed to update staple status: \(error.localizedDescription)"
+                showingError = true
+            }
+        }
+    }
+    
+    private func bulkDeleteSelected() {
+        guard !selectedIngredients.isEmpty else { return }
+        
+        withAnimation {
+            for ingredient in selectedIngredients {
+                viewContext.delete(ingredient)
+            }
+            
+            do {
+                try viewContext.save()
+                selectedIngredients.removeAll()
+                isEditMode = false
+            } catch {
+                errorMessage = "Failed to delete selected ingredients: \(error.localizedDescription)"
+                showingError = true
             }
         }
     }
@@ -387,7 +467,9 @@ struct IngredientsView: View {
     private func deleteIngredients(from items: [IngredientTemplate], at indexSet: IndexSet) {
         withAnimation {
             for index in indexSet {
-                viewContext.delete(items[index])
+                let ingredient = items[index]
+                selectedIngredients.remove(ingredient)
+                viewContext.delete(ingredient)
             }
             
             do {
@@ -400,8 +482,16 @@ struct IngredientsView: View {
     }
     
     // MARK: - Helper Methods
-    private func findCategory(named name: String) -> Category? {
-        return categories.first { $0.displayName == name }
+    private func categoryColor(for categoryName: String) -> Color {
+        switch categoryName.lowercased() {
+        case "produce": return .green
+        case "deli & meat": return .red
+        case "dairy & fridge": return .blue
+        case "bread & frozen": return .orange
+        case "boxed & canned": return .brown
+        case "snacks, drinks, & other": return .purple
+        default: return .gray
+        }
     }
     
     private func categoryEmoji(for categoryName: String) -> String {
@@ -417,7 +507,7 @@ struct IngredientsView: View {
     }
 }
 
-// MARK: - Sort Options (moved to IngredientsView to avoid conflicts)
+// MARK: - Sort Options
 enum SortOption: CaseIterable {
     case alphabetical, category, usage, staplesFirst
     
@@ -427,6 +517,99 @@ enum SortOption: CaseIterable {
         case .category: return "Category"
         case .usage: return "Usage"
         case .staplesFirst: return "Staples First"
+        }
+    }
+}
+
+// MARK: - Add Ingredient View
+struct AddIngredientView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.presentationMode) var presentationMode
+    @State private var ingredientName = ""
+    @State private var selectedCategory = "Uncategorized"
+    @State private var isStaple = false
+    @State private var showingError = false
+    @State private var errorMessage = ""
+    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true)],
+        animation: .default
+    ) private var categories: FetchedResults<Category>
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Ingredient Details")) {
+                    TextField("Ingredient Name", text: $ingredientName)
+                        .autocapitalization(.words)
+                    
+                    Picker("Category", selection: $selectedCategory) {
+                        ForEach(categories, id: \.self) { category in
+                            Text(category.displayName).tag(category.displayName)
+                        }
+                    }
+                    
+                    Toggle("Mark as Staple", isOn: $isStaple)
+                }
+            }
+            .navigationTitle("Add Ingredient")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        saveIngredient()
+                    }
+                    .disabled(ingredientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .alert("Error", isPresented: $showingError) {
+                Button("OK") { }
+            } message: {
+                Text(errorMessage)
+            }
+        }
+    }
+    
+    private func saveIngredient() {
+        let trimmedName = ingredientName.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Check for duplicates
+        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+        request.predicate = NSPredicate(format: "name ==[c] %@", trimmedName)
+        
+        do {
+            let existingIngredients = try viewContext.fetch(request)
+            if !existingIngredients.isEmpty {
+                errorMessage = "An ingredient with this name already exists"
+                showingError = true
+                return
+            }
+        } catch {
+            errorMessage = "Failed to check for duplicates: \(error.localizedDescription)"
+            showingError = true
+            return
+        }
+        
+        let newIngredient = IngredientTemplate(context: viewContext)
+        newIngredient.id = UUID()
+        newIngredient.name = trimmedName
+        newIngredient.category = selectedCategory
+        newIngredient.isStaple = isStaple
+        newIngredient.usageCount = 0
+        newIngredient.dateCreated = Date()
+        
+        do {
+            try viewContext.save()
+            presentationMode.wrappedValue.dismiss()
+        } catch {
+            errorMessage = "Failed to save ingredient: \(error.localizedDescription)"
+            showingError = true
         }
     }
 }
