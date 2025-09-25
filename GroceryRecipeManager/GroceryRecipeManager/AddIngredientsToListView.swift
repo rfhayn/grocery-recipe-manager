@@ -95,7 +95,7 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // FIXED: Use direct Core Data operations instead of PersistenceController.performWrite
+    // FIXED: Updated ingredient parsing with clean names
     private func prepareIngredientsAndTemplates(completion: @escaping (Bool) -> Void) {
         guard let ingredientsSet = recipe.ingredients else {
             completion(false)
@@ -110,12 +110,15 @@ struct AddIngredientsToListView: View {
         
         // Use viewContext directly instead of PersistenceController.performWrite
         for ingredient in selectedIngredientsList {
-            guard let name = ingredient.name?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !name.isEmpty else { continue }
+            guard let fullName = ingredient.name?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !fullName.isEmpty else { continue }
             
-            // Find or create template
+            // FIXED: Extract clean ingredient name without measurements
+            let cleanName = extractCleanIngredientName(from: fullName)
+            
+            // Find or create template using the CLEAN name
             let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
-            request.predicate = NSPredicate(format: "name ==[cd] %@", name)
+            request.predicate = NSPredicate(format: "name ==[cd] %@", cleanName)
             
             do {
                 let template: IngredientTemplate
@@ -124,10 +127,9 @@ struct AddIngredientsToListView: View {
                 } else {
                     template = IngredientTemplate(context: viewContext)
                     template.id = UUID()
-                    template.name = name
+                    template.name = cleanName  // Store CLEAN name, not full recipe text
                     template.usageCount = 0
                     template.dateCreated = Date()
-                    // FIXED: New templates start as "Uncategorized" instead of nil
                     template.category = "Uncategorized"
                 }
                 
@@ -370,12 +372,38 @@ struct AddIngredientsToListView: View {
         }
     }
     
+    // ENHANCED: Better ingredient name extraction
     private func extractCleanIngredientName(from fullText: String) -> String {
-        let cleaned = fullText
-            .replacingOccurrences(of: #"\d+(\.\d+)?\s*(cup|cups|tablespoon|tablespoons|teaspoon|teaspoons|pound|pounds|ounce|ounces|gram|grams|kilogram|kilograms|liter|liters|milliliter|milliliters|tsp|tbsp|lb|oz|g|kg|l|ml)\s*"#, with: "", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let text = fullText.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        return cleaned.isEmpty ? fullText : cleaned
+        // Remove common quantity patterns at the beginning
+        let patterns = [
+            #"^\d+(\.\d+)?\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
+            #"^\d+(\.\d+)?\s*"#,  // Remove bare numbers
+            #"^(a|an|the)\s+"#,    // Remove articles
+            #"^\d+(/\d+)?\s+"#,    // Remove fractions like "1/2"
+            #"^\d+\s*-\s*\d+\s+"# // Remove ranges like "2-3"
+        ]
+        
+        var cleaned = text
+        for pattern in patterns {
+            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+        }
+        
+        // Remove common descriptors from the end
+        let endPatterns = [
+            #",\s*(chopped|diced|sliced|minced|grated|melted|softened|at room temperature|optional).*$"#,
+            #",\s*.*$"#  // Remove everything after first comma
+        ]
+        
+        for pattern in endPatterns {
+            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+        }
+        
+        cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // If cleaning resulted in empty string, return original
+        return cleaned.isEmpty ? text : cleaned
     }
     
     private func buildCompleteQuantity(from ingredient: Ingredient) -> String {

@@ -36,84 +36,82 @@ struct IngredientsView: View {
     @State private var ingredientForCategoryAssignment: IngredientTemplate?
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Search and Filter Section
-                searchAndFilterSection
-                
-                // Main Content
-                if filteredIngredients.isEmpty {
-                    emptyStateView
-                } else {
-                    ingredientsListView
-                }
+        VStack(spacing: 0) {
+            // Search and Filter Section
+            searchAndFilterSection
+            
+            // Main Content
+            if filteredIngredients.isEmpty {
+                emptyStateView
+            } else {
+                ingredientsListView
             }
-            .navigationTitle("Ingredients")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button("Add Ingredient", systemImage: "plus.circle") {
-                            showingAddForm = true
+        }
+        .navigationTitle("Ingredients")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button("Add Ingredient", systemImage: "plus.circle") {
+                        showingAddForm = true
+                    }
+                    
+                    if isEditMode && !selectedIngredients.isEmpty {
+                        Divider()
+                        
+                        Button("Mark as Staples", systemImage: "pin.fill") {
+                            markSelectedAsStaples(true)
                         }
                         
-                        if isEditMode && !selectedIngredients.isEmpty {
-                            Divider()
-                            
-                            Button("Mark as Staples", systemImage: "pin.fill") {
-                                markSelectedAsStaples(true)
-                            }
-                            
-                            Button("Remove Staple Status", systemImage: "pin.slash") {
-                                markSelectedAsStaples(false)
-                            }
-                            
-                            Divider()
-                            
-                            Button("Delete Selected", systemImage: "trash", role: .destructive) {
-                                bulkDeleteSelected()
-                            }
-                        }
-                    } label: {
-                        Image(systemName: isEditMode && !selectedIngredients.isEmpty ? "ellipsis.circle.fill" : "plus")
-                            .foregroundColor(isEditMode && !selectedIngredients.isEmpty ? .blue : .primary)
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    HStack(spacing: 12) {
-                        if isEditMode {
-                            Button("Done") {
-                                withAnimation {
-                                    isEditMode = false
-                                    selectedIngredients.removeAll()
-                                }
-                            }
-                        } else {
-                            Button("Edit") {
-                                withAnimation {
-                                    isEditMode = true
-                                }
-                            }
-                            .disabled(ingredients.isEmpty)
+                        Button("Remove Staple Status", systemImage: "pin.slash") {
+                            markSelectedAsStaples(false)
                         }
                         
-                        if isEditMode {
-                            Text("(\(ingredients.count))")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                        Divider()
+                        
+                        Button("Delete Selected", systemImage: "trash", role: .destructive) {
+                            bulkDeleteSelected()
                         }
+                    }
+                } label: {
+                    Image(systemName: isEditMode && !selectedIngredients.isEmpty ? "ellipsis.circle.fill" : "plus")
+                        .foregroundColor(isEditMode && !selectedIngredients.isEmpty ? .blue : .primary)
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarLeading) {
+                HStack(spacing: 12) {
+                    if isEditMode {
+                        Button("Done") {
+                            withAnimation {
+                                isEditMode = false
+                                selectedIngredients.removeAll()
+                            }
+                        }
+                    } else {
+                        Button("Edit") {
+                            withAnimation {
+                                isEditMode = true
+                            }
+                        }
+                        .disabled(ingredients.isEmpty)
+                    }
+                    
+                    if isEditMode {
+                        Text("(\(ingredients.count))")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
-            .sheet(isPresented: $showingAddForm) {
-                AddIngredientView()
-            }
-            .alert("Error", isPresented: $showingError) {
-                Button("OK") { }
-            } message: {
-                Text(errorMessage)
-            }
+        }
+        .sheet(isPresented: $showingAddForm) {
+            AddIngredientView()
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
         }
     }
     
@@ -142,7 +140,7 @@ struct IngredientsView: View {
             
             // Filter Controls
             HStack {
-                // Category Filter
+                // Category Filter - FIXED VERSION
                 Menu {
                     Button("All Categories") {
                         selectedCategory = "All Categories"
@@ -155,12 +153,17 @@ struct IngredientsView: View {
                     }
                 } label: {
                     HStack {
-                        Text(selectedCategory)
+                        Text(selectedCategory == "All Categories" ? "All Categories" : selectedCategory)
                             .lineLimit(1)
+                            .frame(minWidth: 120, alignment: .leading)
                         Image(systemName: "chevron.down")
                     }
                     .font(.subheadline)
                     .foregroundColor(.primary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
                 }
                 
                 Spacer()
@@ -348,7 +351,7 @@ struct IngredientsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    // MARK: - Ingredients List View
+    // MARK: - Ingredients List View (FIXED SCROLLING)
     private var ingredientsListView: some View {
         List {
             ForEach(groupedIngredients, id: \.key) { categoryName, items in
@@ -380,10 +383,10 @@ struct IngredientsView: View {
                 }
             }
         }
-        .listStyle(PlainListStyle())
+        .listStyle(InsetGroupedListStyle())
     }
     
-    // MARK: - Category Header
+    // MARK: - Category Header (FIXED)
     private func categoryHeader(categoryName: String, count: Int) -> some View {
         HStack {
             Circle()
@@ -411,6 +414,8 @@ struct IngredientsView: View {
                 .cornerRadius(6)
         }
         .padding(.vertical, 4)
+        .background(Color(.systemGroupedBackground))
+        .listRowInsets(EdgeInsets())
     }
     
     // MARK: - Actions
@@ -517,6 +522,69 @@ enum SortOption: CaseIterable {
         case .category: return "Category"
         case .usage: return "Usage"
         case .staplesFirst: return "Staples First"
+        }
+    }
+}
+
+// MARK: - Ingredient Row View (CLEANED - NO COUNTS)
+struct IngredientRowView: View {
+    let ingredient: IngredientTemplate
+    let isSelected: Bool
+    let isEditMode: Bool
+    let onSelectionChanged: (Bool) -> Void
+    let onStapleToggle: () -> Void
+    let onCategoryAssign: () -> Void
+    
+    var body: some View {
+        HStack {
+            if isEditMode {
+                Button(action: { onSelectionChanged(!isSelected) }) {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(isSelected ? .blue : .secondary)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            // Category indicator
+            Circle()
+                .fill(categoryColor(for: ingredient.category ?? "Uncategorized"))
+                .frame(width: 12, height: 12)
+            
+            // Ingredient name ONLY - no usage counts or secondary text
+            Text(ingredient.name ?? "Unknown")
+                .font(.body)
+                .lineLimit(2)
+            
+            Spacer()
+            
+            // Folder icon (category assignment)
+            Button(action: onCategoryAssign) {
+                Image(systemName: "folder")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            // Staple pin
+            Button(action: onStapleToggle) {
+                Image(systemName: ingredient.isStaple ? "pin.fill" : "pin")
+                    .font(.body)
+                    .foregroundColor(ingredient.isStaple ? .blue : .secondary)
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+        .padding(.vertical, 4)
+    }
+    
+    private func categoryColor(for categoryName: String) -> Color {
+        switch categoryName.lowercased() {
+        case "produce": return .green
+        case "deli & meat": return .red
+        case "dairy & fridge": return .blue
+        case "bread & frozen": return .orange
+        case "boxed & canned": return .brown
+        case "snacks, drinks, & other": return .purple
+        default: return .gray
         }
     }
 }

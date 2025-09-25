@@ -377,7 +377,6 @@ struct ManageCategoriesView: View {
         PersistenceController.shared.performWrite({ context in
             // Get references to categories in write context
             let sourceCategoryInContext = context.object(with: sourceCategoryID) as! Category
-            let targetCategoryInContext = context.object(with: targetCategoryID) as! Category
             
             let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
             request.predicate = NSPredicate(format: "category == %@", sourceCategoryName)
