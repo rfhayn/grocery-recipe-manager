@@ -51,14 +51,10 @@ struct IngredientsView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button("Add Ingredient", systemImage: "plus.circle") {
-                        showingAddForm = true
-                    }
-                    
-                    if isEditMode && !selectedIngredients.isEmpty {
-                        Divider()
-                        
+                // FIXED: Check if we're in edit mode with selections for bulk operations
+                if isEditMode && !selectedIngredients.isEmpty {
+                    // Show bulk operations menu when items are selected in edit mode
+                    Menu {
                         Button("Mark as Staples", systemImage: "pin.fill") {
                             markSelectedAsStaples(true)
                         }
@@ -72,10 +68,18 @@ struct IngredientsView: View {
                         Button("Delete Selected", systemImage: "trash", role: .destructive) {
                             bulkDeleteSelected()
                         }
+                    } label: {
+                        Image(systemName: "ellipsis.circle.fill")
+                            .foregroundColor(.blue)
                     }
-                } label: {
-                    Image(systemName: isEditMode && !selectedIngredients.isEmpty ? "ellipsis.circle.fill" : "plus")
-                        .foregroundColor(isEditMode && !selectedIngredients.isEmpty ? .blue : .primary)
+                } else {
+                    // FIXED: Direct button for adding ingredient (single tap)
+                    Button(action: {
+                        showingAddForm = true
+                    }) {
+                        Image(systemName: "plus")
+                            .foregroundColor(.primary)
+                    }
                 }
             }
             
@@ -589,7 +593,7 @@ struct IngredientRowView: View {
     }
 }
 
-// MARK: - Add Ingredient View
+// MARK: - Add Ingredient View (FIXED - Auto-focus text field)
 struct AddIngredientView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode
@@ -598,6 +602,9 @@ struct AddIngredientView: View {
     @State private var isStaple = false
     @State private var showingError = false
     @State private var errorMessage = ""
+    
+    // FIXED: Add focus state for auto-focus functionality
+    @FocusState private var isTextFieldFocused: Bool
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true)],
@@ -610,6 +617,7 @@ struct AddIngredientView: View {
                 Section(header: Text("Ingredient Details")) {
                     TextField("Ingredient Name", text: $ingredientName)
                         .autocapitalization(.words)
+                        .focused($isTextFieldFocused) // FIXED: Add focus binding
                     
                     Picker("Category", selection: $selectedCategory) {
                         ForEach(categories, id: \.self) { category in
@@ -640,6 +648,10 @@ struct AddIngredientView: View {
                 Button("OK") { }
             } message: {
                 Text(errorMessage)
+            }
+            .onAppear {
+                // FIXED: Auto-focus the text field when view appears
+                isTextFieldFocused = true
             }
         }
     }

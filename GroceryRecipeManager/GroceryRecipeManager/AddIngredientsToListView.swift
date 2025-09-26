@@ -95,7 +95,7 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // FIXED: Updated ingredient parsing with clean names
+    // FIXED: Updated ingredient parsing with clean names for templates
     private func prepareIngredientsAndTemplates(completion: @escaping (Bool) -> Void) {
         guard let ingredientsSet = recipe.ingredients else {
             completion(false)
@@ -113,7 +113,7 @@ struct AddIngredientsToListView: View {
             guard let fullName = ingredient.name?.trimmingCharacters(in: .whitespacesAndNewlines),
                   !fullName.isEmpty else { continue }
             
-            // FIXED: Extract clean ingredient name without measurements
+            // FIXED: Extract clean ingredient name without measurements for template matching
             let cleanName = extractCleanIngredientName(from: fullName)
             
             // Find or create template using the CLEAN name
@@ -130,7 +130,7 @@ struct AddIngredientsToListView: View {
                     template.name = cleanName  // Store CLEAN name, not full recipe text
                     template.usageCount = 0
                     template.dateCreated = Date()
-                    template.category = "Uncategorized"
+                    template.category = nil  // Will be handled by category assignment flow
                 }
                 
                 // Update usage count and link to ingredient
@@ -152,7 +152,7 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // FIXED: Check for "Uncategorized" templates that need assignment
+    // FIXED: Check for templates that need category assignment
     private func checkForUncategorizedTemplates(completion: @escaping ([IngredientTemplate]) -> Void) {
         guard let ingredientsSet = recipe.ingredients else {
             completion([])
@@ -165,12 +165,19 @@ struct AddIngredientsToListView: View {
             return selectedIngredients.contains(id)
         }
         
-        // FIXED: Find templates that need category assignment (nil, empty, or "Uncategorized")
+        // DEBUG: Add debugging to see what's actually in the templates
+        for ingredient in selectedIngredientsList {
+            if let template = ingredient.ingredientTemplate {
+                print("🔍 Template '\(template.name ?? "nil")' has category: '\(template.category ?? "nil")'")
+            }
+        }
+        
+        // Find templates that need category assignment (nil, empty, or "Uncategorized")
         var uncategorized: [IngredientTemplate] = []
         
         for ingredient in selectedIngredientsList {
             if let template = ingredient.ingredientTemplate {
-                // Check if category is nil, empty, or "Uncategorized"
+                // FIXED: Check if category is nil, empty, or "Uncategorized"
                 if template.category == nil ||
                    template.category?.isEmpty == true ||
                    template.category?.lowercased() == "uncategorized" {
@@ -271,6 +278,7 @@ struct AddIngredientsToListView: View {
         }
     }
     
+    // FIXED: Modified to preserve quantities in grocery list items
     private func createGroceryListItems(in weeklyList: WeeklyList) {
         guard let ingredientsSet = recipe.ingredients else {
             isProcessing = false
@@ -294,37 +302,48 @@ struct AddIngredientsToListView: View {
         var mergeCount = 0
         
         for ingredient in selectedIngredientsToAdd {
+            // FIXED: Use full ingredient text WITH quantities for grocery list
+            let fullIngredientText = ingredient.name ?? "Unknown ingredient"
+            
+            // But use clean name for template operations and duplicate detection
             let cleanName: String
-            let completeQuantity: String
-            
             if let ingredientTemplate = ingredient.ingredientTemplate {
-                cleanName = ingredientTemplate.name ?? "Unknown"
+                cleanName = ingredientTemplate.name ?? extractCleanIngredientName(from: fullIngredientText)
             } else {
-                cleanName = extractCleanIngredientName(from: ingredient.name ?? "Unknown")
+                cleanName = extractCleanIngredientName(from: fullIngredientText)
             }
-            completeQuantity = buildCompleteQuantity(from: ingredient)
             
+            // Check for existing items by clean name
             if let existingItem = findExistingItem(named: cleanName, in: existingItems) {
-                let mergedQuantity = mergeQuantities(
-                    existing: existingItem.quantity ?? "",
-                    new: completeQuantity
-                )
-                existingItem.quantity = mergedQuantity
+                // FIXED: Merge quantities if both have quantities
+                let existingName = existingItem.name ?? ""
+                let newQuantityInfo = extractQuantityInfo(from: fullIngredientText)
+                let existingQuantityInfo = extractQuantityInfo(from: existingName)
+                
+                if !newQuantityInfo.isEmpty && !existingQuantityInfo.isEmpty {
+                    // Try to merge quantities
+                    let mergedQuantity = mergeQuantities(existing: existingQuantityInfo, new: newQuantityInfo)
+                    existingItem.name = "\(mergedQuantity) \(cleanName)"
+                } else if !newQuantityInfo.isEmpty && existingQuantityInfo.isEmpty {
+                    // Add quantity to existing item
+                    existingItem.name = fullIngredientText
+                }
+                // If new item has no quantity, keep existing as-is
+                
                 mergeCount += 1
-                print("Merged quantities for '\(cleanName)': \(mergedQuantity)")
+                print("Merged quantities for '\(cleanName)'")
             } else {
+                // Create new item with full name including quantities
                 let listItem = GroceryListItem(context: viewContext)
                 listItem.id = UUID()
-                listItem.name = cleanName
-                listItem.quantity = completeQuantity
+                listItem.name = fullIngredientText  // CHANGED: Keep full name with quantities
                 listItem.isCompleted = false
                 listItem.source = "Recipe: \(recipe.title ?? "Unknown Recipe")"
                 
-                // FIXED: Use proper category assignment logic
+                // Use proper category assignment logic
                 if let template = ingredient.ingredientTemplate,
                    let categoryString = template.category,
-                   !categoryString.isEmpty,
-                   categoryString.lowercased() != "uncategorized" {
+                   !categoryString.isEmpty {
                     listItem.categoryName = categoryString
                     print("Assigned category '\(categoryString)' to '\(cleanName)'")
                 } else {
@@ -333,7 +352,7 @@ struct AddIngredientsToListView: View {
                 }
                 
                 weeklyList.addToItems(listItem)
-                print("Created new item: \(cleanName) (\(completeQuantity))")
+                print("Created new item: \(fullIngredientText)")
             }
         }
         
@@ -367,14 +386,16 @@ struct AddIngredientsToListView: View {
     private func findExistingItem(named targetName: String, in items: [GroceryListItem]) -> GroceryListItem? {
         return items.first { item in
             guard let itemName = item.name else { return false }
-            return itemName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) ==
+            let cleanItemName = extractCleanIngredientName(from: itemName)
+            return cleanItemName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) ==
                    targetName.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
     
-    // ENHANCED: Better ingredient name extraction
+    // DEBUGGING: Enhanced ingredient name extraction with debugging
     private func extractCleanIngredientName(from fullText: String) -> String {
         let text = fullText.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("🧹 Extracting clean name from: '\(text)'") // Debug
         
         // Remove common quantity patterns at the beginning
         let patterns = [
@@ -387,7 +408,11 @@ struct AddIngredientsToListView: View {
         
         var cleaned = text
         for pattern in patterns {
+            let before = cleaned
             cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+            if before != cleaned {
+                print("   Applied pattern, result: '\(cleaned)'") // Debug
+            }
         }
         
         // Remove common descriptors from the end
@@ -397,13 +422,153 @@ struct AddIngredientsToListView: View {
         ]
         
         for pattern in endPatterns {
+            let before = cleaned
             cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+            if before != cleaned {
+                print("   Applied end pattern, result: '\(cleaned)'") // Debug
+            }
         }
         
         cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // If cleaning resulted in empty string, return original
-        return cleaned.isEmpty ? text : cleaned
+        let result = cleaned.isEmpty ? text : cleaned
+        print("🎯 Final clean name: '\(result)'") // Debug
+        return result
+    }
+    
+    // DEBUGGING: Helper function to find existing template with debugging
+    private func findExistingTemplate(cleanName: String) -> IngredientTemplate? {
+        print("🔍 Looking for template with clean name: '\(cleanName)'") // Debug
+        
+        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+        request.predicate = NSPredicate(format: "name ==[cd] %@", cleanName)
+        request.fetchLimit = 1
+        
+        do {
+            let templates = try viewContext.fetch(request)
+            if let found = templates.first {
+                print("✅ Found template: '\(found.name ?? "nil")' with category: '\(found.category ?? "nil")'") // Debug
+                return found
+            } else {
+                print("❌ No template found for: '\(cleanName)'") // Debug
+                
+                // DEBUG: Let's see what templates actually exist
+                let allTemplatesRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+                let allTemplates = try viewContext.fetch(allTemplatesRequest)
+                print("📋 Existing templates in database:")
+                for template in allTemplates.prefix(10) { // Show first 10
+                    print("   - '\(template.name ?? "nil")' -> '\(template.category ?? "nil")'")
+                }
+                
+                return nil
+            }
+        } catch {
+            print("❌ Error finding existing template: \(error)")
+            return nil
+        }
+    }
+    
+    // IMPROVED: Helper function to get category color
+    private func categoryColor(for categoryName: String) -> Color {
+        switch categoryName.lowercased() {
+        case "produce": return .green
+        case "deli & meat": return .red
+        case "dairy & fridge": return .blue
+        case "bread & frozen": return .orange
+        case "boxed & canned": return .brown
+        case "snacks, drinks, & other": return .purple
+        default: return .gray
+        }
+    }
+    
+    // FIXED: New helper method to extract quantity info
+    private func extractQuantityInfo(from text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Extract quantity patterns at the beginning
+        let quantityPatterns = [
+            #"^(\d+(\.\d+)?\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml))"#,
+            #"^(\d+(\.\d+)?)"#,  // Bare numbers
+            #"^(\d+/\d+)"#,      // Fractions like "1/2"
+            #"^(\d+\s*-\s*\d+)"# // Ranges like "2-3"
+        ]
+        
+        for pattern in quantityPatterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+               let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
+                return String(trimmed[Range(match.range, in: trimmed)!])
+            }
+        }
+        
+        return ""
+    }
+    
+    // FIXED: Enhanced quantity merging logic
+    private func mergeQuantities(existing: String, new: String) -> String {
+        if existing.isEmpty {
+            return new
+        } else if new.isEmpty {
+            return existing
+        }
+        
+        // Simple unit compatibility check
+        let existingLower = existing.lowercased()
+        let newLower = new.lowercased()
+        
+        // Check for compatible units (cups with cups, tsp with tsp, etc.)
+        let cupUnits = ["cup", "cups"]
+        let tspUnits = ["tsp", "teaspoon", "teaspoons"]
+        let tbspUnits = ["tbsp", "tablespoon", "tablespoons"]
+        
+        let existingHasCups = cupUnits.contains { existingLower.contains($0) }
+        let newHasCups = cupUnits.contains { newLower.contains($0) }
+        
+        let existingHasTsp = tspUnits.contains { existingLower.contains($0) }
+        let newHasTsp = tspUnits.contains { newLower.contains($0) }
+        
+        let existingHasTbsp = tbspUnits.contains { existingLower.contains($0) }
+        let newHasTbsp = tbspUnits.contains { newLower.contains($0) }
+        
+        // If units are compatible, try simple addition
+        if (existingHasCups && newHasCups) || (existingHasTsp && newHasTsp) || (existingHasTbsp && newHasTbsp) {
+            // Extract numeric values and add them
+            let existingNum = extractNumericValue(from: existing)
+            let newNum = extractNumericValue(from: new)
+            
+            if let existingVal = existingNum, let newVal = newNum {
+                let sum = existingVal + newVal
+                let unit = extractUnit(from: existing) ?? extractUnit(from: new) ?? ""
+                return "\(sum) \(unit)"
+            }
+        }
+        
+        // If not compatible or can't parse, combine them
+        return "\(existing), \(new)"
+    }
+    
+    // FIXED: Helper methods for numeric extraction
+    private func extractNumericValue(from text: String) -> Double? {
+        let pattern = #"^(\d+(?:\.\d+)?)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) else {
+            return nil
+        }
+        
+        let numString = String(text[Range(match.range, in: text)!])
+        return Double(numString)
+    }
+    
+    private func extractUnit(from text: String) -> String? {
+        let pattern = #"^\d+(?:\.\d+)?\s*(.+)$"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+              match.numberOfRanges > 1 else {
+            return nil
+        }
+        
+        let unitRange = match.range(at: 1)
+        return String(text[Range(unitRange, in: text)!]).trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     private func buildCompleteQuantity(from ingredient: Ingredient) -> String {
@@ -418,16 +583,6 @@ struct AddIngredientsToListView: View {
         }
         
         return parts.joined(separator: " ")
-    }
-    
-    private func mergeQuantities(existing: String, new: String) -> String {
-        if existing.isEmpty {
-            return new
-        } else if new.isEmpty {
-            return existing
-        } else {
-            return "\(existing), \(new)"
-        }
     }
     
     // MARK: - UI Components
@@ -489,6 +644,7 @@ struct AddIngredientsToListView: View {
         .background(Color(.systemGroupedBackground))
     }
     
+    // IMPROVED: Better ingredient status display in AddIngredientsToListView
     private func ingredientRow(_ ingredient: Ingredient) -> some View {
         HStack(spacing: 12) {
             Button(action: {
@@ -519,37 +675,8 @@ struct AddIngredientsToListView: View {
                     
                     Spacer()
                     
-                    // FIXED: Show proper categorization status
-                    if let template = ingredient.ingredientTemplate {
-                        HStack(spacing: 4) {
-                            if let category = template.category,
-                               !category.isEmpty,
-                               category.lowercased() != "uncategorized" {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.caption2)
-                                    .foregroundColor(.green)
-                                Text("Categorized")
-                                    .font(.caption2)
-                                    .foregroundColor(.green)
-                            } else {
-                                Image(systemName: "exclamationmark.triangle")
-                                    .font(.caption2)
-                                    .foregroundColor(.orange)
-                                Text("Needs Category")
-                                    .font(.caption2)
-                                    .foregroundColor(.orange)
-                            }
-                        }
-                    } else {
-                        HStack(spacing: 4) {
-                            Image(systemName: "plus.circle")
-                                .font(.caption2)
-                                .foregroundColor(.blue)
-                            Text("New Template")
-                                .font(.caption2)
-                                .foregroundColor(.blue)
-                        }
-                    }
+                    // IMPROVED: Show actual category status
+                    ingredientStatusView(for: ingredient)
                 }
             }
             
@@ -558,6 +685,49 @@ struct AddIngredientsToListView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             toggleIngredientSelection(ingredient)
+        }
+    }
+    
+    // UPDATED: Status view logic - show category if exists, "Needs Category" if template exists but no category
+    @ViewBuilder
+    private func ingredientStatusView(for ingredient: Ingredient) -> some View {
+        // Check if template already exists
+        let cleanName = extractCleanIngredientName(from: ingredient.name ?? "")
+        let existingTemplate = findExistingTemplate(cleanName: cleanName)
+        
+        if let template = existingTemplate {
+            // Template exists - check if it has a category
+            if let category = template.category, !category.isEmpty {
+                // Has category - show it with color dot
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(categoryColor(for: category))
+                        .frame(width: 8, height: 8)
+                    Text(category)
+                        .font(.caption2)
+                        .foregroundColor(categoryColor(for: category))
+                }
+            } else {
+                // Template exists but needs category - orange warning
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.caption2)
+                        .foregroundColor(.orange)
+                    Text("Needs Category")
+                        .font(.caption2)
+                        .foregroundColor(.orange)
+                }
+            }
+        } else {
+            // No template exists - will create new (this should be rare if salt exists)
+            HStack(spacing: 4) {
+                Image(systemName: "plus.circle")
+                    .font(.caption2)
+                    .foregroundColor(.blue)
+                Text("New Template")
+                    .font(.caption2)
+                    .foregroundColor(.blue)
+            }
         }
     }
     

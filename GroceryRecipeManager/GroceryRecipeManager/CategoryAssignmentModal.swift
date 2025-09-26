@@ -51,7 +51,8 @@ struct CategoryAssignmentModal: View {
                         // Add New Category Option
                         addNewCategoryButton
                     }
-                    .padding()
+                    .padding(.horizontal, 16) // Consistent padding
+                    .padding(.vertical, 12)
                 }
                 .background(Color(.systemBackground))
                 
@@ -80,8 +81,9 @@ struct CategoryAssignmentModal: View {
     
     // MARK: - View Components
     
+    // IMPROVED: Simplified header with better spacing
     private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Assign Categories")
@@ -94,13 +96,14 @@ struct CategoryAssignmentModal: View {
                 Spacer()
             }
             
-            Text("Assign categories to organize ingredients in your grocery lists.")
+            Text("Assign categories to organize ingredients.")
                 .font(.callout)
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal)
-        .padding(.top)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 8)
         .background(Color(.systemGroupedBackground))
     }
     
@@ -140,8 +143,9 @@ struct CategoryAssignmentModal: View {
         .padding(.top, 8)
     }
     
+    // IMPROVED: Better spaced action buttons section
     private var actionButtons: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             // Assign Categories Button
             Button(action: assignCategories) {
                 HStack {
@@ -178,20 +182,29 @@ struct CategoryAssignmentModal: View {
             }
             .disabled(isLoading)
             
-            // Assignment Summary - FIXED: Handle optional String values
-            HStack {
-                Text("\(properlyAssignedCount) of \(uncategorizedTemplates.count) assigned to specific categories")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Spacer()
-                if properlyAssignedCount < uncategorizedTemplates.count {
-                    Text("• \(uncategorizedTemplates.count - properlyAssignedCount) will remain in Uncategorized")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+            // IMPROVED: Conditional assignment summary with better layout
+            if uncategorizedTemplates.count > 1 {
+                VStack(spacing: 4) {
+                    HStack {
+                        Text("\(properlyAssignedCount) of \(uncategorizedTemplates.count) assigned")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                    
+                    if properlyAssignedCount < uncategorizedTemplates.count {
+                        HStack {
+                            Text("\(uncategorizedTemplates.count - properlyAssignedCount) will remain uncategorized")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                        }
+                    }
                 }
             }
         }
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
         .background(Color(.systemGroupedBackground))
     }
     
@@ -270,7 +283,7 @@ struct CategoryAssignmentModal: View {
     }
 }
 
-// MARK: - Ingredient Assignment Row
+// MARK: - Ingredient Assignment Row - IMPROVED Layout
 struct IngredientAssignmentRow: View {
     let template: IngredientTemplate
     let categories: [Category]
@@ -279,17 +292,14 @@ struct IngredientAssignmentRow: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Ingredient Info
+            // IMPROVED: Ingredient Info without usage line
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(template.name ?? "Unknown ingredient")
                         .font(.body)
                         .fontWeight(.medium)
                         .foregroundColor(.primary)
-                    
-                    Text("Usage: \(template.usageCount) times")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    // REMOVED: Usage line since these are new ingredients being categorized
                 }
                 
                 Spacer()
@@ -298,7 +308,7 @@ struct IngredientAssignmentRow: View {
                 categoryStatusView
             }
             
-            // Category Selection Button
+            // IMPROVED: Category Selection Button with better padding
             NavigationLink(destination: CategorySelectionViewForAssignment(
                 categories: categories,
                 selectedCategoryName: selectedCategoryName,
@@ -327,13 +337,14 @@ struct IngredientAssignmentRow: View {
                         .foregroundColor(.secondary)
                 }
                 .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.vertical, 12) // Increased for better touch target
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
             }
             .buttonStyle(PlainButtonStyle())
         }
-        .padding()
+        .padding(.horizontal, 16) // Consistent horizontal padding
+        .padding(.vertical, 12)    // Reduced vertical padding
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .overlay(
