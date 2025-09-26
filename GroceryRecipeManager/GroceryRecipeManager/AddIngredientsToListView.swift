@@ -95,7 +95,7 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // FIXED: Updated ingredient parsing with clean names for templates
+    // IMPROVED: Updated ingredient parsing with clean names for templates
     private func prepareIngredientsAndTemplates(completion: @escaping (Bool) -> Void) {
         guard let ingredientsSet = recipe.ingredients else {
             completion(false)
@@ -108,13 +108,14 @@ struct AddIngredientsToListView: View {
             return selectedIngredients.contains(id)
         }
         
-        // Use viewContext directly instead of PersistenceController.performWrite
+        // Use viewContext directly
         for ingredient in selectedIngredientsList {
             guard let fullName = ingredient.name?.trimmingCharacters(in: .whitespacesAndNewlines),
                   !fullName.isEmpty else { continue }
             
-            // FIXED: Extract clean ingredient name without measurements for template matching
+            // IMPROVED: Extract clean ingredient name for template matching
             let cleanName = extractCleanIngredientName(from: fullName)
+            print("Looking for ingredient: '\(fullName)' -> clean: '\(cleanName)'")
             
             // Find or create template using the CLEAN name
             let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
@@ -124,16 +125,19 @@ struct AddIngredientsToListView: View {
                 let template: IngredientTemplate
                 if let existing = try viewContext.fetch(request).first {
                     template = existing
+                    print("Found existing template: '\(existing.name ?? "nil")'")
                 } else {
                     template = IngredientTemplate(context: viewContext)
                     template.id = UUID()
-                    template.name = cleanName  // Store CLEAN name, not full recipe text
+                    template.name = cleanName  // Store CLEAN name
                     template.usageCount = 0
                     template.dateCreated = Date()
                     template.category = nil  // Will be handled by category assignment flow
+                    template.isStaple = false // Default value
+                    print("Created new template: '\(cleanName)'")
                 }
                 
-                // Update usage count and link to ingredient
+                // Update usage count and ESTABLISH RELATIONSHIP
                 template.usageCount += 1
                 ingredient.ingredientTemplate = template
                 
@@ -145,6 +149,7 @@ struct AddIngredientsToListView: View {
         // Save context
         do {
             try viewContext.save()
+            print("Templates prepared successfully")
             completion(true)
         } catch {
             print("Error saving templates: \(error)")
@@ -168,7 +173,7 @@ struct AddIngredientsToListView: View {
         // DEBUG: Add debugging to see what's actually in the templates
         for ingredient in selectedIngredientsList {
             if let template = ingredient.ingredientTemplate {
-                print("🔍 Template '\(template.name ?? "nil")' has category: '\(template.category ?? "nil")'")
+                print("Template '\(template.name ?? "nil")' has category: '\(template.category ?? "nil")'")
             }
         }
         
@@ -392,54 +397,69 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // DEBUGGING: Enhanced ingredient name extraction with debugging
+    // IMPROVED: Enhanced ingredient name extraction with better patterns
     private func extractCleanIngredientName(from fullText: String) -> String {
         let text = fullText.trimmingCharacters(in: .whitespacesAndNewlines)
-        print("🧹 Extracting clean name from: '\(text)'") // Debug
+        print("Extracting clean name from: '\(text)'") // Debug
         
-        // Remove common quantity patterns at the beginning
+        // Remove common quantity patterns at the beginning - IMPROVED PATTERNS
         let patterns = [
-            #"^\d+(\.\d+)?\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
-            #"^\d+(\.\d+)?\s*"#,  // Remove bare numbers
-            #"^(a|an|the)\s+"#,    // Remove articles
-            #"^\d+(/\d+)?\s+"#,    // Remove fractions like "1/2"
-            #"^\d+\s*-\s*\d+\s+"# // Remove ranges like "2-3"
+            // Handle fractions at start: "1/2 cup", "3/4 tsp", etc.
+            #"^\d+/\d+\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
+            // Handle decimal numbers with units: "2.5 cups", "1.25 tsp"
+            #"^\d+\.\d+\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
+            // Handle whole numbers with units: "2 cups", "1 tsp"
+            #"^\d+\s+(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
+            // Handle ranges with units: "2-3 cups", "1-2 tsp"
+            #"^\d+\s*-\s*\d+\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
+            // Handle bare fractions: "1/2", "3/4"
+            #"^\d+/\d+\s+"#,
+            // Handle bare numbers: "2", "1.5"
+            #"^\d+(\.\d+)?\s+"#,
+            // Remove articles at the start: "a", "an", "the"
+            #"^(a|an|the)\s+"#
         ]
         
         var cleaned = text
         for pattern in patterns {
             let before = cleaned
-            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: [.regularExpression, .caseInsensitive])
             if before != cleaned {
                 print("   Applied pattern, result: '\(cleaned)'") // Debug
             }
         }
         
-        // Remove common descriptors from the end
+        // Remove common descriptors from the end - IMPROVED
         let endPatterns = [
-            #",\s*(chopped|diced|sliced|minced|grated|melted|softened|at room temperature|optional).*$"#,
-            #",\s*.*$"#  // Remove everything after first comma
+            // Remove everything after comma with descriptors
+            #",\s*(chopped|diced|sliced|minced|grated|melted|softened|at room temperature|optional|fresh|dried|ground|whole|large|small|medium).*$"#,
+            // Remove parenthetical information
+            #"\s*\([^)]*\).*$"#,
+            // Remove everything after first comma if nothing else matched
+            #",.*$"#
         ]
         
         for pattern in endPatterns {
             let before = cleaned
-            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: [.regularExpression, .caseInsensitive])
             if before != cleaned {
                 print("   Applied end pattern, result: '\(cleaned)'") // Debug
+                break // Stop after first match to avoid over-cleaning
             }
         }
         
+        // Final cleanup
         cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // If cleaning resulted in empty string, return original
         let result = cleaned.isEmpty ? text : cleaned
-        print("🎯 Final clean name: '\(result)'") // Debug
+        print("Final clean name: '\(result)'") // Debug
         return result
     }
     
     // DEBUGGING: Helper function to find existing template with debugging
     private func findExistingTemplate(cleanName: String) -> IngredientTemplate? {
-        print("🔍 Looking for template with clean name: '\(cleanName)'") // Debug
+        print("Looking for template with clean name: '\(cleanName)'") // Debug
         
         let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
         request.predicate = NSPredicate(format: "name ==[cd] %@", cleanName)
@@ -448,15 +468,15 @@ struct AddIngredientsToListView: View {
         do {
             let templates = try viewContext.fetch(request)
             if let found = templates.first {
-                print("✅ Found template: '\(found.name ?? "nil")' with category: '\(found.category ?? "nil")'") // Debug
+                print("Found template: '\(found.name ?? "nil")' with category: '\(found.category ?? "nil")'") // Debug
                 return found
             } else {
-                print("❌ No template found for: '\(cleanName)'") // Debug
+                print("No template found for: '\(cleanName)'") // Debug
                 
                 // DEBUG: Let's see what templates actually exist
                 let allTemplatesRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
                 let allTemplates = try viewContext.fetch(allTemplatesRequest)
-                print("📋 Existing templates in database:")
+                print("Existing templates in database:")
                 for template in allTemplates.prefix(10) { // Show first 10
                     print("   - '\(template.name ?? "nil")' -> '\(template.category ?? "nil")'")
                 }
@@ -464,7 +484,7 @@ struct AddIngredientsToListView: View {
                 return nil
             }
         } catch {
-            print("❌ Error finding existing template: \(error)")
+            print("Error finding existing template: \(error)")
             return nil
         }
     }
@@ -688,16 +708,15 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // UPDATED: Status view logic - show category if exists, "Needs Category" if template exists but no category
+    // FIXED: Status view logic - show category if exists, "Needs Category" if template exists but no category
     @ViewBuilder
     private func ingredientStatusView(for ingredient: Ingredient) -> some View {
-        // Check if template already exists
-        let cleanName = extractCleanIngredientName(from: ingredient.name ?? "")
-        let existingTemplate = findExistingTemplate(cleanName: cleanName)
-        
-        if let template = existingTemplate {
+        // Check if ingredient already has a linked template
+        if let existingTemplate = ingredient.ingredientTemplate {
             // Template exists - check if it has a category
-            if let category = template.category, !category.isEmpty {
+            if let category = existingTemplate.category,
+               !category.isEmpty,
+               category.lowercased() != "uncategorized" {
                 // Has category - show it with color dot
                 HStack(spacing: 4) {
                     Circle()
@@ -719,14 +738,45 @@ struct AddIngredientsToListView: View {
                 }
             }
         } else {
-            // No template exists - will create new (this should be rare if salt exists)
-            HStack(spacing: 4) {
-                Image(systemName: "plus.circle")
-                    .font(.caption2)
-                    .foregroundColor(.blue)
-                Text("New Template")
-                    .font(.caption2)
-                    .foregroundColor(.blue)
+            // No template exists yet - check if one exists in database
+            let cleanName = extractCleanIngredientName(from: ingredient.name ?? "")
+            let existingTemplate = findExistingTemplate(cleanName: cleanName)
+            
+            if let template = existingTemplate {
+                // Template exists in database but not linked - check category
+                if let category = template.category,
+                   !category.isEmpty,
+                   category.lowercased() != "uncategorized" {
+                    // Has category
+                    HStack(spacing: 4) {
+                        Circle()
+                            .fill(categoryColor(for: category))
+                            .frame(width: 8, height: 8)
+                        Text(category)
+                            .font(.caption2)
+                            .foregroundColor(categoryColor(for: category))
+                    }
+                } else {
+                    // Template exists but needs category
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                        Text("Needs Category")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                    }
+                }
+            } else {
+                // No template exists - will create new
+                HStack(spacing: 4) {
+                    Image(systemName: "plus.circle")
+                        .font(.caption2)
+                        .foregroundColor(.blue)
+                    Text("New Template")
+                        .font(.caption2)
+                        .foregroundColor(.blue)
+                }
             }
         }
     }

@@ -1,5 +1,5 @@
 // IngredientsView.swift
-// STEP 4 PHASE 2: Complete unified ingredient template and staple management system
+// STEP 4 PHASE 3 FINAL: Category Management with specialized CategoryChangeModal and fixed folder styling
 
 import SwiftUI
 import CoreData
@@ -30,11 +30,13 @@ struct IngredientsView: View {
     @State private var isEditMode = false
     @State private var selectedIngredients: Set<IngredientTemplate> = []
     @State private var showingAddForm = false
-    @State private var showingCategoryAssignment = false
     @State private var showingError = false
     @State private var errorMessage = ""
-    @State private var ingredientForCategoryAssignment: IngredientTemplate?
     
+    // MARK: - PHASE 3: Category Change States - UPDATED for CategoryChangeModal
+    @State private var showingCategoryChange = false
+    @State private var ingredientsForCategoryChange: [IngredientTemplate] = []
+
     var body: some View {
         VStack(spacing: 0) {
             // Search and Filter Section
@@ -51,10 +53,18 @@ struct IngredientsView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                // FIXED: Check if we're in edit mode with selections for bulk operations
+                // PHASE 3: Enhanced toolbar with bulk category assignment
                 if isEditMode && !selectedIngredients.isEmpty {
                     // Show bulk operations menu when items are selected in edit mode
                     Menu {
+                        Button("Change Category", systemImage: "folder") {
+                            // PHASE 3: Bulk category change using CategoryChangeModal
+                            ingredientsForCategoryChange = Array(selectedIngredients)
+                            showingCategoryChange = true
+                        }
+                        
+                        Divider()
+                        
                         Button("Mark as Staples", systemImage: "pin.fill") {
                             markSelectedAsStaples(true)
                         }
@@ -73,7 +83,6 @@ struct IngredientsView: View {
                             .foregroundColor(.blue)
                     }
                 } else {
-                    // FIXED: Direct button for adding ingredient (single tap)
                     Button(action: {
                         showingAddForm = true
                     }) {
@@ -112,6 +121,22 @@ struct IngredientsView: View {
         .sheet(isPresented: $showingAddForm) {
             AddIngredientView()
         }
+        // PHASE 3: CategoryChangeModal Integration - UPDATED
+        .sheet(isPresented: $showingCategoryChange, onDismiss: {
+            // FIXED: Always reset the ingredients array when modal is dismissed
+            ingredientsForCategoryChange = []
+        }) {
+            CategoryChangeModal(
+                ingredientTemplates: ingredientsForCategoryChange,
+                onAssignmentsComplete: {
+                    // Clear selections and exit edit mode after change
+                    selectedIngredients.removeAll()
+                    isEditMode = false
+                    ingredientsForCategoryChange = []
+                }
+            )
+            .environment(\.managedObjectContext, viewContext)
+        }
         .alert("Error", isPresented: $showingError) {
             Button("OK") { }
         } message: {
@@ -144,7 +169,7 @@ struct IngredientsView: View {
             
             // Filter Controls
             HStack {
-                // Category Filter - FIXED VERSION
+                // Category Filter
                 Menu {
                     Button("All Categories") {
                         selectedCategory = "All Categories"
@@ -355,7 +380,7 @@ struct IngredientsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    // MARK: - Ingredients List View (FIXED SCROLLING)
+    // MARK: - Ingredients List View
     private var ingredientsListView: some View {
         List {
             ForEach(groupedIngredients, id: \.key) { categoryName, items in
@@ -376,8 +401,9 @@ struct IngredientsView: View {
                                 toggleStapleStatus(for: ingredient)
                             },
                             onCategoryAssign: {
-                                ingredientForCategoryAssignment = ingredient
-                                showingCategoryAssignment = true
+                                // PHASE 3: Single ingredient category change
+                                ingredientsForCategoryChange = [ingredient]
+                                showingCategoryChange = true
                             }
                         )
                     }
@@ -390,7 +416,7 @@ struct IngredientsView: View {
         .listStyle(InsetGroupedListStyle())
     }
     
-    // MARK: - Category Header (FIXED)
+    // MARK: - Category Header
     private func categoryHeader(categoryName: String, count: Int) -> some View {
         HStack {
             Circle()
@@ -530,7 +556,7 @@ enum SortOption: CaseIterable {
     }
 }
 
-// MARK: - Ingredient Row View (CLEANED - NO COUNTS)
+// MARK: - Ingredient Row View - PHASE 3 FINAL: Fixed folder styling to be consistent blue
 struct IngredientRowView: View {
     let ingredient: IngredientTemplate
     let isSelected: Bool
@@ -561,11 +587,12 @@ struct IngredientRowView: View {
             
             Spacer()
             
-            // Folder icon (category assignment)
+            // PHASE 3 FINAL: Folder icon - FIXED to consistent blue outline styling
+            // FIXED: Always outline folder icon, never filled
             Button(action: onCategoryAssign) {
                 Image(systemName: "folder")
                     .font(.body)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.blue)
             }
             .buttonStyle(PlainButtonStyle())
             
@@ -593,7 +620,7 @@ struct IngredientRowView: View {
     }
 }
 
-// MARK: - Add Ingredient View (FIXED - Auto-focus text field)
+// MARK: - Add Ingredient View
 struct AddIngredientView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode
@@ -603,7 +630,6 @@ struct AddIngredientView: View {
     @State private var showingError = false
     @State private var errorMessage = ""
     
-    // FIXED: Add focus state for auto-focus functionality
     @FocusState private var isTextFieldFocused: Bool
     
     @FetchRequest(
@@ -617,7 +643,7 @@ struct AddIngredientView: View {
                 Section(header: Text("Ingredient Details")) {
                     TextField("Ingredient Name", text: $ingredientName)
                         .autocapitalization(.words)
-                        .focused($isTextFieldFocused) // FIXED: Add focus binding
+                        .focused($isTextFieldFocused)
                     
                     Picker("Category", selection: $selectedCategory) {
                         ForEach(categories, id: \.self) { category in
@@ -650,7 +676,6 @@ struct AddIngredientView: View {
                 Text(errorMessage)
             }
             .onAppear {
-                // FIXED: Auto-focus the text field when view appears
                 isTextFieldFocused = true
             }
         }
