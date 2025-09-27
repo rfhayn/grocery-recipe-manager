@@ -1,8 +1,18 @@
 // IngredientsView.swift
-// STEP 4 PHASE 3 FINAL: Category Management with specialized CategoryChangeModal and fixed folder styling
+// CRITICAL FIX: Use data-driven .sheet(item:) to prevent empty-first-render bug
 
 import SwiftUI
 import CoreData
+
+// MARK: - CategoryChangePayload for Data-Driven Sheet
+struct CategoryChangePayload: Identifiable {
+    let id = UUID()
+    let ingredientTemplates: [IngredientTemplate]
+    
+    init(ingredientTemplates: [IngredientTemplate]) {
+        self.ingredientTemplates = ingredientTemplates
+    }
+}
 
 struct IngredientsView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -33,9 +43,8 @@ struct IngredientsView: View {
     @State private var showingError = false
     @State private var errorMessage = ""
     
-    // MARK: - PHASE 3: Category Change States - UPDATED for CategoryChangeModal
-    @State private var showingCategoryChange = false
-    @State private var ingredientsForCategoryChange: [IngredientTemplate] = []
+    // MARK: - FIXED: Data-driven sheet presentation (no more empty-first-render!)
+    @State private var categoryChangePayload: CategoryChangePayload?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -53,14 +62,15 @@ struct IngredientsView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                // PHASE 3: Enhanced toolbar with bulk category assignment
+                // Enhanced toolbar with bulk category assignment
                 if isEditMode && !selectedIngredients.isEmpty {
                     // Show bulk operations menu when items are selected in edit mode
                     Menu {
                         Button("Change Category", systemImage: "folder") {
-                            // PHASE 3: Bulk category change using CategoryChangeModal
-                            ingredientsForCategoryChange = Array(selectedIngredients)
-                            showingCategoryChange = true
+                            // FIXED: Use data-driven payload approach
+                            categoryChangePayload = CategoryChangePayload(
+                                ingredientTemplates: Array(selectedIngredients)
+                            )
                         }
                         
                         Divider()
@@ -121,21 +131,24 @@ struct IngredientsView: View {
         .sheet(isPresented: $showingAddForm) {
             AddIngredientView()
         }
-        // PHASE 3: CategoryChangeModal Integration - FIXED: Remove onDismiss
-        .sheet(isPresented: $showingCategoryChange) {
+        // FIXED: Data-driven sheet with CategoryChangePayload (prevents empty-first-render!)
+        .sheet(item: $categoryChangePayload) { payload in
             CategoryChangeModal(
-                ingredientTemplates: ingredientsForCategoryChange,
+                ingredientTemplates: payload.ingredientTemplates,
                 onAssignmentsComplete: {
                     // Clear selections and exit edit mode after change
                     selectedIngredients.removeAll()
                     isEditMode = false
-                    ingredientsForCategoryChange = []
+                    // Clear the payload to close the sheet
+                    categoryChangePayload = nil
                 }
             )
-            .environment(\.managedObjectContext, viewContext)
         }
         .alert("Error", isPresented: $showingError) {
-            Button("OK") { }
+            Button("OK") {
+                showingError = false
+                errorMessage = ""
+            }
         } message: {
             Text(errorMessage)
         }
@@ -143,246 +156,99 @@ struct IngredientsView: View {
     
     // MARK: - Search and Filter Section
     private var searchAndFilterSection: some View {
-        VStack(spacing: 12) {
-            // Search Bar
+        VStack(spacing: 16) {
+            // IMPROVED: More prominent search bar following iOS design guidelines
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.secondary)
+                    .font(.body)
                 
                 TextField("Search ingredients...", text: $searchText)
                     .textFieldStyle(PlainTextFieldStyle())
+                    .font(.body)
                 
                 if !searchText.isEmpty {
-                    Button(action: { searchText = "" }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.secondary)
+                    Button("Clear") {
+                        searchText = ""
                     }
+                    .font(.body)
+                    .foregroundColor(.blue)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(.separator), lineWidth: 0.5)
+            )
             
-            // Filter Controls
-            HStack {
+            // FIXED: Single-line filter layout that's clean and organized
+            HStack(spacing: 8) {
                 // Category Filter
                 Menu {
                     Button("All Categories") {
                         selectedCategory = "All Categories"
                     }
                     
-                    ForEach(categories, id: \.self) { category in
-                        Button(category.displayName) {
-                            selectedCategory = category.displayName
+                    Divider()
+                    
+                    ForEach(Array(Set(ingredients.compactMap { $0.category ?? "Uncategorized" })).sorted(), id: \.self) { category in
+                        Button(category) {
+                            selectedCategory = category
                         }
                     }
                 } label: {
-                    HStack {
-                        Text(selectedCategory == "All Categories" ? "All Categories" : selectedCategory)
-                            .lineLimit(1)
-                            .frame(minWidth: 120, alignment: .leading)
-                        Image(systemName: "chevron.down")
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(.primary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+                    FilterPill(
+                        text: selectedCategory == "All Categories" ? "All Categories" : selectedCategory,
+                        isSelected: selectedCategory != "All Categories",
+                        systemImage: "folder"
+                    )
                 }
                 
-                Spacer()
-                
-                // Staples Only Toggle
-                Button(action: { showStaplesOnly.toggle() }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: showStaplesOnly ? "checkmark.circle.fill" : "circle")
-                            .foregroundColor(showStaplesOnly ? .blue : .secondary)
-                        Text("Staples Only")
-                            .font(.subheadline)
-                            .foregroundColor(showStaplesOnly ? .blue : .secondary)
-                    }
+                // Staples Filter
+                Button(action: {
+                    showStaplesOnly.toggle()
+                }) {
+                    FilterPill(
+                        text: "Staples",
+                        isSelected: showStaplesOnly,
+                        systemImage: "pin.fill"
+                    )
                 }
-                
-                Spacer()
                 
                 // Sort Options
                 Menu {
                     ForEach(SortOption.allCases, id: \.self) { option in
-                        Button(action: { sortOption = option }) {
-                            HStack {
-                                Text(option.displayName)
-                                if sortOption == option {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
+                        Button(option.displayName) {
+                            sortOption = option
                         }
                     }
                 } label: {
-                    HStack {
-                        Image(systemName: "arrow.up.arrow.down")
-                        Text(sortOption.displayName)
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(.primary)
+                    FilterPill(
+                        text: sortOption.displayName,
+                        isSelected: false, // Keep sort neutral since it's always active
+                        systemImage: "arrow.up.arrow.down"
+                    )
                 }
-            }
-            .padding(.horizontal, 4)
-            
-            // Edit Mode Info
-            if isEditMode && !selectedIngredients.isEmpty {
-                Text("\(selectedIngredients.count) selected")
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                    .padding(.top, 4)
-            }
-        }
-        .padding()
-        .background(Color(.systemBackground))
-        .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
-    }
-    
-    // MARK: - Computed Properties
-    private var filteredIngredients: [IngredientTemplate] {
-        var filtered = Array(ingredients)
-        
-        // Apply search filter
-        if !searchText.isEmpty {
-            filtered = filtered.filter { ingredient in
-                ingredient.name?.lowercased().contains(searchText.lowercased()) == true
-            }
-        }
-        
-        // Apply category filter
-        if selectedCategory != "All Categories" {
-            filtered = filtered.filter { ingredient in
-                ingredient.category == selectedCategory
-            }
-        }
-        
-        // Apply staples only filter
-        if showStaplesOnly {
-            filtered = filtered.filter { $0.isStaple }
-        }
-        
-        // Apply sorting
-        switch sortOption {
-        case .alphabetical:
-            filtered.sort { ($0.name ?? "") < ($1.name ?? "") }
-        case .category:
-            filtered.sort {
-                if ($0.category ?? "") == ($1.category ?? "") {
-                    return ($0.name ?? "") < ($1.name ?? "")
-                }
-                return ($0.category ?? "") < ($1.category ?? "")
-            }
-        case .usage:
-            filtered.sort {
-                if $0.usageCount == $1.usageCount {
-                    return ($0.name ?? "") < ($1.name ?? "")
-                }
-                return $0.usageCount > $1.usageCount
-            }
-        case .staplesFirst:
-            filtered.sort {
-                if $0.isStaple == $1.isStaple {
-                    if ($0.category ?? "") == ($1.category ?? "") {
-                        return ($0.name ?? "") < ($1.name ?? "")
-                    }
-                    return ($0.category ?? "") < ($1.category ?? "")
-                }
-                return $0.isStaple && !$1.isStaple
-            }
-        }
-        
-        return filtered
-    }
-    
-    private var groupedIngredients: [(key: String, value: [IngredientTemplate])] {
-        let grouped = Dictionary(grouping: filteredIngredients) { ingredient in
-            ingredient.category ?? "Uncategorized"
-        }
-        
-        return grouped.sorted { first, second in
-            let firstCategory = categories.first { $0.displayName == first.key }
-            let secondCategory = categories.first { $0.displayName == second.key }
-            
-            if let firstOrder = firstCategory?.sortOrder,
-               let secondOrder = secondCategory?.sortOrder {
-                return firstOrder < secondOrder
-            } else if firstCategory != nil && secondCategory == nil {
-                return true
-            } else if firstCategory == nil && secondCategory != nil {
-                return false
-            } else {
-                return first.key < second.key
-            }
-        }
-    }
-    
-    // MARK: - Empty State View
-    private var emptyStateView: some View {
-        VStack(spacing: 16) {
-            Spacer()
-            
-            VStack(spacing: 12) {
-                Image(systemName: "leaf.circle")
-                    .font(.system(size: 60))
-                    .foregroundColor(.secondary)
                 
-                if filteredIngredients.isEmpty && ingredients.isEmpty {
-                    Text("No Ingredients Yet")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("Add ingredients to build your catalog")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                } else if !searchText.isEmpty {
-                    Text("No Results")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("Try adjusting your search or filters")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                } else {
-                    Text("No Ingredients Yet")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("Add ingredients to build your catalog")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
+                Spacer()
             }
-            
-            Button(action: { showingAddForm = true }) {
-                Label("Add Ingredient", systemImage: "plus.circle.fill")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(Color.blue)
-                    .cornerRadius(12)
-            }
-            
-            Spacer()
         }
-        .padding(.horizontal, 40)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
+        .background(Color(.systemGroupedBackground))
     }
     
     // MARK: - Ingredients List View
     private var ingredientsListView: some View {
         List {
-            ForEach(groupedIngredients, id: \.key) { categoryName, items in
+            ForEach(sortedCategoryNames, id: \.self) { categoryName in
+                let items = groupedIngredients[categoryName] ?? []
+                
                 Section(header: categoryHeader(categoryName: categoryName, count: items.count)) {
-                    ForEach(items, id: \.self) { ingredient in
+                    ForEach(items, id: \.objectID) { ingredient in
                         IngredientRowView(
                             ingredient: ingredient,
                             isSelected: selectedIngredients.contains(ingredient),
@@ -398,9 +264,10 @@ struct IngredientsView: View {
                                 toggleStapleStatus(for: ingredient)
                             },
                             onCategoryAssign: {
-                                // PHASE 3: Single ingredient category change
-                                ingredientsForCategoryChange = [ingredient]
-                                showingCategoryChange = true
+                                // FIXED: Single ingredient category change with data-driven payload
+                                categoryChangePayload = CategoryChangePayload(
+                                    ingredientTemplates: [ingredient]
+                                )
                             }
                         )
                     }
@@ -445,70 +312,175 @@ struct IngredientsView: View {
         .listRowInsets(EdgeInsets())
     }
     
+    // MARK: - Empty State View
+    private var emptyStateView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "leaf.circle")
+                .font(.system(size: 60))
+                .foregroundColor(.secondary)
+            
+            Text("No Ingredients Found")
+                .font(.title2)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
+            
+            Text("Add ingredients to get started with your grocery management.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+            
+            Button("Add First Ingredient") {
+                showingAddForm = true
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground))
+    }
+    
+    // MARK: - Computed Properties
+    private var filteredIngredients: [IngredientTemplate] {
+        var filtered = Array(ingredients)
+        
+        // Apply search filter
+        if !searchText.isEmpty {
+            filtered = filtered.filter { ingredient in
+                ingredient.name?.localizedCaseInsensitiveContains(searchText) == true
+            }
+        }
+        
+        // Apply category filter
+        if selectedCategory != "All Categories" {
+            filtered = filtered.filter { ingredient in
+                (ingredient.category ?? "Uncategorized") == selectedCategory
+            }
+        }
+        
+        // Apply staples filter
+        if showStaplesOnly {
+            filtered = filtered.filter { $0.isStaple }
+        }
+        
+        // Apply sorting
+        return applySorting(to: filtered)
+    }
+    
+    private var groupedIngredients: [String: [IngredientTemplate]] {
+        Dictionary(grouping: filteredIngredients) { ingredient in
+            ingredient.category ?? "Uncategorized"
+        }
+    }
+    
+    // FIXED: Sort categories by custom sort order from Category entities
+    private var sortedCategoryNames: [String] {
+        let grouped = groupedIngredients
+        let categoryMap = Dictionary(uniqueKeysWithValues: categories.map { ($0.displayName, $0.sortOrder) })
+        
+        return grouped.keys.sorted { category1, category2 in
+            // Handle "Uncategorized" - put it at the end
+            if category1 == "Uncategorized" && category2 != "Uncategorized" { return false }
+            if category2 == "Uncategorized" && category1 != "Uncategorized" { return true }
+            if category1 == "Uncategorized" && category2 == "Uncategorized" { return false }
+            
+            // Use custom sort order for real categories
+            let order1 = categoryMap[category1] ?? Int16.max
+            let order2 = categoryMap[category2] ?? Int16.max
+            
+            if order1 == order2 {
+                return category1 < category2 // Fallback to alphabetical
+            }
+            return order1 < order2
+        }
+    }
+    
     // MARK: - Actions
     private func toggleStapleStatus(for ingredient: IngredientTemplate) {
-        withAnimation {
+        ingredient.isStaple.toggle()
+        
+        do {
+            try viewContext.save()
+        } catch {
+            // Revert on error
             ingredient.isStaple.toggle()
-            
-            do {
-                try viewContext.save()
-            } catch {
-                errorMessage = "Failed to update staple status: \(error.localizedDescription)"
-                showingError = true
-                ingredient.isStaple.toggle()
-            }
+            errorMessage = "Failed to update staple status: \(error.localizedDescription)"
+            showingError = true
         }
     }
     
     private func markSelectedAsStaples(_ isStaple: Bool) {
-        withAnimation {
+        for ingredient in selectedIngredients {
+            ingredient.isStaple = isStaple
+        }
+        
+        do {
+            try viewContext.save()
+            selectedIngredients.removeAll()
+            isEditMode = false
+        } catch {
+            // Revert changes on error
             for ingredient in selectedIngredients {
-                ingredient.isStaple = isStaple
+                ingredient.isStaple = !isStaple
             }
-            
-            do {
-                try viewContext.save()
-                selectedIngredients.removeAll()
-                isEditMode = false
-            } catch {
-                errorMessage = "Failed to update staple status: \(error.localizedDescription)"
-                showingError = true
-            }
+            errorMessage = "Failed to update staple status: \(error.localizedDescription)"
+            showingError = true
         }
     }
     
     private func bulkDeleteSelected() {
-        guard !selectedIngredients.isEmpty else { return }
+        for ingredient in selectedIngredients {
+            viewContext.delete(ingredient)
+        }
         
-        withAnimation {
-            for ingredient in selectedIngredients {
-                viewContext.delete(ingredient)
-            }
-            
-            do {
-                try viewContext.save()
-                selectedIngredients.removeAll()
-                isEditMode = false
-            } catch {
-                errorMessage = "Failed to delete selected ingredients: \(error.localizedDescription)"
-                showingError = true
-            }
+        do {
+            try viewContext.save()
+            selectedIngredients.removeAll()
+            isEditMode = false
+        } catch {
+            errorMessage = "Failed to delete ingredients: \(error.localizedDescription)"
+            showingError = true
         }
     }
     
     private func deleteIngredients(from items: [IngredientTemplate], at indexSet: IndexSet) {
-        withAnimation {
-            for index in indexSet {
-                let ingredient = items[index]
-                selectedIngredients.remove(ingredient)
-                viewContext.delete(ingredient)
+        for index in indexSet {
+            let ingredient = items[index]
+            viewContext.delete(ingredient)
+        }
+        
+        do {
+            try viewContext.save()
+        } catch {
+            errorMessage = "Failed to delete ingredient: \(error.localizedDescription)"
+            showingError = true
+        }
+    }
+    
+    private func applySorting(to ingredients: [IngredientTemplate]) -> [IngredientTemplate] {
+        switch sortOption {
+        case .alphabetical:
+            return ingredients.sorted { ($0.name ?? "") < ($1.name ?? "") }
+        case .category:
+            return ingredients.sorted {
+                let cat1 = $0.category ?? "Uncategorized"
+                let cat2 = $1.category ?? "Uncategorized"
+                if cat1 == cat2 {
+                    return ($0.name ?? "") < ($1.name ?? "")
+                }
+                return cat1 < cat2
             }
-            
-            do {
-                try viewContext.save()
-            } catch {
-                errorMessage = "Failed to delete ingredient: \(error.localizedDescription)"
-                showingError = true
+        case .usage:
+            return ingredients.sorted {
+                // Sort by usage frequency (would require tracking usage)
+                // For now, sort by name as fallback
+                ($0.name ?? "") < ($1.name ?? "")
+            }
+        case .staplesFirst:
+            return ingredients.sorted {
+                if $0.isStaple == $1.isStaple {
+                    return ($0.name ?? "") < ($1.name ?? "")
+                }
+                return $0.isStaple && !$1.isStaple
             }
         }
     }
@@ -553,7 +525,39 @@ enum SortOption: CaseIterable {
     }
 }
 
-// MARK: - Ingredient Row View - PHASE 3 FINAL: Fixed folder styling to be consistent blue
+// MARK: - Filter Pill Component - OPTIMIZED for single line layout
+struct FilterPill: View {
+    let text: String
+    let isSelected: Bool
+    let systemImage: String
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .font(.caption2)
+                .fontWeight(.medium)
+            
+            Text(text)
+                .font(.caption)
+                .fontWeight(.medium)
+                .lineLimit(1)
+                .truncationMode(.tail)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(isSelected ? Color.accentColor : Color(.secondarySystemBackground))
+        )
+        .foregroundColor(isSelected ? .white : .primary)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color(.separator), lineWidth: isSelected ? 0 : 0.5)
+        )
+    }
+}
+
+// MARK: - Ingredient Row View
 struct IngredientRowView: View {
     let ingredient: IngredientTemplate
     let isSelected: Bool
@@ -561,6 +565,12 @@ struct IngredientRowView: View {
     let onSelectionChanged: (Bool) -> Void
     let onStapleToggle: () -> Void
     let onCategoryAssign: () -> Void
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @State private var isEditingName = false
+    @State private var editedName = ""
+    @State private var showingError = false
+    @State private var errorMessage = ""
     
     var body: some View {
         HStack {
@@ -577,31 +587,121 @@ struct IngredientRowView: View {
                 .fill(categoryColor(for: ingredient.category ?? "Uncategorized"))
                 .frame(width: 12, height: 12)
             
-            // Ingredient name ONLY - no usage counts or secondary text
-            Text(ingredient.name ?? "Unknown")
-                .font(.body)
-                .lineLimit(2)
+            // INLINE EDITING: Ingredient name with tap-to-edit functionality
+            if isEditingName {
+                TextField("Ingredient name", text: $editedName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .font(.body)
+                    .onSubmit {
+                        saveNameEdit()
+                    }
+                    .onAppear {
+                        editedName = ingredient.name ?? ""
+                    }
+            } else {
+                Text(ingredient.name ?? "Unknown ingredient")
+                    .font(.body)
+                    .foregroundColor(.primary)
+                    .onTapGesture {
+                        if !isEditMode { // Only allow name editing when not in selection mode
+                            startNameEdit()
+                        }
+                    }
+            }
             
             Spacer()
             
-            // PHASE 3 FINAL: Folder icon - FIXED to consistent blue outline styling
-            // FIXED: Always outline folder icon, never filled
-            Button(action: onCategoryAssign) {
-                Image(systemName: "folder")
-                    .font(.body)
+            // Actions - conditional based on editing state
+            if isEditingName {
+                // Edit mode actions
+                HStack(spacing: 12) {
+                    Button("Cancel") {
+                        cancelNameEdit()
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    
+                    Button("Save") {
+                        saveNameEdit()
+                    }
+                    .font(.caption)
                     .foregroundColor(.blue)
+                    .disabled(editedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            } else {
+                // Normal actions
+                HStack(spacing: 16) {
+                    // Category assignment button
+                    Button(action: onCategoryAssign) {
+                        Image(systemName: "folder")
+                            .font(.body)
+                            .foregroundColor(.blue)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    // Staple toggle button - FIXED: Filled pin for staples, outline for non-staples
+                    Button(action: onStapleToggle) {
+                        Image(systemName: ingredient.isStaple ? "pin.fill" : "pin")
+                            .font(.body)
+                            .foregroundColor(ingredient.isStaple ? .orange : .secondary)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
             }
-            .buttonStyle(PlainButtonStyle())
-            
-            // Staple pin
-            Button(action: onStapleToggle) {
-                Image(systemName: ingredient.isStaple ? "pin.fill" : "pin")
-                    .font(.body)
-                    .foregroundColor(ingredient.isStaple ? .blue : .secondary)
-            }
-            .buttonStyle(PlainButtonStyle())
         }
         .padding(.vertical, 4)
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") {
+                showingError = false
+                errorMessage = ""
+            }
+        } message: {
+            Text(errorMessage)
+        }
+    }
+    
+    // MARK: - Inline Editing Functions
+    
+    private func startNameEdit() {
+        editedName = ingredient.name ?? ""
+        isEditingName = true
+    }
+    
+    private func cancelNameEdit() {
+        editedName = ingredient.name ?? ""
+        isEditingName = false
+    }
+    
+    private func saveNameEdit() {
+        let trimmedName = editedName.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !trimmedName.isEmpty else {
+            errorMessage = "Ingredient name cannot be empty"
+            showingError = true
+            return
+        }
+        
+        // Check for duplicates (excluding current ingredient)
+        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+        request.predicate = NSPredicate(format: "name ==[c] %@ AND self != %@", trimmedName, ingredient)
+        
+        do {
+            let existingIngredients = try viewContext.fetch(request)
+            if !existingIngredients.isEmpty {
+                errorMessage = "An ingredient with this name already exists"
+                showingError = true
+                return
+            }
+            
+            // Save the new name
+            ingredient.name = trimmedName
+            try viewContext.save()
+            isEditingName = false
+            
+        } catch {
+            errorMessage = "Failed to save changes: \(error.localizedDescription)"
+            showingError = true
+        }
     }
     
     private func categoryColor(for categoryName: String) -> Color {
@@ -615,111 +715,4 @@ struct IngredientRowView: View {
         default: return .gray
         }
     }
-}
-
-// MARK: - Add Ingredient View
-struct AddIngredientView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.presentationMode) var presentationMode
-    @State private var ingredientName = ""
-    @State private var selectedCategory = "Uncategorized"
-    @State private var isStaple = false
-    @State private var showingError = false
-    @State private var errorMessage = ""
-    
-    @FocusState private var isTextFieldFocused: Bool
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true)],
-        animation: .default
-    ) private var categories: FetchedResults<Category>
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Ingredient Details")) {
-                    TextField("Ingredient Name", text: $ingredientName)
-                        .autocapitalization(.words)
-                        .focused($isTextFieldFocused)
-                    
-                    Picker("Category", selection: $selectedCategory) {
-                        ForEach(categories, id: \.self) { category in
-                            Text(category.displayName).tag(category.displayName)
-                        }
-                    }
-                    
-                    Toggle("Mark as Staple", isOn: $isStaple)
-                }
-            }
-            .navigationTitle("Add Ingredient")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        saveIngredient()
-                    }
-                    .disabled(ingredientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            }
-            .alert("Error", isPresented: $showingError) {
-                Button("OK") { }
-            } message: {
-                Text(errorMessage)
-            }
-            .onAppear {
-                isTextFieldFocused = true
-            }
-        }
-    }
-    
-    private func saveIngredient() {
-        let trimmedName = ingredientName.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        // Check for duplicates
-        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
-        request.predicate = NSPredicate(format: "name ==[c] %@", trimmedName)
-        
-        do {
-            let existingIngredients = try viewContext.fetch(request)
-            if !existingIngredients.isEmpty {
-                errorMessage = "An ingredient with this name already exists"
-                showingError = true
-                return
-            }
-        } catch {
-            errorMessage = "Failed to check for duplicates: \(error.localizedDescription)"
-            showingError = true
-            return
-        }
-        
-        let newIngredient = IngredientTemplate(context: viewContext)
-        newIngredient.id = UUID()
-        newIngredient.name = trimmedName
-        newIngredient.category = selectedCategory
-        newIngredient.isStaple = isStaple
-        newIngredient.usageCount = 0
-        newIngredient.dateCreated = Date()
-        
-        do {
-            try viewContext.save()
-            presentationMode.wrappedValue.dismiss()
-        } catch {
-            errorMessage = "Failed to save ingredient: \(error.localizedDescription)"
-            showingError = true
-        }
-    }
-}
-
-// MARK: - Preview
-#Preview {
-    NavigationView {
-        IngredientsView()
-    }
-    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
