@@ -1,5 +1,5 @@
 // CategoryChangeModal.swift
-// SIMPLE VERSION: Fixed state initialization issues
+// SIMPLIFIED: Copy the exact working pattern from CategoryAssignmentModal
 
 import SwiftUI
 import CoreData
@@ -12,8 +12,8 @@ struct CategoryChangeModal: View {
     let ingredientTemplates: [IngredientTemplate]
     let onAssignmentsComplete: () -> Void
     
-    // State - SIMPLE: Use @State with explicit initialization
-    @State private var categoryAssignments: [UUID: String] = [:]
+    // State - EXACT SAME as CategoryAssignmentModal
+    @State private var categoryAssignments: [UUID: String?] = [:]
     @State private var showingAddCategory = false
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -44,10 +44,9 @@ struct CategoryChangeModal: View {
                             IngredientCategoryChangeRow(
                                 template: template,
                                 categories: realCategories,
-                                selectedCategoryName: categoryAssignments[template.id ?? UUID()],
+                                selectedCategoryName: categoryAssignments[template.id ?? UUID()] ?? nil,
                                 onCategorySelected: { categoryName in
-                                    categoryAssignments[template.id ?? UUID()] = categoryName ?? "Uncategorized"
-                                    print("Updated \(template.name ?? "Unknown"): \(categoryName ?? "Uncategorized")")
+                                    categoryAssignments[template.id ?? UUID()] = categoryName
                                 }
                             )
                         }
@@ -70,7 +69,7 @@ struct CategoryChangeModal: View {
                 .environment(\.managedObjectContext, viewContext)
         }
         .onAppear {
-            // SIMPLE: Initialize assignments directly in onAppear
+            // SIMPLIFIED: Use the exact same initialization as CategoryAssignmentModal
             initializeAssignments()
         }
         .alert("Change Error", isPresented: .constant(errorMessage != nil)) {
@@ -86,15 +85,13 @@ struct CategoryChangeModal: View {
     
     // MARK: - Helper Methods
     
+    // EXACT COPY from CategoryAssignmentModal - but initialize with current category instead of nil
     private func initializeAssignments() {
-        categoryAssignments.removeAll()
-        
         for template in ingredientTemplates {
             let templateId = template.id ?? UUID()
+            // Initialize with current category instead of nil
             categoryAssignments[templateId] = template.category ?? "Uncategorized"
         }
-        
-        print("Initialized \(categoryAssignments.count) assignments: \(categoryAssignments)")
     }
     
     // MARK: - View Components
@@ -202,6 +199,7 @@ struct CategoryChangeModal: View {
         .background(Color(.systemGroupedBackground))
     }
     
+    // COPY the exact logic from CategoryAssignmentModal
     private func changeCategories() {
         isLoading = true
         errorMessage = nil
@@ -212,8 +210,12 @@ struct CategoryChangeModal: View {
             
             // Apply selected category
             if let selectedCategoryName = categoryAssignments[templateID] {
-                template.category = selectedCategoryName
-                print("Saving \(template.name ?? "Unknown"): \(selectedCategoryName)")
+                if let categoryName = selectedCategoryName,
+                   !categoryName.isEmpty {
+                    template.category = categoryName
+                } else {
+                    template.category = "Uncategorized"
+                }
             }
         }
         
@@ -234,7 +236,7 @@ struct CategoryChangeModal: View {
     }
 }
 
-// MARK: - Ingredient Category Change Row - SIMPLE
+// MARK: - Ingredient Category Change Row - SIMPLIFIED
 struct IngredientCategoryChangeRow: View {
     let template: IngredientTemplate
     let categories: [Category]
@@ -254,7 +256,7 @@ struct IngredientCategoryChangeRow: View {
                 
                 Spacer()
                 
-                // Current Category Display
+                // Current Category Display - Show what's currently selected
                 if let currentCategory = selectedCategoryName,
                    !currentCategory.isEmpty,
                    currentCategory.lowercased() != "uncategorized" {
@@ -275,7 +277,7 @@ struct IngredientCategoryChangeRow: View {
                 }
             }
             
-            // Category Selection Button
+            // Category Selection Button - EXACT SAME logic as CategoryAssignmentModal
             NavigationLink(destination: CategorySelectionViewForChange(
                 categories: categories,
                 selectedCategoryName: selectedCategoryName,
@@ -346,7 +348,7 @@ struct IngredientCategoryChangeRow: View {
     }
 }
 
-// MARK: - Category Selection View for Change
+// MARK: - Category Selection View for Change (unchanged)
 struct CategorySelectionViewForChange: View {
     let categories: [Category]
     let selectedCategoryName: String?
@@ -385,7 +387,7 @@ struct CategorySelectionViewForChange: View {
     }
 }
 
-// MARK: - Category Selection Row for Change
+// MARK: - Category Selection Row for Change (unchanged)
 struct CategorySelectionRowForChange: View {
     let category: Category
     let isSelected: Bool

@@ -121,11 +121,8 @@ struct IngredientsView: View {
         .sheet(isPresented: $showingAddForm) {
             AddIngredientView()
         }
-        // PHASE 3: CategoryChangeModal Integration - UPDATED
-        .sheet(isPresented: $showingCategoryChange, onDismiss: {
-            // FIXED: Always reset the ingredients array when modal is dismissed
-            ingredientsForCategoryChange = []
-        }) {
+        // PHASE 3: CategoryChangeModal Integration - FIXED: Remove onDismiss
+        .sheet(isPresented: $showingCategoryChange) {
             CategoryChangeModal(
                 ingredientTemplates: ingredientsForCategoryChange,
                 onAssignmentsComplete: {
