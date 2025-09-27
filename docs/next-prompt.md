@@ -1,152 +1,159 @@
-# MILESTONE 2 Phase 2 Step 4 Phase 3: Category Management Integration
+# M2.2.6: Custom Category Integration Development Prompt
 
-**Copy and paste this prompt when ready to continue Phase 3 implementation:**
+**Copy and paste this prompt when ready to continue M2.2.6 implementation:**
 
 ---
 
-I'm ready to continue **MILESTONE 2: ENHANCED RECIPE INTEGRATION - Phase 2: Recipe Core Development - Step 4: IngredientsView Consolidation - Phase 3: Category Management Integration** for my Grocery & Recipe Manager iOS app.
+I'm ready to continue **M2.2.6: Custom Category Integration** for my Grocery & Recipe Manager iOS app.
 
-## Current Status - Phase 2 COMPLETE:
+## Current Status - M2.2.5 COMPLETE:
+- **M2.1**: Recipe Architecture Services successfully implemented and validated
+- **M2.2.1**: Basic Recipe List successfully implemented (September 7, 2025)
+- **M2.2.2**: Recipe Detail View with comprehensive features (September 8, 2025)  
+- **M2.2.3**: Ingredient Templates integration working (September 12, 2025)
+- **M2.2.4**: Add to List Enhancement with all 5 components operational (September 18, 2025)
+- **M2.2.5**: Unified Ingredients View with all 4 phases operational (September 27, 2025)
 
-### **Step 4 Achievement Summary - Phase 1 & 2 COMPLETE:**
+### **M2.2.5 Achievement Summary - ALL 4 PHASES COMPLETE:**
 
-**✅ Phase 1: Core Data Model Updates (45 minutes) - COMPLETE**
-- IngredientTemplate.isStaple property added and migration completed
-- All existing staple data successfully migrated from GroceryItem to IngredientTemplate system
+**Phase 1: Core Data Model Updates (45 minutes) - COMPLETE**
+- IngredientTemplate.isStaple property added with successful migration
+- All existing staple data migrated from GroceryItem to IngredientTemplate system
 - Migration validation confirmed with data integrity maintained
 
-**✅ Phase 2: IngredientsView Implementation (90 minutes) - COMPLETE**
+**Phase 2: IngredientsView Implementation (90 minutes) - COMPLETE**
 - IngredientsView successfully replaced StaplesView with unified ingredient management
 - Clean ingredient names implemented (removed quantities like "1 cup" from display)
 - Professional UI with pin icons for staple status, folder icons for category assignment
 - Search, filtering, and sorting functionality operational
-- Removed redundant category subtitles and staple badges for cleaner interface
-- All basic CRUD operations working with Core Data integrity maintained
 
-### **Current Interface Status:**
-- **Clean ingredient names**: "granulated sugar" instead of "1 cup granulated sugar" ✅
-- **Pin icon staple toggle**: Blue pins for staples, clear visual hierarchy ✅
-- **Folder icon placeholder**: Ready for category assignment implementation ✅
-- **Professional design**: Removed clutter, ingredient names prominent ✅
-- **Performance**: Maintaining < 0.1s response times ✅
+**Phase 3: Category Management Integration (45 minutes) - COMPLETE**
+- Direct category assignment: tap folder icon opens category selection modal
+- Bulk category assignment: select multiple ingredients for batch operations
+- CategoryAssignmentModal integration: reused M2.2.4 modal with single/bulk support
+- Immediate UI updates: ingredients move to new category sections instantly
 
-## PHASE 3: CATEGORY MANAGEMENT INTEGRATION (45 minutes)
+**Phase 4: Enhanced Features & Polish (90 minutes) - COMPLETE**
+- Advanced filtering: real-time search with category-aware results
+- Bulk operations: extended functionality including staple toggling and category management
+- Usage analytics integration: display usage insights within ingredient interface
+- Performance optimization: maintained sub-0.1s response times with comprehensive functionality
 
-### **Objective:**
-Implement direct category assignment functionality through the folder icon, enabling users to change ingredient categories without workflow dependencies. Transform the placeholder folder button into a fully functional category management interface.
+**Performance**: All operations maintaining sub-millisecond response times with professional iOS patterns
+**Data Consolidation**: 100% ingredient data now managed through unified IngredientTemplate system
+**User Experience**: Direct category management eliminating all workflow dependencies
 
-### **Implementation Plan:**
+## M2.2.6: CUSTOM CATEGORY INTEGRATION (45 minutes)
 
-#### **3.1 Direct Category Assignment Interface (25 minutes)**
+### **Goal:**
+Integrate M1's revolutionary store-layout optimization with recipe ingredient organization, ensuring the personalized custom category order applies consistently throughout the recipe system.
 
-**Goal**: Make the folder icon functional for immediate category assignment
+### **Problem Statement:**
+**Current State**: Recipe ingredients use IngredientTemplate.category relationships but don't automatically follow the user's personalized store-layout order established in M1.
+**Missing Integration**: Recipe creation, ingredient display, and grocery list generation should respect the custom category order that users have personalized through drag-and-drop.
+**User Value Gap**: Revolutionary store-layout optimization doesn't extend to recipe-generated ingredients and shopping flows.
 
-**Implementation Requirements:**
-- **Tap folder icon → Show category selection modal**
-- **Reuse existing CategoryAssignmentModal from Step 3a** (already built and operational)
-- **Single ingredient assignment**: Quick category change for individual ingredients
-- **Create new category option**: Allow category creation during assignment
-- **Immediate UI update**: Ingredient moves to new category section instantly
+### **Solution Overview:**
+Integrate the custom category order system with recipe ingredient organization, ensuring recipe ingredients display and organize according to the user's personalized store layout. This provides seamless store-layout optimization across the entire application.
 
-**Technical Integration:**
-- Leverage existing `CategoryAssignmentModal.swift` from Step 3a
-- Use established category selection patterns and UI components
-- Maintain consistency with existing category management systems
-- Ensure Core Data persistence at IngredientTemplate level
+### **Implementation Plan (45 minutes total):**
 
-#### **3.2 Bulk Category Assignment Enhancement (20 minutes)**
+#### **Phase 1: Recipe Creation Integration (15 minutes)**
 
-**Goal**: Enable multi-ingredient category assignment through Edit mode
+**1.1 Ingredient Parsing Enhancement (10 minutes)**
+- Update IngredientParsingService to apply custom category order when creating ingredient templates
+- Ensure CategoryAssignmentModal shows categories in custom order during recipe creation
+- Apply personalized category organization to ingredients as they're parsed and assigned
 
-**Implementation Requirements:**
-- **Edit mode selection**: Use existing selection system for multiple ingredients
-- **Bulk assignment action**: Single operation to assign category to all selected ingredients
-- **Batch processing**: Efficient Core Data operations for multiple updates
-- **Progress indication**: User feedback during bulk operations
+**1.2 Recipe Display Integration (5 minutes)**
+- Update RecipeDetailView ingredient display to follow custom category order
+- Ensure ingredients show with proper category colors and organization
+- Maintain visual consistency with established store-layout personalization
 
-**UI Enhancement:**
-- **Selection toolbar**: Show bulk actions when ingredients are selected
-- **Category assignment button**: Prominent action for bulk assignment
-- **Confirmation workflow**: Prevent accidental bulk changes
-- **Success feedback**: Clear indication of successful bulk operations
+#### **Phase 2: Grocery List Generation Integration (15 minutes)**
 
-### **Technical Architecture:**
+**2.1 AddIngredientsToListView Enhancement (10 minutes)**
+- Ensure recipe ingredients added to grocery lists follow custom category order
+- Apply personalized store-layout organization to generated GroceryListItem entities
+- Maintain category assignments with proper order and visual indicators
 
-#### **Category Assignment Flow:**
+**2.2 List Organization Validation (5 minutes)**
+- Test that recipe-generated grocery items appear in correct custom category order
+- Verify visual consistency with manually created grocery items
+- Confirm store-layout optimization works seamlessly across recipe and staple flows
+
+#### **Phase 3: Visual Consistency & Category Integration (15 minutes)**
+
+**3.1 Category Color and Organization (10 minutes)**
+- Apply custom category colors throughout recipe interfaces
+- Ensure IngredientsView displays categories in personalized order
+- Integrate category visual indicators (colors, organization) consistently across all recipe features
+
+**3.2 Cross-App Experience Validation (5 minutes)**
+- Test complete flow: recipe creation → ingredient assignment → grocery list generation
+- Verify custom category order maintained throughout entire recipe-to-shopping workflow
+- Confirm seamless experience matching M1 store-layout optimization patterns
+
+### **Technical Integration Points:**
+
+**Custom Category Order Integration:**
+- Leverage existing `Category.sortOrder` property from M1 drag-and-drop system
+- Apply `NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true)` throughout recipe interfaces
+- Ensure IngredientTemplate.category relationships follow established personalization
+
+**Visual Consistency Patterns:**
 ```swift
-// Single ingredient assignment
-onCategoryAssign: {
-    selectedIngredientForCategory = ingredient
-    showingCategoryAssignment = true
-}
-
-// Bulk ingredient assignment
-func assignCategoryToSelected() {
-    // Process selectedIngredients Set<IngredientTemplate>
-    // Use CategoryAssignmentModal for category selection
-    // Update all selected ingredients with new category
-    // Refresh UI to show ingredients in new category sections
-}
+// Example integration pattern
+@FetchRequest(
+    sortDescriptors: [
+        NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true),
+        NSSortDescriptor(keyPath: \IngredientTemplate.name, ascending: true)
+    ]
+) private var categorizedIngredients: FetchedResults<IngredientTemplate>
 ```
 
-#### **Integration Points:**
-- **CategoryAssignmentModal**: Reuse existing modal from Step 3a
-- **Category Management**: Full integration with Milestone 1 category system
-- **IngredientTemplate.category**: Direct property assignment
-- **Professional UI**: Follow established iOS patterns and accessibility
+**Integration Requirements:**
+- **IngredientParsingService**: Apply custom category order during ingredient template creation
+- **CategoryAssignmentModal**: Display categories in custom order with visual consistency
+- **RecipeDetailView**: Show ingredients grouped by custom category order
+- **AddIngredientsToListView**: Generate grocery items with personalized category organization
+- **IngredientsView**: Display all ingredients following custom category order throughout interface
 
 ### **Success Criteria:**
+- **Recipe Creation**: New recipes automatically organize ingredients according to custom category order
+- **Ingredient Display**: Recipe ingredients show in personalized store-layout order
+- **Grocery Integration**: Recipe-to-grocery flows maintain custom category organization
+- **Visual Consistency**: Category colors and organization match established patterns
+- **Performance**: Maintain < 0.1s response times with enhanced category integration
+- **User Experience**: Seamless store-layout optimization from staples through recipes to shopping
 
-**Functional Requirements:**
-- **Single Assignment**: Tap folder icon → select category → ingredient moves immediately
-- **Bulk Assignment**: Select multiple ingredients → assign category → all move together
-- **Category Creation**: Create new categories during assignment process
-- **Data Persistence**: All assignments save correctly and persist across app sessions
-- **UI Responsiveness**: < 0.1s response time for assignment operations
+### **Validation Plan:**
+- **Recipe Creation Flow**: Create recipe with ingredients, verify custom category order applied
+- **Ingredient Display**: Confirm RecipeDetailView shows ingredients in personalized order
+- **Grocery Generation**: Test "Add to List" maintains custom category organization
+- **Category Assignment**: Verify CategoryAssignmentModal displays custom order
+- **Visual Integration**: Confirm category colors and organization consistent throughout
+- **Cross-Flow Testing**: Complete staple → recipe → grocery workflow with custom organization
 
-**User Experience:**
-- **Intuitive Workflow**: Clear, discoverable category assignment process
-- **Visual Feedback**: Immediate UI updates showing ingredient category changes
-- **Professional Interface**: Native iOS patterns with accessibility compliance
-- **Error Handling**: Graceful handling of assignment failures with user feedback
+### **User Experience Enhancement:**
+1. **Recipe Creation**: Users see ingredients organize automatically according to their personalized store layout
+2. **Ingredient Management**: IngredientsView displays all ingredients in familiar custom category order
+3. **Grocery Shopping**: Recipe-generated lists follow the same store-layout optimization as manually created items
+4. **Visual Familiarity**: Consistent category colors and organization throughout the entire application
+5. **Seamless Workflow**: Revolutionary store-layout personalization extends naturally to all recipe functionality
 
-### **Integration with Existing Systems:**
+### **Post-Implementation:**
+After M2.2.6 completion, ready for:
+- **M2.2.7**: Recipe Search Enhancement (30 minutes)
+- **M2.2.8**: Usage Tracking Foundation (30 minutes)
+- **M2.3**: Recipe Creation & Editing (4-5 hours)
 
-**Step 3a Infrastructure Ready:**
-- **CategoryAssignmentModal.swift**: Comprehensive modal for category selection ✅
-- **Category creation workflow**: New category creation with color picker ✅
-- **Core Data operations**: Background persistence and error handling ✅
-- **Professional UI patterns**: Established modal presentation and selection ✅
+**Technical Foundation Complete:**
+- **Unified Ingredient System**: IngredientTemplate-based architecture with direct category management ✅
+- **Custom Category Integration**: Store-layout optimization ready for seamless recipe integration ✅
+- **Professional UI Components**: Established SwiftUI patterns with category organization ✅
+- **Performance Architecture**: Sub-0.1s response times maintained with enhanced functionality ✅
 
-**Milestone 1 Category Foundation:**
-- **Dynamic category system**: Custom categories with sort order ✅
-- **Category colors and emojis**: Visual category identification ✅
-- **Category management**: Full CRUD operations operational ✅
+**Current Achievement**: M2.2.1 through M2.2.5 complete with unified ingredient management, direct category assignment, and comprehensive functionality. Custom category order system ready for integration across all recipe interfaces to provide seamless store-layout optimization throughout the entire application.
 
-### **Post-Phase 3 Implementation:**
-After completing Phase 3, users will have:
-- **Complete category control**: Change any ingredient's category instantly
-- **Bulk management**: Efficient multi-ingredient category operations
-- **Workflow independence**: No need to use recipe creation or category deletion for assignments
-- **Professional UX**: Native iOS category management experience
-
-### **Ready for Phase 4:**
-- **Advanced filtering**: Category-based search and filtering enhancements
-- **Bulk operations**: Extended bulk functionality beyond category assignment
-- **Analytics integration**: Usage insights and category distribution analysis
-- **Enhanced search**: Real-time search with category-aware results
-
-### **Validation Requirements:**
-- **Category Assignment**: Test single and bulk assignment operations
-- **UI Integration**: Verify modal presentation and dismissal
-- **Data Persistence**: Confirm assignments save and load correctly
-- **Performance**: Maintain < 0.1s response times during assignment
-- **Recipe Integration**: Ensure recipe ingredients respect new category assignments
-
-**Technical Foundation Operational:**
-- **IngredientsView**: Unified interface with folder icon ready for functionality ✅
-- **CategoryAssignmentModal**: Production-ready modal from Step 3a ✅
-- **Core Data Model**: IngredientTemplate.category relationship operational ✅
-- **Performance Architecture**: Sub-millisecond response times maintained ✅
-
-**Please help me implement Phase 3: Category Management Integration, making the folder icon functional and enabling direct category assignment for both individual and bulk ingredient management.**
+**Please help me implement M2.2.6: Custom Category Integration, integrating M1's revolutionary store-layout optimization with recipe ingredient organization to provide consistent personalized category order throughout the entire recipe system.**
