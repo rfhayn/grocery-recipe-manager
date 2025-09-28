@@ -17,6 +17,45 @@ struct AddIngredientsToListView: View {
     @State private var uncategorizedTemplates: [IngredientTemplate] = []
     @State private var pendingAddOperation: (() -> Void)?
     
+    // M2.2.6 - STEP 1: Add Category FetchRequest (add this after your existing @State properties)
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true),
+            NSSortDescriptor(keyPath: \Category.name, ascending: true)
+        ]
+    ) private var categories: FetchedResults<Category>
+    
+    // M2.2.6 - ADDED: Computed properties for custom category grouping
+    private var groupedIngredients: [String: [Ingredient]] {
+        guard let ingredientsSet = recipe.ingredients else { return [:] }
+        let ingredientsList = Array(ingredientsSet) as! [Ingredient]
+        
+        return Dictionary(grouping: ingredientsList) { ingredient in
+            ingredient.ingredientTemplate?.category ?? "Uncategorized"
+        }
+    }
+
+    private var sortedCategoryNames: [String] {
+        let grouped = groupedIngredients
+        let categoryMap = Dictionary(uniqueKeysWithValues: categories.map { ($0.displayName, $0.sortOrder) })
+        
+        return grouped.keys.sorted { category1, category2 in
+            // Handle "Uncategorized" - put it at the end
+            if category1 == "Uncategorized" && category2 != "Uncategorized" { return false }
+            if category2 == "Uncategorized" && category1 != "Uncategorized" { return true }
+            if category1 == "Uncategorized" && category2 == "Uncategorized" { return false }
+            
+            // Use custom sort order for real categories
+            let order1 = categoryMap[category1] ?? Int16.max
+            let order2 = categoryMap[category2] ?? Int16.max
+            
+            if order1 == order2 {
+                return category1 < category2 // Fallback to alphabetical
+            }
+            return order1 < order2
+        }
+    }
+    
     var body: some View {
         NavigationView {
             Group {
@@ -318,6 +357,8 @@ struct AddIngredientsToListView: View {
                 cleanName = extractCleanIngredientName(from: fullIngredientText)
             }
             
+            print("DEBUG: Processing ingredient '\(fullIngredientText)' -> clean: '\(cleanName)'")
+            
             // Check for existing items by clean name
             if let existingItem = findExistingItem(named: cleanName, in: existingItems) {
                 // FIXED: Merge quantities if both have quantities
@@ -325,13 +366,18 @@ struct AddIngredientsToListView: View {
                 let newQuantityInfo = extractQuantityInfo(from: fullIngredientText)
                 let existingQuantityInfo = extractQuantityInfo(from: existingName)
                 
+                print("DEBUG: Merging - existing: '\(existingName)', new: '\(fullIngredientText)'")
+                print("DEBUG: Extracted quantities - existing: '\(existingQuantityInfo)', new: '\(newQuantityInfo)'")
+                
                 if !newQuantityInfo.isEmpty && !existingQuantityInfo.isEmpty {
                     // Try to merge quantities
                     let mergedQuantity = mergeQuantities(existing: existingQuantityInfo, new: newQuantityInfo)
                     existingItem.name = "\(mergedQuantity) \(cleanName)"
+                    print("DEBUG: Final merged result: '\(existingItem.name ?? "nil")'")
                 } else if !newQuantityInfo.isEmpty && existingQuantityInfo.isEmpty {
                     // Add quantity to existing item
                     existingItem.name = fullIngredientText
+                    print("DEBUG: Added quantity to existing: '\(existingItem.name ?? "nil")'")
                 }
                 // If new item has no quantity, keep existing as-is
                 
@@ -397,61 +443,39 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // IMPROVED: Enhanced ingredient name extraction with better patterns
     private func extractCleanIngredientName(from fullText: String) -> String {
         let text = fullText.trimmingCharacters(in: .whitespacesAndNewlines)
         print("Extracting clean name from: '\(text)'") // Debug
         
-        // Remove common quantity patterns at the beginning - IMPROVED PATTERNS
-        let patterns = [
-            // Handle fractions at start: "1/2 cup", "3/4 tsp", etc.
-            #"^\d+/\d+\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
-            // Handle decimal numbers with units: "2.5 cups", "1.25 tsp"
-            #"^\d+\.\d+\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
-            // Handle whole numbers with units: "2 cups", "1 tsp"
-            #"^\d+\s+(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
-            // Handle ranges with units: "2-3 cups", "1-2 tsp"
-            #"^\d+\s*-\s*\d+\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#,
-            // Handle bare fractions: "1/2", "3/4"
-            #"^\d+/\d+\s+"#,
-            // Handle bare numbers: "2", "1.5"
-            #"^\d+(\.\d+)?\s+"#,
-            // Remove articles at the start: "a", "an", "the"
-            #"^(a|an|the)\s+"#
-        ]
-        
         var cleaned = text
-        for pattern in patterns {
-            let before = cleaned
-            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: [.regularExpression, .caseInsensitive])
-            if before != cleaned {
-                print("   Applied pattern, result: '\(cleaned)'") // Debug
-            }
-        }
         
-        // Remove common descriptors from the end - IMPROVED
-        let endPatterns = [
-            // Remove everything after comma with descriptors
-            #",\s*(chopped|diced|sliced|minced|grated|melted|softened|at room temperature|optional|fresh|dried|ground|whole|large|small|medium).*$"#,
-            // Remove parenthetical information
-            #"\s*\([^)]*\).*$"#,
-            // Remove everything after first comma if nothing else matched
-            #",.*$"#
-        ]
+        // Remove measurements with units (comprehensive pattern)
+        let measurementPattern = #"^[\d/.\s-]*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#
+        cleaned = cleaned.replacingOccurrences(of: measurementPattern, with: "", options: [.regularExpression, .caseInsensitive])
         
-        for pattern in endPatterns {
-            let before = cleaned
-            cleaned = cleaned.replacingOccurrences(of: pattern, with: "", options: [.regularExpression, .caseInsensitive])
-            if before != cleaned {
-                print("   Applied end pattern, result: '\(cleaned)'") // Debug
-                break // Stop after first match to avoid over-cleaning
-            }
-        }
+        // Remove any remaining numbers and fractions at the start
+        let numberPattern = #"^[\d/.\s-]+"#
+        cleaned = cleaned.replacingOccurrences(of: numberPattern, with: "", options: [.regularExpression])
+        
+        // Remove size descriptors at the start
+        let sizePattern = #"^(large|small|medium|whole)\s+"#
+        cleaned = cleaned.replacingOccurrences(of: sizePattern, with: "", options: [.regularExpression, .caseInsensitive])
+        
+        // Remove articles at the start
+        let articlePattern = #"^(a|an|the)\s+"#
+        cleaned = cleaned.replacingOccurrences(of: articlePattern, with: "", options: [.regularExpression, .caseInsensitive])
+        
+        // Clean up the end - remove descriptors after comma
+        let descriptorPattern = #",.*$"#
+        cleaned = cleaned.replacingOccurrences(of: descriptorPattern, with: "", options: [.regularExpression])
+        
+        // Remove parenthetical info
+        let parenthesesPattern = #"\s*\([^)]*\).*$"#
+        cleaned = cleaned.replacingOccurrences(of: parenthesesPattern, with: "", options: [.regularExpression])
         
         // Final cleanup
         cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // If cleaning resulted in empty string, return original
         let result = cleaned.isEmpty ? text : cleaned
         print("Final clean name: '\(result)'") // Debug
         return result
@@ -502,93 +526,229 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // FIXED: New helper method to extract quantity info
+    // MARK: - UPDATED Quantity Processing Methods
+    
+    // IMPROVED: Better quantity extraction that handles fractions and decimals
     private func extractQuantityInfo(from text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Extract quantity patterns at the beginning
+        // Enhanced patterns to handle fractions, decimals, and ranges
         let quantityPatterns = [
-            #"^(\d+(\.\d+)?\s*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml))"#,
-            #"^(\d+(\.\d+)?)"#,  // Bare numbers
-            #"^(\d+/\d+)"#,      // Fractions like "1/2"
-            #"^(\d+\s*-\s*\d+)"# // Ranges like "2-3"
+            // Fractions with units: "1/2 cup", "3/4 tsp" - FIXED: Made "l" more specific
+            #"^(\d+/\d+\s+(?:cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|liter|milliliters?|ml|eggs?))"#,
+            // Decimals with units: "1.5 cups", "0.25 tsp" - FIXED: Made "l" more specific
+            #"^(\d+(?:\.\d+)?\s+(?:cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|liter|milliliters?|ml|eggs?))"#,
+            // Just fractions: "1/2", "3/4"
+            #"^(\d+/\d+)"#,
+            // Just numbers: "2", "1.5"
+            #"^(\d+(?:\.\d+)?)"#,
+            // Ranges: "2-3", "1-2"
+            #"^(\d+\s*-\s*\d+)"#
         ]
         
         for pattern in quantityPatterns {
             if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
                let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
-                return String(trimmed[Range(match.range, in: trimmed)!])
+                let result = String(trimmed[Range(match.range, in: trimmed)!])
+                print("Extracted quantity: '\(result)' from '\(text)'")
+                return result
             }
         }
         
+        print("No quantity found in: '\(text)'")
         return ""
     }
     
-    // FIXED: Enhanced quantity merging logic
+    // COMPLETELY REWRITTEN: Enhanced quantity merging with proper numeric handling
     private func mergeQuantities(existing: String, new: String) -> String {
+        print("Merging: '\(existing)' + '\(new)'")
+        
         if existing.isEmpty {
             return new
         } else if new.isEmpty {
             return existing
         }
         
-        // Simple unit compatibility check
-        let existingLower = existing.lowercased()
-        let newLower = new.lowercased()
+        // Extract numeric and unit parts
+        let existingParts = parseQuantityParts(from: existing)
+        let newParts = parseQuantityParts(from: new)
         
-        // Check for compatible units (cups with cups, tsp with tsp, etc.)
-        let cupUnits = ["cup", "cups"]
-        let tspUnits = ["tsp", "teaspoon", "teaspoons"]
-        let tbspUnits = ["tbsp", "tablespoon", "tablespoons"]
-        
-        let existingHasCups = cupUnits.contains { existingLower.contains($0) }
-        let newHasCups = cupUnits.contains { newLower.contains($0) }
-        
-        let existingHasTsp = tspUnits.contains { existingLower.contains($0) }
-        let newHasTsp = tspUnits.contains { newLower.contains($0) }
-        
-        let existingHasTbsp = tbspUnits.contains { existingLower.contains($0) }
-        let newHasTbsp = tbspUnits.contains { newLower.contains($0) }
-        
-        // If units are compatible, try simple addition
-        if (existingHasCups && newHasCups) || (existingHasTsp && newHasTsp) || (existingHasTbsp && newHasTbsp) {
-            // Extract numeric values and add them
-            let existingNum = extractNumericValue(from: existing)
-            let newNum = extractNumericValue(from: new)
+        // Check if units are compatible
+        if let existingUnit = existingParts.unit,
+           let newUnit = newParts.unit,
+           areUnitsCompatible(existingUnit, newUnit) {
             
-            if let existingVal = existingNum, let newVal = newNum {
+            // Convert both to decimals and add
+            let existingDecimal = convertToDecimal(existingParts.number)
+            let newDecimal = convertToDecimal(newParts.number)
+            
+            if let existingVal = existingDecimal, let newVal = newDecimal {
                 let sum = existingVal + newVal
-                let unit = extractUnit(from: existing) ?? extractUnit(from: new) ?? ""
-                return "\(sum) \(unit)"
+                let displayNumber = formatNumber(sum)
+                let properUnit = pluralizeUnit(normalizeUnit(existingUnit), quantity: sum)
+                let mergedResult = "\(displayNumber) \(properUnit)"
+                print("Merged result: '\(mergedResult)'")
+                return mergedResult
             }
         }
         
-        // If not compatible or can't parse, combine them
-        return "\(existing), \(new)"
-    }
-    
-    // FIXED: Helper methods for numeric extraction
-    private func extractNumericValue(from text: String) -> Double? {
-        let pattern = #"^(\d+(?:\.\d+)?)"#
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) else {
-            return nil
+        // Handle case where one or both have no units
+        if existingParts.unit == nil && newParts.unit == nil {
+            // Both are just numbers - add them
+            let existingDecimal = convertToDecimal(existingParts.number)
+            let newDecimal = convertToDecimal(newParts.number)
+            
+            if let existingVal = existingDecimal, let newVal = newDecimal {
+                let sum = existingVal + newVal
+                let displayNumber = formatNumber(sum)
+                print("Merged numbers: '\(displayNumber)'")
+                return displayNumber
+            }
         }
         
-        let numString = String(text[Range(match.range, in: text)!])
-        return Double(numString)
+        // If units aren't compatible or can't parse, combine them
+        let fallbackResult = "\(existing) + \(new)"
+        print("Fallback result: '\(fallbackResult)'")
+        return fallbackResult
     }
     
-    private func extractUnit(from text: String) -> String? {
-        let pattern = #"^\d+(?:\.\d+)?\s*(.+)$"#
+    // NEW: Parse quantity into number and unit components
+    private func parseQuantityParts(from text: String) -> (number: String, unit: String?) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Pattern to separate number from unit - improved to handle all cases
+        let pattern = #"^(\d+(?:/\d+)?(?:\.\d+)?)\s+(.+)$"#
+        
         guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
-              match.numberOfRanges > 1 else {
-            return nil
+              let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+              match.numberOfRanges >= 3 else {
+            // If no unit found, check if it's just a number
+            let numberOnlyPattern = #"^(\d+(?:/\d+)?(?:\.\d+)?)$"#
+            if let numberRegex = try? NSRegularExpression(pattern: numberOnlyPattern),
+               numberRegex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) != nil {
+                print("Parsed as number only: '\(trimmed)'")
+                return (number: trimmed, unit: nil)
+            }
+            print("Failed to parse: '\(trimmed)'")
+            return (number: trimmed, unit: nil)
         }
         
-        let unitRange = match.range(at: 1)
-        return String(text[Range(unitRange, in: text)!]).trimmingCharacters(in: .whitespacesAndNewlines)
+        let numberRange = match.range(at: 1)
+        let number = String(trimmed[Range(numberRange, in: trimmed)!])
+        
+        let unitRange = match.range(at: 2)
+        let unitString = String(trimmed[Range(unitRange, in: trimmed)!]).trimmingCharacters(in: .whitespacesAndNewlines)
+        let unit = unitString.isEmpty ? nil : unitString
+        
+        print("Parsed '\(trimmed)' -> number: '\(number)', unit: '\(unit ?? "nil")'")
+        return (number: number, unit: unit)
+    }
+    
+    // NEW: Convert fractions and decimals to decimal numbers
+    private func convertToDecimal(_ numberString: String) -> Double? {
+        let trimmed = numberString.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Handle fractions
+        if trimmed.contains("/") {
+            let parts = trimmed.split(separator: "/")
+            if parts.count == 2,
+               let numerator = Double(parts[0]),
+               let denominator = Double(parts[1]),
+               denominator != 0 {
+                return numerator / denominator
+            }
+        }
+        
+        // Handle regular decimals
+        return Double(trimmed)
+    }
+    
+    // NEW: Format numbers to avoid unnecessary decimals
+    private func formatNumber(_ value: Double) -> String {
+        // If it's a whole number, display as integer
+        if value == floor(value) {
+            return String(Int(value))
+        }
+        
+        // Check if it's a common fraction
+        let commonFractions: [(Double, String)] = [
+            (0.25, "1/4"),
+            (0.33, "1/3"),
+            (0.5, "1/2"),
+            (0.67, "2/3"),
+            (0.75, "3/4")
+        ]
+        
+        for (decimal, fraction) in commonFractions {
+            if abs(value - decimal) < 0.01 {
+                return fraction
+            }
+        }
+        
+        // For mixed numbers (like 1.5), check if the decimal part is a common fraction
+        let wholeNumber = floor(value)
+        let decimalPart = value - wholeNumber
+        
+        if wholeNumber > 0 {
+            for (decimal, fraction) in commonFractions {
+                if abs(decimalPart - decimal) < 0.01 {
+                    return "\(Int(wholeNumber)) \(fraction)"
+                }
+            }
+        }
+        
+        // Default to one decimal place, removing trailing zeros
+        let formatted = String(format: "%.1f", value)
+        return formatted.hasSuffix(".0") ? String(Int(value)) : formatted
+    }
+    
+    // NEW: Check if units can be merged
+    private func areUnitsCompatible(_ unit1: String, _ unit2: String) -> Bool {
+        let normalized1 = normalizeUnit(unit1)
+        let normalized2 = normalizeUnit(unit2)
+        return normalized1 == normalized2
+    }
+    
+    // NEW: Normalize unit names for comparison
+    private func normalizeUnit(_ unit: String) -> String {
+        let lowercased = unit.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Normalize plural forms to singular for comparison
+        switch lowercased {
+        case "cup", "cups": return "cup"
+        case "tsp", "teaspoon", "teaspoons": return "tsp"
+        case "tbsp", "tablespoon", "tablespoons": return "tbsp"
+        case "pound", "pounds", "lb", "lbs": return "lb"
+        case "ounce", "ounces", "oz": return "oz"
+        case "gram", "grams", "g": return "g"
+        case "kilogram", "kilograms", "kg": return "kg"
+        case "liter", "liters", "l": return "l"
+        case "milliliter", "milliliters", "ml": return "ml"
+        case "egg", "eggs": return "egg"
+        default: return lowercased
+        }
+    }
+    
+    // NEW: Pluralize units based on quantity
+    private func pluralizeUnit(_ normalizedUnit: String, quantity: Double) -> String {
+        if quantity == 1.0 {
+            return normalizedUnit
+        }
+        
+        // Pluralize for quantities > 1
+        switch normalizedUnit {
+        case "cup": return "cups"
+        case "tsp": return "tsp" // Already abbreviated
+        case "tbsp": return "tbsp" // Already abbreviated
+        case "lb": return "lbs"
+        case "oz": return "oz" // Already abbreviated
+        case "g": return "g" // Already abbreviated
+        case "kg": return "kg" // Already abbreviated
+        case "l": return "l" // Already abbreviated
+        case "ml": return "ml" // Already abbreviated
+        case "egg": return "eggs"
+        default: return normalizedUnit // For unknown units, don't change
+        }
     }
     
     private func buildCompleteQuantity(from ingredient: Ingredient) -> String {
@@ -605,8 +765,49 @@ struct AddIngredientsToListView: View {
         return parts.joined(separator: " ")
     }
     
-    // MARK: - UI Components
+    // MARK: - Category Helper
+    private func categoryHeaderSimple(categoryName: String, count: Int) -> some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(categoryColor(for: categoryName))
+                .frame(width: 12, height: 12)
+                .overlay(
+                    Text(categoryEmoji(for: categoryName))
+                        .font(.system(size: 8))
+                )
+            
+            Text(categoryName.uppercased())
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Text("\(count)")
+                .font(.caption2)
+                .fontWeight(.medium)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color(.systemGray5))
+                .cornerRadius(4)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func categoryEmoji(for categoryName: String) -> String {
+        switch categoryName.lowercased() {
+        case "produce": return "🥬"
+        case "deli & meat": return "🥩"
+        case "dairy & fridge": return "🥛"
+        case "bread & frozen": return "🍞"
+        case "boxed & canned": return "📦"
+        case "snacks, drinks, & other": return "🥤"
+        default: return "📦"
+        }
+    }
     
+    // MARK: - UI Components
     private var processingView: some View {
         VStack(spacing: 20) {
             ProgressView()
@@ -624,21 +825,27 @@ struct AddIngredientsToListView: View {
             headerSection
             
             List {
-                if let ingredientsSet = recipe.ingredients, ingredientsSet.count > 0 {
-                    let ingredientsList = Array(ingredientsSet) as! [Ingredient]
-                    
-                    ForEach(ingredientsList, id: \.objectID) { ingredient in
-                        ingredientRow(ingredient)
-                    }
-                } else {
+                if groupedIngredients.isEmpty {
                     Text("No ingredients found in this recipe")
                         .font(.body)
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .listRowBackground(Color.clear)
+                } else {
+                    ForEach(sortedCategoryNames, id: \.self) { categoryName in
+                        let categoryIngredients = groupedIngredients[categoryName] ?? []
+                        
+                        if !categoryIngredients.isEmpty {
+                            Section(header: categoryHeaderSimple(categoryName: categoryName, count: categoryIngredients.count)) {
+                                ForEach(categoryIngredients, id: \.objectID) { ingredient in
+                                    ingredientRow(ingredient)
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            .listStyle(PlainListStyle())
+            .listStyle(InsetGroupedListStyle())
             
             selectionSummary
         }
