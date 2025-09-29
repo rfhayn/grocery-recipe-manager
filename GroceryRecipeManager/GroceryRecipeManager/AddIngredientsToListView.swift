@@ -445,12 +445,12 @@ struct AddIngredientsToListView: View {
     
     private func extractCleanIngredientName(from fullText: String) -> String {
         let text = fullText.trimmingCharacters(in: .whitespacesAndNewlines)
-        print("Extracting clean name from: '\(text)'") // Debug
+        print("Extracting clean name from: '\(text)'")
         
         var cleaned = text
         
         // Remove measurements with units (comprehensive pattern)
-        let measurementPattern = #"^[\d/.\s-]*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml)\s+"#
+        let measurementPattern = #"^[\d/.\s-]*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml|eggs?)\s+"#
         cleaned = cleaned.replacingOccurrences(of: measurementPattern, with: "", options: [.regularExpression, .caseInsensitive])
         
         // Remove any remaining numbers and fractions at the start
@@ -477,13 +477,13 @@ struct AddIngredientsToListView: View {
         cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
         
         let result = cleaned.isEmpty ? text : cleaned
-        print("Final clean name: '\(result)'") // Debug
+        print("Final clean name: '\(result)'")
         return result
     }
     
     // DEBUGGING: Helper function to find existing template with debugging
     private func findExistingTemplate(cleanName: String) -> IngredientTemplate? {
-        print("Looking for template with clean name: '\(cleanName)'") // Debug
+        print("Looking for template with clean name: '\(cleanName)'")
         
         let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
         request.predicate = NSPredicate(format: "name ==[cd] %@", cleanName)
@@ -492,10 +492,10 @@ struct AddIngredientsToListView: View {
         do {
             let templates = try viewContext.fetch(request)
             if let found = templates.first {
-                print("Found template: '\(found.name ?? "nil")' with category: '\(found.category ?? "nil")'") // Debug
+                print("Found template: '\(found.name ?? "nil")' with category: '\(found.category ?? "nil")'")
                 return found
             } else {
-                print("No template found for: '\(cleanName)'") // Debug
+                print("No template found for: '\(cleanName)'")
                 
                 // DEBUG: Let's see what templates actually exist
                 let allTemplatesRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
@@ -526,21 +526,19 @@ struct AddIngredientsToListView: View {
         }
     }
     
-    // MARK: - UPDATED Quantity Processing Methods
+    // MARK: - FIXED Quantity Processing Methods
     
-    // IMPROVED: Better quantity extraction that handles fractions and decimals
+    // IMPROVED: Better quantity extraction that handles size descriptors like "large eggs"
     private func extractQuantityInfo(from text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Enhanced patterns to handle fractions, decimals, and ranges
+        // Enhanced patterns to handle fractions, decimals, and ranges INCLUDING EGGS with size descriptors
         let quantityPatterns = [
-            // Fractions with units: "1/2 cup", "3/4 tsp" - FIXED: Made "l" more specific
-            #"^(\d+/\d+\s+(?:cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|liter|milliliters?|ml|eggs?))"#,
-            // Decimals with units: "1.5 cups", "0.25 tsp" - FIXED: Made "l" more specific
-            #"^(\d+(?:\.\d+)?\s+(?:cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|liter|milliliters?|ml|eggs?))"#,
+            // Numbers with optional size descriptors + units: "2 large eggs", "4 eggs", "1/2 cup"
+            #"^(\d+(?:/\d+)?(?:\.\d+)?\s+(?:large\s+|medium\s+|small\s+)?(?:cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|liter|milliliters?|ml|eggs?))"#,
             // Just fractions: "1/2", "3/4"
             #"^(\d+/\d+)"#,
-            // Just numbers: "2", "1.5"
+            // Just numbers: "2", "1.5", "4"
             #"^(\d+(?:\.\d+)?)"#,
             // Ranges: "2-3", "1-2"
             #"^(\d+\s*-\s*\d+)"#
@@ -549,23 +547,29 @@ struct AddIngredientsToListView: View {
         for pattern in quantityPatterns {
             if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
                let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
-                let result = String(trimmed[Range(match.range, in: trimmed)!])
-                print("Extracted quantity: '\(result)' from '\(text)'")
+                var result = String(trimmed[Range(match.range, in: trimmed)!])
+                
+                // Remove size descriptors from the result for cleaner merging
+                result = result.replacingOccurrences(of: #"\b(large|medium|small)\s+"#, with: "", options: [.regularExpression, .caseInsensitive])
+                
+                print("DEBUG extractQuantityInfo: Extracted '\(result)' from '\(text)'")
                 return result
             }
         }
         
-        print("No quantity found in: '\(text)'")
+        print("DEBUG extractQuantityInfo: No quantity found in '\(text)'")
         return ""
     }
     
-    // COMPLETELY REWRITTEN: Enhanced quantity merging with proper numeric handling
+    // FIXED: Improved quantity merging with better debugging and egg support
     private func mergeQuantities(existing: String, new: String) -> String {
-        print("Merging: '\(existing)' + '\(new)'")
+        print("DEBUG mergeQuantities: Starting merge - existing: '\(existing)', new: '\(new)'")
         
         if existing.isEmpty {
+            print("DEBUG mergeQuantities: Existing empty, returning new: '\(new)'")
             return new
         } else if new.isEmpty {
+            print("DEBUG mergeQuantities: New empty, returning existing: '\(existing)'")
             return existing
         }
         
@@ -573,80 +577,103 @@ struct AddIngredientsToListView: View {
         let existingParts = parseQuantityParts(from: existing)
         let newParts = parseQuantityParts(from: new)
         
-        // Check if units are compatible
-        if let existingUnit = existingParts.unit,
-           let newUnit = newParts.unit,
-           areUnitsCompatible(existingUnit, newUnit) {
-            
+        print("DEBUG mergeQuantities: Existing parts - number: '\(existingParts.number)', unit: '\(existingParts.unit ?? "nil")'")
+        print("DEBUG mergeQuantities: New parts - number: '\(newParts.number)', unit: '\(newParts.unit ?? "nil")'")
+        
+        // Check if units are compatible (or both nil)
+        let unitsCompatible: Bool
+        if let existingUnit = existingParts.unit, let newUnit = newParts.unit {
+            unitsCompatible = areUnitsCompatible(existingUnit, newUnit)
+            print("DEBUG mergeQuantities: Units compatible check: '\(existingUnit)' vs '\(newUnit)' = \(unitsCompatible)")
+        } else if existingParts.unit == nil && newParts.unit == nil {
+            unitsCompatible = true
+            print("DEBUG mergeQuantities: Both units nil, treating as compatible")
+        } else {
+            unitsCompatible = false
+            print("DEBUG mergeQuantities: One unit nil, one not - incompatible")
+        }
+        
+        if unitsCompatible {
             // Convert both to decimals and add
             let existingDecimal = convertToDecimal(existingParts.number)
             let newDecimal = convertToDecimal(newParts.number)
             
-            if let existingVal = existingDecimal, let newVal = newDecimal {
-                let sum = existingVal + newVal
-                let displayNumber = formatNumber(sum)
-                let properUnit = pluralizeUnit(normalizeUnit(existingUnit), quantity: sum)
-                let mergedResult = "\(displayNumber) \(properUnit)"
-                print("Merged result: '\(mergedResult)'")
-                return mergedResult
-            }
-        }
-        
-        // Handle case where one or both have no units
-        if existingParts.unit == nil && newParts.unit == nil {
-            // Both are just numbers - add them
-            let existingDecimal = convertToDecimal(existingParts.number)
-            let newDecimal = convertToDecimal(newParts.number)
+            print("DEBUG mergeQuantities: Converted to decimals - existing: \(existingDecimal?.description ?? "nil"), new: \(newDecimal?.description ?? "nil")")
             
             if let existingVal = existingDecimal, let newVal = newDecimal {
                 let sum = existingVal + newVal
                 let displayNumber = formatNumber(sum)
-                print("Merged numbers: '\(displayNumber)'")
-                return displayNumber
+                
+                // Determine the unit to use
+                let finalUnit: String?
+                if let existingUnit = existingParts.unit {
+                    finalUnit = pluralizeUnit(normalizeUnit(existingUnit), quantity: sum)
+                } else if let newUnit = newParts.unit {
+                    finalUnit = pluralizeUnit(normalizeUnit(newUnit), quantity: sum)
+                } else {
+                    finalUnit = nil
+                }
+                
+                let mergedResult: String
+                if let unit = finalUnit {
+                    mergedResult = "\(displayNumber) \(unit)"
+                } else {
+                    mergedResult = displayNumber
+                }
+                
+                print("DEBUG mergeQuantities: Successfully merged to: '\(mergedResult)'")
+                return mergedResult
             }
         }
         
         // If units aren't compatible or can't parse, combine them
         let fallbackResult = "\(existing) + \(new)"
-        print("Fallback result: '\(fallbackResult)'")
+        print("DEBUG mergeQuantities: Using fallback merge: '\(fallbackResult)'")
         return fallbackResult
     }
     
-    // NEW: Parse quantity into number and unit components
+    // FIXED: Better parsing for simple quantities like "4 eggs"
     private func parseQuantityParts(from text: String) -> (number: String, unit: String?) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Pattern to separate number from unit - improved to handle all cases
-        let pattern = #"^(\d+(?:/\d+)?(?:\.\d+)?)\s+(.+)$"#
+        print("DEBUG parseQuantityParts: Parsing '\(trimmed)'")
         
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
-              match.numberOfRanges >= 3 else {
-            // If no unit found, check if it's just a number
-            let numberOnlyPattern = #"^(\d+(?:/\d+)?(?:\.\d+)?)$"#
-            if let numberRegex = try? NSRegularExpression(pattern: numberOnlyPattern),
-               numberRegex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) != nil {
-                print("Parsed as number only: '\(trimmed)'")
-                return (number: trimmed, unit: nil)
-            }
-            print("Failed to parse: '\(trimmed)'")
+        // Try multiple patterns in order of complexity
+        
+        // Pattern 1: Number + unit (e.g., "4 eggs", "2 cups", "1.5 tsp")
+        let numberUnitPattern = #"^(\d+(?:/\d+)?(?:\.\d+)?)\s+(.+)$"#
+        if let regex = try? NSRegularExpression(pattern: numberUnitPattern),
+           let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+           match.numberOfRanges >= 3 {
+            
+            let numberRange = match.range(at: 1)
+            let number = String(trimmed[Range(numberRange, in: trimmed)!])
+            
+            let unitRange = match.range(at: 2)
+            let unitString = String(trimmed[Range(unitRange, in: trimmed)!]).trimmingCharacters(in: .whitespacesAndNewlines)
+            let unit = unitString.isEmpty ? nil : unitString
+            
+            print("DEBUG parseQuantityParts: Parsed '\(trimmed)' -> number: '\(number)', unit: '\(unit ?? "nil")'")
+            return (number: number, unit: unit)
+        }
+        
+        // Pattern 2: Just a number (e.g., "4", "2", "1.5")
+        let numberOnlyPattern = #"^(\d+(?:/\d+)?(?:\.\d+)?)$"#
+        if let regex = try? NSRegularExpression(pattern: numberOnlyPattern),
+           regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) != nil {
+            print("DEBUG parseQuantityParts: Parsed as number only: '\(trimmed)'")
             return (number: trimmed, unit: nil)
         }
         
-        let numberRange = match.range(at: 1)
-        let number = String(trimmed[Range(numberRange, in: trimmed)!])
-        
-        let unitRange = match.range(at: 2)
-        let unitString = String(trimmed[Range(unitRange, in: trimmed)!]).trimmingCharacters(in: .whitespacesAndNewlines)
-        let unit = unitString.isEmpty ? nil : unitString
-        
-        print("Parsed '\(trimmed)' -> number: '\(number)', unit: '\(unit ?? "nil")'")
-        return (number: number, unit: unit)
+        // Pattern 3: Fallback - treat whole thing as unparseable
+        print("DEBUG parseQuantityParts: Failed to parse quantity: '\(trimmed)'")
+        return (number: trimmed, unit: nil)
     }
     
-    // NEW: Convert fractions and decimals to decimal numbers
+    // ENHANCED: Better number conversion with debugging
     private func convertToDecimal(_ numberString: String) -> Double? {
         let trimmed = numberString.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("DEBUG convertToDecimal: Converting '\(trimmed)' to decimal")
         
         // Handle fractions
         if trimmed.contains("/") {
@@ -655,19 +682,31 @@ struct AddIngredientsToListView: View {
                let numerator = Double(parts[0]),
                let denominator = Double(parts[1]),
                denominator != 0 {
-                return numerator / denominator
+                let result = numerator / denominator
+                print("DEBUG convertToDecimal: Fraction '\(trimmed)' converted to \(result)")
+                return result
             }
         }
         
         // Handle regular decimals
-        return Double(trimmed)
+        if let result = Double(trimmed) {
+            print("DEBUG convertToDecimal: Number '\(trimmed)' converted to \(result)")
+            return result
+        }
+        
+        print("DEBUG convertToDecimal: Failed to convert '\(trimmed)' to decimal")
+        return nil
     }
     
-    // NEW: Format numbers to avoid unnecessary decimals
+    // ENHANCED: Better number formatting
     private func formatNumber(_ value: Double) -> String {
+        print("DEBUG formatNumber: Formatting number \(value)")
+        
         // If it's a whole number, display as integer
         if value == floor(value) {
-            return String(Int(value))
+            let result = String(Int(value))
+            print("DEBUG formatNumber: Formatted as integer: '\(result)'")
+            return result
         }
         
         // Check if it's a common fraction
@@ -681,6 +720,7 @@ struct AddIngredientsToListView: View {
         
         for (decimal, fraction) in commonFractions {
             if abs(value - decimal) < 0.01 {
+                print("DEBUG formatNumber: Formatted as fraction: '\(fraction)'")
                 return fraction
             }
         }
@@ -692,24 +732,30 @@ struct AddIngredientsToListView: View {
         if wholeNumber > 0 {
             for (decimal, fraction) in commonFractions {
                 if abs(decimalPart - decimal) < 0.01 {
-                    return "\(Int(wholeNumber)) \(fraction)"
+                    let result = "\(Int(wholeNumber)) \(fraction)"
+                    print("DEBUG formatNumber: Formatted as mixed number: '\(result)'")
+                    return result
                 }
             }
         }
         
         // Default to one decimal place, removing trailing zeros
         let formatted = String(format: "%.1f", value)
-        return formatted.hasSuffix(".0") ? String(Int(value)) : formatted
+        let result = formatted.hasSuffix(".0") ? String(Int(value)) : formatted
+        print("DEBUG formatNumber: Formatted as decimal: '\(result)'")
+        return result
     }
     
-    // NEW: Check if units can be merged
+    // FIXED: Improved unit compatibility checking with debugging
     private func areUnitsCompatible(_ unit1: String, _ unit2: String) -> Bool {
         let normalized1 = normalizeUnit(unit1)
         let normalized2 = normalizeUnit(unit2)
-        return normalized1 == normalized2
+        let compatible = normalized1 == normalized2
+        print("DEBUG areUnitsCompatible: '\(unit1)' -> '\(normalized1)', '\(unit2)' -> '\(normalized2)', compatible: \(compatible)")
+        return compatible
     }
     
-    // NEW: Normalize unit names for comparison
+    // FIXED: Better unit normalization including eggs and large eggs
     private func normalizeUnit(_ unit: String) -> String {
         let lowercased = unit.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -725,11 +771,14 @@ struct AddIngredientsToListView: View {
         case "liter", "liters", "l": return "l"
         case "milliliter", "milliliters", "ml": return "ml"
         case "egg", "eggs": return "egg"
+        case "large egg", "large eggs": return "egg"
+        case "medium egg", "medium eggs": return "egg"
+        case "small egg", "small eggs": return "egg"
         default: return lowercased
         }
     }
     
-    // NEW: Pluralize units based on quantity
+    // FIXED: Better pluralization including eggs
     private func pluralizeUnit(_ normalizedUnit: String, quantity: Double) -> String {
         if quantity == 1.0 {
             return normalizedUnit

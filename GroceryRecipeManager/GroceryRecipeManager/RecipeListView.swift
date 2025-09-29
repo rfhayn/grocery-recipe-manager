@@ -7,6 +7,7 @@ struct RecipeListView: View {
     
     @State private var searchText = ""
     @State private var showingAddRecipe = false
+    @State private var searchHistory: [String] = []
     
     @FetchRequest(
         entity: Recipe.entity(),
@@ -17,27 +18,167 @@ struct RecipeListView: View {
         animation: .default
     ) private var recipes: FetchedResults<Recipe>
     
+    // ENHANCED: Multi-field search with intelligent ranking - preserving existing structure
     private var filteredRecipes: [Recipe] {
         if searchText.isEmpty {
             return Array(recipes)
-        } else {
-            return recipes.filter { recipe in
-                recipe.title?.localizedCaseInsensitiveContains(searchText) == true
-            }
         }
+        
+        let searchTerms = searchText.lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .components(separatedBy: .whitespaces)
+            .filter { !$0.isEmpty }
+        
+        if searchTerms.isEmpty {
+            return Array(recipes)
+        }
+        
+        // Apply multi-field search with relevance scoring
+        return Array(recipes)
+            .compactMap { recipe in
+                let relevanceScore = calculateRelevanceScore(for: recipe, searchTerms: searchTerms)
+                return relevanceScore > 0 ? (recipe, relevanceScore) : nil
+            }
+            .sorted { first, second in
+                // Primary sort: Relevance score (higher first)
+                if first.1 != second.1 {
+                    return first.1 > second.1
+                }
+                // Secondary sort: Usage count (higher first)
+                if first.0.usageCount != second.0.usageCount {
+                    return first.0.usageCount > second.0.usageCount
+                }
+                // Tertiary sort: Alphabetical
+                return (first.0.title ?? "") < (second.0.title ?? "")
+            }
+            .map { $0.0 }
     }
     
+    // ENHANCED: Search relevance scoring algorithm
+    private func calculateRelevanceScore(for recipe: Recipe, searchTerms: [String]) -> Int {
+        var score = 0
+        let title = recipe.title?.lowercased() ?? ""
+        let instructions = recipe.instructions?.lowercased() ?? ""
+        
+        // Get ingredient names (handling Core Data relationship safely)
+        let ingredientNames = (recipe.ingredients?.allObjects as? [Ingredient])?
+            .compactMap { $0.name?.lowercased() } ?? []
+        
+        for term in searchTerms {
+            // Exact title match (highest priority): +100 points
+            if title == term {
+                score += 100
+                continue
+            }
+            
+            // Title contains term: +50 points
+            if title.contains(term) {
+                score += 50
+                continue
+            }
+            
+            // Ingredient name exact match: +30 points
+            if ingredientNames.contains(term) {
+                score += 30
+                continue
+            }
+            
+            // Ingredient name contains term: +20 points
+            if ingredientNames.contains(where: { $0.contains(term) }) {
+                score += 20
+                continue
+            }
+            
+            // Instructions contain term: +10 points
+            if instructions.contains(term) {
+                score += 10
+                continue
+            }
+            
+            // If no match found for this term, recipe doesn't match
+            return 0
+        }
+        
+        // Bonus points for highly used recipes
+        if recipe.usageCount > 5 {
+            score += 5
+        } else if recipe.usageCount > 2 {
+            score += 2
+        }
+        
+        return score
+    }
+    
+    // ENHANCED: Search result analysis for UI indicators
+    private func getMatchIndicators(for recipe: Recipe) -> [SearchMatchType] {
+        guard !searchText.isEmpty else { return [] }
+        
+        let searchTerms = searchText.lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .components(separatedBy: .whitespaces)
+            .filter { !$0.isEmpty }
+        
+        var indicators: [SearchMatchType] = []
+        let title = recipe.title?.lowercased() ?? ""
+        let instructions = recipe.instructions?.lowercased() ?? ""
+        
+        let ingredientNames = (recipe.ingredients?.allObjects as? [Ingredient])?
+            .compactMap { $0.name?.lowercased() } ?? []
+        
+        for term in searchTerms {
+            if title.contains(term) {
+                indicators.append(.title)
+            }
+            if ingredientNames.contains(where: { $0.contains(term) }) {
+                indicators.append(.ingredient)
+            }
+            if instructions.contains(term) {
+                indicators.append(.instructions)
+            }
+        }
+        
+        return Array(Set(indicators)) // Remove duplicates
+    }
+    
+    // ENHANCED: Search history management
+    private func addToSearchHistory(_ term: String) {
+        let trimmed = term.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, !searchHistory.contains(trimmed) else { return }
+        
+        searchHistory.insert(trimmed, at: 0)
+        if searchHistory.count > 8 {
+            searchHistory = Array(searchHistory.prefix(8))
+        }
+        
+        // Persist search history
+        UserDefaults.standard.set(searchHistory, forKey: "RecipeSearchHistory")
+    }
+    
+    // ENHANCED: Load search history
+    private func loadSearchHistory() {
+        searchHistory = UserDefaults.standard.stringArray(forKey: "RecipeSearchHistory") ?? []
+    }
+
     var body: some View {
         NavigationView {
             Group {
                 if filteredRecipes.isEmpty {
-                    emptyStateView
+                    enhancedEmptyStateView // ENHANCED: Improved empty state
                 } else {
                     recipeListContent
                 }
             }
             .navigationTitle("Recipes")
-            .searchable(text: $searchText, prompt: "Search recipes...")
+            .searchable(
+                text: $searchText,
+                prompt: "Search recipes, ingredients, instructions..." // ENHANCED: More descriptive prompt
+            )
+            .searchSuggestions {
+                // ENHANCED: Search suggestions when available
+                if !searchText.isEmpty && !searchHistory.isEmpty {
+                    searchSuggestionsView
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -49,58 +190,142 @@ struct RecipeListView: View {
             }
         }
         .sheet(isPresented: $showingAddRecipe) {
-            // Add recipe functionality (placeholder for Story 2.2)
+            // PRESERVED: Original placeholder text
             Text("Add Recipe functionality coming in Story 2.2")
                 .padding()
         }
+        .onAppear {
+            loadSearchHistory()
+        }
+        .onSubmit(of: .search) {
+            if !searchText.isEmpty {
+                addToSearchHistory(searchText)
+            }
+        }
     }
     
-    private var emptyStateView: some View {
+    // ENHANCED: Improved empty state with search awareness
+    private var enhancedEmptyStateView: some View {
         VStack(spacing: 20) {
-            Image(systemName: "book.closed")
+            Image(systemName: searchText.isEmpty ? "book.closed" : "magnifyingglass")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
             
             VStack(spacing: 8) {
-                Text("No Recipes Yet")
+                Text(searchText.isEmpty ? "No Recipes Yet" : "No Matches Found")
                     .font(.title2)
                     .fontWeight(.semibold)
                 
-                Text("Start building your recipe collection")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
+                if searchText.isEmpty {
+                    Text("Start building your recipe collection")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                } else {
+                    VStack(spacing: 4) {
+                        Text("No recipes found for \"\(searchText)\"")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Try searching for recipe names, ingredients, or cooking methods")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                }
             }
             
-            Button(action: {
-                createSampleRecipe()
-            }) {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Add Sample Recipe")
+            if searchText.isEmpty {
+                // PRESERVED: Original sample recipe button
+                Button(action: {
+                    createSampleRecipe()
+                }) {
+                    HStack {
+                        Image(systemName: "plus.circle.fill")
+                        Text("Add Sample Recipe")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(12)
                 }
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding()
-                .background(Color.blue)
-                .cornerRadius(12)
+            } else {
+                Button("Clear Search") {
+                    searchText = ""
+                }
+                .buttonStyle(.bordered)
             }
         }
         .padding()
     }
     
     private var recipeListContent: some View {
-        List {
-            ForEach(filteredRecipes, id: \.objectID) { recipe in
-                NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
-                    RecipeRowView(recipe: recipe, searchText: searchText)
-                }
+        VStack(spacing: 0) {
+            // ENHANCED: Search result count when searching
+            if !searchText.isEmpty {
+                searchResultHeader
             }
-            .onDelete(perform: deleteRecipes)
+            
+            List {
+                ForEach(filteredRecipes, id: \.objectID) { recipe in
+                    NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                        // ENHANCED: Pass match indicators to existing row view
+                        EnhancedRecipeRowView(
+                            recipe: recipe,
+                            searchText: searchText,
+                            matchIndicators: getMatchIndicators(for: recipe)
+                        )
+                    }
+                }
+                .onDelete(perform: deleteRecipes) // PRESERVED: Original delete functionality
+            }
+            .listStyle(PlainListStyle())
         }
-        .listStyle(PlainListStyle())
     }
     
+    // ENHANCED: Search result header with count
+    private var searchResultHeader: some View {
+        HStack {
+            Text("\(filteredRecipes.count) recipe\(filteredRecipes.count == 1 ? "" : "s") found")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            if !filteredRecipes.isEmpty {
+                Text("Sorted by relevance")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color(.systemGray6))
+    }
+    
+    // ENHANCED: Search suggestions
+    private var searchSuggestionsView: some View {
+        ForEach(searchHistory.prefix(5), id: \.self) { historyItem in
+            Button(action: {
+                searchText = historyItem
+            }) {
+                HStack {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+                    
+                    Text(historyItem)
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                }
+            }
+        }
+    }
+    
+    // PRESERVED: Original sample recipe creation function
     private func createSampleRecipe() {
         withAnimation {
             let newRecipe = Recipe(context: viewContext)
@@ -125,6 +350,7 @@ struct RecipeListView: View {
         }
     }
     
+    // PRESERVED: Original sample ingredients function
     private func addSampleIngredientsWithTemplates(to recipe: Recipe, in context: NSManagedObjectContext) {
         // Sample ingredients with realistic variety for template testing
         let ingredientTexts = [
@@ -150,9 +376,11 @@ struct RecipeListView: View {
         print("Created \(ingredientTexts.count) sample ingredients")
     }
     
+    // PRESERVED: Original delete function with same index mapping
     private func deleteRecipes(offsets: IndexSet) {
         withAnimation {
-            offsets.map { recipes[$0] }.forEach(viewContext.delete)
+            // FIXED: Map from filteredRecipes instead of recipes for proper deletion
+            offsets.map { filteredRecipes[$0] }.forEach(viewContext.delete)
             
             do {
                 try viewContext.save()
@@ -164,12 +392,13 @@ struct RecipeListView: View {
     }
 }
 
-// MARK: - Recipe Row View
-
-struct RecipeRowView: View {
+// ENHANCED: Recipe Row with search indicators while preserving original functionality
+struct EnhancedRecipeRowView: View {
     let recipe: Recipe
     var searchText: String = ""
+    let matchIndicators: [SearchMatchType]
     
+    // PRESERVED: Original computed properties
     private var formattedLastUsed: String {
         guard let lastUsed = recipe.lastUsed else {
             return "Never used"
@@ -193,6 +422,7 @@ struct RecipeRowView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            // PRESERVED: Original recipe info layout
             HStack {
                 // Recipe title
                 VStack(alignment: .leading, spacing: 4) {
@@ -217,7 +447,7 @@ struct RecipeRowView: View {
                 }
             }
             
-            // Usage tracking
+            // PRESERVED: Original usage tracking layout
             HStack {
                 Text(usageText)
                     .font(.caption)
@@ -242,13 +472,42 @@ struct RecipeRowView: View {
                         .foregroundColor(.secondary)
                 }
             }
+            
+            // ENHANCED: Search match indicators (only shown when searching)
+            if !matchIndicators.isEmpty && !searchText.isEmpty {
+                searchMatchIndicators
+            }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 4) // PRESERVED: Original padding
+    }
+    
+    // ENHANCED: Visual indicators for search matches
+    private var searchMatchIndicators: some View {
+        HStack(spacing: 8) {
+            Text("Matches:")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            
+            ForEach(matchIndicators, id: \.self) { indicator in
+                HStack(spacing: 4) {
+                    Image(systemName: indicator.iconName)
+                        .font(.caption2)
+                    Text(indicator.displayName)
+                        .font(.caption2)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 2)
+                .background(indicator.color.opacity(0.15))
+                .foregroundColor(indicator.color)
+                .cornerRadius(4)
+            }
+            
+            Spacer()
+        }
     }
 }
 
-// MARK: - Recipe Detail View with Custom Category Integration
-
+// PRESERVED: Original RecipeDetailView - completely unchanged
 struct RecipeDetailView: View {
     @ObservedObject var recipe: Recipe
     @Environment(\.managedObjectContext) private var viewContext
@@ -686,6 +945,38 @@ struct RecipeDetailView: View {
             print("Recipe marked as used successfully")
         } catch {
             print("Error marking recipe as used: \(error)")
+        }
+    }
+}
+
+// MARK: - Search Match Types
+
+enum SearchMatchType: CaseIterable, Hashable {
+    case title
+    case ingredient
+    case instructions
+    
+    var displayName: String {
+        switch self {
+        case .title: return "Name"
+        case .ingredient: return "Ingredient"
+        case .instructions: return "Instructions"
+        }
+    }
+    
+    var iconName: String {
+        switch self {
+        case .title: return "textformat"
+        case .ingredient: return "leaf"
+        case .instructions: return "list.bullet"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .title: return .blue
+        case .ingredient: return .green
+        case .instructions: return .orange
         }
     }
 }
