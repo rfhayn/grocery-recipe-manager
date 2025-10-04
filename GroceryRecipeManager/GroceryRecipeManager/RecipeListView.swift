@@ -6,7 +6,7 @@ struct RecipeListView: View {
     @StateObject private var recipeService = OptimizedRecipeDataService(context: PersistenceController.shared.container.viewContext)
     
     @State private var searchText = ""
-    @State private var showingAddRecipe = false
+    @State private var showingAddRecipe = false  // UPDATED: Changed from showingAddRecipe to match M2.3
     @State private var searchHistory: [String] = []
     
     @FetchRequest(
@@ -189,10 +189,9 @@ struct RecipeListView: View {
                 }
             }
         }
+        // UPDATED: M2.3 Integration - Show CreateRecipeView instead of placeholder
         .sheet(isPresented: $showingAddRecipe) {
-            // PRESERVED: Original placeholder text
-            Text("Add Recipe functionality coming in Story 2.2")
-                .padding()
+            CreateRecipeView(context: viewContext)
         }
         .onAppear {
             loadSearchHistory()
@@ -507,7 +506,7 @@ struct EnhancedRecipeRowView: View {
     }
 }
 
-// PRESERVED: Original RecipeDetailView - completely unchanged
+// PRESERVED: Original RecipeDetailView - with M2.3 Edit Button Integration
 struct RecipeDetailView: View {
     @ObservedObject var recipe: Recipe
     @Environment(\.managedObjectContext) private var viewContext
@@ -523,6 +522,7 @@ struct RecipeDetailView: View {
     // UI state for Add to List functionality
     @State private var showingAddToListSheet = false
     @State private var showingMarkUsedConfirmation = false
+    @State private var showingEditSheet = false  // M2.3: NEW - Edit sheet state
     
     // ADDED: Computed properties for custom category grouping
     private var groupedIngredients: [String: [Ingredient]] {
@@ -598,6 +598,10 @@ struct RecipeDetailView: View {
         .sheet(isPresented: $showingAddToListSheet) {
             AddIngredientsToListView(recipe: recipe)
                 .environment(\.managedObjectContext, viewContext)
+        }
+        // M2.3: NEW - Edit sheet presentation
+        .sheet(isPresented: $showingEditSheet) {
+            EditRecipeView(recipe: recipe, context: viewContext)
         }
         .confirmationDialog(
             "Mark Recipe as Used",
@@ -916,8 +920,9 @@ struct RecipeDetailView: View {
                 Image(systemName: "checkmark.circle")
             }
             
+            // M2.3: UPDATED - Functional Edit button
             Button(action: {
-                // Edit functionality (placeholder for Story 2.2)
+                showingEditSheet = true
             }) {
                 Image(systemName: "pencil")
             }
