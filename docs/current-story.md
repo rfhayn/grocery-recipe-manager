@@ -109,9 +109,9 @@
 
 ---
 
-## 🔢 **M3: STRUCTURED QUANTITY MANAGEMENT - READY TO START**
+## 📢 **M3: STRUCTURED QUANTITY MANAGEMENT - READY TO START**
 
-### **Goal**: Transform string-based quantities to structured data while preserving flexibility
+### **Goal**: Replace string-based quantities with structured numeric data enabling math operations
 **Timeline**: 8-12 hours  
 **Status**: ⏳ **READY FOR IMPLEMENTATION**  
 **Dependencies**: M2 Recipe Integration complete ✅
@@ -124,107 +124,147 @@
 - No nutrition calculations possible
 - No price-per-unit analysis
 
-**Solution**: Hybrid quantity system enabling mathematical operations while preserving user input flexibility
+**Solution**: Structured quantity system with numeric values + standardized units, supporting both precise measurements and imprecise descriptions
 
 ### **Implementation Plan (8-12 hours total):**
 
-#### **Phase 1: Hybrid Quantity Architecture (3-4 hours)**
+#### **Phase 1: Core Data Model Updates (60-90 minutes)**
 
-**Data Model Enhancement:**
+**Replace Ingredient string fields:**
 ```swift
-// New QuantityComponent entity
-numericValue: Double?       // 2.0, 1.5, nil
-unit: String?              // "cups", "lbs", nil  
-originalText: String       // "2 cups", "a pinch"
-isParseable: Bool          // true/false
-userNotified: Bool         // Notification acknowledgment
+// REMOVE from Ingredient entity:
+quantity: String?    // "2", "1 1/2"
+unit: String?        // "cups", "lbs"
+
+// ADD to Ingredient entity:
+numericValue: Double?   // 2.0, 1.5, nil for "a pinch"
+standardUnit: String?   // "cup", "lb" (standardized)
+displayText: String     // "2 cups", "a pinch" (user-facing)
+isParseable: Bool       // true = can scale/merge
+parseConfidence: Float  // 0.0-1.0
 ```
 
-**1.1 Core Data Model Updates (60-90 min)**
-- Create QuantityComponent entity with hybrid fields
-- Add relationships: Ingredient.quantityComponent, GroceryListItem.quantityComponent
-- Migration strategy for existing string quantities
-- Preserve all original text as fallback
+**Update GroceryListItem similarly:**
+```swift
+// REMOVE: quantity: String?
+// ADD: Same structured fields as Ingredient
+```
 
-**1.2 Quantity Parsing Service (90-120 min)**
-- Implement intelligent parsing: "2 cups" → numericValue: 2.0, unit: "cups"
-- Handle fractions: "1 1/2" → 1.5
-- Recognize common units (volume, weight, count)
-- Flag unparseable quantities: "a pinch", "to taste"
-- User notification system for calculation limitations
+**Core Data Changes:**
+- Update Ingredient and GroceryListItem entities in .xcdatamodeld
+- Generate new Core Data property files
+- Add fetch indexes for numericValue and standardUnit
 
-**1.3 Unit Management System (60 min)**
-- Predefined unit categories (Volume, Weight, Count)
-- Unit aliases: "cup"/"cups", "tbsp"/"tablespoon"
-- Unit validation preventing invalid combinations
+#### **Phase 2: Enhanced Parsing Service (90-120 minutes)**
 
-#### **Phase 2: Recipe Scaling Intelligence (2-3 hours)**
+**Extend IngredientParsingService:**
+- Keep existing regex patterns (already proven to work)
+- Add numeric conversion: "2" → 2.0, "1 1/2" → 1.5, "3/4" → 0.75
+- Add unit standardization: "cups"/"cup" → "cup", "tablespoons"/"tbsp" → "tbsp"
+- Return structured fields instead of strings
+- Flag unparseable quantities: "a pinch", "to taste" (numericValue = nil, isParseable = false)
 
-**2.1 Scaling Engine (90-120 min)**
-- Mathematical scaling for parseable quantities
-- Proportional calculation with rounding
-- Practical measurement conversion (1.33 cups → "1 1/3 cups")
+**New Methods:**
+```swift
+func convertToNumeric(_ quantity: String) -> Double?
+func standardizeUnit(_ unit: String?) -> String?
+func parseToStructured(text: String) -> StructuredQuantity
+```
 
-**2.2 Mixed Quantity Handling (60-90 min)**
-- Auto-scale parseable ingredients
-- Provide guidance for unparseable: "adjust to taste for X servings"
-- Scaling summary: "12 auto-scaled, 3 manual adjustment needed"
-- User override capability
+#### **Phase 3: Data Migration (60 minutes)**
 
-#### **Phase 3: Shopping List Consolidation (2-3 hours)**
+**One-time migration of existing data:**
+- Fetch all Ingredients and GroceryListItems with old string quantities
+- Parse each using enhanced IngredientParsingService
+- Write new structured fields
+- Migration summary: "X ingredients parsed, Y remain as text-only"
+- User review interface for validation
 
-**3.1 Intelligent Merging (90-120 min)**
-- Combine same ingredients with same units: "1 cup" + "2 cups" = "3 cups"
-- Handle mixed units gracefully: separate display
-- Unit conversion suggestions
+**Migration Service:**
+```swift
+class QuantityMigrationService {
+    func migrateAllQuantities(context: NSManagedObjectContext)
+    func getMigrationPreview() -> MigrationSummary
+    func validateMigration() -> Bool
+}
+```
 
-**3.2 Unparseable Consolidation (60 min)**
-- Group parseable quantities mathematically
-- List unparseable separately: "Plus: a pinch, to taste"
-- Consolidation preview with user approval
+#### **Phase 4: Recipe Scaling Service (90-120 minutes)**
 
-#### **Phase 4: Migration & Polish (1-2 hours)**
+**Mathematical scaling for parseable quantities:**
+```swift
+class RecipeScalingService {
+    func scale(recipe: Recipe, factor: Double) -> ScaledRecipe {
+        // For parseable: 2 cups × 1.5 = 3 cups
+        // For unparseable: keep original with note
+    }
+    
+    func formatScaled(_ value: Double, unit: String?) -> String {
+        // 1.33 cups → "1 1/3 cups"
+    }
+}
+```
 
-**4.1 Data Migration (60 min)**
-- Batch parse existing quantities
-- User review of parsing results
-- Manual correction interface
-- Progress tracking
+**Features:**
+- Scale all parseable ingredients automatically
+- Display unparseable with guidance: "a pinch (adjust to taste for X servings)"
+- Scaling summary: "12 auto-scaled, 3 require manual adjustment"
 
-**4.2 User Experience Enhancement (30-60 min)**
-- Visual indicators: parsed vs unparsed quantities
-- Non-intrusive notification system
-- Inline badges and tooltips
-- Performance optimization
+#### **Phase 5: Quantity Merge Service (90-120 minutes)**
+
+**Intelligent shopping list consolidation:**
+```swift
+class QuantityMergeService {
+    func merge(items: [GroceryListItem]) -> [MergedItem] {
+        // Group by ingredient name + unit
+        // Sum numeric values where isParseable = true
+        // List unparseable separately
+    }
+}
+```
+
+**Features:**
+- Combine same ingredients: "1 cup flour" + "2 cups flour" = "3 cups flour"
+- Handle unparseable gracefully: "Salt: 3 tsp, plus: a pinch (Recipe A)"
+- Consolidation preview before applying
+
+#### **Phase 6: UI Updates (45-60 minutes)**
+
+**Update forms and displays:**
+- Recipe creation/editing uses structured quantity input
+- Visual indicators for parseable vs unparseable quantities
+- Recipe scaling UI with serving size adjustment
+- Shopping list shows consolidated quantities
+- Inline badges for calculation limitations
 
 ### **Success Criteria:**
 - **Parsing Accuracy**: > 80% success rate for existing quantities
 - **Recipe Scaling**: Functional for all parseable ingredients
 - **Shopping Consolidation**: Intelligent merging operational
 - **Performance**: Parsing < 0.1s, scaling < 0.5s
-- **Data Preservation**: Zero loss during migration
-- **User Education**: Clear communication of limitations
+- **Migration Success**: > 95% completion rate
+- **Zero Data Loss**: All original text preserved in displayText field
 
 ### **Technical Architecture:**
 
 **Services:**
-- **QuantityParsingService**: String parsing with validation
-- **UnitConversionService**: Unit standardization
-- **RecipeScalingService**: Mathematical operations
+- **Enhanced IngredientParsingService**: String → structured conversion
+- **QuantityMigrationService**: One-time data migration
+- **RecipeScalingService**: Mathematical scaling operations
 - **QuantityMergeService**: Shopping list consolidation
-- **NotificationService**: User awareness system
+- **UnitStandardizationService**: Unit normalization and aliases
 
 **Key Design Decisions:**
-- **Hybrid Approach**: Structured data + original text preservation
-- **User Control**: Manual override capability throughout
-- **Transparent Limitations**: Clear communication about unparseable quantities
-- **Backward Compatible**: All existing data preserved
+- **Clean Replacement**: Remove old string fields, not dual storage
+- **One-Time Migration**: Parse existing data once during upgrade
+- **Structured Foundation**: Enable all future math-based features
+- **Flexible Support**: Both precise ("2 cups") and imprecise ("a pinch") quantities
 
 ### **Strategic Value:**
 - **Recipe Intelligence**: Enable scaling and portion adjustment
 - **Shopping Efficiency**: Smart quantity consolidation
 - **Analytics Foundation**: Structured data for nutrition/cost analysis (M8-M9)
-- **Competitive Advantage**: Advanced features while maintaining simplicity
+- **Competitive Advantage**: Advanced features with clean architecture
 
 ---
 
@@ -270,4 +310,4 @@ userNotified: Bool         // Notification acknowledgment
 
 ---
 
-**Current Status**: M1 and M2 successfully completed (48.5 hours total). Revolutionary grocery management with store-layout optimization and complete recipe integration operational. Ready to begin M3 Structured Quantity Management enabling recipe scaling, intelligent shopping consolidation, and analytics foundation.
+**Current Status**: M1 and M2 successfully completed (48.5 hours total). Revolutionary grocery management with store-layout optimization and complete recipe integration operational. Ready to begin M3 Structured Quantity Management with clean replacement architecture enabling recipe scaling, intelligent shopping consolidation, and analytics foundation.
