@@ -343,6 +343,7 @@ struct RecipeListView: View {
         }
     }
     
+    // M3 FIX: Updated to populate all structured quantity fields
     private func addSampleIngredientsWithTemplates(to recipe: Recipe, in context: NSManagedObjectContext) {
         // Sample ingredients with realistic variety for template testing
         let ingredientTexts = [
@@ -356,16 +357,31 @@ struct RecipeListView: View {
             "1/4 cup milk"
         ]
         
-        // Create simple ingredients without complex parsing service integration
+        // Initialize parsing service for structured quantities
+        let templateService = IngredientTemplateService(context: context)
+        let parsingService = IngredientParsingService(context: context, templateService: templateService)
+        
+        // Create ingredients with proper structured quantities
         for (index, text) in ingredientTexts.enumerated() {
+            // Parse the text to get structured data
+            let structured = parsingService.parseToStructured(text: text)
+            
+            // Create ingredient with ALL required M3 fields
             let ingredient = Ingredient(context: context)
             ingredient.id = UUID()
-            ingredient.name = text  // Store full text as name for now
+            ingredient.name = text  // Store full text as name
             ingredient.sortOrder = Int16(index)
             ingredient.recipe = recipe
+            
+            // M3: Set structured quantity fields
+            ingredient.displayText = structured.displayText
+            ingredient.numericValue = structured.numericValue ?? 0.0
+            ingredient.standardUnit = structured.standardUnit
+            ingredient.isParseable = structured.isParseable
+            ingredient.parseConfidence = structured.parseConfidence
         }
         
-        print("Created \(ingredientTexts.count) sample ingredients")
+        print("✅ Created \(ingredientTexts.count) sample ingredients with structured quantities")
     }
     
     private func deleteRecipes(offsets: IndexSet) {
@@ -489,7 +505,8 @@ struct EnhancedRecipeRowView: View {
     }
 }
 
-// RecipeDetailView
+// MARK: - M3 PHASE 4: RecipeDetailView with Scaling Integration
+
 struct RecipeDetailView: View {
     @ObservedObject var recipe: Recipe
     @Environment(\.managedObjectContext) private var viewContext
@@ -504,6 +521,18 @@ struct RecipeDetailView: View {
     @State private var showingAddToListSheet = false
     @State private var showingMarkUsedConfirmation = false
     @State private var showingEditSheet = false
+    
+    // M3 PHASE 4: Recipe Scaling State
+    @State private var showingScalingSheet = false
+    private let scalingService: RecipeScalingService
+    
+    // M3 PHASE 4: Initialize scaling service
+    init(recipe: Recipe) {
+        self.recipe = recipe
+        self.scalingService = RecipeScalingService(
+            context: PersistenceController.shared.container.viewContext
+        )
+    }
     
     private var groupedIngredients: [String: [Ingredient]] {
         guard let ingredientsSet = recipe.ingredients else { return [:] }
@@ -564,8 +593,42 @@ struct RecipeDetailView: View {
         .navigationTitle("Recipe Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                toolbarActions
+            ToolbarItem(placement: .navigationBarTrailing) {
+                // M3 PHASE 4: Enhanced toolbar with Menu
+                Menu {
+                    Button {
+                        showingMarkUsedConfirmation = true
+                    } label: {
+                        Label("Mark as Used", systemImage: "checkmark.circle")
+                    }
+                    
+                    Button {
+                        showingEditSheet = true
+                    } label: {
+                        Label("Edit Recipe", systemImage: "pencil")
+                    }
+                    
+                    Divider()
+                    
+                    // M3 PHASE 4: Scale Recipe Button
+                    Button {
+                        showingScalingSheet = true
+                    } label: {
+                        Label("Scale Recipe", systemImage: "slider.horizontal.3")
+                    }
+                    .disabled(!hasIngredients)
+                    
+                    Divider()
+                    
+                    Button {
+                        showingAddToListSheet = true
+                    } label: {
+                        Label("Add to Shopping List", systemImage: "cart.badge.plus")
+                    }
+                    .disabled(!hasIngredients)
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
             }
         }
         .sheet(isPresented: $showingAddToListSheet) {
@@ -574,6 +637,15 @@ struct RecipeDetailView: View {
         }
         .sheet(isPresented: $showingEditSheet) {
             EditRecipeView(recipe: recipe, context: viewContext)
+        }
+        // M3 PHASE 4: Recipe Scaling Sheet
+        .sheet(isPresented: $showingScalingSheet) {
+            NavigationStack {
+                RecipeScalingView(
+                    recipe: recipe,
+                    scalingService: scalingService
+                )
+            }
         }
         .confirmationDialog(
             "Mark Recipe as Used",
@@ -871,22 +943,6 @@ struct RecipeDetailView: View {
             Text(instructions)
                 .font(.body)
                 .lineSpacing(4)
-        }
-    }
-    
-    private var toolbarActions: some View {
-        HStack {
-            Button(action: {
-                showingMarkUsedConfirmation = true
-            }) {
-                Image(systemName: "checkmark.circle")
-            }
-            
-            Button(action: {
-                showingEditSheet = true
-            }) {
-                Image(systemName: "pencil")
-            }
         }
     }
     
