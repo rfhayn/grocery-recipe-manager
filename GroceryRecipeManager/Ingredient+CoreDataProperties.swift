@@ -2,11 +2,15 @@
 //  Ingredient+CoreDataProperties.swift
 //  GroceryRecipeManager
 //
-//  Updated September 12, 2025 - Step 3: IngredientTemplate Integration
+//  Created by Rich Hayn on 10/10/25.
+//
 //
 
-import Foundation
-import CoreData
+public import Foundation
+public import CoreData
+
+
+public typealias IngredientCoreDataPropertiesSet = NSSet
 
 extension Ingredient {
 
@@ -16,12 +20,16 @@ extension Ingredient {
 
     @NSManaged public var id: UUID?
     @NSManaged public var name: String?
-    @NSManaged public var quantity: String?
-    @NSManaged public var unit: String?
     @NSManaged public var notes: String?
     @NSManaged public var sortOrder: Int16
-    @NSManaged public var recipe: Recipe?                    // ← MISSING - ADDED
-    @NSManaged public var ingredientTemplate: IngredientTemplate?  // ← MISSING - ADDED
+    @NSManaged public var numericValue: Double
+    @NSManaged public var standardUnit: String?
+    @NSManaged public var displayText: String?
+    @NSManaged public var isParseable: Bool
+    @NSManaged public var parseConfidence: Float
+    @NSManaged public var ingredientTemplate: IngredientTemplate?
+    @NSManaged public var recipe: Recipe?
+
 }
 
 extension Ingredient : Identifiable {

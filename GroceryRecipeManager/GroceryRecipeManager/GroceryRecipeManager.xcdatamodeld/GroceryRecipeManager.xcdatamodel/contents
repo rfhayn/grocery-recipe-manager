@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24299" systemVersion="25A362" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="Category" representedClassName="Category" syncable="YES">
         <attribute name="color" optional="YES" attributeType="String"/>
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -33,26 +33,43 @@
     <entity name="GroceryListItem" representedClassName="GroceryListItem" syncable="YES">
         <attribute name="categoryName" optional="YES" attributeType="String"/>
         <attribute name="dateCompleted" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="displayText" attributeType="String" defaultValueString="&quot;&quot;"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isCompleted" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isFromRecipe" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isParseable" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="quantity" optional="YES" attributeType="String"/>
+        <attribute name="numericValue" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
+        <attribute name="parseConfidence" attributeType="Float" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="source" optional="YES" attributeType="String"/>
         <attribute name="sourceRecipeID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="sourceType" optional="YES" attributeType="String"/>
+        <attribute name="standardUnit" optional="YES" attributeType="String"/>
         <relationship name="weeklyList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WeeklyList" inverseName="items" inverseEntity="WeeklyList"/>
+        <fetchIndex name="byQuantityFields">
+            <fetchIndexElement property="numericValue" type="Binary" order="ascending"/>
+            <fetchIndexElement property="standardUnit" type="Binary" order="ascending"/>
+            <fetchIndexElement property="isFromRecipe" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="Ingredient" representedClassName="Ingredient" syncable="YES">
+        <attribute name="displayText" attributeType="String" defaultValueString="&quot;&quot;"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isParseable" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="notes" optional="YES" attributeType="String"/>
-        <attribute name="quantity" optional="YES" attributeType="String"/>
+        <attribute name="numericValue" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
+        <attribute name="parseConfidence" attributeType="Float" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="unit" optional="YES" attributeType="String"/>
+        <attribute name="standardUnit" optional="YES" attributeType="String"/>
         <relationship name="ingredientTemplate" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IngredientTemplate" inverseName="ingredients" inverseEntity="IngredientTemplate"/>
         <relationship name="recipe" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recipe" inverseName="ingredients" inverseEntity="Recipe"/>
+        <fetchIndex name="byQuantityFields">
+            <fetchIndexElement property="numericValue" type="Binary" order="ascending"/>
+            <fetchIndexElement property="standardUnit" type="Binary" order="ascending"/>
+            <fetchIndexElement property="isParseable" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="IngredientTemplate" representedClassName="IngredientTemplate" syncable="YES" codeGenerationType="class">
         <attribute name="category" optional="YES" attributeType="String"/>

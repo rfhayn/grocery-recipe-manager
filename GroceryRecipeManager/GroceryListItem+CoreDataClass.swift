@@ -2,12 +2,14 @@
 //  GroceryListItem+CoreDataClass.swift
 //  GroceryRecipeManager
 //
-//  Created by Rich Hayn on 8/18/25.
+//  Created by Rich Hayn on 10/10/25.
 //
 //
 
-import Foundation
-import CoreData
+public import Foundation
+public import CoreData
+
+public typealias GroceryListItemCoreDataClassSet = NSSet
 
 @objc(GroceryListItem)
 public class GroceryListItem: NSManagedObject {
