@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct SettingsView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -21,13 +22,17 @@ struct SettingsView: View {
                 
                 // Developer Tools Section
                 Section {
-                    NavigationLink(destination: QuantityMigrationView()) {
-                        Label("Quantity Migration", systemImage: "arrow.triangle.2.circlepath")
+                    NavigationLink(destination: M3DataDebugView()) {
+                        Label("Debug: Check Data", systemImage: "ant.circle")
+                    }
+                    
+                    NavigationLink(destination: MigrationDebugView(context: viewContext)) {
+                        Label("M3 Quantity Migration", systemImage: "arrow.triangle.2.circlepath")
                     }
                 } header: {
                     Text("Developer Tools")
                 } footer: {
-                    Text("Migration tools for updating ingredient quantities to the new structured format")
+                    Text("Debug tools for M3 structured quantity migration")
                 }
                 
                 // About Section
@@ -58,290 +63,143 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Quantity Migration View
-struct QuantityMigrationView: View {
+// MARK: - M3 Data Debug View (separate struct to avoid conflicts)
+struct M3DataDebugView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var migrationReport = ""
-    @State private var isLoading = false
-    @State private var showingAlert = false
-    @State private var alertMessage = ""
+    @State private var debugOutput: String = "Loading..."
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // Header
-                VStack(spacing: 8) {
-                    Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
-                        .font(.system(size: 60))
-                        .foregroundColor(.blue)
-                    
-                    Text("Quantity Migration")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("Migrate ingredients to structured quantity format")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .padding(.top)
-                
-                // Migration Status Card
-                migrationStatusCard
-                    .padding(.horizontal)
-                
-                // Action Buttons
-                VStack(spacing: 12) {
-                    Button(action: checkMigrationStatus) {
-                        Label("Check Status", systemImage: "doc.text.magnifyingglass")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(SettingsPrimaryButtonStyle())
-                    .disabled(isLoading)
-                    
-                    Button(action: validateMigration) {
-                        Label("Validate Migration", systemImage: "checkmark.shield")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(SettingsSecondaryButtonStyle())
-                    .disabled(isLoading)
-                    
-                    #if DEBUG
-                    Divider()
-                        .padding(.vertical, 8)
-                    
-                    Text("Debug Actions")
-                        .font(.headline)
-                        .foregroundColor(.orange)
-                    
-                    Button(action: resetMigration) {
-                        Label("Reset Migration", systemImage: "arrow.counterclockwise")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(SettingsDebugButtonStyle(color: .orange))
-                    .disabled(isLoading)
-                    
-                    Button(action: forceMigration) {
-                        Label("Force Execute", systemImage: "bolt.fill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(SettingsDebugButtonStyle(color: .green))
-                    .disabled(isLoading)
-                    #endif
-                }
-                .padding(.horizontal)
-                
-                // Loading Indicator
-                if isLoading {
-                    ProgressView("Processing...")
-                        .scaleEffect(1.2)
-                        .padding()
-                }
-                
-                // Migration Report
-                if !migrationReport.isEmpty {
-                    migrationReportView
-                        .padding(.horizontal)
-                }
-            }
-            .padding(.bottom)
-        }
-        .navigationTitle("Quantity Migration")
-        .navigationBarTitleDisplayMode(.inline)
-        .alert("Migration Action", isPresented: $showingAlert) {
-            Button("OK") { }
-        } message: {
-            Text(alertMessage)
-        }
-        .onAppear {
-            checkMigrationStatus()
-        }
-    }
-    
-    // MARK: - UI Components
-    
-    private var migrationStatusCard: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Image(systemName: IngredientTemplate.isMigrationCompleted ? "checkmark.circle.fill" : "clock.circle")
-                    .foregroundColor(IngredientTemplate.isMigrationCompleted ? .green : .orange)
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Data Debug Report")
                     .font(.title2)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 8)
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(IngredientTemplate.isMigrationCompleted ? "Migration Complete" : "Migration Pending")
-                        .font(.headline)
-                    
-                    if let date = IngredientTemplate.migrationDate {
-                        Text("Completed: \(date, style: .date)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                Text(debugOutput)
+                    .font(.system(.caption, design: .monospaced))
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                
+                Button(action: checkData) {
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Refresh Data Check")
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
                 }
                 
-                Spacer()
+                // Copy button
+                Button(action: copyToClipboard) {
+                    HStack {
+                        Image(systemName: "doc.on.doc")
+                        Text("Copy Report")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        }
+        .navigationTitle("Data Debug")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            checkData()
         }
     }
     
-    private var migrationReportView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Migration Report")
-                    .font(.headline)
-                Spacer()
-                Button("Copy") {
-                    UIPasteboard.general.string = migrationReport
-                    alertMessage = "Report copied to clipboard"
-                    showingAlert = true
+    private func checkData() {
+        var output = "🔍 ACTUAL DATA CHECK\n"
+        output += String(repeating: "=", count: 50) + "\n\n"
+        
+        // Check Ingredients
+        let ingredientRequest: NSFetchRequest<Ingredient> = Ingredient.fetchRequest()
+        ingredientRequest.fetchLimit = 5
+        
+        do {
+            let ingredients = try viewContext.fetch(ingredientRequest)
+            let totalCount = try viewContext.count(for: Ingredient.fetchRequest())
+            output += "📊 INGREDIENTS (showing 5 of \(totalCount))\n"
+            output += String(repeating: "-", count: 50) + "\n\n"
+            
+            if ingredients.isEmpty {
+                output += "⚠️ No ingredients found!\n\n"
+            }
+            
+            for (index, ingredient) in ingredients.enumerated() {
+                output += "[\(index + 1)] Ingredient:\n"
+                output += "  ID: \(ingredient.id?.uuidString.prefix(8) ?? "nil")\n"
+                output += "  name: '\(ingredient.name ?? "nil")'\n"
+                output += "  displayText: '\(ingredient.displayText ?? "nil")'\n"
+                output += "  numericValue: \(ingredient.numericValue)\n"
+                output += "  standardUnit: '\(ingredient.standardUnit ?? "nil")'\n"
+                output += "  isParseable: \(ingredient.isParseable)\n"
+                output += "  parseConfidence: \(ingredient.parseConfidence)\n"
+                
+                if let recipe = ingredient.recipe {
+                    output += "  recipe: '\(recipe.title ?? "nil")'\n"
                 }
-                .font(.caption)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(6)
-            }
-            .padding(.bottom, 4)
-            
-            Text(migrationReport)
-                .font(.system(.body, design: .monospaced))
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-        }
-    }
-    
-    // MARK: - Actions
-    
-    private func checkMigrationStatus() {
-        isLoading = true
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            #if DEBUG
-            let report = PersistenceController.shared.getMigrationStatusReport()
-            #else
-            let validation = IngredientTemplate.validateMigration(in: viewContext)
-            let report = validation.report
-            #endif
-            
-            DispatchQueue.main.async {
-                self.migrationReport = report
-                self.isLoading = false
-            }
-        }
-    }
-    
-    private func validateMigration() {
-        isLoading = true
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            let validation = IngredientTemplate.validateMigration(in: self.viewContext)
-            
-            DispatchQueue.main.async {
-                self.migrationReport = validation.report
-                self.isLoading = false
                 
-                self.alertMessage = validation.success ?
-                    "Migration validation passed successfully!" :
-                    "Migration validation failed. Check the report for details."
-                self.showingAlert = true
+                output += "\n"
             }
+        } catch {
+            output += "❌ Error fetching ingredients: \(error)\n\n"
         }
-    }
-    
-    #if DEBUG
-    private func resetMigration() {
-        isLoading = true
         
-        DispatchQueue.global(qos: .userInitiated).async {
-            PersistenceController.shared.resetMigrationForTesting()
-            
-            DispatchQueue.main.async {
-                self.isLoading = false
-                self.migrationReport = "Migration status reset successfully.\n\nRestart the app to trigger fresh migration."
-                self.alertMessage = "Migration status reset. Restart app to see effects."
-                self.showingAlert = true
-            }
-        }
-    }
-    
-    private func forceMigration() {
-        isLoading = true
+        // Check GroceryListItems
+        let itemRequest: NSFetchRequest<GroceryListItem> = GroceryListItem.fetchRequest()
+        itemRequest.fetchLimit = 5
         
-        DispatchQueue.global(qos: .userInitiated).async {
-            PersistenceController.shared.resetMigrationForTesting()
+        do {
+            let items = try viewContext.fetch(itemRequest)
+            let totalCount = try viewContext.count(for: GroceryListItem.fetchRequest())
+            output += "📊 GROCERY LIST ITEMS (showing 5 of \(totalCount))\n"
+            output += String(repeating: "-", count: 50) + "\n\n"
             
-            let container = PersistenceController.shared.container
-            container.performBackgroundTask { backgroundContext in
-                print("Force executing migration...")
-                IngredientTemplate.migrateStaplesFromGroceryItems(in: backgroundContext)
-                
-                let validation = IngredientTemplate.validateMigration(in: backgroundContext)
-                
-                DispatchQueue.main.async {
-                    self.migrationReport = validation.report
-                    self.isLoading = false
-                    
-                    self.alertMessage = validation.success ?
-                        "Forced migration completed successfully!" :
-                        "Forced migration failed. Check the report."
-                    self.showingAlert = true
-                }
+            if items.isEmpty {
+                output += "⚠️ No grocery items found!\n\n"
             }
+            
+            for (index, item) in items.enumerated() {
+                output += "[\(index + 1)] GroceryListItem:\n"
+                output += "  ID: \(item.id?.uuidString.prefix(8) ?? "nil")\n"
+                output += "  name: '\(item.name ?? "nil")'\n"
+                output += "  displayText: '\(item.displayText ?? "nil")'\n"
+                output += "  numericValue: \(item.numericValue)\n"
+                output += "  standardUnit: '\(item.standardUnit ?? "nil")'\n"
+                output += "  isParseable: \(item.isParseable)\n"
+                output += "  parseConfidence: \(item.parseConfidence)\n"
+                output += "  isCompleted: \(item.isCompleted)\n"
+                output += "\n"
+            }
+        } catch {
+            output += "❌ Error fetching items: \(error)\n\n"
         }
+        
+        // Summary
+        output += String(repeating: "=", count: 50) + "\n"
+        output += "🎯 WHAT TO LOOK FOR:\n"
+        output += String(repeating: "-", count: 50) + "\n"
+        output += "✅ name should have quantity text\n"
+        output += "   e.g., '2 cups flour'\n"
+        output += "✅ displayText can be nil (will be populated)\n"
+        output += "✅ numericValue should be 0.0 before migration\n"
+        output += "✅ isParseable should be false before migration\n"
+        
+        debugOutput = output
     }
-    #endif
-}
-
-// MARK: - Button Styles (with Settings prefix to avoid conflicts)
-
-struct SettingsPrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline)
-            .foregroundColor(.white)
-            .padding(.vertical, 12)
-            .background(configuration.isPressed ? Color.blue.opacity(0.8) : Color.blue)
-            .cornerRadius(10)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
-    }
-}
-
-struct SettingsSecondaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline)
-            .foregroundColor(.blue)
-            .padding(.vertical, 12)
-            .background(configuration.isPressed ? Color(.systemGray5) : Color(.systemGray6))
-            .cornerRadius(10)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
-    }
-}
-
-struct SettingsDebugButtonStyle: ButtonStyle {
-    let color: Color
     
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.subheadline)
-            .foregroundColor(color)
-            .padding(.vertical, 10)
-            .background(configuration.isPressed ? color.opacity(0.1) : Color.clear)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(color, lineWidth: 1)
-            )
-            .cornerRadius(8)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    private func copyToClipboard() {
+        UIPasteboard.general.string = debugOutput
     }
 }
 

@@ -1,396 +1,500 @@
-# M3: Structured Quantity Management Development Prompt
+# M3 Phase 4: Recipe Scaling Service - Development Prompt
 
-**Copy and paste this prompt when ready to continue M3 implementation:**
+**Copy and paste this prompt when ready to continue M3 Phase 4:**
 
 ---
 
-I'm ready to continue **M3: Structured Quantity Management** for my Grocery & Recipe Manager iOS app.
+I'm ready to continue **M3 Phase 4: Recipe Scaling Service** for my Grocery & Recipe Manager iOS app.
 
-## Current Status - M2 COMPLETE:
-- **M1**: Professional Grocery Management successfully implemented (32 hours, Aug 2025)
-- **M2.1**: Recipe Architecture Services successfully implemented (1 hour, Sep 7, 2025)
-- **M2.2**: Recipe Catalog with 7 tasks successfully completed (10.5 hours, Sep 7-28, 2025)
-- **M2.3**: Recipe Creation & Editing successfully completed (5 hours, Oct 4, 2025)
+## Current Status - M3 Phase 1-3 COMPLETE:
 
-### **M2.3 Achievement Summary - COMPLETE:**
+### **M1-M2: Foundation Complete** ✅
+- **M1**: Professional Grocery Management (32 hours, Aug 2025) - Complete
+- **M2**: Recipe Integration (16.5 hours, Sep-Oct 2025) - Complete
 
-**Recipe Creation & Editing Success:**
-- **Parse-Then-Autocomplete**: Intelligent ingredient matching with fuzzy search operational
-- **Template Alignment**: 100% ingredient-to-template linking with READ-ONLY pattern enforced
-- **Category Assignment**: Batch category assignment modal integration working
-- **Core Data Transactions**: Proper save order (Templates → Ingredients → Recipe) validated
-- **Unsaved Changes Protection**: Comprehensive discard confirmation implemented
-- **Create and Edit Workflows**: Full recipe lifecycle management operational
-- **Form Validation**: Complete validation preventing data integrity issues
-- **Professional UI**: Time pickers, autocomplete dropdowns, native iOS patterns
+### **M3 Phase 1-2: Structured Quantity Foundation** ✅
+**Completion Date**: October 10, 2025  
+**Time**: 3 hours
 
-**Technical Achievements:**
-- **IngredientAutocompleteService**: Multi-pass search with fuzzy matching < 0.1s
-- **RecipeFormData**: Comprehensive form state management with validation
-- **CreateRecipeView**: Full-featured recipe creation with all requirements
-- **EditRecipeView**: Recipe editing preserving data integrity
-- **Transaction Management**: Single-save pattern with rollback on error
+**Achievements:**
+- **Structured Data Model**: Replaced string fields with numericValue, standardUnit, displayText, isParseable, parseConfidence
+- **Enhanced IngredientParsingService**: Numeric conversion, unit standardization, fraction handling operational
+- **10 Files Updated**: Systematic update across Ingredient, GroceryListItem, all views and services
+- **Zero Build Errors**: Clean replacement architecture with type safety
+- **Performance**: Sub-0.1s response times maintained
 
-**Performance**: All operations maintaining sub-0.5s response times with proper Core Data management
-**Recipe Management Complete**: Full create/read/update/delete lifecycle operational
-**User Experience**: Professional forms with native iOS patterns and accessibility
+### **M3 Phase 3: Data Migration** ✅
+**Completion Date**: October 11, 2025  
+**Time**: 1.5 hours
 
-## M3: STRUCTURED QUANTITY MANAGEMENT (8-12 hours)
+**Achievements:**
+- **QuantityMigrationService**: Batch processing with async/await patterns
+- **Professional Migration UI**: Preview → Migration → Results flow
+- **Settings Infrastructure**: Settings tab created and operational
+- **100% Success Rate**: 32 items processed - 24 parsed (75%), 8 text-only (25%)
+- **Migration Complete**: All existing data successfully migrated to structured format
+
+**Migration Results:**
+```
+✅ Successfully Parsed: 24 items with quantities
+   "2 cups all-purpose flour" → 2.0 cup
+   "1.5 lb ground beef" → 1.5 lb
+   "3/4 teaspoon salt" → 0.75 tsp
+
+📝 Text-Only (Correct): 8 staple items without quantities
+   "Apples", "Milk 2%", "Bananas" (correctly preserved)
+```
+
+---
+
+## M3 Phase 4: Recipe Scaling Service (2-3 hours)
 
 ### **Goal:**
-Replace string-based quantity storage with structured numeric + unit fields, enabling recipe scaling, intelligent shopping consolidation, and analytics foundation with clean architecture.
+Build mathematical recipe scaling service enabling users to scale recipes up or down for different serving sizes, with graceful handling of both parseable and unparseable quantities.
 
-### **Problem Statement:**
-**Current State**: All quantities stored as separate string fields
-- `Ingredient.quantity: String?` // "2", "1 1/2"
-- `Ingredient.unit: String?` // "cups", "lbs"
-- `GroceryListItem.quantity: String?` // "3", "a pinch"
+### **Current Foundation:**
+- ✅ Structured quantity data model operational
+- ✅ numericValue, standardUnit, isParseable fields populated
+- ✅ IngredientParsingService with unit standardization ready
+- ✅ All recipes and ingredients have structured quantities
 
-**Limitations**:
-- No mathematical operations: Cannot scale recipes or combine quantities
-- No unit conversions or standardization
-- Nutritional tracking and spending analysis impossible with string data
-- No quantity-based intelligence features
+### **Phase 4 Implementation Plan:**
 
-**User Value Gap**: Users cannot scale recipes for different servings, shopping lists don't combine duplicate ingredients intelligently, and no foundation exists for nutrition or budget tracking
+#### **Step 1: RecipeScalingService (60-90 minutes)**
 
-### **Solution Overview:**
-Direct replacement of string quantity fields with structured data model, enabling mathematical operations while supporting both precise measurements ("2 cups") and imprecise descriptions ("a pinch").
-
-### **Implementation Plan (8-12 hours total):**
-
-#### **Phase 1: Core Data Model Updates (60-90 minutes)**
-
-**Update Ingredient Entity:**
+**Create New Service:**
 ```swift
-// REMOVE these fields:
-quantity: String?    // "2", "1 1/2" 
-unit: String?        // "cups", "lbs"
+// Services/RecipeScalingService.swift
 
-// ADD these fields:
-numericValue: Double?     // 2.0, 1.5, nil for "a pinch"
-standardUnit: String?     // "cup", "lb", "tsp" (standardized)
-displayText: String       // "2 cups", "a pinch" (user-facing display)
-isParseable: Bool         // true = can scale/merge, false = text only
-parseConfidence: Float    // 0.0-1.0 (for future ML improvements)
-```
+import Foundation
+import CoreData
 
-**Update GroceryListItem Entity:**
-```swift
-// REMOVE:
-quantity: String?
-
-// ADD: Same structured fields as Ingredient
-numericValue: Double?
-standardUnit: String?
-displayText: String
-isParseable: Bool
-parseConfidence: Float
-```
-
-**Core Data Tasks:**
-- Open GroceryRecipeManager.xcdatamodeld in Xcode
-- Update Ingredient entity: remove quantity/unit, add new fields
-- Update GroceryListItem entity: remove quantity, add new fields
-- Add fetch indexes for numericValue and standardUnit for performance
-- Generate new NSManagedObject subclasses
-- Verify build succeeds with new schema
-
-#### **Phase 2: Enhanced Parsing Service (90-120 minutes)**
-
-**Extend Existing IngredientParsingService:**
-
-Current service already parses text into components. Enhance it to return structured data:
-
-```swift
-struct StructuredQuantity {
-    let numericValue: Double?      // 2.0, 1.5, nil
-    let standardUnit: String?      // "cup", "lb", nil
-    let displayText: String        // "2 cups", "a pinch"
-    let isParseable: Bool          // can this be used in math?
-    let parseConfidence: Float     // 0.0-1.0
-}
-
-// NEW methods to add:
-func convertToNumeric(_ quantity: String) -> Double? {
-    // "2" → 2.0
-    // "1 1/2" → 1.5  
-    // "3/4" → 0.75
-    // "a pinch" → nil
-}
-
-func standardizeUnit(_ unit: String?) -> String? {
-    // "cups" → "cup"
-    // "tablespoons"/"tbsp"/"T" → "tbsp"
-    // "pounds"/"lbs" → "lb"
-}
-
-func parseToStructured(text: String) -> StructuredQuantity {
-    // Use existing regex patterns
-    // Convert quantity string to numeric
-    // Standardize unit
-    // Determine if parseable
-    // Return structured result
-}
-```
-
-**Unit Standardization Map:**
-- Volume: cup/cups → "cup", tablespoon/tbsp/T → "tbsp", teaspoon/tsp/t → "tsp"
-- Weight: pound/pounds/lb/lbs → "lb", ounce/ounces/oz → "oz"
-- Metric: milliliter/ml → "ml", liter/l → "l", gram/g → "g", kilogram/kg → "kg"
-
-#### **Phase 3: Data Migration Service (60 minutes)**
-
-**One-Time Migration of Existing Data:**
-
-```swift
-class QuantityMigrationService {
-    private let context: NSManagedObjectContext
-    private let parsingService: IngredientParsingService
-    
-    func migrateAllQuantities() {
-        // 1. Fetch all Ingredients
-        let ingredients = fetchAllIngredients()
-        
-        for ingredient in ingredients {
-            // 2. Parse old quantity + unit strings
-            let oldText = "\(ingredient.quantity ?? "") \(ingredient.unit ?? "")"
-            let structured = parsingService.parseToStructured(text: oldText)
-            
-            // 3. Write new structured fields
-            ingredient.numericValue = structured.numericValue
-            ingredient.standardUnit = structured.standardUnit
-            ingredient.displayText = structured.displayText
-            ingredient.isParseable = structured.isParseable
-            ingredient.parseConfidence = structured.parseConfidence
-        }
-        
-        // 4. Repeat for GroceryListItems
-        // 5. Save context
-        try? context.save()
-    }
-    
-    func getMigrationPreview() -> MigrationSummary {
-        // Show: X parseable, Y unparseable
-        // User can review before committing
-    }
-}
-```
-
-**Migration UI:**
-- Show preview: "85% quantities parsed successfully"
-- List unparseable quantities for user review
-- Allow manual corrections if needed
-- One-time operation on first launch after update
-
-#### **Phase 4: Recipe Scaling Service (90-120 minutes)**
-
-**New Service for Mathematical Scaling:**
-
-```swift
 class RecipeScalingService {
-    func scale(recipe: Recipe, factor: Double) -> ScaledRecipe {
+    private let context: NSManagedObjectContext
+    
+    init(context: NSManagedObjectContext) {
+        self.context = context
+    }
+    
+    // Main scaling function
+    func scale(recipe: Recipe, scaleFactor: Double) -> ScaledRecipe {
         var scaledIngredients: [ScaledIngredient] = []
+        var autoScaledCount = 0
+        var manualAdjustCount = 0
         
         for ingredient in recipe.ingredientsArray {
             if ingredient.isParseable, let value = ingredient.numericValue {
-                // Scale parseable quantities
-                let scaled = value * factor
-                let newDisplay = formatScaled(scaled, unit: ingredient.standardUnit)
+                // Scale parseable quantities mathematically
+                let scaledValue = value * scaleFactor
+                let displayText = formatScaled(
+                    value: scaledValue,
+                    unit: ingredient.standardUnit
+                )
+                
                 scaledIngredients.append(ScaledIngredient(
-                    name: ingredient.name,
-                    displayText: newDisplay,
-                    wasScaled: true
+                    name: ingredient.name ?? "Unknown",
+                    displayText: displayText,
+                    wasScaled: true,
+                    originalText: ingredient.displayText
                 ))
+                autoScaledCount += 1
             } else {
-                // Keep unparseable with note
+                // Keep unparseable with helpful note
+                let adjustmentNote = "adjust to taste for \(formatServings(recipe.servings, scaleFactor)) servings"
+                
                 scaledIngredients.append(ScaledIngredient(
-                    name: ingredient.name,
-                    displayText: "\(ingredient.displayText) (adjust to taste for \(Int(factor))x servings)",
-                    wasScaled: false
+                    name: ingredient.name ?? "Unknown",
+                    displayText: "\(ingredient.displayText) (\(adjustmentNote))",
+                    wasScaled: false,
+                    originalText: ingredient.displayText
                 ))
+                manualAdjustCount += 1
             }
         }
         
         return ScaledRecipe(
-            title: recipe.title,
-            servings: Int(Double(recipe.servings) * factor),
-            ingredients: scaledIngredients
+            originalRecipe: recipe,
+            scaleFactor: scaleFactor,
+            scaledServings: Int(Double(recipe.servings) * scaleFactor),
+            scaledIngredients: scaledIngredients,
+            autoScaledCount: autoScaledCount,
+            manualAdjustCount: manualAdjustCount
         )
     }
     
-    func formatScaled(_ value: Double, unit: String?) -> String {
-        // 1.33 cups → "1 1/3 cups"
-        // 2.5 lbs → "2 1/2 lbs"
-        // Smart fractional display
+    // Format scaled values with kitchen-friendly fractions
+    private func formatScaled(value: Double, unit: String?) -> String {
+        let fractionString = formatToFraction(value)
+        
+        if let unit = unit, !unit.isEmpty {
+            return "\(fractionString) \(unit)"
+        } else {
+            return fractionString
+        }
     }
-}
-```
-
-**Scaling UI:**
-- Recipe detail view: "Scale Recipe" button
-- Slider or stepper for serving size adjustment
-- Preview scaled quantities before applying
-- Summary: "12 ingredients auto-scaled, 3 require manual adjustment"
-
-#### **Phase 5: Quantity Merge Service (90-120 minutes)**
-
-**Shopping List Consolidation:**
-
-```swift
-class QuantityMergeService {
-    func merge(items: [GroceryListItem]) -> [MergedItem] {
-        // 1. Group by ingredient name (using IngredientTemplate if available)
-        let grouped = Dictionary(grouping: items) { $0.ingredientTemplate?.name ?? $0.name }
+    
+    // Convert decimal to fraction for kitchen-friendly display
+    private func formatToFraction(_ value: Double) -> String {
+        let whole = Int(value)
+        let fractional = value - Double(whole)
         
-        var merged: [MergedItem] = []
+        // Common fractions with tolerance
+        let fractions: [(value: Double, display: String)] = [
+            (0.125, "1/8"), (0.166, "1/6"), (0.25, "1/4"),
+            (0.333, "1/3"), (0.375, "3/8"), (0.5, "1/2"),
+            (0.625, "5/8"), (0.666, "2/3"), (0.75, "3/4"),
+            (0.833, "5/6"), (0.875, "7/8")
+        ]
         
-        for (ingredientName, itemGroup) in grouped {
-            // 2. Separate parseable from unparseable
-            let parseable = itemGroup.filter { $0.isParseable }
-            let unparseable = itemGroup.filter { !$0.isParseable }
-            
-            // 3. Group parseable by unit
-            let byUnit = Dictionary(grouping: parseable) { $0.standardUnit }
-            
-            for (unit, sameUnitItems) in byUnit {
-                // 4. Sum numeric values
-                let total = sameUnitItems.reduce(0.0) { sum, item in
-                    sum + (item.numericValue ?? 0.0)
+        let tolerance = 0.05
+        
+        // Find matching fraction
+        for (fValue, fDisplay) in fractions {
+            if abs(fractional - fValue) < tolerance {
+                if whole > 0 {
+                    return "\(whole) \(fDisplay)"
+                } else {
+                    return fDisplay
                 }
-                
-                merged.append(MergedItem(
-                    name: ingredientName,
-                    displayText: formatQuantity(total, unit: unit),
-                    sources: sameUnitItems.map { $0.source }
-                ))
-            }
-            
-            // 5. List unparseable separately
-            if !unparseable.isEmpty {
-                merged.append(MergedItem(
-                    name: ingredientName,
-                    displayText: "Plus: \(unparseable.map { $0.displayText }.joined(separator: ", "))",
-                    sources: unparseable.map { $0.source }
-                ))
             }
         }
         
-        return merged
+        // No close fraction match, use decimal
+        if whole > 0 {
+            return String(format: "%.1f", value)
+        } else {
+            return String(format: "%.2f", value)
+        }
+    }
+    
+    private func formatServings(_ servings: Int16, _ factor: Double) -> String {
+        let scaled = Int(Double(servings) * factor)
+        return "\(scaled)"
+    }
+}
+
+// Data structures for scaled recipe
+struct ScaledRecipe {
+    let originalRecipe: Recipe
+    let scaleFactor: Double
+    let scaledServings: Int
+    let scaledIngredients: [ScaledIngredient]
+    let autoScaledCount: Int
+    let manualAdjustCount: Int
+    
+    var summary: String {
+        if manualAdjustCount == 0 {
+            return "All \(autoScaledCount) ingredients auto-scaled"
+        } else {
+            return "\(autoScaledCount) ingredients auto-scaled, \(manualAdjustCount) require manual adjustment"
+        }
+    }
+}
+
+struct ScaledIngredient: Identifiable {
+    let id = UUID()
+    let name: String
+    let displayText: String
+    let wasScaled: Bool
+    let originalText: String
+}
+```
+
+#### **Step 2: Recipe Scaling UI (45-60 minutes)**
+
+**Add to RecipeDetailView:**
+```swift
+// Add these state variables near other @State properties
+@State private var showScalingSheet = false
+@State private var scaleFactor: Double = 1.0
+@State private var scaledRecipe: ScaledRecipe?
+
+// Add scaling service
+private let scalingService: RecipeScalingService
+
+// Initialize service in init
+init(recipe: Recipe) {
+    self.recipe = recipe
+    self.scalingService = RecipeScalingService(
+        context: PersistenceController.shared.container.viewContext
+    )
+}
+
+// Add "Scale Recipe" button to toolbar
+.toolbar {
+    ToolbarItem(placement: .navigationBarTrailing) {
+        Menu {
+            // ... existing menu items ...
+            
+            Divider()
+            
+            Button {
+                showScalingSheet = true
+                scaleFactor = 1.0
+            } label: {
+                Label("Scale Recipe", systemImage: "slider.horizontal.3")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+        }
+    }
+}
+
+// Add scaling sheet
+.sheet(isPresented: $showScalingSheet) {
+    NavigationStack {
+        RecipeScalingView(
+            recipe: recipe,
+            scalingService: scalingService
+        )
     }
 }
 ```
 
-**Consolidation UI:**
-- "Consolidate" button on shopping list
-- Preview merged quantities
-- Show source breakdown: "Flour: 3 cups (Recipe A: 1 cup, Recipe B: 2 cups)"
-- User approval before applying changes
-
-#### **Phase 6: UI Updates (45-60 minutes)**
-
-**Update Recipe Forms:**
-- CreateRecipeView: Use structured quantity input
-- EditRecipeView: Display and edit structured quantities
-- Visual indicators: ✓ for parseable, ⓘ for unparseable quantities
-
-**Update Recipe Display:**
-- RecipeDetailView: Show displayText for quantities
-- Add "Scale Recipe" button and UI
-- Show scaling preview
-
-**Update Shopping Lists:**
-- Display consolidated quantities
-- Show source tracking
-- "Consolidate" feature with preview
-
-**Visual Design:**
-- Parseable quantities: calculator icon
-- Unparseable quantities: text icon with tooltip
-- Inline help for calculation limitations
-
-### **Technical Implementation Requirements:**
-
-**Core Data Schema Changes:**
+**Create RecipeScalingView:**
 ```swift
-// Ingredient entity
-@NSManaged public var numericValue: Double  // 0.0 for unparseable
-@NSManaged public var standardUnit: String?
-@NSManaged public var displayText: String
-@NSManaged public var isParseable: Bool
-@NSManaged public var parseConfidence: Float
+// Views/Recipe/RecipeScalingView.swift
 
-// GroceryListItem entity (same structure)
+import SwiftUI
+
+struct RecipeScalingView: View {
+    @Environment(\.dismiss) var dismiss
+    let recipe: Recipe
+    let scalingService: RecipeScalingService
+    
+    @State private var scaleFactor: Double = 1.0
+    @State private var scaledRecipe: ScaledRecipe?
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with current servings
+            VStack(spacing: 12) {
+                Text("Scale Recipe")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                HStack(spacing: 16) {
+                    VStack {
+                        Text("Original")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("\(recipe.servings)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        Text("servings")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Image(systemName: "arrow.right")
+                        .foregroundColor(.secondary)
+                    
+                    VStack {
+                        Text("Scaled")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("\(scaledServings)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.accentColor)
+                        Text("servings")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            
+            // Scale factor slider
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Scale Factor: \(scaleFactor, specifier: "%.2f")x")
+                    .font(.headline)
+                
+                Slider(value: $scaleFactor, in: 0.25...4.0, step: 0.25)
+                    .onChange(of: scaleFactor) { _, _ in
+                        updateScaledRecipe()
+                    }
+                
+                HStack {
+                    Text("0.25x")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("1x")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("4x")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding()
+            
+            // Quick scale buttons
+            HStack(spacing: 12) {
+                ForEach([0.5, 1.0, 1.5, 2.0], id: \.self) { factor in
+                    Button {
+                        scaleFactor = factor
+                    } label: {
+                        Text("\(factor, specifier: "%.1f")x")
+                            .font(.subheadline)
+                            .fontWeight(scaleFactor == factor ? .semibold : .regular)
+                            .foregroundColor(scaleFactor == factor ? .white : .accentColor)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(scaleFactor == factor ? Color.accentColor : Color.clear)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.accentColor, lineWidth: 1)
+                            )
+                    }
+                }
+            }
+            .padding(.horizontal)
+            
+            Divider()
+                .padding(.vertical)
+            
+            // Scaled ingredients preview
+            if let scaled = scaledRecipe {
+                List {
+                    Section {
+                        Text(scaled.summary)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Section("Scaled Ingredients") {
+                        ForEach(scaled.scaledIngredients) { ingredient in
+                            HStack(alignment: .top, spacing: 12) {
+                                Image(systemName: ingredient.wasScaled ? "checkmark.circle.fill" : "info.circle")
+                                    .foregroundColor(ingredient.wasScaled ? .green : .orange)
+                                    .font(.title3)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(ingredient.name)
+                                        .font(.body)
+                                    
+                                    Text(ingredient.displayText)
+                                        .font(.subheadline)
+                                        .foregroundColor(ingredient.wasScaled ? .primary : .secondary)
+                                    
+                                    if !ingredient.wasScaled {
+                                        Text("Original: \(ingredient.originalText)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
+            }
+            
+            Spacer()
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Done") {
+                    // For Phase 4, just dismiss
+                    // In future, could save scaled version
+                    dismiss()
+                }
+                .fontWeight(.semibold)
+            }
+        }
+        .onAppear {
+            updateScaledRecipe()
+        }
+    }
+    
+    private var scaledServings: Int {
+        Int(Double(recipe.servings) * scaleFactor)
+    }
+    
+    private func updateScaledRecipe() {
+        scaledRecipe = scalingService.scale(recipe: recipe, scaleFactor: scaleFactor)
+    }
+}
 ```
 
-**Service Architecture:**
-```swift
-// Enhanced existing service
-IngredientParsingService: Add numeric conversion and unit standardization
+#### **Step 3: Testing & Validation (15-30 minutes)**
 
-// New services
-QuantityMigrationService: One-time data migration
-RecipeScalingService: Mathematical scaling operations
-QuantityMergeService: Shopping list consolidation
-```
+**Test Scenarios:**
+1. **Scale Up (2x)**:
+   - "2 cups flour" → "4 cups flour"
+   - "1.5 lb beef" → "3 lbs beef"
+   - "Salt to taste" → "Salt to taste (adjust for 8 servings)"
 
-**Migration Strategy:**
-1. Add new fields to Core Data model
-2. Generate new property files
-3. Implement enhanced parsing service
-4. Build migration service
-5. Run one-time migration on app launch
-6. Update all UI to use new fields
+2. **Scale Down (0.5x)**:
+   - "4 cups water" → "2 cups water"
+   - "2 tablespoons oil" → "1 tablespoon oil"
+
+3. **Fractional Scaling (1.5x)**:
+   - "2 cups flour" → "3 cups flour"
+   - "1 cup milk" → "1 1/2 cups milk"
+   - "2/3 cup sugar" → "1 cup sugar"
+
+4. **Edge Cases**:
+   - Very small quantities (0.25x)
+   - Large scaling (3x, 4x)
+   - Mixed parseable/unparseable ingredients
+
+**Performance Validation:**
+- Scaling operation < 0.5s for 20+ ingredient recipes
+- UI responsive during calculations
+- Fraction formatting displays correctly
 
 ### **Success Criteria:**
-- **Parsing Accuracy**: > 80% success rate for existing quantity strings
-- **Recipe Scaling**: Functional scaling for all parseable ingredients
-- **Shopping Consolidation**: Intelligent quantity merging operational
-- **Performance**: Parsing < 0.1s per ingredient, scaling < 0.5s for 20+ ingredient recipes
-- **Migration Success**: > 95% completion rate in single session
-- **Zero Data Loss**: All original text preserved in displayText field
 
-### **Validation Plan:**
-- **Parsing Engine**: Test with 100+ real ingredient quantities
-- **Numeric Conversion**: Verify "1 1/2" → 1.5, "3/4" → 0.75 accuracy
-- **Unit Standardization**: Test all unit aliases
-- **Scaling Accuracy**: Verify mathematical correctness across scale factors
-- **Consolidation Logic**: Test merging scenarios including edge cases
-- **Migration Safety**: Validate data preservation with rollback capability
-- **Performance Testing**: Validate sub-0.1s parsing and sub-0.5s scaling targets
+**Functionality:**
+- ✅ Scale button appears in recipe detail toolbar
+- ✅ Scaling sheet opens with current servings display
+- ✅ Slider and quick buttons adjust scale factor
+- ✅ Live preview updates as slider moves
+- ✅ Parseable quantities scale mathematically
+- ✅ Unparseable quantities show adjustment note
+- ✅ Summary shows auto-scaled vs manual count
+- ✅ Kitchen-friendly fractions display correctly
 
-### **Structured Quantity Management Features:**
+**User Experience:**
+- ✅ Intuitive scaling interface
+- ✅ Clear visual indicators (checkmark = auto-scaled, info = manual)
+- ✅ Helpful adjustment notes for unparseable quantities
+- ✅ Original quantities visible for comparison
+- ✅ Quick scale buttons for common factors (0.5x, 1x, 1.5x, 2x)
 
-1. **Structured Data Model**: Numeric values + standardized units
-2. **Intelligent Parsing**: Automatic quantity parsing with fraction support
-3. **Recipe Scaling**: Mathematical scaling with practical display formatting
-4. **Smart Consolidation**: Intelligent shopping list quantity merging
-5. **Flexible Support**: Both precise ("2 cups") and imprecise ("a pinch") quantities
-6. **Clean Architecture**: Single source of truth for quantity data
-7. **Performance Optimized**: Fast parsing and scaling operations
+**Performance:**
+- ✅ Scaling calculations < 0.5s
+- ✅ UI remains responsive during preview updates
+- ✅ Smooth slider interaction
 
-### **Strategic Value Enhancement:**
-1. **Recipe Intelligence**: Enable scaling and portion adjustment features
-2. **Shopping Efficiency**: Smart quantity consolidation reduces duplicate purchases
-3. **Analytics Foundation**: Structured data enables nutrition and cost analysis (M8-M9)
-4. **Competitive Advantage**: Advanced features with clean architecture
-5. **User Flexibility**: Support both precise measurements and cooking intuition
+### **What's Already Ready:**
+- ✅ Structured quantity data model
+- ✅ numericValue, standardUnit, isParseable fields populated
+- ✅ All recipes migrated to structured format
+- ✅ IngredientParsingService with unit standardization
+- ✅ Recipe detail view architecture ready for enhancement
 
-### **Post-Implementation:**
-After M3 completion, structured quantity foundation enables:
-- **M4**: Meal Planning with intelligent grocery list generation from meal plans
-- **M5**: CloudKit Family Sharing with quantity data synchronization
-- **M7**: Analytics Dashboard with quantity-based insights
-- **M8**: Health Analytics with nutrition calculations (future)
-- **M9**: Budget Intelligence with price-per-unit analysis (future)
+### **After Phase 4:**
+- **Phase 5**: Quantity Merge Service for shopping list consolidation (2-3 hours)
+- **Phase 6**: UI polish and final documentation (1 hour)
+- **M3 Complete**: Recipe scaling, migration, foundation for analytics
 
-**Technical Foundation Ready:**
-- **Unified Ingredient System**: IngredientTemplate-based architecture operational ✅
-- **Recipe Management**: Complete create/read/update/delete lifecycle ✅
-- **Custom Category Integration**: Store-layout optimization throughout app ✅
-- **Performance Architecture**: Sub-0.1s response times established ✅
-- **Parsing Infrastructure**: Regex-based ingredient parsing proven and operational ✅
+**Current Progress**: M3 is 50% complete (3 of 6 phases). Phase 4 will bring us to 67% complete with recipe scaling operational.
 
-**Current Achievement**: M1 and M2 complete (48.5 hours total) with revolutionary grocery management, store-layout optimization, and complete recipe integration providing robust foundation. Ready for clean structured quantity replacement enabling recipe scaling, intelligent consolidation, and analytics foundation.
-
-**Please help me implement M3: Structured Quantity Management with clean replacement architecture, transforming string-based quantities to structured numeric system enabling recipe scaling, intelligent shopping consolidation, and analytics foundation.**
+**Please help me implement M3 Phase 4: Recipe Scaling Service with mathematical quantity scaling, kitchen-friendly fraction display, and professional scaling UI.**

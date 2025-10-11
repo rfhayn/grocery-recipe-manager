@@ -79,6 +79,32 @@ class QuantityMigrationService: ObservableObject {
         )
     }
     
+    // MARK: - Helper Methods
+    
+    /// Get text to migrate from Ingredient (displayText or name fallback)
+    private func getTextToMigrate(from ingredient: Ingredient) -> String {
+        // Check displayText first - but skip if it's literally the string `""`
+        if let displayText = ingredient.displayText,
+           !displayText.isEmpty,
+           displayText != "\"\"" {
+            return displayText
+        }
+        // Fallback to name
+        return ingredient.name ?? ""
+    }
+    
+    /// Get text to migrate from GroceryListItem (displayText or name fallback)
+    private func getTextToMigrate(from item: GroceryListItem) -> String {
+        // Check displayText first - but skip if it's literally the string `""`
+        if let displayText = item.displayText,
+           !displayText.isEmpty,
+           displayText != "\"\"" {
+            return displayText
+        }
+        // Fallback to name
+        return item.name ?? ""
+    }
+    
     // MARK: - Migration Preview
     
     /// Generate preview of what migration will do
@@ -93,20 +119,21 @@ class QuantityMigrationService: ObservableObject {
             let sampleIngredients = try context.fetch(ingredientRequest)
             let sampleGroceryItems = try context.fetch(groceryItemRequest)
             
+            // Use the helper method to get text
             let ingredientPreviews = sampleIngredients.compactMap { ingredient -> (String, StructuredQuantity)? in
-                guard let displayText = ingredient.displayText, !displayText.isEmpty else {
-                    return nil
-                }
-                let structured = parsingService.parseToStructured(text: displayText)
-                return (displayText, structured)
+                let textToMigrate = getTextToMigrate(from: ingredient)
+                guard !textToMigrate.isEmpty else { return nil }
+                
+                let structured = parsingService.parseToStructured(text: textToMigrate)
+                return (textToMigrate, structured)
             }
             
             let groceryItemPreviews = sampleGroceryItems.compactMap { item -> (String, StructuredQuantity)? in
-                guard let displayText = item.displayText, !displayText.isEmpty else {
-                    return nil
-                }
-                let structured = parsingService.parseToStructured(text: displayText)
-                return (displayText, structured)
+                let textToMigrate = getTextToMigrate(from: item)
+                guard !textToMigrate.isEmpty else { return nil }
+                
+                let structured = parsingService.parseToStructured(text: textToMigrate)
+                return (textToMigrate, structured)
             }
             
             // Count total items to migrate
@@ -193,14 +220,17 @@ class QuantityMigrationService: ObservableObject {
             var failed = 0
             
             for ingredient in ingredients {
-                // Only migrate if displayText is already populated
-                guard let displayText = ingredient.displayText, !displayText.isEmpty else {
+                // Use helper method to get text (name fallback if displayText empty)
+                let textToMigrate = getTextToMigrate(from: ingredient)
+                
+                guard !textToMigrate.isEmpty else {
+                    print("⚠️ Ingredient \(ingredient.id?.uuidString.prefix(8) ?? "?") has no text to migrate")
                     failed += 1
                     continue
                 }
                 
-                // Parse the displayText to get structured data
-                let structured = parsingService.parseToStructured(text: displayText)
+                // Parse the text to get structured data
+                let structured = parsingService.parseToStructured(text: textToMigrate)
                 
                 // Update structured fields
                 ingredient.numericValue = structured.numericValue ?? 0.0
@@ -208,10 +238,17 @@ class QuantityMigrationService: ObservableObject {
                 ingredient.isParseable = structured.isParseable
                 ingredient.parseConfidence = structured.parseConfidence
                 
+                // Ensure displayText is populated
+                if ingredient.displayText == nil || ingredient.displayText!.isEmpty {
+                    ingredient.displayText = textToMigrate
+                }
+                
                 if structured.isParseable {
                     successful += 1
+                    print("✅ Migrated ingredient: '\(textToMigrate)' -> \(structured.numericValue ?? 0) \(structured.standardUnit ?? "")")
                 } else {
                     failed += 1
+                    print("❌ FAILED ingredient: '\(textToMigrate)' - confidence: \(structured.parseConfidence)")
                 }
             }
             
@@ -233,14 +270,17 @@ class QuantityMigrationService: ObservableObject {
             var failed = 0
             
             for item in items {
-                // Only migrate if displayText is already populated
-                guard let displayText = item.displayText, !displayText.isEmpty else {
+                // Use helper method to get text (name fallback if displayText empty)
+                let textToMigrate = getTextToMigrate(from: item)
+                
+                guard !textToMigrate.isEmpty else {
+                    print("⚠️ GroceryListItem \(item.id?.uuidString.prefix(8) ?? "?") has no text to migrate")
                     failed += 1
                     continue
                 }
                 
-                // Parse the displayText to get structured data
-                let structured = parsingService.parseToStructured(text: displayText)
+                // Parse the text to get structured data
+                let structured = parsingService.parseToStructured(text: textToMigrate)
                 
                 // Update structured fields
                 item.numericValue = structured.numericValue ?? 0.0
@@ -248,10 +288,17 @@ class QuantityMigrationService: ObservableObject {
                 item.isParseable = structured.isParseable
                 item.parseConfidence = structured.parseConfidence
                 
+                // Ensure displayText is populated
+                if item.displayText == nil || item.displayText!.isEmpty {
+                    item.displayText = textToMigrate
+                }
+                
                 if structured.isParseable {
                     successful += 1
+                    print("✅ Migrated item: '\(textToMigrate)' -> \(structured.numericValue ?? 0) \(structured.standardUnit ?? "")")
                 } else {
                     failed += 1
+                    print("❌ FAILED item: '\(textToMigrate)' - confidence: \(structured.parseConfidence)")
                 }
             }
             
@@ -276,10 +323,11 @@ class QuantityMigrationService: ObservableObject {
             let ingredients = try context.fetch(ingredientRequest)
             
             for ingredient in ingredients {
-                // Check if displayText exists but structured fields are empty
-                if let displayText = ingredient.displayText, !displayText.isEmpty {
+                // Check if we have text but no structured data
+                let textToMigrate = getTextToMigrate(from: ingredient)
+                if !textToMigrate.isEmpty {
                     if ingredient.numericValue == 0.0 && ingredient.standardUnit == nil && !ingredient.isParseable {
-                        issues.append("Ingredient '\(ingredient.name ?? "Unknown")' has displayText but no structured data")
+                        issues.append("Ingredient '\(ingredient.name ?? "Unknown")' has text but no structured data")
                     }
                 }
             }
@@ -293,10 +341,11 @@ class QuantityMigrationService: ObservableObject {
             let items = try context.fetch(itemRequest)
             
             for item in items {
-                // Check if displayText exists but structured fields are empty
-                if let displayText = item.displayText, !displayText.isEmpty {
+                // Check if we have text but no structured data
+                let textToMigrate = getTextToMigrate(from: item)
+                if !textToMigrate.isEmpty {
                     if item.numericValue == 0.0 && item.standardUnit == nil && !item.isParseable {
-                        issues.append("Grocery item '\(item.name ?? "Unknown")' has displayText but no structured data")
+                        issues.append("Grocery item '\(item.name ?? "Unknown")' has text but no structured data")
                     }
                 }
             }
