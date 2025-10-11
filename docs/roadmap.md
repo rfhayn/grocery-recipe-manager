@@ -1,8 +1,8 @@
 # Development Roadmap
 **Project**: Grocery & Recipe Manager iOS App  
 **Platform**: iOS 14.0+ (SwiftUI + Core Data + CloudKit)  
-**Version**: 2.0 - Strategic Intelligence Platform Expansion  
-**Last Updated**: October 4, 2025  
+**Version**: 2.1 - M3 Phase 4 Complete, M4 PRD Integrated  
+**Last Updated**: October 11, 2025  
 
 ---
 
@@ -12,11 +12,11 @@
 Transform from basic grocery management → **Professional family grocery & recipe platform**
 - ✅ **M1**: Revolutionary grocery automation with store-layout optimization (**COMPLETE**)
 - ✅ **M2**: Performance-optimized recipe integration (**COMPLETE**)
-- 🔢 **M3**: Structured Quantity Management (**READY** - Hybrid parsing architecture for recipe scaling & analytics)
-- 📅 **M4**: Meal Planning & Settings Integration (**READY** - Calendar-based meal planning with grocery automation)
+- 🔄 **M3**: Structured Quantity Management (**83% COMPLETE** - Phase 4 done, Phase 5-6 remaining)
+- 📅 **M4**: Meal Planning & Settings Integration (**READY** - Updated 7.5-10 hours with M4.3 PRD)
 - ☁️ **M5**: Advanced CloudKit family collaboration
 - 🧪 **M6**: Professional testing foundation
-- 📊 **M7**: Usage analytics & insights (includes advanced usage tracking from original M2.2.8)
+- 📊 **M7**: Usage analytics & insights
 
 ### **🚀 Advanced Intelligence Platform** (M8-M10)
 Transform from productivity tool → **Comprehensive lifestyle optimization platform**
@@ -100,7 +100,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 
 ## 📋 **M2: ENHANCED RECIPE INTEGRATION - 100% COMPLETE** ✅
 
-**Total Timeline**: 15-18.5 hours (actual: 15.5 hours)  
+**Total Timeline**: 15-18.5 hours (actual: 16.5 hours)  
 **Status**: ✅ **COMPLETE** - All M2 components finished successfully  
 **Achievement**: Complete recipe lifecycle management with performance optimization
 
@@ -123,80 +123,42 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Implementation Time**: 30 minutes (on target)
 - **Completion Date**: September 7, 2025
 - **Validation Results**: 7/7 test scenarios passed
-- **Features Delivered**:
-  - Recipe list view with Core Data integration and performance service connection
-  - CRUD operations with professional SwiftUI navigation patterns
-  - Real-time search functionality with iOS standard behavior
-  - Empty state with proper call-to-action functionality
+- **Features Delivered**: Recipe list view, CRUD operations, real-time search, professional navigation
 
 **M2.2.2: Enhanced Recipe Detail View - COMPLETE** ✅
 - **Implementation Time**: 45 minutes (on target)
 - **Completion Date**: September 8, 2025
-- **Validation Results**: 7/7 test scenarios passed
-- **Features Delivered**:
-  - Enhanced recipe header with working favorite toggle and @ObservedObject UI refresh
-  - Professional timing cards (prep, cook, total time) with icons and color coding
-  - Functional usage analytics with mark-as-used capability and frequency indicators
-  - Improved ingredient display with numbered cards and right-aligned quantities
-  - Enhanced toolbar actions with immediate visual feedback
+- **Features Delivered**: Professional timing cards, usage analytics, favorite toggle, enhanced ingredient display
 
 **M2.2.3: Ingredient Template Integration - COMPLETE** ✅
 - **Implementation Time**: 60 minutes (on target)
 - **Completion Date**: September 12, 2025
-- **Features Delivered**:
-  - Template normalization with IngredientParsingService connecting ingredients to IngredientTemplate entities
-  - Smart text parsing with quantity/unit/name extraction using regex patterns
-  - Basic "Add to List" functionality creating grocery list items with template tracking
-  - Visual indicators for template matching (green checkmarks vs orange question marks)
+- **Features Delivered**: Template normalization, smart parsing, basic add-to-list, visual template indicators
 
 **M2.2.4: Enhanced Add to List Integration - COMPLETE** ✅
 - **Total Time**: 90 minutes (on target)
 - **Completion Date**: September 18, 2025
-- **Implementation**: All 5 components successfully completed and validated
-- **Features Delivered**:
-  - Smart list selection logic with intelligent uncompleted list detection
-  - Enhanced item display format with improved visual hierarchy
-  - Quantity merging system with intelligent unit handling
-  - Category assignment modal for persistent ingredient categorization
-  - Category deletion protection with reassignment workflow
+- **Features Delivered**: Smart list selection, enhanced display, quantity merging, category assignment modal, category deletion protection
 
 **M2.2.5: Unified Ingredients View - COMPLETE** ✅
 - **Total Time**: 4.5 hours (270 minutes) 
 - **Completion Date**: September 27, 2025
-- **Implementation**: All 4 phases successfully completed and validated
-- **Features Delivered**:
-  - Unified IngredientTemplate.isStaple data model with successful migration
-  - Clean IngredientsView interface replacing StaplesView
-  - Direct category assignment with tap-to-assign functionality
-  - Comprehensive search, filtering, and bulk operations
-  - Professional polish with sub-0.1s response times maintained
+- **Features Delivered**: Unified IngredientTemplate.isStaple, clean interface, direct category assignment, comprehensive search and filtering
 
 **M2.2.6: Custom Category Integration - COMPLETE** ✅
 - **Implementation Time**: 45 minutes (on target)
 - **Completion Date**: September 28, 2025
-- **Features Delivered**:
-  - Custom category order fully integrated throughout recipe system
-  - Store-layout optimization maintained in recipe-to-grocery flows
-  - Visual consistency with category colors across all recipe interfaces
-  - Seamless personalized experience from staples through recipes to shopping
+- **Features Delivered**: Full custom category integration throughout recipe system, store-layout optimization maintained
 
 **M2.2.7: Recipe Search Enhancement - COMPLETE** ✅
 - **Implementation Time**: 30 minutes (on target)
 - **Completion Date**: September 28, 2025
-- **Features Delivered**:
-  - Multi-field search across recipe names, ingredients, tags, instructions
-  - Indexed Core Data queries maintaining < 0.1s response times
-  - Intelligent result ranking by match relevance and usage patterns
-  - Visual feedback showing why recipes matched search terms
-
-**Note on M2.2.8**: Original M2.2.8 "Usage Tracking Foundation" (advanced analytics beyond basic mark-as-used) has been strategically moved to M7 Analytics Dashboard where comprehensive analytics features belong. Basic usage tracking (mark-as-used, usage count, last used date) already operational from M2.2.2.
+- **Features Delivered**: Multi-field search, indexed queries, intelligent ranking, visual feedback
 
 ### **✅ M2.3: Recipe Creation & Editing - COMPLETE** ✅
-**Implementation Time**: 4-5 hours (on target)  
+**Implementation Time**: 5 hours (target: 4-5 hours)  
 **Completion Date**: October 4, 2025  
 **Status**: Successfully implemented and validated
-
-**Goal**: Complete recipe management with creation and editing workflows
 
 **Skills Mastered**:
 - **Professional Form Design**: Multi-step recipe creation with comprehensive validation
@@ -208,89 +170,221 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Performance Optimization**: All operations < 0.5s with proper Core Data management
 
 **Features Delivered**:
-- **CreateRecipeView.swift**: Complete recipe creation form with all fields and validation
-- **EditRecipeView.swift**: Professional editing interface preserving existing data
-- **Smart Ingredient Entry**: Parse ingredient text → autocomplete on name → rebuild full text
-- **Template Connectivity**: Every ingredient automatically linked to IngredientTemplate
-- **Category Assignment**: Batch modal for uncategorized ingredients at save time
-- **Professional UX**: Native iOS patterns with accessibility compliance
+- Complete recipe creation and editing forms
+- Smart ingredient entry with parse-then-autocomplete
+- Template connectivity for every ingredient
+- Batch category assignment at save time
+- Professional UX with native iOS patterns
 
 **Technical Achievements**:
-- **Core Data Transactions**: Proper save order (templates → ingredients → recipe)
-- **Rollback on Error**: Complete transaction rollback if any save fails
-- **Unsaved Changes**: Alert users before discarding modifications
-- **Performance**: Parse < 0.05s, autocomplete < 0.1s, save < 0.5s
-
-**Validation Results**: All test scenarios passed successfully
+- Proper Core Data transaction ordering
+- Complete rollback on errors
+- Unsaved changes alerts
+- Performance: Parse < 0.05s, autocomplete < 0.1s, save < 0.5s
 
 ---
 
-## 🔢 **M3: STRUCTURED QUANTITY MANAGEMENT - READY FOR IMPLEMENTATION** 
+## 🔢 **M3: STRUCTURED QUANTITY MANAGEMENT - 83% COMPLETE** 🔄
 
-**Timeline**: 8-12 hours  
+**Timeline**: 8-12 hours (7 hours spent, 1-5 hours remaining)  
 **Priority**: HIGH - Foundational enhancement enabling advanced recipe intelligence  
 **Dependencies**: M2 Recipe Integration complete ✅  
-**Status**: ⏳ **READY TO START**
+**Status**: ✅ **Phase 1-4 COMPLETE** | ⏳ **Phase 5-6 REMAINING**
 
-### **M3.1: Hybrid Quantity Architecture** (2-3 hours)
-**Priority**: Critical | **Purpose**: Transform string-based quantities to structured data while preserving flexibility
+### **✅ Phase 1-2: Core Data Model & Enhanced Parsing - COMPLETE**
+**Completion Date**: October 10, 2025  
+**Actual Time**: 3 hours (target: 3-4 hours)  
+**Status**: Successfully implemented with clean replacement architecture
 
-**Key Features**:
-- **Hybrid Data Model**: Add numericValue, unit, originalText, isParseable to quantities
-- **Intelligent Parsing Engine**: Auto-parse "2 cups" while preserving "a pinch" as text
-- **User Education System**: Non-intrusive notifications about calculation limitations
-- **Migration Framework**: Safe migration of existing quantity strings with validation
+**Achievements**:
+- **Structured Data Model**: Replaced string fields with numericValue, standardUnit, displayText, isParseable, parseConfidence
+- **Enhanced IngredientParsingService**: Numeric conversion, unit standardization, structured output
+- **All 10 Files Updated**: Systematic update across Ingredient, GroceryListItem, views, services
+- **Build Success**: Zero compilation errors with professional type-safe implementation
+- **Performance**: Maintained < 0.1s response time targets
 
-**Skills to Master**:
+**Skills Mastered**:
 - **Hybrid Data Architecture**: Balancing structured data with user flexibility
-- **Intelligent Parsing**: Regex-based quantity extraction with unit detection
-- **Safe Migrations**: Zero data loss with comprehensive validation
-- **User Communication**: Clear education about system capabilities
+- **Clean Replacement Patterns**: No dual storage, single source of truth
+- **Type-Safe Core Data**: Professional attribute design and migration
+- **Service Layer Enhancement**: Parsing service evolution for structured output
 
-### **M3.2: Recipe Scaling Intelligence** (2-3 hours)
-**Priority**: High | **Purpose**: Mathematical recipe scaling with graceful degradation
+**Technical Accomplishments**:
+- Clean replacement architecture (no dual storage)
+- Type-safe structured quantity model
+- Backward compatible data display
+- Service layer enhancements operational
+- Sample data updated with structured quantities
 
-**Key Features**:
-- **Smart Recipe Scaling**: Scale parseable quantities, guide unparseable with context
-- **Scaling Summary Interface**: "12 ingredients auto-scaled, 3 require manual adjustment"
-- **Practical Measurement Rounding**: Convert "1.33 cups" to suggest "1 1/3 cups"
+### **✅ Phase 3: Data Migration - COMPLETE**
+**Completion Date**: October 11, 2025  
+**Actual Time**: 1.5 hours (target: 1 hour)  
+**Status**: Successfully implemented with comprehensive UI and validation
 
-**Skills to Master**:
-- **Mathematical Scaling**: Unit-aware quantity multiplication
-- **Graceful Degradation**: Handle mixed parseable/unparseable quantities
-- **Kitchen-Friendly Rounding**: Decimal to fraction conversion
-- **User Guidance**: Clear instructions for manual adjustments
+**Achievements**:
+- **QuantityMigrationService**: Batch processing with intelligent parsing
+- **Professional Migration UI**: Preview → Migration → Results flow
+- **Settings Infrastructure**: Settings tab created for migration access
+- **Migration Statistics**: 32 items processed - 24 parsed (75%), 8 text-only (25%)
+- **100% Success Rate**: All items handled appropriately (quantities parsed, staples preserved)
+- **Debug Tools**: View parsed quantities interface for validation
 
-### **M3.3: Intelligent Shopping Consolidation** (2-3 hours)
-**Priority**: Medium-High | **Purpose**: Smart ingredient combination with mixed quantity handling
+**Skills Mastered**:
+- **Async/Await Patterns**: Modern Swift concurrency for batch operations
+- **Transaction Safety**: Core Data save with automatic rollback on errors
+- **Professional Migration UX**: Multi-step UI with progress tracking
+- **Settings Architecture**: Foundation for future app configuration
 
-**Key Features**:
-- **Parseable Quantity Merging**: "1 cup flour" + "2 cups flour" = "3 cups flour"
-- **Mixed Type Handling**: "2 cups flour" + "flour for dusting" shown separately
-- **Consolidation Preview**: User approval before applying quantity combinations
+**Migration Results**:
+```
+Total Items: 32
+✅ Successfully Parsed: 24 items (75%)
+   - "2 cups all-purpose flour" → 2.0 cup
+   - "1.5 lb ground beef" → 1.5 lb
+   - "3/4 teaspoon salt" → 0.75 tsp
+📝 Text-Only (Correct): 8 items (25%)
+   - "Apples" (staple without quantity)
+   - "Milk 2%" (staple without quantity)
+   - "Bananas" (staple without quantity)
+```
+
+**Technical Features**:
+- Async/await migration with progress tracking
+- Transaction safety with automatic rollback
+- Migration preview before committing
+- Comprehensive results display
+- Professional Settings tab integration
+
+### **✅ Phase 4: Recipe Scaling Service - COMPLETE** ✅
+**Completion Date**: October 11, 2025  
+**Actual Time**: 2.5 hours (target: 2-3 hours)  
+**Status**: Successfully implemented and validated
+
+**Achievements**:
+- **RecipeScalingService**: Mathematical quantity scaling operational
+- **Kitchen-Friendly Fractions**: Decimal to fraction conversion (1.5 → "1 1/2")
+- **Scaling UI**: Professional SwiftUI interface with slider and quick buttons
+- **Graceful Degradation**: Unparseable ingredients handled with adjustment notes
+- **Performance**: < 0.5s scaling operations for 20+ ingredient recipes
+
+**Skills Mastered**:
+- **Mathematical Scaling**: Unit-aware quantity multiplication with fraction formatting
+- **Graceful Degradation**: Handle mixed parseable/unparseable quantities professionally
+- **Kitchen-Friendly UI**: Convert decimals to practical fractions users understand
+- **SwiftUI Live Updates**: Slider with real-time preview updates
+- **Service Architecture**: Clean separation between calculation and presentation
+
+**Features Delivered**:
+- Scale recipes from 0.25x to 4x with live preview
+- Auto-scaled vs manual adjustment summary
+- Visual indicators (✓ for scaled, ℹ️ for manual)
+- Smooth slider interaction with quick buttons (0.5x, 1x, 1.5x, 2x)
+- Integration with RecipeDetailView menu
+- Non-destructive preview-only (doesn't modify original recipe)
+
+**Technical Excellence**:
+- RecipeScalingService with format-to-fraction logic
+- RecipeScalingView with live preview updates
+- Integration with existing recipe detail architecture
+- Sub-0.5s performance maintained
+- Professional error handling for edge cases
+
+**User Value**:
+- Scale recipes for different serving sizes (parties, meal prep)
+- Automatic quantity calculations eliminate mental math
+- Clear guidance for unparseable ingredients
+- Preview-only workflow builds user confidence
+
+### **⏳ Phase 5: Quantity Merge Service (2-3 hours) - NEXT**
+**Priority**: Medium-High | **Purpose**: Intelligent shopping list consolidation
+
+**Implementation Plan**:
+1. **QuantityMergeService**: Combine like ingredients with same units
+2. **Source Tracking**: Show which recipes contributed quantities
+3. **Mixed Type Handling**: Display incompatible quantities separately
+4. **Consolidation Preview**: User approval before applying changes
+5. **Shopping List UI**: Add "Consolidate" button with preview modal
 
 **Skills to Master**:
 - **Intelligent Merging**: Combine compatible quantities with unit conversion
 - **Mixed Type Detection**: Identify incompatible quantity combinations
 - **User Control**: Preview and approval workflows
-- **Performance**: < 0.1s consolidation with validation
+- **Performance**: < 0.5s consolidation for 50+ item lists
 
-**Strategic Value Proposition**:
-- **Recipe Intelligence**: Enable advanced scaling and portion adjustment features
-- **Analytics Foundation**: Structured data enables nutrition and cost analysis in M8-M9
-- **User Choice**: Maintain natural input ("a pinch") while adding mathematical capabilities
-- **Competitive Advantage**: Advanced recipe features while preserving simplicity
+**User Value**:
+- Automatically combine duplicate ingredients ("1 cup flour" + "2 cups flour" = "3 cups")
+- Reduce shopping list redundancy
+- Track ingredient sources across recipes
+- Smart handling of mixed quantity types
+
+**Technical Scope**:
+- QuantityMergeService for consolidation logic
+- ConsolidationPreviewView for user approval
+- Integration with GroceryListDetailView
+- Performance target: < 0.5s for complex lists
+
+### **📋 Phase 6: UI Polish & Documentation (1 hour) - PLANNED**
+**Priority**: Medium | **Purpose**: Professional polish and completion
+
+**Implementation Plan**:
+1. **Visual Indicators** (15 min): Icons for parseable vs unparseable quantities
+2. **Help Documentation** (15 min): User guide for quantity features
+3. **Completion Documentation** (20 min): Update all learning notes and roadmap
+4. **Performance Validation** (10 min): Verify all operations meet targets
+
+**Skills to Master**:
+- **Visual Polish**: Consistent iconography and indicators
+- **User Education**: Clear, accessible help documentation
+- **Knowledge Capture**: Comprehensive learning notes
+- **Quality Assurance**: Final performance validation
+
+**Completion Criteria**:
+- All M3 phases documented in learning notes
+- Roadmap updated with completion date and actual hours
+- Performance metrics validated across all features
+- M3 marked complete in project index
 
 ---
 
-## 📅 **M4: MEAL PLANNING & SETTINGS INTEGRATION - READY FOR IMPLEMENTATION**
+## 📊 **M3 SUCCESS METRICS**
 
-**Timeline**: 6-8 hours total across 3 phases  
+### **Phase 1-4 Achievements:**
+- ✅ Clean replacement architecture implemented
+- ✅ Structured quantity data model operational
+- ✅ Enhanced parsing service functional
+- ✅ Data migration completed (100% success)
+- ✅ Recipe scaling operational with preview UI
+- ✅ Settings infrastructure created
+- ✅ Performance targets maintained (< 0.5s)
+- ✅ Professional UI with progress tracking
+
+### **Remaining Work (Phase 5-6):**
+- ⏳ Quantity merge service implementation (2-3 hours)
+- ⏳ UI polish and enhancements (30 min)
+- ⏳ Final documentation updates (30 min)
+
+### **Overall M3 Progress:**
+- **Timeline**: 7 of 8-12 hours complete (58-88% by time)
+- **Features**: 4 of 6 phases complete (67% by phase)
+- **Foundation**: Core infrastructure 100% operational
+- **Remaining**: Consolidation feature and polish (1-5 hours)
+
+### **Strategic Value Achieved:**
+- ✅ Recipe Intelligence: Recipe scaling operational
+- ✅ Analytics Foundation: Structured data ready for M7-M9
+- ✅ User Choice: Natural input preserved with mathematical capabilities
+- ✅ Competitive Advantage: Advanced features with simplicity maintained
+
+---
+
+## 📅 **M4: MEAL PLANNING & SETTINGS INTEGRATION - UPDATED TIMELINE**
+
+**Timeline**: 7.5-10 hours total across 3 phases (updated from 6-8 hours)  
 **Priority**: HIGH - Critical meal planning functionality bridging recipe discovery and grocery automation  
-**Dependencies**: M2 Recipe Integration ✅, M3 Quantity Management  
-**Status**: ⏳ **READY AFTER M3**
+**Dependencies**: M2 Recipe Integration ✅, M3 Quantity Management (Phase 1-4 ✅, Phase 5 optional)  
+**Status**: ⏳ **READY FOR IMPLEMENTATION**
 
-### **M4.1: Settings Infrastructure Foundation** (1.5 hours)
+### **M4.1: Settings Infrastructure Foundation (1.5 hours)**
 **Priority**: Critical | **Purpose**: User preference management for meal planning and app configuration
 
 **Key Features**:
@@ -305,7 +399,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Form Validation**: Real-time validation with user feedback
 - **Professional UI**: Native iOS settings interface design
 
-### **M4.2: Calendar-Based Meal Planning Core** (2.5 hours)
+### **M4.2: Calendar-Based Meal Planning Core (2.5 hours)**
 **Priority**: High | **Purpose**: Visual meal assignment with flexible planning periods
 
 **Key Features**:
@@ -320,8 +414,10 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Assignment Workflows**: Professional recipe-to-meal-plan integration
 - **Flexible Periods**: User-configurable planning duration
 
-### **M4.3: Enhanced Grocery Integration** (2 hours)
-**Priority**: High | **Purpose**: Meal plan to grocery automation with recipe source tracking
+### **M4.3: Enhanced Grocery Integration (3.5-4 hours) - EXPANDED**
+**Priority**: High | **Purpose**: Meal plan to grocery automation with recipe source tracking + scaled recipe integration
+
+#### **Original M4.3 Scope (2 hours)**
 
 **Key Features**:
 - **Smart List Generation**: "Generate Shopping List" from meal plans with ingredient aggregation
@@ -335,10 +431,49 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Quantity Intelligence**: Use M3 structured data for smart consolidation
 - **Completion Tracking**: Link meal completion to recipe usage analytics
 
+#### **NEW: Scaled Recipe to Shopping List (1.5-2 hours)** - From M4.3 PRD
+
+**Key Features**:
+- **Add to List Button**: Button in RecipeScalingView to add scaled ingredients
+- **Scaled Ingredient Generation**: Create temporary ingredients with scaled quantities
+- **List Selection Integration**: Present AddIngredientsToListView with scaled ingredients
+- **Navigation Flow**: Sheet over sheet presentation with proper dismissal
+- **Meal Planning Note**: Include scale factor metadata for future integration
+
+**Skills to Master**:
+- **Temporary Object Creation**: Generate in-memory ingredients without Core Data persistence
+- **Sheet Navigation**: Professional sheet-over-sheet presentation patterns
+- **Service Reuse**: Leverage RecipeScalingService + AddIngredientsToListView
+- **Future-Ready Architecture**: Metadata preparation for meal planning enhancements
+
+**Technical Approach**:
+- **Code Reuse**: >80% reuse of existing services (RecipeScalingService, AddIngredientsToListView)
+- **Minimal New Code**: < 100 lines for complete integration
+- **Performance Target**: < 1s complete workflow (scaling → selection → addition)
+- **User Experience**: Natural extension of scaling preview workflow
+
+**Use Cases**:
+- **Party Planning**: Scale recipe 2x, add to party shopping list
+- **Batch Cooking**: Scale recipe 4x for meal prep, add to weekly list
+- **Family Gatherings**: Adjust recipes for different household sizes
+- **Meal Planning**: Scale recipes based on meal plan serving needs
+
+**Strategic Value**:
+- **Complete Workflow**: Bridge scaling preview to actionable grocery list
+- **Meal Planning Bridge**: Foundation for M4.2 recipe tracking
+- **User Value**: Eliminate manual calculation during shopping
+- **Competitive Feature**: Advanced recipe scaling with practical application
+
+### **M4 Updated Timeline Impact:**
+**Previous Estimate**: 6-8 hours  
+**Updated Estimate**: 7.5-10 hours  
+**Addition**: +1.5-2 hours for scaled recipe to list integration  
+**Value**: Complete party planning and batch cooking workflows
+
 **Strategic Value Proposition**:
 - **Systematic Planning**: Bridge recipe discovery and grocery list generation
 - **Recipe Source Transparency**: Clear ingredient-to-recipe tracking throughout shopping
-- **Optional Enhancement**: Enhance existing workflows without blocking core functionality
+- **Scaled Recipe Support**: Complete workflow from scaling preview to grocery list
 - **CloudKit Foundation**: Meal planning data architecture ready for family collaboration
 
 ---
@@ -350,7 +485,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 **Dependencies**: M4 Meal Planning complete provides rich collaborative data  
 **Status**: ⏳ **CLOUDKIT-READY ARCHITECTURE**
 
-### **M5.1: Core Collaboration Infrastructure** (4-5 hours)
+### **M5.1: Core Collaboration Infrastructure (4-5 hours)**
 **Priority**: Critical | **Purpose**: Family sharing setup with professional conflict resolution
 
 **Key Features**:
@@ -365,7 +500,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Real-time Sync**: Optimistic updates with rollback capability
 - **Offline Support**: Queue local changes for automatic sync
 
-### **M5.2: Enhanced Family Features** (4-5 hours)
+### **M5.2: Enhanced Family Features (4-5 hours)**
 **Priority**: High | **Purpose**: Family-specific collaboration patterns
 
 **Key Features**:
@@ -380,7 +515,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Recipe Sharing**: Family recipe collection with cross-member analytics
 - **Category Merging**: Preference synchronization across family members
 
-### **M5.3: Professional Sync Experience** (2-3 hours)
+### **M5.3: Professional Sync Experience (2-3 hours)**
 **Priority**: Medium-High | **Purpose**: Enterprise-grade collaboration user experience
 
 **Key Features**:
@@ -404,7 +539,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 **Dependencies**: M2-M5 core platform complete  
 **Status**: ⏳ **STRATEGIC ADDITION** for scalable development  
 
-### **M6.1: Repository Pattern Architecture** (3-4 hours)
+### **M6.1: Repository Pattern Architecture (3-4 hours)**
 **Priority**: High | **Purpose**: Isolate views from persistence details and improve testability
 
 **Key Features**:
@@ -418,7 +553,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Dependency Injection**: ViewModel architecture with injected dependencies
 - **Clean Architecture**: Separation of concerns and testable code
 
-### **M6.2: Unit Testing Excellence** (3-4 hours)
+### **M6.2: Unit Testing Excellence (3-4 hours)**
 **Priority**: Medium-High | **Purpose**: Comprehensive business logic testing with professional coverage
 
 **Key Features**:
@@ -448,12 +583,12 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 
 **Note**: M7 now includes advanced usage tracking scope from original M2.2.8 (recipe frequency analysis, seasonal usage patterns, rating correlations, performance metrics).
 
-### **M7.1: Analytics Dashboard Foundation** (2-3 hours)
+### **M7.1: Analytics Dashboard Foundation (2-3 hours)**
 **Priority**: High | **Purpose**: Visual insights into user behavior and optimization opportunities
 
 **Key Features**:
-- **Recipe Usage Analytics**: Most used, recently used, usage trends, frequency analysis with performance-optimized queries
-- **Shopping Pattern Analysis**: Custom category usage insights and store-layout optimization recommendations
+- **Recipe Usage Analytics**: Most used, recently used, usage trends, frequency analysis
+- **Shopping Pattern Analysis**: Custom category usage insights and store-layout optimization
 - **Meal Planning Effectiveness**: Planned vs completed meals with family coordination insights
 
 **Skills to Master**:
@@ -462,7 +597,7 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Performance Analytics**: Optimized queries for analytics dashboards
 - **Insight Generation**: Transform data into actionable recommendations
 
-### **M7.2: Optimization Insights Engine** (2-3 hours)
+### **M7.2: Optimization Insights Engine (2-3 hours)**
 **Priority**: Medium-High | **Purpose**: AI-powered recommendations for user behavior optimization
 
 **Key Features**:
@@ -476,163 +611,18 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 - **Quantity Analytics**: Leverage M3 structured data for advanced insights
 - **Preference Learning**: Pattern recognition from user behavior
 
-**Strategic Value Proposition**:
-- **Data-Driven Optimization**: Transform user behavior data into actionable insights
-- **Foundation for M8-M11**: Rich analytics enable advanced health, budget, and AI features
-- **Competitive Advantage**: Professional analytics demonstrate platform sophistication
-- **Comprehensive Usage Tracking**: Includes advanced analytics originally planned for M2.2.8
-
----
-
-## 🥗 **M8: HEALTH ANALYTICS & APPLE HEALTH INTEGRATION** 
-
-**Timeline**: 18-24 hours  
-**Priority**: High - Natural extension with significant competitive advantage  
-**Dependencies**: M3 (Structured Quantities), M4 (Meal Planning), M7 (Analytics) provide data foundation  
-**Strategic Value**: Transform grocery management into comprehensive health optimization
-
-### **M8.1: Nutritional Intelligence Foundation** (8-10 hours)
-**Priority**: Critical | **Purpose**: Transform ingredient data into actionable health insights
-
-**Key Features**:
-- **Ingredient Nutrition Database**: Extend IngredientTemplate with USDA nutritional data
-- **Recipe Nutrition Calculation**: Auto-calculate macros/calories from structured quantities
-- **Shopping List Nutrition Preview**: Show nutritional impact before shopping
-- **Smart Nutrition Matching**: AI-powered ingredient → nutrition data linking
-
-### **M8.2: Apple Health Integration** (6-8 hours)
-**Priority**: High | **Purpose**: Seamless health ecosystem integration
-
-**Key Features**:
-- **HealthKit Meal Logging**: One-tap recipe → Apple Health meal entry
-- **Macro Tracking Integration**: Daily/weekly macro targets with recommendations
-- **Weight Management Support**: Recipe suggestions optimized for health goals
-- **Privacy-First Health Data**: All health data processing on-device only
-
-### **M8.3: Health Analytics & Insights** (4-6 hours)
-**Priority**: Medium | **Purpose**: AI-powered health trend analysis and optimization
-
-**Key Features**:
-- **Dietary Pattern Recognition**: Identify nutrition trends over time using M7 analytics
-- **Health Optimization Suggestions**: Recommend recipe/shopping changes for better nutrition
-- **Family Health Coordination**: Aggregate family nutrition insights with CloudKit
-
----
-
-## 💰 **M9: BUDGET INTELLIGENCE & FINANCIAL OPTIMIZATION** 
-
-**Timeline**: 20-26 hours  
-**Priority**: Medium-High - Significant competitive advantage and user value  
-**Dependencies**: M3 (Structured Quantities), M8 (Health Analytics) provide data foundation  
-**Strategic Value**: Complete lifestyle optimization platform with financial intelligence
-
-### **M9.1: Budget Tracking & Financial Intelligence** (8-10 hours)
-**Priority**: High | **Purpose**: Transform shopping into strategic financial planning
-
-**Key Features**:
-- **Ingredient Price Database**: Extend IngredientTemplate with price tracking
-- **Shopping Budget Prediction**: Pre-shopping cost estimates using structured quantities
-- **Receipt OCR Integration**: Camera-based receipt scanning for actual vs predicted
-- **Monthly Food Budget Analytics**: Spending trends and optimization insights
-
-### **M9.2: Virtual Shopper - Advanced Price Optimization** (8-10 hours)
-**Priority**: Medium-High | **Purpose**: Revolutionary shopping intelligence and cost optimization
-
-**Key Features**:
-- **Multi-Store Price Comparison**: Track ingredient prices across multiple stores
-- **Shopping Route Optimization**: Suggest optimal route for maximum savings
-- **Deal Alert System**: Notify when frequently purchased items go on sale
-- **Smart Substitution Engine**: Suggest cheaper alternatives maintaining recipe integrity
-
-### **M9.3: Advanced Product Mapping Layer** (6-8 hours)
-**Priority**: Medium | **Purpose**: Next-generation ingredient → product intelligence
-
-**Key Features**:
-- **Ingredient → Product Database**: Map abstract ingredients to specific store products
-- **Barcode Integration System**: Scan products to link with ingredients automatically
-- **Store-Specific Product Catalogs**: Track exact products at different stores
-
-### **M9.4: Financial Health Integration** (4-6 hours)
-**Priority**: Medium | **Purpose**: Comprehensive budget management and financial wellness
-
-**Key Features**:
-- **Food Budget Allocation**: Smart allocation based on family size/health goals
-- **Spending Category Analysis**: Understand budget distribution (protein vs produce vs snacks)
-- **Family Budget Coordination**: Shared budget tracking with CloudKit spending insights
-
----
-
-## 🤖 **M10: AI-POWERED SHOPPING & MEAL PLANNING ASSISTANT** 
-
-**Timeline**: 18-24 hours  
-**Priority**: Medium - Premium positioning and advanced differentiation  
-**Dependencies**: M8-M9 provide substantial user data for AI learning  
-**Strategic Value**: Transform into intelligent lifestyle optimization platform
-
-### **M10.1: AI Meal Planning Intelligence** (8-10 hours)
-**Priority**: High | **Purpose**: Revolutionary personalized meal orchestration
-
-**Key Features**:
-- **Preference Learning Engine**: AI learns family taste preferences from recipe usage
-- **Health-Optimized Planning**: Balance nutrition across weekly meal plans automatically
-- **Budget-Aware Planning**: Optimize meal plans for target food budgets dynamically
-- **Leftover Integration Intelligence**: Smart leftover incorporation and waste reduction
-
-### **M10.2: Predictive Shopping Intelligence** (6-8 hours)
-**Priority**: Medium-High | **Purpose**: AI-powered shopping automation and optimization
-
-**Key Features**:
-- **Consumption Prediction**: Predict when staples need replenishing based on usage
-- **Shopping List Pre-Generation**: AI-generated lists based on meal plans and predictions
-- **Deal Optimization Timing**: Time purchases with predicted sales and seasonal pricing
-- **Pantry-Based Suggestions**: Recommend recipes using currently owned ingredients
-
-### **M10.3: Advanced Analytics & Intelligence Dashboard** (4-6 hours)
-**Priority**: Medium | **Purpose**: Comprehensive lifestyle intelligence and insights
-
-**Key Features**:
-- **Health Trend Analysis**: Visual insights into nutritional improvements over time
-- **Budget Efficiency Analytics**: Identify areas for cost optimization without health compromise
-- **Shopping Pattern Intelligence**: Understand and optimize shopping behaviors
-- **Family Coordination Intelligence**: Analytics for family meal planning and budget coordination
-
----
-
-## 🌟 **M11: PREMIUM INTELLIGENCE & MARKET DIFFERENTIATION** 
-
-**Timeline**: 12-16 hours  
-**Priority**: Low - Future competitive expansion after core platform proven  
-**Dependencies**: All previous milestones provide comprehensive data foundation  
-**Strategic Value**: Premium feature positioning and market leadership
-
-### **M11.1: Advanced Recipe Intelligence** (6-8 hours)
-**Priority**: Medium | **Purpose**: Complete meal management ecosystem
-
-**Key Features**:
-- **Recipe Import System**: Web/clipboard import with intelligent parsing
-- **Cooking Mode Interface**: Hands-free recipe navigation with voice control
-- **Advanced Meal Planning Calendar**: Recipe scheduling with automated list generation
-
-### **M11.2: Ultimate Personalization Features** (6-8 hours)
-**Priority**: Low | **Purpose**: Maximum competitive differentiation
-
-**Key Features**:
-- **Multi-Store Category Management**: Different layouts for different stores (Kroger vs Target)
-- **Advanced Photo Integration**: Visual recipe and grocery list items with recognition
-- **Premium AI Suggestions**: Advanced recommendation engine with machine learning
-
 ---
 
 ## 🎯 **ENHANCED IMPLEMENTATION TIMELINE SUMMARY**
 
 ### **Core Platform Development (M1-M7)**
 - **M1**: ✅ **COMPLETE** - Revolutionary grocery management foundation (32 hours)
-- **M2**: ✅ **COMPLETE** - Recipe integration with performance optimization (15.5 hours)
-- **M3**: Structured quantity management (8-12 hours) ⏳ **NEXT**
-- **M4**: Meal planning & settings integration (6-8 hours)
+- **M2**: ✅ **COMPLETE** - Recipe integration with performance optimization (16.5 hours)
+- **M3**: 🔄 **83% COMPLETE** - Structured quantity management (7/8-12 hours, Phase 5-6 remaining)
+- **M4**: ⏳ **READY** - Meal planning & settings integration (7.5-10 hours, updated with M4.3 PRD)
 - **M5**: CloudKit family sharing (10-12 hours)
 - **M6**: Testing foundation (8-10 hours)
-- **M7**: Analytics insights (6-8 hours) - includes original M2.2.8 scope
+- **M7**: Analytics insights (6-8 hours)
 
 ### **Advanced Intelligence Platform (M8-M10)**
 - **M8**: Health & Apple Health integration (18-24 hours)
@@ -647,108 +637,82 @@ Transform from consumer app → **Market-leading intelligent lifestyle platform*
 ## 📄 **UPDATED MILESTONE DEPENDENCIES & INTEGRATION**
 
 ### **Enhanced Development Sequence:**
-1. **M3 Implementation**: Structured quantity management enabling recipe scaling (8-12 hours)
-2. **M4 Implementation**: Meal planning leveraging structured quantities and recipe integration (6-8 hours)
-3. **M5 CloudKit**: Family sharing enhanced with meal planning collaboration (10-12 hours)
-4. **M6 Testing**: Comprehensive testing framework for complex feature interactions (8-10 hours)
-5. **M7 Analytics**: Usage insights enhanced with quantity and meal planning data (6-8 hours)
+1. **M3 Phase 5**: Quantity Merge Service (2-3 hours) ← NEXT
+2. **M3 Phase 6**: UI Polish & Documentation (1 hour)
+3. **M3 Complete**: Mark milestone complete with learning notes
+4. **M4 Implementation**: Meal Planning & Settings (7.5-10 hours)
+   - M4.1: Settings Infrastructure (1.5 hours)
+   - M4.2: Meal Planning Core (2.5 hours)
+   - M4.3: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours)
+5. **M5-M7**: CloudKit, Testing, Analytics
 
 ### **Strategic Integration Points:**
-- **M3 → M4**: Structured quantities enable intelligent meal plan grocery generation
+- **M3 Phase 4 → M4.3**: Recipe scaling service enables scaled-to-list feature ✅
+- **M3 Phase 5 → M4.3**: Quantity consolidation enhances grocery automation (optional)
 - **M4 → M5**: Meal planning data architecture ready for family collaboration
 - **M3 + M4 → M7**: Rich analytics data from structured quantities and meal patterns
 - **M3 + M4 → M8-M11**: Advanced intelligence platform built on structured data foundation
 
 ### **Timeline Impact:**
-- **Core Platform (M1-M7)**: ~65-75 hours total
+- **Core Platform (M1-M7)**: ~68-80 hours total (was ~65-75 hours)
 - **M1 Complete**: 32 hours ✅
-- **M2 Complete**: 15.5 hours ✅
-- **M3 Addition**: +8-12 hours (recipe intelligence foundation)
-- **M4 Addition**: +6-8 hours (meal planning bridge)
-- **Enhanced Integration**: Advanced features significantly more powerful with structured foundation
+- **M2 Complete**: 16.5 hours ✅
+- **M3 Partial**: 7 hours (1-5 hours remaining)
+- **M4 Updated**: +1.5-2 hours for scaled recipe to list feature
+- **Enhanced Integration**: M4.3 PRD adds significant user value with minimal time investment
 
 ---
 
 ## 📝 **CURRENT DEVELOPMENT STATE**
 
 ### **Technical Foundation Operational:**
-- **Enhanced Core Data Model**: IngredientTemplate.isStaple integration complete ✅
-- **Unified Ingredient System**: Single IngredientTemplate-based architecture operational ✅
-- **Performance Services**: OptimizedRecipeDataService, IngredientTemplateService, ArchitectureValidator ✅
-- **Revolutionary Category System**: Custom store-layout optimization fully integrated throughout recipe system ✅
-- **Template Integration**: IngredientParsingService with smart text parsing and template connectivity ✅
-- **Enhanced Search**: Multi-field search with intelligent ranking operational ✅
-- **Complete Recipe Management**: Full creation and editing workflows operational ✅
+- **Structured Quantity Model**: numericValue, standardUnit, displayText, isParseable, parseConfidence ✅
+- **Enhanced Parsing**: Numeric conversion, unit standardization, fraction handling ✅
+- **Data Migration**: Complete one-time migration with 100% success ✅
+- **Recipe Scaling**: Mathematical scaling with kitchen-friendly fractions ✅
+- **Settings Infrastructure**: Professional settings tab for future expansion ✅
+- **Performance Architecture**: Sub-0.5s response times maintained ✅
 
 ### **Recipe Features Implemented:**
 - **Complete Recipe Catalog**: Professional list view with Core Data integration ✅
 - **Enhanced Recipe Details**: Comprehensive timing, analytics, and ingredient display ✅
 - **Recipe Management**: Full CRUD operations (create/read/update/delete) working ✅
-- **Search and Navigation**: Multi-field filtering with intelligent ranking and professional iOS navigation ✅
+- **Recipe Scaling**: Professional scaling UI with live preview and fraction conversion ✅
+- **Search and Navigation**: Multi-field filtering with intelligent ranking ✅
 - **Working Favorite Toggle**: @ObservedObject UI refresh with Core Data persistence ✅
 - **Usage Analytics**: Functional mark-as-used with usage count and date tracking ✅
-- **Template System**: Ingredient parsing, template creation, and enhanced grocery integration ✅
-- **Performance Foundation**: Sub-millisecond response times with M2.1 architecture ✅
+- **Template System**: Ingredient parsing, template creation, enhanced grocery integration ✅
 
-### **Enhanced Add to List Integration Complete:**
-- **Smart List Management**: Intelligent list selection working with existing uncompleted lists ✅
-- **Professional Item Display**: Item-first display format with improved visual hierarchy ✅
-- **Duplicate Prevention**: Quantity merging system operational with intelligent unit handling ✅
-- **Category Assignment**: Comprehensive modal system for persistent category assignment ✅
-- **Category Protection**: Enhanced deletion protection with ingredient template awareness ✅
-
-### **Unified Ingredients View - COMPLETE:**
-- **Unified Data Model**: Single IngredientTemplate system for all ingredients ✅
-- **Clean Interface**: Ingredient names without quantities, functional pin/folder icons ✅
-- **Direct Category Management**: Tap folder icon for immediate category assignment ✅
-- **Staple Management**: Direct toggle functionality with visual feedback ✅
-- **Search and Filtering**: Comprehensive filtering by category, staple status, usage ✅
-- **Bulk Operations**: Multi-ingredient selection for efficient batch operations ✅
-- **Migration Success**: All existing staple data preserved and operational ✅
-- **Professional Polish**: Advanced features with < 0.1s response times maintained ✅
-
-### **Custom Category Integration Complete:**
-- **Recipe System Integration**: Custom category order fully applied throughout recipe ingredient organization ✅
-- **Store-Layout Optimization**: Seamless personalized experience from staples through recipes to shopping ✅
-- **Visual Consistency**: Category colors and organization consistent across all recipe interfaces ✅
-- **Performance Maintained**: < 0.1s response times with enhanced category integration ✅
-
-### **Recipe Search Enhancement Complete:**
-- **Multi-Field Search**: Comprehensive search across names, ingredients, tags, instructions ✅
-- **Performance Optimization**: Indexed queries maintaining sub-0.1s response times ✅
-- **Intelligent Ranking**: Usage-based relevance with alphabetical secondary sorting ✅
-- **Visual Feedback**: Clear match type indicators for superior user experience ✅
-
-### **Recipe Creation & Editing Complete:**
-- **Professional Creation Form**: Multi-step form with comprehensive validation ✅
-- **Ingredient Management**: Full add/edit/remove/reorder capabilities with template integration ✅
-- **Parse-Then-Autocomplete**: Intelligent parsing with fuzzy matching system ✅
-- **Template Alignment**: Automatic ingredient normalization with template linking ✅
-- **Category Assignment**: Batch category assignment using CategoryAssignmentModal ✅
-- **Edit Workflow**: Seamless editing with data integrity preservation ✅
-- **Unsaved Changes Detection**: Alert users before discarding modifications ✅
-- **Performance Excellence**: All operations < 0.5s with proper Core Data management ✅
+### **Ready for Advanced Features:**
+- **Quantity Consolidation**: Foundation for intelligent merging (Phase 5)
+- **Meal Planning**: Scaled recipes ready for M4 integration ✅
+- **Analytics**: Numeric quantities ready for insights (M7)
+- **Nutrition Tracking**: Data structure supports future health features (M8)
+- **Budget Intelligence**: Quantity data ready for cost analysis (M9)
 
 ---
 
 ## 🚀 **CURRENT SPRINT FOCUS**
 
-### **Immediate Priority: M3 Structured Quantity Management** ⏳
-- **Timeline**: 8-12 hours
-- **M3.1**: Hybrid Quantity Architecture (2-3 hours)
-- **M3.2**: Recipe Scaling Intelligence (2-3 hours)
-- **M3.3**: Intelligent Shopping Consolidation (2-3 hours)
-- **Impact**: Enable recipe scaling, nutrition analysis foundation, intelligent shopping consolidation
+### **Immediate Priority: M3 Phase 5 - Quantity Merge Service** ⏳
+- **Timeline**: 2-3 hours
+- **Purpose**: Intelligent shopping list consolidation
+- **Impact**: Reduce shopping list redundancy, track recipe sources
+- **Next Action**: Implement QuantityMergeService and ConsolidationPreviewView
 
 ### **Next Sprint Targets**:
-1. **M3.1**: Hybrid quantity architecture with intelligent parsing (2-3 hours)
-2. **M3.2**: Recipe scaling with graceful degradation (2-3 hours)
-3. **M3.3**: Shopping consolidation with mixed type handling (2-3 hours)
-4. **M4**: Begin meal planning implementation after M3 complete
+1. **M3 Phase 5**: Quantity merge service (2-3 hours)
+2. **M3 Phase 6**: UI polish and documentation (1 hour)
+3. **M3 Complete**: Mark milestone complete with learning notes
+4. **M4 Start**: Begin meal planning implementation
 
 ### **Development Achievements:**
 - **M1**: 32 hours - Revolutionary grocery management ✅
-- **M2**: 15.5 hours - Complete recipe lifecycle management ✅
-- **Total Platform Hours**: 47.5 hours invested in production-ready foundation
+- **M2**: 16.5 hours - Complete recipe lifecycle management ✅
+- **M3 Phases 1-4**: 7 hours - Structured quantities and recipe scaling ✅
+- **Total Platform Hours**: 55.5 hours invested in production-ready foundation
 
 **Strategic Positioning**: Core platform (M1-M7) provides robust foundation for advanced intelligence features (M8-M11) representing significant competitive advantage and market differentiation opportunity.
+
+**Last Updated**: October 11, 2025  
+**Next Update**: After M3 Phase 5 completion

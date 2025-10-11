@@ -1,12 +1,12 @@
-# M3 Phase 4: Recipe Scaling Service - Development Prompt
+# M3 Phase 5: Quantity Merge Service - Development Prompt
 
-**Copy and paste this prompt when ready to continue M3 Phase 4:**
+**Copy and paste this prompt when ready to continue M3 Phase 5:**
 
 ---
 
-I'm ready to continue **M3 Phase 4: Recipe Scaling Service** for my Grocery & Recipe Manager iOS app.
+I'm ready to continue **M3 Phase 5: Quantity Merge Service** for my Grocery & Recipe Manager iOS app.
 
-## Current Status - M3 Phase 1-3 COMPLETE:
+## Current Status - M3 Phase 1-4 COMPLETE:
 
 ### **M1-M2: Foundation Complete** ✅
 - **M1**: Professional Grocery Management (32 hours, Aug 2025) - Complete
@@ -34,111 +34,217 @@ I'm ready to continue **M3 Phase 4: Recipe Scaling Service** for my Grocery & Re
 - **100% Success Rate**: 32 items processed - 24 parsed (75%), 8 text-only (25%)
 - **Migration Complete**: All existing data successfully migrated to structured format
 
-**Migration Results:**
-```
-✅ Successfully Parsed: 24 items with quantities
-   "2 cups all-purpose flour" → 2.0 cup
-   "1.5 lb ground beef" → 1.5 lb
-   "3/4 teaspoon salt" → 0.75 tsp
+### **M3 Phase 4: Recipe Scaling Service** ✅
+**Completion Date**: October 11, 2025  
+**Time**: 2.5 hours
 
-📝 Text-Only (Correct): 8 staple items without quantities
-   "Apples", "Milk 2%", "Bananas" (correctly preserved)
-```
+**Achievements:**
+- **RecipeScalingService**: Mathematical quantity scaling operational
+- **Kitchen-Friendly Fractions**: Decimal to fraction conversion (1.5 → "1 1/2")
+- **Scaling UI**: Professional SwiftUI interface with slider and quick buttons
+- **Graceful Degradation**: Unparseable ingredients handled with adjustment notes
+- **Performance**: < 0.5s scaling operations for 20+ ingredient recipes
+
+**Features Working:**
+- Scale recipes from 0.25x to 4x with live preview
+- Auto-scaled vs manual adjustment summary
+- Visual indicators (✓ for scaled, ℹ️ for manual)
+- Preview-only (non-destructive to original recipe)
 
 ---
 
-## M3 Phase 4: Recipe Scaling Service (2-3 hours)
+## M3 Phase 5: Quantity Merge Service (2-3 hours)
 
 ### **Goal:**
-Build mathematical recipe scaling service enabling users to scale recipes up or down for different serving sizes, with graceful handling of both parseable and unparseable quantities.
+Build intelligent shopping list consolidation service that combines duplicate ingredients with compatible quantities while handling mixed types gracefully.
 
 ### **Current Foundation:**
 - ✅ Structured quantity data model operational
 - ✅ numericValue, standardUnit, isParseable fields populated
-- ✅ IngredientParsingService with unit standardization ready
-- ✅ All recipes and ingredients have structured quantities
+- ✅ Recipe scaling service demonstrates quantity manipulation
+- ✅ Shopping lists have structured quantities ready for merging
 
-### **Phase 4 Implementation Plan:**
+### **Phase 5 Implementation Plan:**
 
-#### **Step 1: RecipeScalingService (60-90 minutes)**
+#### **Step 1: QuantityMergeService (90-120 minutes)**
 
 **Create New Service:**
 ```swift
-// Services/RecipeScalingService.swift
+// Services/QuantityMergeService.swift
 
 import Foundation
 import CoreData
 
-class RecipeScalingService {
+class QuantityMergeService {
     private let context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
         self.context = context
     }
     
-    // Main scaling function
-    func scale(recipe: Recipe, scaleFactor: Double) -> ScaledRecipe {
-        var scaledIngredients: [ScaledIngredient] = []
-        var autoScaledCount = 0
-        var manualAdjustCount = 0
+    // MARK: - Main Merge Function
+    
+    /// Analyze grocery list items for consolidation opportunities
+    func analyzeMergeOpportunities(for list: WeeklyList) -> MergeAnalysis {
+        guard let itemsSet = list.items else {
+            return MergeAnalysis(list: list, groups: [], totalSavings: 0)
+        }
         
-        for ingredient in recipe.ingredientsArray {
-            if ingredient.isParseable, let value = ingredient.numericValue {
-                // Scale parseable quantities mathematically
-                let scaledValue = value * scaleFactor
-                let displayText = formatScaled(
-                    value: scaledValue,
-                    unit: ingredient.standardUnit
-                )
-                
-                scaledIngredients.append(ScaledIngredient(
-                    name: ingredient.name ?? "Unknown",
-                    displayText: displayText,
-                    wasScaled: true,
-                    originalText: ingredient.displayText
-                ))
-                autoScaledCount += 1
-            } else {
-                // Keep unparseable with helpful note
-                let adjustmentNote = "adjust to taste for \(formatServings(recipe.servings, scaleFactor)) servings"
-                
-                scaledIngredients.append(ScaledIngredient(
-                    name: ingredient.name ?? "Unknown",
-                    displayText: "\(ingredient.displayText) (\(adjustmentNote))",
-                    wasScaled: false,
-                    originalText: ingredient.displayText
-                ))
-                manualAdjustCount += 1
+        let items = Array(itemsSet) as! [GroceryListItem]
+        let incompleteItems = items.filter { !$0.isCompleted }
+        
+        // Group by ingredient template (normalized name)
+        let grouped = Dictionary(grouping: incompleteItems) { item -> String in
+            return item.ingredientTemplate?.name?.lowercased() ?? item.name?.lowercased() ?? ""
+        }
+        
+        var mergeGroups: [MergeGroup] = []
+        var potentialSavings = 0
+        
+        for (ingredientName, groupItems) in grouped where groupItems.count > 1 {
+            // Further subdivide by unit compatibility
+            let compatible = groupCompatibleQuantities(groupItems)
+            
+            if let mergedGroup = createMergeGroup(
+                ingredientName: ingredientName,
+                items: groupItems,
+                compatibleSets: compatible
+            ) {
+                mergeGroups.append(mergedGroup)
+                potentialSavings += (groupItems.count - mergedGroup.resultCount)
             }
         }
         
-        return ScaledRecipe(
-            originalRecipe: recipe,
-            scaleFactor: scaleFactor,
-            scaledServings: Int(Double(recipe.servings) * scaleFactor),
-            scaledIngredients: scaledIngredients,
-            autoScaledCount: autoScaledCount,
-            manualAdjustCount: manualAdjustCount
+        return MergeAnalysis(
+            list: list,
+            groups: mergeGroups,
+            totalSavings: potentialSavings
         )
     }
     
-    // Format scaled values with kitchen-friendly fractions
-    private func formatScaled(value: Double, unit: String?) -> String {
-        let fractionString = formatToFraction(value)
+    // MARK: - Compatibility Analysis
+    
+    private func groupCompatibleQuantities(_ items: [GroceryListItem]) -> [[GroceryListItem]] {
+        var compatibleSets: [[GroceryListItem]] = []
         
-        if let unit = unit, !unit.isEmpty {
-            return "\(fractionString) \(unit)"
-        } else {
-            return fractionString
+        // Separate parseable from unparseable
+        let parseable = items.filter { $0.isParseable && $0.standardUnit != nil }
+        let unparseable = items.filter { !$0.isParseable || $0.standardUnit == nil }
+        
+        // Group parseable by standardUnit
+        let byUnit = Dictionary(grouping: parseable) { $0.standardUnit ?? "" }
+        
+        for (_, unitItems) in byUnit where unitItems.count > 1 {
+            compatibleSets.append(unitItems)
         }
+        
+        // Each unparseable is its own group
+        for item in unparseable {
+            compatibleSets.append([item])
+        }
+        
+        return compatibleSets
     }
     
-    // Convert decimal to fraction for kitchen-friendly display
+    private func createMergeGroup(
+        ingredientName: String,
+        items: [GroceryListItem],
+        compatibleSets: [[GroceryListItem]]
+    ) -> MergeGroup? {
+        
+        var mergedItems: [MergedItem] = []
+        
+        for itemSet in compatibleSets {
+            if itemSet.count > 1 && canMerge(itemSet) {
+                // Mergeable set - combine quantities
+                let totalValue = itemSet.compactMap { $0.numericValue }.reduce(0, +)
+                let unit = itemSet.first?.standardUnit
+                let sources = itemSet.compactMap { $0.source }
+                
+                mergedItems.append(MergedItem(
+                    displayText: formatMergedQuantity(value: totalValue, unit: unit),
+                    sourceCount: itemSet.count,
+                    sources: sources,
+                    originalItems: itemSet,
+                    isMerged: true
+                ))
+            } else {
+                // Keep separate
+                for item in itemSet {
+                    mergedItems.append(MergedItem(
+                        displayText: item.displayText ?? item.name ?? "",
+                        sourceCount: 1,
+                        sources: [item.source ?? ""],
+                        originalItems: [item],
+                        isMerged: false
+                    ))
+                }
+            }
+        }
+        
+        guard mergedItems.count < items.count else { return nil }
+        
+        return MergeGroup(
+            ingredientName: ingredientName,
+            originalCount: items.count,
+            mergedItems: mergedItems,
+            savingsCount: items.count - mergedItems.count
+        )
+    }
+    
+    private func canMerge(_ items: [GroceryListItem]) -> Bool {
+        // All must be parseable with same unit
+        guard items.allSatisfy({ $0.isParseable && $0.standardUnit != nil }) else {
+            return false
+        }
+        
+        let firstUnit = items.first?.standardUnit
+        return items.allSatisfy { $0.standardUnit == firstUnit }
+    }
+    
+    // MARK: - Merge Execution
+    
+    func executeMerge(analysis: MergeAnalysis) throws {
+        guard let list = analysis.list else { return }
+        
+        for group in analysis.groups {
+            for mergedItem in group.mergedItems where mergedItem.isMerged {
+                // Create single consolidated item
+                let consolidated = GroceryListItem(context: context)
+                consolidated.id = UUID()
+                consolidated.name = group.ingredientName
+                consolidated.displayText = mergedItem.displayText
+                consolidated.numericValue = mergedItem.originalItems.compactMap { $0.numericValue }.reduce(0, +)
+                consolidated.standardUnit = mergedItem.originalItems.first?.standardUnit
+                consolidated.isParseable = true
+                consolidated.source = "merged(\(mergedItem.sourceCount))"
+                consolidated.dateCreated = Date()
+                consolidated.isCompleted = false
+                consolidated.weeklyList = list
+                consolidated.ingredientTemplate = mergedItem.originalItems.first?.ingredientTemplate
+                
+                // Delete original items
+                mergedItem.originalItems.forEach { context.delete($0) }
+            }
+        }
+        
+        try context.save()
+    }
+    
+    // MARK: - Formatting
+    
+    private func formatMergedQuantity(value: Double, unit: String?) -> String {
+        let fractionString = formatToFraction(value)
+        if let unit = unit, !unit.isEmpty {
+            return "\(fractionString) \(unit)"
+        }
+        return fractionString
+    }
+    
     private func formatToFraction(_ value: Double) -> String {
         let whole = Int(value)
         let fractional = value - Double(whole)
         
-        // Common fractions with tolerance
         let fractions: [(value: Double, display: String)] = [
             (0.125, "1/8"), (0.166, "1/6"), (0.25, "1/4"),
             (0.333, "1/3"), (0.375, "3/8"), (0.5, "1/2"),
@@ -148,286 +254,212 @@ class RecipeScalingService {
         
         let tolerance = 0.05
         
-        // Find matching fraction
         for (fValue, fDisplay) in fractions {
             if abs(fractional - fValue) < tolerance {
-                if whole > 0 {
-                    return "\(whole) \(fDisplay)"
-                } else {
-                    return fDisplay
-                }
+                return whole > 0 ? "\(whole) \(fDisplay)" : fDisplay
             }
         }
         
-        // No close fraction match, use decimal
         if whole > 0 {
-            return String(format: "%.1f", value)
-        } else {
-            return String(format: "%.2f", value)
+            return fractional < 0.01 ? "\(whole)" : String(format: "%.1f", value)
         }
-    }
-    
-    private func formatServings(_ servings: Int16, _ factor: Double) -> String {
-        let scaled = Int(Double(servings) * factor)
-        return "\(scaled)"
+        return String(format: "%.2f", value)
     }
 }
 
-// Data structures for scaled recipe
-struct ScaledRecipe {
-    let originalRecipe: Recipe
-    let scaleFactor: Double
-    let scaledServings: Int
-    let scaledIngredients: [ScaledIngredient]
-    let autoScaledCount: Int
-    let manualAdjustCount: Int
+// MARK: - Data Structures
+
+struct MergeAnalysis {
+    let list: WeeklyList?
+    let groups: [MergeGroup]
+    let totalSavings: Int
+    
+    var hasMergeOpportunities: Bool {
+        return totalSavings > 0
+    }
     
     var summary: String {
-        if manualAdjustCount == 0 {
-            return "All \(autoScaledCount) ingredients auto-scaled"
+        if totalSavings == 0 {
+            return "No merge opportunities found"
+        } else if totalSavings == 1 {
+            return "Can consolidate 1 duplicate item"
         } else {
-            return "\(autoScaledCount) ingredients auto-scaled, \(manualAdjustCount) require manual adjustment"
+            return "Can consolidate \(totalSavings) duplicate items"
         }
     }
 }
 
-struct ScaledIngredient: Identifiable {
+struct MergeGroup {
+    let ingredientName: String
+    let originalCount: Int
+    let mergedItems: [MergedItem]
+    let savingsCount: Int
+    
+    var resultCount: Int {
+        return mergedItems.count
+    }
+}
+
+struct MergedItem: Identifiable {
     let id = UUID()
-    let name: String
     let displayText: String
-    let wasScaled: Bool
-    let originalText: String
+    let sourceCount: Int
+    let sources: [String]
+    let originalItems: [GroceryListItem]
+    let isMerged: Bool
 }
 ```
 
-#### **Step 2: Recipe Scaling UI (45-60 minutes)**
+#### **Step 2: Consolidation UI (45-60 minutes)**
 
-**Add to RecipeDetailView:**
+**Add to GroceryListDetailView:**
 ```swift
-// Add these state variables near other @State properties
-@State private var showScalingSheet = false
-@State private var scaleFactor: Double = 1.0
-@State private var scaledRecipe: ScaledRecipe?
+// Add state for consolidation
+@State private var showingConsolidationSheet = false
+@State private var mergeAnalysis: MergeAnalysis?
+@StateObject private var mergeService: QuantityMergeService
 
-// Add scaling service
-private let scalingService: RecipeScalingService
-
-// Initialize service in init
-init(recipe: Recipe) {
-    self.recipe = recipe
-    self.scalingService = RecipeScalingService(
+// Initialize service
+init(weeklyList: WeeklyList) {
+    self.weeklyList = weeklyList
+    _mergeService = StateObject(wrappedValue: QuantityMergeService(
         context: PersistenceController.shared.container.viewContext
-    )
+    ))
 }
 
-// Add "Scale Recipe" button to toolbar
+// Add "Consolidate" button in toolbar
 .toolbar {
     ToolbarItem(placement: .navigationBarTrailing) {
-        Menu {
-            // ... existing menu items ...
-            
-            Divider()
-            
-            Button {
-                showScalingSheet = true
-                scaleFactor = 1.0
-            } label: {
-                Label("Scale Recipe", systemImage: "slider.horizontal.3")
-            }
+        Button {
+            analyzeConsolidation()
         } label: {
-            Image(systemName: "ellipsis.circle")
+            Label("Consolidate", systemImage: "arrow.triangle.merge")
         }
+        .disabled(incompletedItems.count < 2)
     }
 }
 
-// Add scaling sheet
-.sheet(isPresented: $showScalingSheet) {
-    NavigationStack {
-        RecipeScalingView(
-            recipe: recipe,
-            scalingService: scalingService
+private func analyzeConsolidation() {
+    mergeAnalysis = mergeService.analyzeMergeOpportunities(for: weeklyList)
+    if mergeAnalysis?.hasMergeOpportunities == true {
+        showingConsolidationSheet = true
+    } else {
+        // Show "no opportunities" message
+    }
+}
+
+.sheet(isPresented: $showingConsolidationSheet) {
+    if let analysis = mergeAnalysis {
+        ConsolidationPreviewView(
+            analysis: analysis,
+            mergeService: mergeService,
+            onComplete: {
+                showingConsolidationSheet = false
+                mergeAnalysis = nil
+            }
         )
     }
 }
 ```
 
-**Create RecipeScalingView:**
+**Create ConsolidationPreviewView:**
 ```swift
-// Views/Recipe/RecipeScalingView.swift
+// Views/ConsolidationPreviewView.swift
 
-import SwiftUI
-
-struct RecipeScalingView: View {
+struct ConsolidationPreviewView: View {
     @Environment(\.dismiss) var dismiss
-    let recipe: Recipe
-    let scalingService: RecipeScalingService
+    let analysis: MergeAnalysis
+    let mergeService: QuantityMergeService
+    let onComplete: () -> Void
     
-    @State private var scaleFactor: Double = 1.0
-    @State private var scaledRecipe: ScaledRecipe?
+    @State private var isExecuting = false
+    @State private var error: Error?
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with current servings
-            VStack(spacing: 12) {
-                Text("Scale Recipe")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                HStack(spacing: 16) {
-                    VStack {
-                        Text("Original")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("\(recipe.servings)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                        Text("servings")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Image(systemName: "arrow.right")
-                        .foregroundColor(.secondary)
-                    
-                    VStack {
-                        Text("Scaled")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("\(scaledServings)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.accentColor)
-                        Text("servings")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-            .padding()
-            .background(Color(.systemGray6))
-            
-            // Scale factor slider
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Scale Factor: \(scaleFactor, specifier: "%.2f")x")
-                    .font(.headline)
-                
-                Slider(value: $scaleFactor, in: 0.25...4.0, step: 0.25)
-                    .onChange(of: scaleFactor) { _, _ in
-                        updateScaledRecipe()
-                    }
-                
-                HStack {
-                    Text("0.25x")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text("1x")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text("4x")
-                        .font(.caption)
+        NavigationStack {
+            List {
+                Section {
+                    Text(analysis.summary)
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
-            }
-            .padding()
-            
-            // Quick scale buttons
-            HStack(spacing: 12) {
-                ForEach([0.5, 1.0, 1.5, 2.0], id: \.self) { factor in
-                    Button {
-                        scaleFactor = factor
-                    } label: {
-                        Text("\(factor, specifier: "%.1f")x")
-                            .font(.subheadline)
-                            .fontWeight(scaleFactor == factor ? .semibold : .regular)
-                            .foregroundColor(scaleFactor == factor ? .white : .accentColor)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(scaleFactor == factor ? Color.accentColor : Color.clear)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.accentColor, lineWidth: 1)
-                            )
-                    }
-                }
-            }
-            .padding(.horizontal)
-            
-            Divider()
-                .padding(.vertical)
-            
-            // Scaled ingredients preview
-            if let scaled = scaledRecipe {
-                List {
-                    Section {
-                        Text(scaled.summary)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Section("Scaled Ingredients") {
-                        ForEach(scaled.scaledIngredients) { ingredient in
-                            HStack(alignment: .top, spacing: 12) {
-                                Image(systemName: ingredient.wasScaled ? "checkmark.circle.fill" : "info.circle")
-                                    .foregroundColor(ingredient.wasScaled ? .green : .orange)
-                                    .font(.title3)
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(ingredient.name)
-                                        .font(.body)
-                                    
-                                    Text(ingredient.displayText)
-                                        .font(.subheadline)
-                                        .foregroundColor(ingredient.wasScaled ? .primary : .secondary)
-                                    
-                                    if !ingredient.wasScaled {
-                                        Text("Original: \(ingredient.originalText)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                            }
-                            .padding(.vertical, 4)
+                
+                ForEach(analysis.groups) { group in
+                    Section(header: groupHeader(group)) {
+                        ForEach(group.mergedItems) { item in
+                            mergedItemRow(item)
                         }
                     }
                 }
-                .listStyle(.insetGrouped)
             }
-            
+            .navigationTitle("Consolidate Items")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Apply") {
+                        executeConsolidation()
+                    }
+                    .disabled(isExecuting)
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+    }
+    
+    private func groupHeader(_ group: MergeGroup) -> some View {
+        HStack {
+            Text(group.ingredientName.capitalized)
             Spacer()
+            Text("\(group.originalCount) → \(group.resultCount) items")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Cancel") {
-                    dismiss()
-                }
-            }
+    }
+    
+    private func mergedItemRow(_ item: MergedItem) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: item.isMerged ? "arrow.triangle.merge" : "minus")
+                .foregroundColor(item.isMerged ? .green : .secondary)
+                .font(.title3)
             
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    // For Phase 4, just dismiss
-                    // In future, could save scaled version
-                    dismiss()
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.displayText)
+                    .font(.body)
+                    .fontWeight(item.isMerged ? .medium : .regular)
+                
+                if item.isMerged && item.sourceCount > 1 {
+                    Text("Merged from \(item.sourceCount) items")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
-                .fontWeight(.semibold)
+                
+                if !item.sources.isEmpty {
+                    Text("Sources: \(item.sources.joined(separator: ", "))")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
-        .onAppear {
-            updateScaledRecipe()
+        .padding(.vertical, 4)
+    }
+    
+    private func executeConsolidation() {
+        isExecuting = true
+        
+        do {
+            try mergeService.executeMerge(analysis: analysis)
+            dismiss()
+            onComplete()
+        } catch {
+            self.error = error
+            isExecuting = false
         }
-    }
-    
-    private var scaledServings: Int {
-        Int(Double(recipe.servings) * scaleFactor)
-    }
-    
-    private func updateScaledRecipe() {
-        scaledRecipe = scalingService.scale(recipe: recipe, scaleFactor: scaleFactor)
     }
 }
 ```
@@ -435,66 +467,62 @@ struct RecipeScalingView: View {
 #### **Step 3: Testing & Validation (15-30 minutes)**
 
 **Test Scenarios:**
-1. **Scale Up (2x)**:
-   - "2 cups flour" → "4 cups flour"
-   - "1.5 lb beef" → "3 lbs beef"
-   - "Salt to taste" → "Salt to taste (adjust for 8 servings)"
+1. **Simple Merge**:
+   - Add "1 cup flour" from Recipe A
+   - Add "2 cups flour" from Recipe B
+   - Consolidate → "3 cups flour" with source tracking
 
-2. **Scale Down (0.5x)**:
-   - "4 cups water" → "2 cups water"
-   - "2 tablespoons oil" → "1 tablespoon oil"
+2. **Mixed Units**:
+   - "2 cups milk" + "1 tablespoon milk"
+   - Keep separate (incompatible units)
 
-3. **Fractional Scaling (1.5x)**:
-   - "2 cups flour" → "3 cups flour"
-   - "1 cup milk" → "1 1/2 cups milk"
-   - "2/3 cup sugar" → "1 cup sugar"
+3. **Unparseable**:
+   - "Flour to taste" + "2 cups flour"
+   - Keep separate (incompatible types)
 
-4. **Edge Cases**:
-   - Very small quantities (0.25x)
-   - Large scaling (3x, 4x)
-   - Mixed parseable/unparseable ingredients
+4. **Multiple Recipes**:
+   - Same ingredient from 3+ recipes
+   - Proper source tracking
 
 **Performance Validation:**
-- Scaling operation < 0.5s for 20+ ingredient recipes
-- UI responsive during calculations
-- Fraction formatting displays correctly
+- Analysis < 0.5s for 50+ item lists
+- Merge execution < 1s
+- UI responsive during operations
 
 ### **Success Criteria:**
 
 **Functionality:**
-- ✅ Scale button appears in recipe detail toolbar
-- ✅ Scaling sheet opens with current servings display
-- ✅ Slider and quick buttons adjust scale factor
-- ✅ Live preview updates as slider moves
-- ✅ Parseable quantities scale mathematically
-- ✅ Unparseable quantities show adjustment note
-- ✅ Summary shows auto-scaled vs manual count
-- ✅ Kitchen-friendly fractions display correctly
+- ✅ Analyze button appears in grocery list toolbar
+- ✅ Consolidation sheet shows merge preview
+- ✅ Compatible quantities merge correctly
+- ✅ Incompatible quantities stay separate
+- ✅ Source tracking shows origin recipes
+- ✅ Apply button executes merge
+- ✅ Original items deleted, consolidated item created
 
 **User Experience:**
-- ✅ Intuitive scaling interface
-- ✅ Clear visual indicators (checkmark = auto-scaled, info = manual)
-- ✅ Helpful adjustment notes for unparseable quantities
-- ✅ Original quantities visible for comparison
-- ✅ Quick scale buttons for common factors (0.5x, 1x, 1.5x, 2x)
+- ✅ Clear preview of what will be consolidated
+- ✅ Easy to understand merge summary
+- ✅ Cancel preserves original items
+- ✅ Apply executes merge and updates list
+- ✅ Visual indicators for merged vs separate items
 
 **Performance:**
-- ✅ Scaling calculations < 0.5s
-- ✅ UI remains responsive during preview updates
-- ✅ Smooth slider interaction
+- ✅ Analysis < 0.5s for lists with 50+ items
+- ✅ Merge execution < 1s
+- ✅ UI remains responsive during consolidation
 
 ### **What's Already Ready:**
-- ✅ Structured quantity data model
-- ✅ numericValue, standardUnit, isParseable fields populated
-- ✅ All recipes migrated to structured format
-- ✅ IngredientParsingService with unit standardization
-- ✅ Recipe detail view architecture ready for enhancement
+- ✅ Structured quantity data in all grocery list items
+- ✅ numericValue and standardUnit fields populated
+- ✅ Recipe scaling service shows quantity manipulation patterns
+- ✅ GroceryListDetailView ready for toolbar enhancement
 
-### **After Phase 4:**
-- **Phase 5**: Quantity Merge Service for shopping list consolidation (2-3 hours)
-- **Phase 6**: UI polish and final documentation (1 hour)
-- **M3 Complete**: Recipe scaling, migration, foundation for analytics
+### **After Phase 5:**
+- **Phase 6**: UI polish and final M3 documentation (1 hour)
+- **M3 Complete**: All 6 phases operational
+- **M4 Ready**: Meal planning with enhanced grocery integration
 
-**Current Progress**: M3 is 50% complete (3 of 6 phases). Phase 4 will bring us to 67% complete with recipe scaling operational.
+**Current Progress**: M3 is 67% complete (4 of 6 phases). Phase 5 will bring us to 83% complete with intelligent shopping list consolidation operational.
 
-**Please help me implement M3 Phase 4: Recipe Scaling Service with mathematical quantity scaling, kitchen-friendly fraction display, and professional scaling UI.**
+**Please help me implement M3 Phase 5: Quantity Merge Service with intelligent consolidation, source tracking, and professional preview UI.**
