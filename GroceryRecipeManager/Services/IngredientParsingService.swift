@@ -2,13 +2,22 @@
 //  IngredientParsingService.swift
 //  GroceryRecipeManager
 //
-//  Created on September 12, 2025
-//  MILESTONE 2 - Phase 2: Recipe Core Development
-//  Step 3: IngredientTemplate Integration
+//  Updated for M3 Phase 2: Structured Quantity Management
+//  Enhanced with numeric conversion and unit standardization
 //
 
 import Foundation
 import CoreData
+
+// MARK: - Structured Quantity Model
+
+struct StructuredQuantity {
+    let numericValue: Double?      // 2.0, 1.5, nil for unparseable
+    let standardUnit: String?      // "cup", "lb", "tsp" (standardized)
+    let displayText: String        // "2 cups", "a pinch" (user-facing)
+    let isParseable: Bool          // Can be used in math operations
+    let parseConfidence: Float     // 0.0-1.0
+}
 
 struct ParsedIngredient {
     let originalText: String
@@ -26,7 +35,7 @@ struct ParsedIngredient {
     }
 }
 
-/// Service for intelligent ingredient text parsing and IngredientTemplate integration
+/// Service for intelligent ingredient text parsing with structured quantity support
 class IngredientParsingService: ObservableObject {
     private let context: NSManagedObjectContext
     private let templateService: IngredientTemplateService
@@ -40,15 +49,14 @@ class IngredientParsingService: ObservableObject {
         self.templateService = templateService
     }
     
-    // MARK: - Smart Ingredient Parsing
+    // MARK: - Smart Ingredient Parsing (Legacy)
     
-    /// Parse ingredient text into structured components
+    /// Parse ingredient text into components (legacy method)
     func parseIngredient(text: String) -> ParsedIngredient {
         let startTime = CFAbsoluteTimeGetCurrent()
         
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Handle empty or very short text
         guard !trimmedText.isEmpty else {
             return ParsedIngredient(
                 originalText: text,
@@ -69,45 +77,199 @@ class IngredientParsingService: ObservableObject {
             )
         }
         
-        // Parse using regex patterns for common ingredient formats
         let parsed = parseWithPatterns(text: trimmedText)
         
-        // Track performance
         let duration = CFAbsoluteTimeGetCurrent() - startTime
         self.lastParsingDuration = duration
         
         return parsed
     }
     
-    /// Parse ingredient list and connect to templates
+    // MARK: - Structured Quantity Parsing (NEW)
+    
+    /// Parse ingredient text into structured quantity format
+    func parseToStructured(text: String) -> StructuredQuantity {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Parse using existing patterns
+        let parsed = parseWithPatterns(text: trimmedText)
+        
+        // Convert to numeric and standardize
+        let numericValue = convertToNumeric(parsed.quantity)
+        let standardUnit = standardizeUnit(parsed.unit)
+        
+        // Determine if parseable
+        let isParseable = numericValue != nil
+        
+        // Calculate confidence
+        let confidence: Float
+        if parsed.isFullyParsed && isParseable {
+            confidence = 1.0
+        } else if isParseable {
+            confidence = 0.7
+        } else if parsed.quantity != nil {
+            confidence = 0.3
+        } else {
+            confidence = 0.0
+        }
+        
+        // Build display text
+        var displayParts: [String] = []
+        if let qty = parsed.quantity {
+            displayParts.append(qty)
+        }
+        if let unit = parsed.unit {
+            displayParts.append(unit)
+        }
+        let displayText = displayParts.isEmpty ? trimmedText : displayParts.joined(separator: " ")
+        
+        let duration = CFAbsoluteTimeGetCurrent() - startTime
+        self.lastParsingDuration = duration
+        
+        return StructuredQuantity(
+            numericValue: numericValue,
+            standardUnit: standardUnit,
+            displayText: displayText,
+            isParseable: isParseable,
+            parseConfidence: confidence
+        )
+    }
+    
+    // MARK: - Numeric Conversion
+    
+    /// Convert quantity string to numeric value
+    func convertToNumeric(_ quantity: String?) -> Double? {
+        guard let qty = quantity?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !qty.isEmpty else {
+            return nil
+        }
+        
+        // Handle simple decimals: "2", "1.5", "0.75"
+        if let value = Double(qty) {
+            return value
+        }
+        
+        // Handle fractions: "3/4", "1/2", "2/3"
+        if qty.contains("/") {
+            let parts = qty.split(separator: "/").map(String.init)
+            if parts.count == 2,
+               let numerator = Double(parts[0]),
+               let denominator = Double(parts[1]),
+               denominator != 0 {
+                return numerator / denominator
+            }
+        }
+        
+        // Handle mixed fractions: "1 1/2", "2 3/4"
+        let mixedPattern = #"^(\d+)\s+(\d+)/(\d+)$"#
+        if let regex = try? NSRegularExpression(pattern: mixedPattern),
+           let match = regex.firstMatch(in: qty, range: NSRange(qty.startIndex..., in: qty)) {
+            
+            if let wholeRange = Range(match.range(at: 1), in: qty),
+               let numRange = Range(match.range(at: 2), in: qty),
+               let denomRange = Range(match.range(at: 3), in: qty),
+               let whole = Double(qty[wholeRange]),
+               let numerator = Double(qty[numRange]),
+               let denominator = Double(qty[denomRange]),
+               denominator != 0 {
+                return whole + (numerator / denominator)
+            }
+        }
+        
+        // Unparseable
+        return nil
+    }
+    
+    // MARK: - Unit Standardization
+    
+    /// Standardize unit strings to canonical forms
+    func standardizeUnit(_ unit: String?) -> String? {
+        guard let unit = unit?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines),
+              !unit.isEmpty else {
+            return nil
+        }
+        
+        // Volume units
+        let volumeMap: [String: String] = [
+            "cup": "cup", "cups": "cup", "c": "cup",
+            "tablespoon": "tbsp", "tablespoons": "tbsp", "tbsp": "tbsp", "tbs": "tbsp", "t": "tbsp",
+            "teaspoon": "tsp", "teaspoons": "tsp", "tsp": "tsp", "ts": "tsp",
+            "milliliter": "ml", "milliliters": "ml", "ml": "ml", "mls": "ml",
+            "liter": "l", "liters": "l", "l": "l", "ls": "l",
+            "fluid ounce": "fl oz", "fluid ounces": "fl oz", "fl oz": "fl oz", "fl. oz.": "fl oz",
+            "pint": "pint", "pints": "pint", "pt": "pint",
+            "quart": "quart", "quarts": "quart", "qt": "quart",
+            "gallon": "gallon", "gallons": "gallon", "gal": "gallon"
+        ]
+        
+        // Weight units
+        let weightMap: [String: String] = [
+            "pound": "lb", "pounds": "lb", "lb": "lb", "lbs": "lb",
+            "ounce": "oz", "ounces": "oz", "oz": "oz",
+            "gram": "g", "grams": "g", "g": "g",
+            "kilogram": "kg", "kilograms": "kg", "kg": "kg"
+        ]
+        
+        // Count/other units
+        let countMap: [String: String] = [
+            "piece": "piece", "pieces": "piece", "pc": "piece",
+            "clove": "clove", "cloves": "clove",
+            "slice": "slice", "slices": "slice",
+            "can": "can", "cans": "can",
+            "package": "package", "packages": "package", "pkg": "package",
+            "bunch": "bunch", "bunches": "bunch",
+            "head": "head", "heads": "head"
+        ]
+        
+        // Check all maps
+        if let standard = volumeMap[unit] { return standard }
+        if let standard = weightMap[unit] { return standard }
+        if let standard = countMap[unit] { return standard }
+        
+        // Return original if not found
+        return unit
+    }
+    
+    // MARK: - Parse and Connect (UPDATED for Structured Quantities)
+    
+    /// Parse ingredient list and connect to templates using structured quantities
     func parseAndConnectIngredients(for recipe: Recipe, ingredientTexts: [String]) -> [Ingredient] {
         var createdIngredients: [Ingredient] = []
         var successfulParses = 0
         
         for (index, text) in ingredientTexts.enumerated() {
-            let parsedIngredient = parseIngredient(text: text)
+            let parsed = parseIngredient(text: text)
+            let structured = parseToStructured(text: text)
             
-            // Create Ingredient entity
+            // Create Ingredient entity with NEW structured fields
             let ingredient = Ingredient(context: context)
             ingredient.id = UUID()
-            ingredient.name = parsedIngredient.originalText // Store original text as name
-            ingredient.quantity = parsedIngredient.quantity
-            ingredient.unit = parsedIngredient.unit
-            ingredient.notes = parsedIngredient.notes
+            ingredient.name = parsed.originalText // Store original text as name
+            
+            // NEW: Set structured quantity fields
+            ingredient.numericValue = structured.numericValue ?? 0.0
+            ingredient.standardUnit = structured.standardUnit
+            ingredient.displayText = structured.displayText
+            ingredient.isParseable = structured.isParseable
+            ingredient.parseConfidence = structured.parseConfidence
+            
+            ingredient.notes = parsed.notes
             ingredient.sortOrder = Int16(index)
             ingredient.recipe = recipe
             
             // Connect to IngredientTemplate for normalization
             let template = templateService.findOrCreateTemplate(
-                name: parsedIngredient.displayName,
-                category: categorizeIngredient(parsedIngredient.displayName)
+                name: parsed.displayName,
+                category: categorizeIngredient(parsed.displayName)
             )
             ingredient.ingredientTemplate = template
             templateService.incrementUsage(template: template)
             
             createdIngredients.append(ingredient)
             
-            if parsedIngredient.isFullyParsed {
+            if structured.isParseable {
                 successfulParses += 1
             }
         }
@@ -120,7 +282,7 @@ class IngredientParsingService: ObservableObject {
         return createdIngredients
     }
     
-    // MARK: - Pattern-Based Parsing
+    // MARK: - Pattern-Based Parsing (Existing - Unchanged)
     
     private func parseWithPatterns(text: String) -> ParsedIngredient {
         // Pattern 1: "2 cups flour" or "1 1/2 tbsp olive oil"
@@ -203,43 +365,25 @@ class IngredientParsingService: ObservableObject {
         return results.isEmpty ? nil : results
     }
     
-    // MARK: - Category Assignment
+    // MARK: - Category Inference
     
-    private func categorizeIngredient(_ name: String) -> String {
-        let lowercaseName = name.lowercased()
+    private func categorizeIngredient(_ name: String) -> String? {
+        let lowercased = name.lowercased()
         
-        // Basic categorization logic (can be enhanced with your custom category system)
-        if lowercaseName.contains("milk") || lowercaseName.contains("cheese") ||
-           lowercaseName.contains("butter") || lowercaseName.contains("yogurt") {
-            return "Dairy"
-        } else if lowercaseName.contains("chicken") || lowercaseName.contains("beef") ||
-                  lowercaseName.contains("pork") || lowercaseName.contains("fish") {
+        if lowercased.contains("chicken") || lowercased.contains("beef") ||
+           lowercased.contains("pork") || lowercased.contains("fish") {
             return "Meat & Seafood"
-        } else if lowercaseName.contains("apple") || lowercaseName.contains("banana") ||
-                  lowercaseName.contains("orange") || lowercaseName.contains("berry") {
+        } else if lowercased.contains("milk") || lowercased.contains("cheese") ||
+                  lowercased.contains("butter") || lowercased.contains("cream") {
+            return "Dairy"
+        } else if lowercased.contains("apple") || lowercased.contains("banana") ||
+                  lowercased.contains("orange") || lowercased.contains("berry") {
             return "Produce"
-        } else if lowercaseName.contains("flour") || lowercaseName.contains("bread") ||
-                  lowercaseName.contains("rice") || lowercaseName.contains("pasta") {
+        } else if lowercased.contains("bread") || lowercased.contains("pasta") ||
+                  lowercased.contains("rice") || lowercased.contains("flour") {
             return "Pantry"
-        } else if lowercaseName.contains("salt") || lowercaseName.contains("pepper") ||
-                  lowercaseName.contains("spice") || lowercaseName.contains("herb") {
-            return "Seasonings"
-        } else {
-            return "Other"
         }
-    }
-    
-    // MARK: - Template Matching
-    
-    /// Find matching templates for autocomplete
-    func findMatchingTemplates(for name: String, limit: Int = 5) -> [IngredientTemplate] {
-        return templateService.searchTemplates(query: name, limit: limit)
-    }
-    
-    /// Validate parsing performance
-    func validateParsingPerformance() -> Bool {
-        // Test parsing with sample ingredient
-        let _ = parseIngredient(text: "2 cups all-purpose flour")
-        return lastParsingDuration < 0.05 // Target: < 0.05s for parsing
+        
+        return "Other"
     }
 }

@@ -165,12 +165,19 @@ struct WeeklyListsView: View {
             do {
                 let staples = try context.fetch(stapleRequest)
                 
-                // 3. Create GroceryListItems from staples
+                // 3. Create GroceryListItems from staples with structured quantities
                 for (index, staple) in staples.enumerated() {
                     let listItem = GroceryListItem(context: context)
                     listItem.id = UUID()
                     listItem.name = staple.name
-                    listItem.quantity = "1" // Default quantity
+                    
+                    // NEW: Use structured quantity fields
+                    listItem.displayText = "1"
+                    listItem.numericValue = 1.0
+                    listItem.standardUnit = nil
+                    listItem.isParseable = true
+                    listItem.parseConfidence = 1.0
+                    
                     listItem.isCompleted = false
                     listItem.source = "staples"
                     listItem.sortOrder = Int16(index)

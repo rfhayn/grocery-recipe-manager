@@ -124,7 +124,13 @@ struct AddListItemView: View {
             let newItem = GroceryListItem(context: context)
             newItem.id = UUID()
             newItem.name = trimmedName
-            newItem.quantity = trimmedQuantity.isEmpty ? "1" : trimmedQuantity
+            
+            // M3: Use structured quantity fields
+            newItem.displayText = trimmedQuantity.isEmpty ? "1" : trimmedQuantity
+            newItem.numericValue = 0.0  // Manual entry - will be properly parsed in Phase 3
+            newItem.isParseable = false  // Not parsed yet
+            newItem.parseConfidence = 0.0
+            
             newItem.isCompleted = false
             newItem.source = "manual"
             newItem.sortOrder = maxSortOrder + 1

@@ -6,7 +6,7 @@ struct RecipeListView: View {
     @StateObject private var recipeService = OptimizedRecipeDataService(context: PersistenceController.shared.container.viewContext)
     
     @State private var searchText = ""
-    @State private var showingAddRecipe = false  // UPDATED: Changed from showingAddRecipe to match M2.3
+    @State private var showingAddRecipe = false
     @State private var searchHistory: [String] = []
     
     @FetchRequest(
@@ -18,7 +18,7 @@ struct RecipeListView: View {
         animation: .default
     ) private var recipes: FetchedResults<Recipe>
     
-    // ENHANCED: Multi-field search with intelligent ranking - preserving existing structure
+    // ENHANCED: Multi-field search with intelligent ranking
     private var filteredRecipes: [Recipe] {
         if searchText.isEmpty {
             return Array(recipes)
@@ -163,7 +163,7 @@ struct RecipeListView: View {
         NavigationView {
             Group {
                 if filteredRecipes.isEmpty {
-                    enhancedEmptyStateView // ENHANCED: Improved empty state
+                    enhancedEmptyStateView
                 } else {
                     recipeListContent
                 }
@@ -171,10 +171,9 @@ struct RecipeListView: View {
             .navigationTitle("Recipes")
             .searchable(
                 text: $searchText,
-                prompt: "Search recipes, ingredients, instructions..." // ENHANCED: More descriptive prompt
+                prompt: "Search recipes, ingredients, instructions..."
             )
             .searchSuggestions {
-                // ENHANCED: Search suggestions when available
                 if !searchText.isEmpty && !searchHistory.isEmpty {
                     searchSuggestionsView
                 }
@@ -189,7 +188,6 @@ struct RecipeListView: View {
                 }
             }
         }
-        // UPDATED: M2.3 Integration - Show CreateRecipeView instead of placeholder
         .sheet(isPresented: $showingAddRecipe) {
             CreateRecipeView(context: viewContext)
         }
@@ -236,7 +234,6 @@ struct RecipeListView: View {
             }
             
             if searchText.isEmpty {
-                // PRESERVED: Original sample recipe button
                 Button(action: {
                     createSampleRecipe()
                 }) {
@@ -262,7 +259,6 @@ struct RecipeListView: View {
     
     private var recipeListContent: some View {
         VStack(spacing: 0) {
-            // ENHANCED: Search result count when searching
             if !searchText.isEmpty {
                 searchResultHeader
             }
@@ -270,7 +266,6 @@ struct RecipeListView: View {
             List {
                 ForEach(filteredRecipes, id: \.objectID) { recipe in
                     NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
-                        // ENHANCED: Pass match indicators to existing row view
                         EnhancedRecipeRowView(
                             recipe: recipe,
                             searchText: searchText,
@@ -278,7 +273,7 @@ struct RecipeListView: View {
                         )
                     }
                 }
-                .onDelete(perform: deleteRecipes) // PRESERVED: Original delete functionality
+                .onDelete(perform: deleteRecipes)
             }
             .listStyle(PlainListStyle())
         }
@@ -324,7 +319,6 @@ struct RecipeListView: View {
         }
     }
     
-    // PRESERVED: Original sample recipe creation function
     private func createSampleRecipe() {
         withAnimation {
             let newRecipe = Recipe(context: viewContext)
@@ -349,7 +343,6 @@ struct RecipeListView: View {
         }
     }
     
-    // PRESERVED: Original sample ingredients function
     private func addSampleIngredientsWithTemplates(to recipe: Recipe, in context: NSManagedObjectContext) {
         // Sample ingredients with realistic variety for template testing
         let ingredientTexts = [
@@ -375,10 +368,8 @@ struct RecipeListView: View {
         print("Created \(ingredientTexts.count) sample ingredients")
     }
     
-    // PRESERVED: Original delete function with same index mapping
     private func deleteRecipes(offsets: IndexSet) {
         withAnimation {
-            // FIXED: Map from filteredRecipes instead of recipes for proper deletion
             offsets.map { filteredRecipes[$0] }.forEach(viewContext.delete)
             
             do {
@@ -391,13 +382,12 @@ struct RecipeListView: View {
     }
 }
 
-// ENHANCED: Recipe Row with search indicators while preserving original functionality
+// ENHANCED: Recipe Row with search indicators
 struct EnhancedRecipeRowView: View {
     let recipe: Recipe
     var searchText: String = ""
     let matchIndicators: [SearchMatchType]
     
-    // PRESERVED: Original computed properties
     private var formattedLastUsed: String {
         guard let lastUsed = recipe.lastUsed else {
             return "Never used"
@@ -421,9 +411,7 @@ struct EnhancedRecipeRowView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // PRESERVED: Original recipe info layout
             HStack {
-                // Recipe title
                 VStack(alignment: .leading, spacing: 4) {
                     Text(recipe.title ?? "Untitled Recipe")
                         .font(.headline)
@@ -438,7 +426,6 @@ struct EnhancedRecipeRowView: View {
                 
                 Spacer()
                 
-                // Favorite indicator
                 if recipe.isFavorite {
                     Image(systemName: "heart.fill")
                         .foregroundColor(.red)
@@ -446,7 +433,6 @@ struct EnhancedRecipeRowView: View {
                 }
             }
             
-            // PRESERVED: Original usage tracking layout
             HStack {
                 Text(usageText)
                     .font(.caption)
@@ -464,7 +450,6 @@ struct EnhancedRecipeRowView: View {
                 
                 Spacer()
                 
-                // Recipe indicators
                 if recipe.prepTime > 0 {
                     Label("\(recipe.prepTime)m", systemImage: "clock")
                         .font(.caption)
@@ -472,15 +457,13 @@ struct EnhancedRecipeRowView: View {
                 }
             }
             
-            // ENHANCED: Search match indicators (only shown when searching)
             if !matchIndicators.isEmpty && !searchText.isEmpty {
                 searchMatchIndicators
             }
         }
-        .padding(.vertical, 4) // PRESERVED: Original padding
+        .padding(.vertical, 4)
     }
     
-    // ENHANCED: Visual indicators for search matches
     private var searchMatchIndicators: some View {
         HStack(spacing: 8) {
             Text("Matches:")
@@ -506,12 +489,11 @@ struct EnhancedRecipeRowView: View {
     }
 }
 
-// PRESERVED: Original RecipeDetailView - with M2.3 Edit Button Integration
+// RecipeDetailView
 struct RecipeDetailView: View {
     @ObservedObject var recipe: Recipe
     @Environment(\.managedObjectContext) private var viewContext
     
-    // ADDED: Category FetchRequest for custom ordering
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true),
@@ -519,12 +501,10 @@ struct RecipeDetailView: View {
         ]
     ) private var categories: FetchedResults<Category>
     
-    // UI state for Add to List functionality
     @State private var showingAddToListSheet = false
     @State private var showingMarkUsedConfirmation = false
-    @State private var showingEditSheet = false  // M2.3: NEW - Edit sheet state
+    @State private var showingEditSheet = false
     
-    // ADDED: Computed properties for custom category grouping
     private var groupedIngredients: [String: [Ingredient]] {
         guard let ingredientsSet = recipe.ingredients else { return [:] }
         let ingredientsList = Array(ingredientsSet) as! [Ingredient]
@@ -539,17 +519,15 @@ struct RecipeDetailView: View {
         let categoryMap = Dictionary(uniqueKeysWithValues: categories.map { ($0.displayName, $0.sortOrder) })
         
         return grouped.keys.sorted { category1, category2 in
-            // Handle "Uncategorized" - put it at the end
             if category1 == "Uncategorized" && category2 != "Uncategorized" { return false }
             if category2 == "Uncategorized" && category1 != "Uncategorized" { return true }
             if category1 == "Uncategorized" && category2 == "Uncategorized" { return false }
             
-            // Use custom sort order for real categories
             let order1 = categoryMap[category1] ?? Int16.max
             let order2 = categoryMap[category2] ?? Int16.max
             
             if order1 == order2 {
-                return category1 < category2 // Fallback to alphabetical
+                return category1 < category2
             }
             return order1 < order2
         }
@@ -563,23 +541,18 @@ struct RecipeDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Recipe Header Section
                 recipeHeaderSection
                 
-                // Timing Information Section
                 if recipe.prepTime > 0 || recipe.cookTime > 0 {
                     timingSection
                 }
                 
-                // Usage Analytics Section
                 usageAnalyticsSection
                 
-                // ENHANCED: Ingredients Section with custom category ordering
                 if hasIngredients {
                     ingredientsSection
                 }
                 
-                // Instructions Section
                 if let instructions = recipe.instructions, !instructions.isEmpty {
                     instructionsSection(instructions)
                 }
@@ -599,7 +572,6 @@ struct RecipeDetailView: View {
             AddIngredientsToListView(recipe: recipe)
                 .environment(\.managedObjectContext, viewContext)
         }
-        // M2.3: NEW - Edit sheet presentation
         .sheet(isPresented: $showingEditSheet) {
             EditRecipeView(recipe: recipe, context: viewContext)
         }
@@ -629,7 +601,6 @@ struct RecipeDetailView: View {
                 
                 Spacer()
                 
-                // Favorite indicator
                 if recipe.isFavorite {
                     Image(systemName: "heart.fill")
                         .foregroundColor(.red)
@@ -637,7 +608,6 @@ struct RecipeDetailView: View {
                 }
             }
             
-            // Recipe metadata
             if recipe.servings > 0 {
                 HStack {
                     Image(systemName: "person.2")
@@ -748,7 +718,6 @@ struct RecipeDetailView: View {
         }
     }
     
-    // ENHANCED: Ingredients section with custom category ordering
     private var ingredientsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -758,7 +727,6 @@ struct RecipeDetailView: View {
                 
                 Spacer()
                 
-                // Add to List button
                 Button(action: {
                     showingAddToListSheet = true
                 }) {
@@ -776,7 +744,6 @@ struct RecipeDetailView: View {
                 .disabled(!hasIngredients)
             }
             
-            // ENHANCED: Group ingredients by custom category order
             if groupedIngredients.isEmpty {
                 Text("No ingredients found")
                     .font(.body)
@@ -788,10 +755,8 @@ struct RecipeDetailView: View {
                     let categoryIngredients = groupedIngredients[categoryName] ?? []
                     
                     if !categoryIngredients.isEmpty {
-                        // Category Header
                         categoryHeaderView(categoryName: categoryName, count: categoryIngredients.count)
                         
-                        // Category Ingredients
                         ForEach(categoryIngredients, id: \.objectID) { ingredient in
                             ingredientRowView(ingredient: ingredient)
                         }
@@ -801,7 +766,6 @@ struct RecipeDetailView: View {
         }
     }
     
-    // ADDED: Category header view
     private func categoryHeaderView(categoryName: String, count: Int) -> some View {
         HStack(spacing: 8) {
             Circle()
@@ -834,24 +798,23 @@ struct RecipeDetailView: View {
         .cornerRadius(6)
     }
     
-    // ADDED: Enhanced ingredient row view
+    // M3: Updated to use displayText instead of quantity
     private func ingredientRowView(ingredient: Ingredient) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            // Ingredient bullet point
             Circle()
                 .fill(Color.secondary.opacity(0.6))
                 .frame(width: 6, height: 6)
                 .padding(.top, 6)
             
-            // Ingredient details
             VStack(alignment: .leading, spacing: 4) {
                 Text(ingredient.name ?? "Unknown Ingredient")
                     .font(.body)
                     .foregroundColor(.primary)
                 
-                if let quantity = ingredient.quantity?.trimmingCharacters(in: .whitespacesAndNewlines),
-                   !quantity.isEmpty {
-                    Text(quantity)
+                // M3: Use displayText instead of quantity
+                if let displayText = ingredient.displayText?.trimmingCharacters(in: .whitespacesAndNewlines),
+                   !displayText.isEmpty {
+                    Text(displayText)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 8)
@@ -875,7 +838,6 @@ struct RecipeDetailView: View {
         .padding(.leading, 8)
     }
     
-    // ADDED: Category styling helpers
     private func categoryColor(for categoryName: String) -> Color {
         switch categoryName.lowercased() {
         case "produce": return .green
@@ -920,7 +882,6 @@ struct RecipeDetailView: View {
                 Image(systemName: "checkmark.circle")
             }
             
-            // M2.3: UPDATED - Functional Edit button
             Button(action: {
                 showingEditSheet = true
             }) {

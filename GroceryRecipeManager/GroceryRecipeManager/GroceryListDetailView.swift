@@ -362,7 +362,6 @@ struct GroceryListDetailView: View {
 }
 
 // MARK: - Enhanced GroceryListItemRow Component
-// Step 3a Implementation - Step 2: Enhanced Item Display Format
 
 struct GroceryListItemRow: View {
     let item: GroceryListItem
@@ -389,19 +388,19 @@ struct GroceryListItemRow: View {
                         .foregroundColor(item.isCompleted ? .secondary : .primary)
                         .lineLimit(2)
                     
-                    // Enhanced: Quantity display (75% font size, muted color as per PRD)
-                    if let quantity = item.quantity, !quantity.isEmpty, quantity != "1" {
-                        Text("(\(quantity))")
+                    // NEW: Use displayText for quantity (75% font size, muted color)
+                    if let displayText = item.displayText, !displayText.isEmpty, displayText != "1" {
+                        Text("(\(displayText))")
                             .font(.caption)  // This is ~75% of body font size
                             .fontWeight(.regular)
-                            .foregroundColor(.secondary)  // Muted color as specified in PRD
+                            .foregroundColor(.secondary)  // Muted color
                             .strikethrough(item.isCompleted)
                     }
                     
                     Spacer()
                 }
                 
-                // Tertiary: Source and completion info (unchanged)
+                // Tertiary: Source and completion info
                 HStack {
                     // Source indicator
                     if let source = item.source {
@@ -466,7 +465,12 @@ private let timeFormatter: DateFormatter = {
     item1.id = UUID()
     item1.name = "Bananas"
     item1.categoryName = "Produce"
-    item1.quantity = "2 bunches"
+    // NEW: Use structured fields
+    item1.displayText = "2 bunches"
+    item1.numericValue = 2.0
+    item1.standardUnit = "bunch"
+    item1.isParseable = true
+    item1.parseConfidence = 1.0
     item1.isCompleted = false
     item1.source = "staples"
     sampleList.addToItems(item1)
@@ -475,7 +479,12 @@ private let timeFormatter: DateFormatter = {
     item2.id = UUID()
     item2.name = "Milk"
     item2.categoryName = "Dairy & Fridge"
-    item2.quantity = "1 gallon"
+    // NEW: Use structured fields
+    item2.displayText = "1 gallon"
+    item2.numericValue = 1.0
+    item2.standardUnit = "gallon"
+    item2.isParseable = true
+    item2.parseConfidence = 1.0
     item2.isCompleted = true
     item2.source = "staples"
     item2.dateCompleted = Date()

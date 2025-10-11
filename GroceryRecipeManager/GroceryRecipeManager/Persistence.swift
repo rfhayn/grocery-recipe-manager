@@ -394,7 +394,10 @@ struct PersistenceController {
             let listItem = GroceryListItem(context: context)
             listItem.id = UUID()
             listItem.name = name
-            listItem.quantity = quantity
+            listItem.displayText = quantity
+            listItem.numericValue = 0.0
+            listItem.isParseable = false
+            listItem.parseConfidence = 0.0
             listItem.isCompleted = isCompleted
             listItem.source = source
             listItem.sortOrder = Int16(listItems.firstIndex(where: { $0.0 == name }) ?? 0)
