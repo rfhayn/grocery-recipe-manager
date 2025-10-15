@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import Combine  // NEW: Added for QuantityMergeService
 
 struct GroceryListDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -23,6 +24,12 @@ struct GroceryListDetailView: View {
     @State private var showingError = false
     @State private var errorMessage = ""
     
+    // NEW: M3 Phase 5 - Consolidation state
+    @State private var showingConsolidationSheet = false
+    @State private var showingNoOpportunitiesAlert = false
+    @State private var mergeAnalysis: MergeAnalysis?
+    @StateObject private var mergeService: QuantityMergeService
+    
     // Initialize with dynamic fetch request for the specific list
     init(weeklyList: WeeklyList) {
         self.weeklyList = weeklyList
@@ -36,6 +43,11 @@ struct GroceryListDetailView: View {
         ]
         
         self._listItems = FetchRequest(fetchRequest: request, animation: .default)
+        
+        // NEW: Initialize merge service
+        _mergeService = StateObject(wrappedValue: QuantityMergeService(
+            context: PersistenceController.shared.container.viewContext
+        ))
     }
     
     // Group items by category using custom sort order
@@ -67,6 +79,11 @@ struct GroceryListDetailView: View {
         return Double(completedItemsCount) / Double(totalItemsCount)
     }
     
+    // NEW: M3 Phase 5 - Incomplete items for consolidation
+    private var incompletedItems: [GroceryListItem] {
+        Array(listItems).filter { !$0.isCompleted }
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             progressHeader
@@ -85,10 +102,25 @@ struct GroceryListDetailView: View {
         .sheet(isPresented: $showingAddItem) {
             AddListItemView(weeklyList: weeklyList)
         }
+        // NEW: M3 Phase 5 - Consolidation preview sheet
+        .sheet(isPresented: $showingConsolidationSheet) {
+            if let analysis = mergeAnalysis {
+                ConsolidationPreviewView(
+                    analysis: analysis,
+                    mergeService: mergeService,
+                    onComplete: handleConsolidationComplete
+                )
+            }
+        }
         .alert("Error", isPresented: $showingError) {
             Button("OK") { }
         } message: {
             Text(errorMessage)
+        }
+        .alert("No Items to Consolidate", isPresented: $showingNoOpportunitiesAlert) {
+            Button("OK") { }
+        } message: {
+            Text("This list has no duplicate items that can be combined. Items can only be consolidated if they have the same ingredient name and compatible units (e.g., \"1 cup flour\" + \"2 cups flour\" = \"3 cups flour\", or \"1 tsp sugar\" + \"2 tbsp sugar\" with unit conversion).")
         }
     }
     
@@ -203,6 +235,14 @@ struct GroceryListDetailView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        // NEW: M3 Phase 5 - Consolidate button
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button(action: analyzeConsolidation) {
+                Label("Consolidate", systemImage: "arrow.triangle.merge")
+            }
+            .disabled(incompletedItems.count < 2)
+        }
+        
         ToolbarItem(placement: .navigationBarTrailing) {
             Button(action: { showingAddItem = true }) {
                 Label("Add Item", systemImage: "plus")
@@ -338,6 +378,29 @@ struct GroceryListDetailView: View {
         })
     }
     
+    // MARK: - M3 Phase 5: Consolidation Actions
+    
+    /// Analyze list for consolidation opportunities
+    private func analyzeConsolidation() {
+        mergeAnalysis = mergeService.analyzeMergeOpportunities(for: weeklyList)
+        
+        if let analysis = mergeAnalysis, analysis.hasMergeOpportunities {
+            showingConsolidationSheet = true
+        } else {
+            // Show informational alert (not an error)
+            showingNoOpportunitiesAlert = true
+        }
+    }
+    
+    /// Handle consolidation completion
+    private func handleConsolidationComplete() {
+        // Refresh the view by accessing context
+        viewContext.refreshAllObjects()
+        
+        // Clear analysis
+        mergeAnalysis = nil
+    }
+    
     // MARK: - List Completion Status Management
     
     private func updateListCompletionStatus(_ weeklyList: WeeklyList, in context: NSManagedObjectContext) {
@@ -388,12 +451,12 @@ struct GroceryListItemRow: View {
                         .foregroundColor(item.isCompleted ? .secondary : .primary)
                         .lineLimit(2)
                     
-                    // NEW: Use displayText for quantity (75% font size, muted color)
+                    // Use displayText for quantity (75% font size, muted color)
                     if let displayText = item.displayText, !displayText.isEmpty, displayText != "1" {
                         Text("(\(displayText))")
-                            .font(.caption)  // This is ~75% of body font size
+                            .font(.caption)
                             .fontWeight(.regular)
-                            .foregroundColor(.secondary)  // Muted color
+                            .foregroundColor(.secondary)
                             .strikethrough(item.isCompleted)
                     }
                     
@@ -432,6 +495,18 @@ struct GroceryListItemRow: View {
     }
     
     private func sourceDisplayText(_ source: String) -> String {
+        // NEW: Handle merged+converted source indicator
+        if source.hasPrefix("merged+converted(") {
+            let count = source.replacingOccurrences(of: "merged+converted(", with: "").replacingOccurrences(of: ")", with: "")
+            return "🔀⚡ Merged (\(count))"
+        }
+        
+        // Handle regular merged source indicator
+        if source.hasPrefix("merged(") {
+            let count = source.replacingOccurrences(of: "merged(", with: "").replacingOccurrences(of: ")", with: "")
+            return "🔀 Merged (\(count))"
+        }
+        
         switch source {
         case "staples": return "📌 Staple"
         case "recipe": return "🍳 Recipe"
@@ -452,7 +527,6 @@ private let timeFormatter: DateFormatter = {
 // MARK: - Preview
 
 #Preview {
-    // Create sample data for preview
     let context = PersistenceController.preview.container.viewContext
     
     let sampleList = WeeklyList(context: context)
@@ -465,7 +539,6 @@ private let timeFormatter: DateFormatter = {
     item1.id = UUID()
     item1.name = "Bananas"
     item1.categoryName = "Produce"
-    // NEW: Use structured fields
     item1.displayText = "2 bunches"
     item1.numericValue = 2.0
     item1.standardUnit = "bunch"
@@ -479,7 +552,6 @@ private let timeFormatter: DateFormatter = {
     item2.id = UUID()
     item2.name = "Milk"
     item2.categoryName = "Dairy & Fridge"
-    // NEW: Use structured fields
     item2.displayText = "1 gallon"
     item2.numericValue = 1.0
     item2.standardUnit = "gallon"

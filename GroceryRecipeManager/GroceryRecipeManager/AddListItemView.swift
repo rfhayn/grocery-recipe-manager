@@ -7,7 +7,6 @@ struct AddListItemView: View {
     
     let weeklyList: WeeklyList
     
-    // Dynamic categories fetch (sorted by custom order)
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true),
@@ -16,39 +15,38 @@ struct AddListItemView: View {
         animation: .default
     ) private var categories: FetchedResults<Category>
     
-    // Form state
-    @State private var name = ""
-    @State private var quantity = "1"
+    @State private var ingredientText = ""
     @State private var selectedCategory = ""
-    
-    // Error handling
     @State private var showingError = false
     @State private var errorMessage = ""
     
-    // Validation
     private var isFormValid: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !ingredientText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Item Details")) {
-                    TextField("Item Name", text: $name)
+                    TextField("Item Name", text: $ingredientText)
                         .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
                     
-                    TextField("Quantity", text: $quantity)
-                        .textInputAutocapitalization(.never)
+                    Text("Enter with quantity (e.g., \"2 cups flour\") or just the item name")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
                 
                 Section(header: Text("Category")) {
                     if !categories.isEmpty {
                         Picker("Category", selection: $selectedCategory) {
                             ForEach(categories, id: \.displayName) { category in
+                                // FIXED: Show both emoji and text
                                 Text("\(categoryEmoji(for: category.displayName)) \(category.displayName)")
                                     .tag(category.displayName)
                             }
                         }
+                        .pickerStyle(.menu)
                     } else {
                         Text("Loading categories...")
                             .foregroundColor(.secondary)
@@ -63,8 +61,10 @@ struct AddListItemView: View {
                     .disabled(!isFormValid)
                 }
                 
-                Section(footer: Text("Items added manually will be marked as 'Added' items.")) {
-                    EmptyView()
+                Section {
+                    Text("Items added manually will be marked as 'Added' items.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
             .navigationTitle("Add Item")
@@ -76,22 +76,16 @@ struct AddListItemView: View {
                     }
                 }
             }
-            .onAppear {
-                setDefaultCategory()
-            }
             .alert("Error", isPresented: $showingError) {
                 Button("OK") { }
             } message: {
                 Text(errorMessage)
             }
-        }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func setDefaultCategory() {
-        if selectedCategory.isEmpty && !categories.isEmpty {
-            selectedCategory = categories.first?.displayName ?? "Produce"
+            .onAppear {
+                if selectedCategory.isEmpty, let firstCategory = categories.first {
+                    selectedCategory = firstCategory.displayName
+                }
+            }
         }
     }
     
@@ -108,57 +102,50 @@ struct AddListItemView: View {
     }
     
     private func addItemToList() {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedQuantity = quantity.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedText = ingredientText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else { return }
         
-        let listID = weeklyList.objectID
-        PersistenceController.shared.performWrite({ context in
-            // Get the weekly list in the background context
-            let listInContext = context.object(with: listID) as! WeeklyList
-            
-            // Get current max sort order
-            let existingItems = listInContext.items as? Set<GroceryListItem> ?? []
-            let maxSortOrder = existingItems.map { $0.sortOrder }.max() ?? -1
-            
-            // Create new item
-            let newItem = GroceryListItem(context: context)
-            newItem.id = UUID()
-            newItem.name = trimmedName
-            
-            // M3: Use structured quantity fields
-            newItem.displayText = trimmedQuantity.isEmpty ? "1" : trimmedQuantity
-            newItem.numericValue = 0.0  // Manual entry - will be properly parsed in Phase 3
-            newItem.isParseable = false  // Not parsed yet
-            newItem.parseConfidence = 0.0
-            
-            newItem.isCompleted = false
-            newItem.source = "manual"
-            newItem.sortOrder = maxSortOrder + 1
-            newItem.categoryName = selectedCategory
-            
-            // Add to the weekly list
-            listInContext.addToItems(newItem)
-            
-            print("✅ Added manual item: \(trimmedName) to list \(listInContext.name ?? "Unknown")")
-        }, onError: { error in
-            DispatchQueue.main.async {
-                errorMessage = "Failed to add item: \(error.localizedDescription)"
-                showingError = true
-            }
-        })
+        let templateService = IngredientTemplateService(context: viewContext)
+        let parsingService = IngredientParsingService(
+            context: viewContext,
+            templateService: templateService
+        )
         
-        dismiss()
+        let parsed = parsingService.parseIngredient(text: trimmedText)
+        let structured = parsingService.parseToStructured(text: trimmedText)
+        
+        let listItem = GroceryListItem(context: viewContext)
+        listItem.id = UUID()
+        listItem.name = parsed.displayName
+        listItem.displayText = structured.displayText
+        listItem.numericValue = structured.numericValue ?? 0.0
+        listItem.standardUnit = structured.standardUnit
+        listItem.isParseable = structured.isParseable
+        listItem.parseConfidence = structured.parseConfidence
+        listItem.categoryName = selectedCategory
+        listItem.source = "manual"
+        listItem.isCompleted = false
+        listItem.weeklyList = weeklyList
+        listItem.sortOrder = Int16(weeklyList.items?.count ?? 0)
+        
+        do {
+            try viewContext.save()
+            print("✅ Added item: \(parsed.displayName)")
+            dismiss()
+        } catch {
+            errorMessage = "Failed to add item: \(error.localizedDescription)"
+            showingError = true
+        }
     }
 }
 
 #Preview {
-    // Create sample data for preview
     let context = PersistenceController.preview.container.viewContext
-    
     let sampleList = WeeklyList(context: context)
     sampleList.id = UUID()
     sampleList.name = "Sample List"
     sampleList.dateCreated = Date()
+    sampleList.isCompleted = false
     
     return AddListItemView(weeklyList: sampleList)
         .environment(\.managedObjectContext, context)
