@@ -1,3 +1,10 @@
+//
+//  WeeklyListsView.swift
+//  GroceryRecipeManager
+//
+//  PHASE 1 UPDATE: Generate from IngredientTemplate.isStaple instead of GroceryItem.isStaple
+//
+
 import SwiftUI
 import CoreData
 
@@ -85,8 +92,6 @@ struct WeeklyListsView: View {
             Section {
                 ForEach(weeklyLists, id: \.self) { list in
                     NavigationLink(destination: GroceryListDetailView(weeklyList: list)) {
-                        // FIXED: Remove the dynamic .id that was causing navigation issues
-                        // The .id was changing when list.isCompleted changed, breaking navigation
                         WeeklyListRowView(weeklyList: list)
                     }
                 }
@@ -150,28 +155,30 @@ struct WeeklyListsView: View {
             newList.name = "Weekly Shopping - \(DateFormatter.shortDate.string(from: Date()))"
             newList.dateCreated = Date()
             newList.isCompleted = false
-            newList.notes = "Auto-generated from staples"
+            newList.notes = "Auto-generated from ingredient staples"
             
-            // 2. Fetch staples with custom category sorting
-            let stapleRequest: NSFetchRequest<GroceryItem> = GroceryItem.fetchRequest()
+            // 2. UPDATED: Fetch staples from IngredientTemplate instead of GroceryItem
+            let stapleRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
             stapleRequest.predicate = NSPredicate(format: "isStaple == YES")
             
-            // Sort by category sort order first, then by name within category
+            // Sort by category first, then by name within category
             stapleRequest.sortDescriptors = [
-                NSSortDescriptor(keyPath: \GroceryItem.categoryEntity?.sortOrder, ascending: true),
-                NSSortDescriptor(keyPath: \GroceryItem.name, ascending: true)
+                NSSortDescriptor(keyPath: \IngredientTemplate.category, ascending: true),
+                NSSortDescriptor(keyPath: \IngredientTemplate.name, ascending: true)
             ]
             
             do {
-                let staples = try context.fetch(stapleRequest)
+                let stapleTemplates = try context.fetch(stapleRequest)
                 
-                // 3. Create GroceryListItems from staples with structured quantities
-                for (index, staple) in staples.enumerated() {
+                print("📋 Generating list from \(stapleTemplates.count) staple templates")
+                
+                // 3. Create GroceryListItems from staple templates
+                for (index, template) in stapleTemplates.enumerated() {
                     let listItem = GroceryListItem(context: context)
                     listItem.id = UUID()
-                    listItem.name = staple.name
+                    listItem.name = template.name
                     
-                    // NEW: Use structured quantity fields
+                    // Use structured quantity fields with default values
                     listItem.displayText = "1"
                     listItem.numericValue = 1.0
                     listItem.standardUnit = nil
@@ -181,16 +188,24 @@ struct WeeklyListsView: View {
                     listItem.isCompleted = false
                     listItem.source = "staples"
                     listItem.sortOrder = Int16(index)
-                    listItem.categoryName = staple.effectiveCategory // Store category for organization
+                    
+                    // UPDATED: Copy category from template
+                    if let category = template.category, !category.isEmpty {
+                        listItem.categoryName = category
+                    } else {
+                        listItem.categoryName = "Uncategorized"
+                    }
                     
                     // Link to the weekly list
                     newList.addToItems(listItem)
+                    
+                    print("  ✓ Added '\(template.name ?? "Unknown")' in category '\(listItem.categoryName ?? "None")'")
                 }
                 
-                print("✅ Generated grocery list with \(staples.count) items organized by custom categories")
+                print("✅ Generated grocery list with \(stapleTemplates.count) items from ingredient templates")
+                
             } catch {
-                print("❌ Error fetching staples: \(error)")
-                // Handle error within the closure - don't throw
+                print("❌ Error fetching staple templates: \(error)")
                 DispatchQueue.main.async {
                     self.errorMessage = "Failed to fetch staples: \(error.localizedDescription)"
                     self.showingError = true
@@ -269,10 +284,10 @@ struct WeeklyListRowView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(weeklyList.name ?? "Unnamed List")
                         .font(.headline)
-                        .fontWeight(.medium)
+                        .foregroundColor(isListCompleted ? .secondary : .primary)
                     
-                    if let dateCreated = weeklyList.dateCreated {
-                        Text("Created \(dateCreated, formatter: relativeDateFormatter)")
+                    if let date = weeklyList.dateCreated {
+                        Text(date, style: .date)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -280,81 +295,46 @@ struct WeeklyListRowView: View {
                 
                 Spacer()
                 
-                // Real-time completion status display
-                VStack(alignment: .trailing, spacing: 4) {
-                    if isListCompleted {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("Complete")
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(.green)
-                        }
-                    } else {
-                        Text("\(completedItemsCount)/\(totalItemsCount)")
+                if isListCompleted {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.title3)
+                }
+            }
+            
+            // Progress bar
+            if totalItemsCount > 0 {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("\(completedItemsCount) of \(totalItemsCount) items")
                             .font(.caption)
-                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                        
+                        Spacer()
+                        
+                        Text("\(Int(completionPercentage * 100))%")
+                            .font(.caption)
                             .foregroundColor(.secondary)
                     }
-                }
-            }
-            
-            // Progress bar with real-time updates
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    Rectangle()
-                        .frame(height: 6)
-                        .foregroundColor(.gray.opacity(0.3))
-                        .cornerRadius(3)
                     
-                    Rectangle()
-                        .frame(width: geometry.size.width * completionPercentage, height: 6)
-                        .foregroundColor(isListCompleted ? .green : .blue)
-                        .cornerRadius(3)
-                        .animation(.easeInOut(duration: 0.3), value: completionPercentage)
+                    ProgressView(value: completionPercentage)
+                        .tint(completionPercentage == 1.0 ? .green : .blue)
                 }
-            }
-            .frame(height: 6)
-            
-            // Item count and notes preview
-            HStack {
-                Text("\(totalItemsCount) items")
+            } else {
+                Text("Empty list")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                
-                if let notes = weeklyList.notes, !notes.isEmpty {
-                    Text("•")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Text(notes)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
-                
-                Spacer()
             }
         }
         .padding(.vertical, 4)
     }
 }
 
-// MARK: - Date Formatter
-
-private let relativeDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .none
-    return formatter
-}()
-
 // MARK: - Preview
 
 #Preview {
     NavigationView {
         WeeklyListsView()
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
-    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

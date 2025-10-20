@@ -1,3 +1,10 @@
+//
+//  AddListItemView.swift
+//  GroceryRecipeManager
+//
+//  PHASE 3 UPDATE: Added new ingredient to template system with category assignment
+//
+
 import SwiftUI
 import CoreData
 
@@ -15,33 +22,131 @@ struct AddListItemView: View {
         animation: .default
     ) private var categories: FetchedResults<Category>
     
+    // Services for autocomplete
+    @StateObject private var templateService: IngredientTemplateService
+    @StateObject private var parsingService: IngredientParsingService
+    @StateObject private var autocompleteService: IngredientAutocompleteService
+    
     @State private var ingredientText = ""
     @State private var selectedCategory = ""
     @State private var showingError = false
     @State private var errorMessage = ""
     
+    // Autocomplete state
+    @State private var showingAutocomplete = false
+    @State private var selectedTemplate: IngredientTemplate? = nil
+    
+    // PHASE 3: New ingredient tracking
+    @State private var showingAddToTemplates = false
+    @State private var newIngredientName = ""
+    @State private var newIngredientCategory = ""
+    @State private var markAsStaple = false
+    
     private var isFormValid: Bool {
         !ingredientText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    init(weeklyList: WeeklyList) {
+        self.weeklyList = weeklyList
+        
+        let context = PersistenceController.shared.container.viewContext
+        let templateSvc = IngredientTemplateService(context: context)
+        let parsingSvc = IngredientParsingService(context: context, templateService: templateSvc)
+        let autocompleteSvc = IngredientAutocompleteService(context: context, parsingService: parsingSvc)
+        
+        _templateService = StateObject(wrappedValue: templateSvc)
+        _parsingService = StateObject(wrappedValue: parsingSvc)
+        _autocompleteService = StateObject(wrappedValue: autocompleteSvc)
     }
     
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Item Details")) {
-                    TextField("Item Name", text: $ingredientText)
-                        .textInputAutocapitalization(.words)
-                        .autocorrectionDisabled()
+                    VStack(alignment: .leading, spacing: 0) {
+                        TextField("Item Name (e.g., \"2 cups flour\")", text: $ingredientText)
+                            .textInputAutocapitalization(.words)
+                            .autocorrectionDisabled()
+                            .onChange(of: ingredientText) { oldValue, newValue in
+                                if newValue.count >= 2 {
+                                    autocompleteService.debouncedSearch(fullText: newValue)
+                                    showingAutocomplete = true
+                                } else {
+                                    showingAutocomplete = false
+                                    selectedTemplate = nil
+                                }
+                            }
+                        
+                        // Autocomplete dropdown
+                        if showingAutocomplete && !autocompleteService.suggestions.isEmpty {
+                            VStack(spacing: 0) {
+                                ForEach(autocompleteService.suggestions, id: \.objectID) { template in
+                                    Button(action: {
+                                        selectAutocompleteTemplate(template)
+                                    }) {
+                                        HStack {
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(template.name ?? "")
+                                                    .font(.body)
+                                                    .foregroundColor(.primary)
+                                                
+                                                if let category = template.category, !category.isEmpty {
+                                                    Text(category)
+                                                        .font(.caption)
+                                                        .foregroundColor(.secondary)
+                                                }
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            if template.isStaple {
+                                                Image(systemName: "star.fill")
+                                                    .font(.caption)
+                                                    .foregroundColor(.orange)
+                                            }
+                                        }
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 12)
+                                        .contentShape(Rectangle())
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    
+                                    if template != autocompleteService.suggestions.last {
+                                        Divider()
+                                    }
+                                }
+                            }
+                            .background(Color(.systemBackground))
+                            .cornerRadius(8)
+                            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                            .padding(.top, 4)
+                        }
+                    }
                     
                     Text("Enter with quantity (e.g., \"2 cups flour\") or just the item name")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                    
+                    if let template = selectedTemplate {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                                .font(.caption)
+                            
+                            Text("Using ingredient: \(template.name ?? "")")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            
+                            Spacer()
+                        }
+                        .padding(.top, 4)
+                    }
                 }
                 
                 Section(header: Text("Category")) {
                     if !categories.isEmpty {
                         Picker("Category", selection: $selectedCategory) {
                             ForEach(categories, id: \.displayName) { category in
-                                // FIXED: Show both emoji and text
                                 Text("\(categoryEmoji(for: category.displayName)) \(category.displayName)")
                                     .tag(category.displayName)
                             }
@@ -81,6 +186,10 @@ struct AddListItemView: View {
             } message: {
                 Text(errorMessage)
             }
+            // PHASE 3: Add to ingredient list prompt
+            .sheet(isPresented: $showingAddToTemplates) {
+                addToTemplatesSheet
+            }
             .onAppear {
                 if selectedCategory.isEmpty, let firstCategory = categories.first {
                     selectedCategory = firstCategory.displayName
@@ -88,6 +197,87 @@ struct AddListItemView: View {
             }
         }
     }
+    
+    // MARK: - PHASE 3: Add to Templates Sheet
+    
+    private var addToTemplatesSheet: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("New Ingredient")) {
+                    HStack {
+                        Text("Name:")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(newIngredientName)
+                            .fontWeight(.medium)
+                    }
+                    
+                    Picker("Category", selection: $newIngredientCategory) {
+                        ForEach(categories, id: \.displayName) { category in
+                            Text("\(categoryEmoji(for: category.displayName)) \(category.displayName)")
+                                .tag(category.displayName)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+                
+                Section {
+                    Toggle("Mark as Staple", isOn: $markAsStaple)
+                    
+                    Text("Staple items automatically appear when generating new grocery lists.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Section {
+                    Button("Add to Ingredient List") {
+                        saveToTemplates()
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .navigationTitle("Add to Ingredients?")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Skip") {
+                        showingAddToTemplates = false
+                        dismiss() // Dismiss the main view too
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Autocomplete Selection
+    
+    private func selectAutocompleteTemplate(_ template: IngredientTemplate) {
+        selectedTemplate = template
+        
+        let parsed = parsingService.parseIngredient(text: ingredientText)
+        
+        let quantityPart = parsed.quantity ?? ""
+        let unitPart = parsed.unit ?? ""
+        
+        var rebuiltText = ""
+        if !quantityPart.isEmpty {
+            rebuiltText += quantityPart + " "
+        }
+        if !unitPart.isEmpty {
+            rebuiltText += unitPart + " "
+        }
+        rebuiltText += template.name ?? ""
+        
+        ingredientText = rebuiltText
+        showingAutocomplete = false
+        
+        if let category = template.category, !category.isEmpty {
+            selectedCategory = category
+            print("📋 Auto-populated category: \(category)")
+        }
+    }
+    
+    // MARK: - Helper Functions
     
     private func categoryEmoji(for categoryName: String) -> String {
         switch categoryName {
@@ -105,14 +295,14 @@ struct AddListItemView: View {
         let trimmedText = ingredientText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else { return }
         
-        let templateService = IngredientTemplateService(context: viewContext)
-        let parsingService = IngredientParsingService(
-            context: viewContext,
-            templateService: templateService
-        )
-        
         let parsed = parsingService.parseIngredient(text: trimmedText)
         let structured = parsingService.parseToStructured(text: trimmedText)
+        
+        // Try to find exact match if no template selected
+        if selectedTemplate == nil {
+            selectedTemplate = templateService.searchTemplates(query: parsed.name, limit: 1)
+                .first(where: { $0.name?.lowercased() == parsed.name.lowercased() })
+        }
         
         let listItem = GroceryListItem(context: viewContext)
         listItem.id = UUID()
@@ -130,11 +320,54 @@ struct AddListItemView: View {
         
         do {
             try viewContext.save()
-            print("✅ Added item: \(parsed.displayName)")
-            dismiss()
+            print("✅ Added item to list: \(parsed.displayName)")
+            
+            // PHASE 3: Check if this is a new ingredient
+            if selectedTemplate == nil {
+                print("   ℹ️ New ingredient detected: \(parsed.name)")
+                
+                // Prepare data for template creation prompt
+                newIngredientName = parsed.name
+                newIngredientCategory = selectedCategory
+                markAsStaple = false
+                
+                // Show the add to templates sheet
+                showingAddToTemplates = true
+            } else {
+                print("   ✓ Matched to existing template: \(selectedTemplate?.name ?? "unknown")")
+                dismiss() // Close immediately if template exists
+            }
+            
         } catch {
             errorMessage = "Failed to add item: \(error.localizedDescription)"
             showingError = true
+        }
+    }
+    
+    // PHASE 3: Save new ingredient to templates
+    private func saveToTemplates() {
+        // Create new IngredientTemplate
+        let newTemplate = IngredientTemplate(context: viewContext)
+        newTemplate.id = UUID()
+        newTemplate.name = newIngredientName
+        newTemplate.category = newIngredientCategory
+        newTemplate.isStaple = markAsStaple
+        newTemplate.usageCount = 1
+        newTemplate.dateCreated = Date()
+        
+        do {
+            try viewContext.save()
+            print("✅ Created new ingredient template: \(newIngredientName)")
+            print("   📁 Category: \(newIngredientCategory)")
+            print("   ⭐ Staple: \(markAsStaple)")
+            
+            showingAddToTemplates = false
+            dismiss() // Dismiss main view
+            
+        } catch {
+            errorMessage = "Failed to save ingredient: \(error.localizedDescription)"
+            showingError = true
+            showingAddToTemplates = false
         }
     }
 }
