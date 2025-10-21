@@ -1,481 +1,277 @@
-# Current Development Story
+# Current Story: M3.5 Foundation Hardening
 
-**Last Updated**: October 20, 2025  
-**Current Milestone**: M4 - Meal Planning & Enhanced Grocery Integration  
-**Current Phase**: M4.1 (Settings Infrastructure Foundation)  
-**Status**: Ready to Begin
-
----
-
-## Strategic Context
-
-### **Milestone Sequence**
-1. **M3 Complete**: Structured Quantity Management ✅
-2. **M4 Implementation**: Meal Planning & Enhanced Grocery Integration ← **CURRENT**
-3. **TestFlight Preparation**: Apple Developer Account & Device Testing
-
-### **M4 Overview:**
-**M4 completes the core grocery-recipe workflow**
-- **M4.1**: Settings Infrastructure Foundation (1.5 hours) ← **STARTING NOW**
-- **M4.2**: Calendar-Based Meal Planning Core (2.5 hours)
-- **M4.3**: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours)
-- **Total**: 7.5-10 hours
-
-### **Strategic Integration:**
-- **M3 → M4**: Structured quantities enable smart meal plan grocery generation ✅
-- **M3 Phase 4 → M4.3**: Recipe scaling service enables scaled-to-list feature ✅
-- **M3 Phase 5 → M4.3**: Quantity consolidation enhances grocery automation ✅
-- **M4 → TestFlight**: Core workflow complete, ready for device testing
-- **M4 → M5**: Meal planning data architecture ready for CloudKit family sharing
+**Last Updated**: October 21, 2025  
+**Current Milestone**: M3.5 - Foundation Hardening (Pre-M4)  
+**Status**: Ready to Begin  
+**Estimated Remaining Time**: 6-8 hours  
 
 ---
 
-**Current Status**: M1, M2, and M3 successfully completed (59 hours total). Revolutionary grocery management with store-layout optimization, complete recipe integration, and structured quantity management operational. Ready to begin M4 meal planning implementation.
+## 📍 CURRENT STATUS
+
+### Active Milestone: M3.5 Foundation Hardening
+**Purpose**: Harden data validation and parsing before M4 meal planning complexity  
+**Total Estimated Time**: 6-8 hours  
+**Phases**: 2 phases (Data Validation, Parsing Enhancement)  
+
+**Strategic Context:**
+- M3 Complete ✅ - All structured quantity features operational
+- No current data quality or parsing issues
+- M4 will significantly stress test foundation with meal plans
+- Better to validate now than debug compound issues later
+- Deferred performance/polish to M4.5 (post-TestFlight with real data)
 
 ---
 
-## M3: Structured Quantity Management - COMPLETE ✅
+## 🎯 MILESTONE BREAKDOWN
 
-**Completion Date**: October 20, 2025  
-**Total Time**: 10.5 hours (target: 8-12 hours) ✅  
-**Status**: Production Ready
-
-### **Final Phase Summary:**
-
-**✅ Phase 1-2: Core Data Model & Enhanced Parsing (3 hours)**
-- Structured data model with numericValue, standardUnit, displayText, isParseable, parseConfidence
-- Enhanced IngredientParsingService operational
-- 10 files systematically updated
-- Zero build errors, sub-0.1s performance
-
-**✅ Phase 3: Data Migration (1.5 hours)**
-- QuantityMigrationService with batch processing
-- Professional migration UI
-- Settings infrastructure created
-- 100% success rate: 24 parsed (75%), 8 text-only (25%)
-
-**✅ Phase 4: Recipe Scaling Service (2.5 hours)**
-- RecipeScalingService with mathematical scaling
-- Kitchen-friendly fraction conversion (1.5 → "1 1/2")
-- Professional scaling UI with slider and quick buttons
-- Scale recipes 0.25x to 4x with live preview
-- Performance: < 0.5s for 20+ ingredient recipes
-
-**✅ Phase 5: Quantity Merge Service (2.5 hours)**
-- QuantityMergeService with intelligent consolidation
-- UnitConversionService for volume/weight conversions
-- ConsolidationPreviewView with professional UI
-- Source tracking and transaction safety
-- Performance: < 0.3s analysis for 50+ items
-- Reduces list redundancy by 30-50%
-
-**✅ Phase 6: UI Polish & Documentation (1 hour)**
-- Recipe ingredient autocomplete validated with M3 features
-- Consolidation button with opportunity badge
-- Visual indicators for parseable vs unparseable quantities
-- Comprehensive user help documentation (HelpView.swift)
-- Complete milestone documentation
-
-**M3 Achievements:**
-- Structured quantity system operational
-- Recipe scaling with kitchen-friendly fractions
-- Intelligent shopping list consolidation with unit conversion
-- Recipe ingredient autocomplete fully integrated
-- Professional UI throughout
-- Sub-0.5s performance for all operations
-- Comprehensive documentation
-- Production-ready quality
-
-**Strategic Value Delivered:**
-- Foundation for meal planning grocery automation (M4)
-- Analytics-ready structured data (M7)
-- Recipe scaling for party planning and batch cooking
-- List consolidation reduces shopping redundancy by 30-50%
-- Platform ready for nutrition and budget intelligence (M8-M9)
-
----
-
-## M4: Meal Planning & Enhanced Grocery Integration - Ready to Begin
-
-**Total Estimated Time**: 7.5-10 hours  
-**Priority**: HIGH - Core user workflow completion  
-**Dependencies**: M3 Complete ✅
-
-### **Strategic Overview**
-
-M4 completes the core grocery-recipe workflow with calendar-based meal planning, enhanced grocery automation, and the scaled recipe to list feature (FEAT-001). This milestone leverages M3's structured quantities and scaling service to provide powerful meal planning capabilities.
-
-### **Phase Breakdown**
-
-**M4.1: Settings Infrastructure Foundation (1.5 hours)** ← **STARTING NOW**
-
-**Purpose**: Establish user preference management foundation supporting meal planning and future features.
-
-**What's Being Built:**
-- UserPreferences Core Data entity for persistent configuration
-- Meal planning preferences in Settings tab
-- Duration settings (3-14 days, default 7)
-- Start day preference (Sunday/Monday, default Sunday)
-- Auto-naming toggle for meal plans
-- Recipe source display preferences
-- Real-time validation and persistence
-
-**What's Already Ready:**
-- Settings tab exists (created in M3 Phase 3) ✅
-- Professional iOS settings interface structure ✅
-- Clean navigation patterns established ✅
-- Migration service UI as reference example ✅
-
-**Implementation Tasks:**
-1. Core Data Model - UserPreferences Entity (30 min)
-2. Settings UI - Meal Planning Preferences Section (45 min)
-3. Integration Testing & Validation (15 min)
-
-**Acceptance Criteria:**
-- UserPreferences entity operational in Core Data
-- UserPreferencesService with CRUD operations
-- Meal planning preferences section in Settings UI
-- Four preference controls functional
-- Real-time validation and persistence
-- Professional iOS UI maintained
-- Settings persist across app restarts
-- Ready for M4.2 integration
-
-**M4.2: Calendar-Based Meal Planning Core (2.5 hours)**
-
-**Purpose**: Implement calendar-based meal planning with recipe assignment.
-
-**What Will Be Built:**
-- MealPlan and PlannedMeal Core Data entities
-- Clean one-week calendar view with recipe display
-- "Add to Meal Plan" buttons in RecipeListView and RecipeDetailView
-- Modal calendar picker for date selection
-- User-configurable planning periods (3-14 days)
-- Meal plan management (create/edit/delete)
-- Recipe assignment workflow
-
-**Dependencies:**
-- M4.1 preferences for duration and start day ✅ (after M4.1)
-- Recipe catalog operational ✅
-- Navigation patterns established ✅
-
-**User Flow:**
-1. User taps "Meal Planning" tab
-2. System checks for existing meal plans
-3. If none exist: Create first meal plan with user preferences
-4. If exists: Display current plan with calendar
-5. User browses recipes, taps "Add to Meal Plan"
-6. Modal calendar picker shows available dates
-7. User selects date, recipe assigned
-8. Calendar updates immediately
-
-**Key Features:**
-- One recipe per day constraint
-- Drag recipes between dates
-- Empty state guidance for new users
-- Performance: < 0.1s for calendar operations
-
-**M4.3: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours)**
-
-**Purpose**: Complete meal planning workflow with automated grocery list generation and scaled recipe integration.
-
-**Original M4.3 Scope (2 hours):**
-- Generate grocery list from meal plan with one tap
-- Recipe source tags ("Ground beef [Tacos] [Spaghetti]")
-- Smart quantity consolidation leveraging M3 Phase 5
-- Meal completion tracking with analytics integration
-- Integration with existing list workflows
-
-**NEW: Scaled Recipe to Shopping List (1.5-2 hours) - From FEAT-001 PRD:**
-- Add "Add to List" button to RecipeScalingView
-- Generate temporary ingredients with scaled quantities
-- Integrate with existing AddIngredientsToListView
-- Proper sheet navigation (list selection over scaling sheet)
-- Scaling metadata for meal planning integration
-
-**Strategic Integration Points:**
-- M3 Phase 4 (Scaling) → M4.3 scaled-to-list feature ✅
-- M3 Phase 5 (Consolidation) → M4.3 smart merging ✅
-- M4 → M5: Meal planning ready for CloudKit family sharing
-- M4 → M7: Rich analytics from meal patterns
-
-**User Scenarios:**
-- **Party Planning**: Scale recipe 2x, add directly to party shopping list
-- **Meal Planning**: Generate complete shopping list from week's meal plan
-- **Batch Cooking**: Scale recipe 4x for meal prep, add to weekly list
-
----
-
-## Recent Completions
-
-### **M1: Professional Grocery Management (32 hours) - August 2025** ✅
-- Store-layout optimized grocery lists
-- Custom category management
-- Staple item system
-- Professional iOS UI
-
-### **M2: Recipe Integration (16.5 hours) - September-October 2025** ✅
-- Complete recipe catalog with CRUD operations
-- Unified IngredientTemplate system
-- Recipe-to-grocery list integration
-- Enhanced search and navigation
-- Recipe ingredient autocomplete with parse-then-search ✅
-- Fuzzy matching and template alignment
-- Performance: < 0.1s autocomplete, < 0.5s save
-
-### **M3: Structured Quantity Management (10.5 hours) - October 2025** ✅
-- Structured data model operational
-- Recipe scaling with kitchen-friendly fractions
-- Intelligent shopping list consolidation
-- Unit conversion support
-- Visual polish and help documentation
-- All performance targets exceeded
-- Production-ready quality achieved
-
----
-
-## Technical Foundation Operational
-
-### **Core Systems Complete** ✅
-- **Structured Quantity Model**: numericValue, standardUnit, displayText, isParseable, parseConfidence
-- **Enhanced Parsing**: Numeric conversion, unit standardization, fraction handling
-- **Data Migration**: Complete one-time migration with 100% success
-- **Recipe Scaling**: Mathematical scaling with kitchen-friendly fractions
-- **Quantity Consolidation**: Intelligent merging with unit conversion
-- **Ingredient Autocomplete**: Parse-then-search with fuzzy matching
-- **Settings Infrastructure**: Professional settings tab ready for expansion
-- **Performance Architecture**: Sub-0.5s response times maintained
-
-### **Recipe Features Implemented** ✅
-- **Complete Recipe Catalog**: Professional list view with Core Data integration
-- **Enhanced Recipe Details**: Comprehensive timing, analytics, and ingredient display
-- **Recipe Management**: Full CRUD operations working
-- **Recipe Scaling**: Professional scaling UI with live preview
-- **Recipe Ingredient Autocomplete**: Smart ingredient entry with fuzzy matching
-- **Search and Navigation**: Multi-field filtering with intelligent ranking
-- **Working Favorite Toggle**: Real-time UI refresh with persistence
-- **Usage Analytics**: Functional mark-as-used with tracking
-- **Template System**: Ingredient normalization and category integration
-
-### **Ready for M4 Features**
-- **Settings Infrastructure**: Expandable for meal planning preferences ✅
-- **Scaled Recipe to List**: Service and UI ready for integration ✅
-- **Smart Grocery Automation**: Consolidation ready for meal plan lists ✅
-- **Recipe Catalog**: Complete foundation for meal planning ✅
-- **Analytics**: Numeric quantities ready for insights (M7)
-- **Nutrition Tracking**: Data structure supports future health features (M8)
-- **Budget Intelligence**: Quantity data ready for cost analysis (M9)
-
----
-
-## Current Sprint Focus
-
-### **Immediate Priority: M4.1 - Settings Infrastructure Foundation** 🎯
-- **Timeline**: 1.5 hours
-- **Purpose**: Establish meal planning preference management
-- **Impact**: Foundation for M4.2 calendar-based meal planning
+### Phase 1: Data Model Validation (3-4 hours) ⏳ NEXT
+**Status**: Ready to Begin  
+**Purpose**: Add Core Data validation rules to prevent bad data  
 
 **Tasks:**
-1. Core Data Model - UserPreferences Entity (30 min)
-2. Settings UI - Meal Planning Preferences Section (45 min)
-3. Integration Testing & Validation (15 min)
+1. **Recipe Validation** (60 min)
+   - Add validateForInsert/Update methods
+   - Validate title, servings, times, instructions
+   - Test against existing recipes
 
-**After M4.1:**
-- Create learning note: `17-m4-phase1-settings-infrastructure.md`
-- Update progress documentation
-- Begin M4.2 (Calendar-Based Meal Planning Core)
+2. **Ingredient Validation** (45 min)
+   - Validate parsed data consistency
+   - Ensure template relationships valid
+   - Test against existing ingredients
 
-### **Next Sprint Targets:**
+3. **Template Validation** (30 min)
+   - Validate name uniqueness
+   - Ensure category assigned
+   - Test against existing templates
 
-**1. M4.2 Implementation** (2.5 hours)
-- MealPlan and PlannedMeal Core Data entities
-- Calendar view with recipe assignment
-- "Add to Meal Plan" buttons throughout app
-- Modal calendar picker for date selection
+4. **Computed Properties** (45 min)
+   - Add convenience properties (hasValidIngredients, totalTime, etc.)
+   - Update views to use computed properties
+   - Test in UI contexts
 
-**2. M4.3 Implementation** (3.5-4 hours)
-- Generate grocery list from meal plan
-- Recipe source tags in lists
-- Smart consolidation for meal plans
-- Meal completion tracking
-- Scaled recipe to shopping list integration
+5. **Validation Testing** (30 min)
+   - Run validation against all existing data
+   - Document any violations
+   - Fix violations if found
 
-**3. TestFlight Preparation**
-- Apple Developer Account creation
-- App provisioning and certificates
-- Build for device testing
-- TestFlight beta distribution setup
+**Deliverables:**
+- Validation methods on all entities
+- Computed properties for common queries
+- Zero validation errors on existing data
+- Documentation of validation rules
 
----
-
-## Performance & Quality Metrics
-
-### **M3 Performance Achievements**
-- **Parsing**: < 0.05s per ingredient ✅
-- **Migration**: < 2s for 32 items ✅
-- **Scaling**: < 0.5s for 20+ ingredients ✅
-- **Consolidation Analysis**: < 0.3s for 50+ items ✅
-- **Merge Execution**: < 0.8s ✅
-- **UI Responsiveness**: 60fps maintained ✅
-
-### **Quality Metrics**
-- **Parse Accuracy**: 95%+ ✅
-- **Fraction Conversion**: 100% accurate ✅
-- **Unit Conversion**: 100% accurate ✅
-- **Data Integrity**: Zero data loss ✅
-- **Transaction Safety**: 100% rollback capability ✅
-
-### **Project Velocity**
-- **M1**: 32 hours (on target) ✅
-- **M2**: 16.5 hours (on target) ✅
-- **M3**: 10.5 hours (on target) ✅
-- **Total**: 59 hours completed
-- **Planning Accuracy**: Excellent (all within estimates)
+**Success Criteria:**
+- All entities have validation rules
+- All existing data passes validation
+- Clear error messages for violations
+- No performance degradation
 
 ---
 
-## Architecture Highlights
+### Phase 2: Parsing Enhancement & Testing (3-4 hours) ⏳ PLANNED
+**Status**: After Phase 1  
+**Purpose**: Ensure parsing handles all edge cases gracefully  
 
-### **Service Layer Excellence**
-- **IngredientParsingService**: Enhanced with structured quantity support
-- **IngredientTemplateService**: Unified ingredient management
-- **RecipeScalingService**: Mathematical scaling with fractions
-- **QuantityMergeService**: Intelligent consolidation logic
-- **UnitConversionService**: Professional unit conversion
-- **IngredientAutocompleteService**: Smart ingredient search
-- **QuantityMigrationService**: One-time data migration
-- **UserPreferencesService**: Settings management (M4.1) ← **NEW**
+**Tasks:**
+1. **Expanded Test Coverage** (90 min)
+   - Create comprehensive test suite
+   - Test standard formats, fractions, mixed, ranges, approximate
+   - Test edge cases (empty, whitespace, special chars)
+   - Achieve 95%+ pass rate
 
-### **Data Architecture**
-- **IngredientTemplate**: Central normalization hub (READ-ONLY relationships)
-- **Recipe/Ingredient**: Template-linked with full text preservation
-- **GroceryListItem**: Structured quantities with source tracking
-- **WeeklyList**: Store-layout optimized organization
-- **Category**: Custom user-defined categorization
-- **UserPreferences**: Persistent user settings (M4.1) ← **NEW**
-- **MealPlan/PlannedMeal**: Calendar-based planning (M4.2) ← **UPCOMING**
+2. **Graceful Failure Handling** (60 min)
+   - Add input validation
+   - Add graceful fallbacks for unparseable text
+   - Preserve display text always
+   - Test all failure modes
 
-### **UI Patterns**
-- **@FetchRequest**: Predicate-based Core Data queries
-- **SwiftUI Navigation**: Sheets, NavigationStack, modal flows
-- **Category-Aware**: Consistent categorization throughout
-- **Real-Time Search**: Native iOS patterns with debouncing
-- **Performance**: Sub-0.1s response times for all queries
+3. **Parsing Documentation** (30 min)
+   - Document supported formats
+   - Document confidence levels
+   - Add code examples
+   - Update user-facing help if needed
 
----
+4. **Performance Testing** (30 min)
+   - Profile parsing with large inputs
+   - Test batch operations (10+ ingredients)
+   - Verify < 0.05s per parse
+   - Check memory usage
 
-## Looking Ahead
+**Deliverables:**
+- Comprehensive parsing test suite
+- Graceful error handling
+- Complete parsing documentation
+- Performance validation
 
-### **M4 Integration Opportunities**
-- Meal planning leverages structured quantities for smart list generation
-- Scaled recipe to list uses consolidation for duplicate handling
-- Recipe source tracking enhances meal plan transparency
-- Foundation ready for family collaboration (M5)
-- Calendar-based data ready for analytics (M7)
-
-### **Post-M4: TestFlight Preparation**
-- Apple Developer Account creation
-- App provisioning and certificates
-- Device testing with TestFlight
-- Beta user feedback collection
-- Iteration based on real-world usage
-
-### **Long-Term Platform Vision**
-- **M5**: CloudKit family sharing (10-12 hours)
-- **M6**: Comprehensive testing foundation (8-10 hours)
-- **M7**: Analytics and insights (6-8 hours)
-- **M8-M11**: Advanced intelligence features (20-30 hours)
+**Success Criteria:**
+- 95%+ parsing success rate maintained
+- All unparseable inputs handled gracefully
+- Clear documentation of supported formats
+- Sub-0.05s parsing performance
 
 ---
 
-## 🎓 **RECENT LEARNINGS (M3 Complete)**
+## 📊 PROGRESS TRACKING
 
-### **Key Insights**
-1. **Phase-Based Validation**: Incremental testing prevents compound errors
-2. **Service Layer Patterns**: Clean separation enables rapid feature development
-3. **Performance Tracking**: Built-in monitoring ensures targets met
-4. **User Experience First**: Preview-before-action pattern builds confidence
-5. **Documentation Value**: Comprehensive docs accelerate future work
+### Time Invested
+- **M3.5 Total**: 0 hours / 6-8 hours estimated
+- **Phase 1**: 0 hours / 3-4 hours estimated
+- **Phase 2**: 0 hours / 3-4 hours estimated
 
-### **Best Practices Reinforced**
-- Always preserve working functionality during enhancements
-- Document integration points clearly for future reference
-- Test incrementally at each step
-- Comprehensive help documentation improves user confidence
-- Real-time feedback (badges, indicators) enhances UX
-- Additive enhancements safer than full replacements
-- Descriptive code comments explain "why" not just "what"
-
-### **Technical Patterns Established**
-1. **Service Layer Pattern**: Clean separation of business logic
-2. **Performance Tracking**: @Published properties for monitoring
-3. **Transaction Safety**: Atomic operations with rollback
-4. **Preview Before Action**: User control over destructive operations
-5. **Visual Feedback**: Real-time badges and indicators
-6. **Minimal Integration**: Additive code changes preserve stability
-7. **Code Documentation**: Function headers and inline comments explaining intent
+### Completion Status
+- **Phase 1**: ⏳ Not Started (0%)
+- **Phase 2**: ⏳ Not Started (0%)
 
 ---
 
-## 🔄 **STRATEGIC MILESTONE SEQUENCE**
+## 🎯 NEXT SESSION ACTIONS
 
-### **Foundation Complete** ✅ (59 hours)
-- **M1**: Professional Grocery Management (32h)
-- **M2**: Recipe Integration (16.5h)
-- **M3**: Structured Quantity Management (10.5h)
+### Immediate Next Steps (Phase 1 Start)
+1. **Search project knowledge** for complete Core Data model
+2. **Review Recipe entity** - understand current structure
+3. **Implement Recipe validation** - start with validateForInsert()
+4. **Test against existing recipes** - ensure no violations
+5. **Move to Ingredient validation** - follow same pattern
 
-### **Core User Workflows** (Next 25-35 hours)
-- **M4**: Meal Planning & Enhanced Grocery Integration (7.5-10h) ← **CURRENT**
-- **TestFlight**: Device testing and beta feedback
-- **M5**: Family Collaboration (10-12h)
-- **M6**: Testing Foundation (8-10h)
+### Session Goals
+- Complete Phase 1 Task 1: Recipe Validation (60 min)
+- Begin Phase 1 Task 2: Ingredient Validation (45 min)
+- Document any findings
 
-### **Intelligence & Analytics** (45-70 hours)
-- **M7**: Analytics & Insights (6-8h)
-- **M8**: Nutrition Tracking (6-8h)
-- **M9**: Budget Intelligence (6-8h)
-- **M10**: AI Recipe Assistant (4-6h)
-- **M11**: Lifestyle Optimization (4-8h)
-
-**Current Progress**: 3 of 11 milestones complete (27%)  
-**Estimated Remaining**: 84-110 hours  
-**Foundation Strength**: Excellent - clean architecture, zero technical debt
+### Key Questions to Answer
+- Do any existing recipes violate new rules?
+- Are validation messages clear and helpful?
+- Does validation impact performance?
 
 ---
 
-## 🎯 **IMMEDIATE NEXT STEPS**
+## 📝 RECENT COMPLETIONS
 
-### **1. Begin M4.1 Development** (Now)
-- Create UserPreferences Core Data entity
-- Build UserPreferencesService following established patterns
-- Add Meal Planning section to Settings UI
-- Implement real-time validation and persistence
-- Test settings across app restarts
+### October 20, 2025 - M3 Complete ✅
+**Completed**: M3 Phase 6 - UI Polish & Documentation  
+**Duration**: 1 hour  
+**Key Achievements:**
+- Recipe ingredient autocomplete validated with M3 features
+- Consolidation button with opportunity badge
+- Visual indicators for quantity types (parseable vs text-only)
+- Comprehensive user help documentation (HelpView.swift)
+- All M3 documentation finalized
 
-### **2. Preparation Checklist**
-- [x] M3 complete and documented
-- [x] M4 PRDs reviewed and understood
-- [x] Settings infrastructure exists from M3 Phase 3
-- [ ] UserPreferences entity defined
-- [ ] UserPreferencesService implemented
-- [ ] Meal planning preferences UI added
-
-### **3. M4.1 Development Approach**
-- Follow proven phase-based planning (3 tasks, ~30-45 min each)
-- Leverage M3's Settings infrastructure
-- Follow established Core Data patterns (Class Definition like IngredientTemplate)
-- Incremental validation at each task
-- Document learnings in real-time
-
-### **4. After M4 Completion**
-- Apple Developer Account creation
-- App Store Connect setup
-- Provisioning profiles and certificates
-- Build for TestFlight distribution
-- Begin beta testing with real devices
+**Total M3 Time**: 10.5 hours (within 8-12 hour estimate)  
+**Status**: Production ready, all acceptance criteria met
 
 ---
 
-**Next Action**: Begin M4.1 - Settings Infrastructure Foundation (1.5 hours)
+## 🔄 STRATEGIC MILESTONE SEQUENCE
 
-**Status**: M3 complete with production-ready quality. Ready to begin M4 meal planning implementation with strong foundation in place.
+### Completed Milestones
+- **M1**: Professional Grocery Management (32 hours) ✅
+- **M2**: Recipe Integration (16.5 hours) ✅
+- **M3**: Structured Quantity Management (10.5 hours) ✅
+
+### Current Path
+- **M3.5**: Foundation Hardening (6-8 hours) ← **ACTIVE**
+- **M4**: Meal Planning & Enhanced Grocery (7.5-10 hours) ← **NEXT**
+- **M4.5**: Performance & Polish (6-8 hours, post-TestFlight) ← **DEFERRED**
+- **M5**: CloudKit Family Collaboration (12-15 hours)
+- **M6**: Testing Foundation (8-10 hours)
+
+### Strategic Rationale for M3.5
+**Why Now:**
+- M4 meal planning will create 3-14 plans × 3-21 meals each
+- Consolidated grocery lists will combine multiple recipes
+- Any data quality issues will compound exponentially
+- Parsing will face real-world recipe variety
+- Better to validate foundation now than debug later
+
+**Why Split from Original M3.5 PRD:**
+- Performance profiling requires real devices (not simulator)
+- UI polish benefits from actual user feedback (TestFlight)
+- Data validation and parsing testing can be done now
+- Focus current effort where it has highest ROI
+
+---
+
+## 🎓 LEARNING FOCUS
+
+### M3.5 Learning Objectives
+- **Core Data Validation**: Deep understanding of validation patterns
+- **Error Handling**: Professional error messages and recovery
+- **Test-Driven Development**: Comprehensive test suite creation
+- **Edge Case Analysis**: Systematic identification and handling
+- **Documentation**: Clear technical documentation practices
+
+### Skills Being Developed
+- Advanced Core Data techniques
+- Swift testing frameworks
+- Regex and text parsing mastery
+- Error handling best practices
+- Technical writing and documentation
+
+---
+
+## 🚨 RISK MANAGEMENT
+
+### Known Risks
+1. **Data Violations Found** (10% likelihood)
+   - Impact: 2-3 hours migration work
+   - Mitigation: Run audit first, create migration if needed
+   
+2. **Parsing Edge Cases Found** (20% likelihood)
+   - Impact: 2-3 hours parser fixes
+   - Mitigation: Comprehensive tests, graceful fallbacks
+
+3. **Performance Degradation** (5% likelihood)
+   - Impact: 1 hour optimization
+   - Mitigation: Performance tests throughout
+
+### Contingency Plans
+- If validation reveals issues: Create migration, test thoroughly
+- If parsing needs fixes: Document unsupported formats, prioritize common cases
+- If performance issues: Optimize validation checks, cache results
+
+---
+
+## 📋 DOCUMENTATION STATUS
+
+### M3.5 Documentation
+- [X] PRD: `docs/prds/milestone-3.5-foundation-hardening.md`
+- [X] PRD: `docs/prds/milestone-4.5-performance-polish.md` (deferred phases)
+- [X] Current Story: `docs/current-story.md` (this file)
+- [X] Next Prompt: `docs/next-prompt.md`
+- [ ] Learning Note: `docs/learning-notes/17-m3.5-foundation-hardening.md` (after completion)
+
+### Related Documentation
+- [ ] Roadmap updated with M3.5 and M4.5 split (update after completion)
+- [X] Development guidelines up to date
+- [ ] Architecture Decision Record if needed (TBD based on findings)
+
+---
+
+## 💡 KEY PRINCIPLES FOR M3.5
+
+### Development Approach
+1. **Validate incrementally** - Test after each validation rule
+2. **Document findings** - Record any violations discovered
+3. **Graceful degradation** - Never break existing functionality
+4. **Performance conscious** - Validation must be fast
+
+### Quality Gates
+- All validation rules implemented correctly
+- Zero validation errors on existing data
+- 95%+ parsing test pass rate
+- Sub-0.1s performance maintained
+- Clear error messages throughout
+- Comprehensive documentation
+
+### Success Definition
+- Foundation validated and hardened
+- Confident moving to M4 complexity
+- Professional error handling in place
+- Ready for TestFlight quality standards
+
+---
+
+**Next Update**: After Phase 1 completion  
+**Ready to Start**: Phase 1, Task 1 - Recipe Validation
