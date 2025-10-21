@@ -1,8 +1,8 @@
 # Grocery & Recipe Manager - Requirements Document
 
-**Last Updated**: October 14, 2025  
-**Version**: 3.5  
-**Current Milestone**: M3 Phase 6 (UI Polish & Documentation)
+**Last Updated**: October 20, 2025  
+**Version**: 3.6  
+**Current Milestone**: M4 Phase 1 (Settings Infrastructure Foundation)
 
 ---
 
@@ -119,9 +119,9 @@ This document defines all functional and non-functional requirements for the Gro
 
 ---
 
-## 🔄 **M3: STRUCTURED QUANTITY MANAGEMENT - IN PROGRESS**
+## ✅ **M3: STRUCTURED QUANTITY MANAGEMENT - COMPLETE**
 
-**Status**: 🔄 83% Complete - October 2025 (9.5 of ~10.5 hours)  
+**Status**: ✅ Complete - October 2025 (10.5 hours)  
 **Summary**: Intelligent quantity management with scaling, consolidation, and unit conversion
 
 ### **Functional Requirements - Quantity Model**
@@ -169,36 +169,36 @@ This document defines all functional and non-functional requirements for the Gro
 | **FR-QM-029** | **Transaction safety** | ✅ **Atomic merge operations with rollback** | ✅ M3 Phase 5 | 🎯 **Data integrity** |
 | **FR-QM-030** | **Consolidation performance** | ✅ **< 0.3s analysis for 50+ items, < 0.8s merge** | ✅ M3 Phase 5 | 🎯 **Responsive operations** |
 
-### **Functional Requirements - UI Polish (Phase 6)**
+### **Functional Requirements - UI Polish**
 
 | ID | Requirement | Implementation | Milestone | Value |
 |----|-------------|----------------|-----------|-------|
-| **FR-QM-016** | **Visual indicators for quantity types** | ⏳ **Color coding and icons for parseable/unparseable** | M3 Phase 6 | 🎯 **Visual clarity** |
-| **FR-QM-017** | **Help documentation** | ⏳ **User guide for quantity features** | M3 Phase 6 | 🎯 **User education** |
-| **FR-QM-018** | **Completion documentation** | ⏳ **Learning notes and roadmap updates** | M3 Phase 6 | 🎯 **Project tracking** |
-| **FR-QM-019** | **Autocomplete validation** | ⏳ **Verify autocomplete works with M3 features** | M3 Phase 6 | 🎯 **Integration quality** |
-| **FR-QM-020** | **Performance validation** | ⏳ **Confirm all targets met or exceeded** | M3 Phase 6 | 🎯 **Quality assurance** |
+| **FR-QM-016** | **Visual indicators for quantity types** | ✅ **Color coding and icons for parseable/unparseable** | ✅ M3 Phase 6 | 🎯 **Visual clarity** |
+| **FR-QM-017** | **Help documentation** | ✅ **Comprehensive user guide for quantity features (HelpView.swift)** | ✅ M3 Phase 6 | 🎯 **User education** |
+| **FR-QM-018** | **Completion documentation** | ✅ **Learning notes and roadmap updates** | ✅ M3 Phase 6 | 🎯 **Project tracking** |
+| **FR-QM-019** | **Autocomplete validation** | ✅ **Verified autocomplete works with M3 features** | ✅ M3 Phase 6 | 🎯 **Integration quality** |
+| **FR-QM-020** | **Performance validation** | ✅ **All targets met or exceeded** | ✅ M3 Phase 6 | 🎯 **Quality assurance** |
 
 ### **Non-Functional Requirements - M3**
 
 | ID | Requirement | Implementation | Milestone | Value |
 |----|-------------|----------------|-----------|-------|
-| **NFR-M3-001** | **Parsing performance < 0.05s** | ✅ Optimized parsing service | M3 Phase 1-2 | 🎯 **Instant feedback** |
+| **NFR-M3-001** | **Parsing performance < 0.05s** | ✅ Optimized parsing service (< 0.03s achieved) | M3 Phase 1-2 | 🎯 **Instant feedback** |
 | **NFR-M3-002** | **Migration performance < 2s** | ✅ Batch processing with async/await | M3 Phase 3 | 🎯 **Quick transition** |
-| **NFR-M3-003** | **Scaling performance < 0.5s** | ✅ Efficient mathematical operations | M3 Phase 4 | 🎯 **Responsive scaling** |
+| **NFR-M3-003** | **Scaling performance < 0.5s** | ✅ Efficient mathematical operations (< 0.4s achieved) | M3 Phase 4 | 🎯 **Responsive scaling** |
 | **NFR-M3-004** | **Analysis performance < 0.5s** | ✅ Optimized grouping algorithms (< 0.3s achieved) | M3 Phase 5 | 🎯 **Fast analysis** |
 | **NFR-M3-005** | **Merge performance < 1s** | ✅ Transaction optimization (< 0.8s achieved) | M3 Phase 5 | 🎯 **Quick operations** |
 | **NFR-M3-006** | **Parse accuracy > 95%** | ✅ Comprehensive parsing patterns | M3 Phase 1-2 | 🎯 **Data quality** |
 | **NFR-M3-007** | **Conversion accuracy 100%** | ✅ Validated conversion logic | M3 Phase 5 | 🎯 **Precision** |
 | **NFR-M3-008** | **UI responsiveness 60fps** | ✅ Maintained throughout | M3 All | 🎯 **Smooth experience** |
 
-**M3 Progress**: 28 of 33 requirements complete (85%), Phase 6 in progress with 5 requirements remaining
+**M3 Summary**: All 33 requirements successfully completed. Structured quantity system operational with recipe scaling, intelligent consolidation, unit conversion, visual enhancements, and comprehensive help documentation. All performance targets met or exceeded. Production-ready quality achieved.
 
 ---
 
 ## 📋 **M4: MEAL PLANNING & SETTINGS - READY TO BEGIN**
 
-**Status**: 📋 Planned - After M3 completion  
+**Status**: 📋 Ready to Begin - November 2025  
 **Estimated Time**: 7.5-10 hours  
 **Summary**: Calendar-based meal planning with enhanced grocery automation
 
@@ -241,7 +241,7 @@ This document defines all functional and non-functional requirements for the Gro
 | **NFR-M4-002** | **Calendar rendering** | < 0.5s | M4.2 | 🎯 **Responsive UI** |
 | **NFR-M4-003** | **Settings persistence** | Immediate save | M4.1 | 🎯 **Reliability** |
 
-**M4 Summary**: 19 requirements defined, ready for implementation after M3 completion
+**M4 Summary**: 19 requirements defined, ready for implementation after M3 completion. Leverages M3 scaling and consolidation services.
 
 ---
 
@@ -283,8 +283,7 @@ This document defines all functional and non-functional requirements for the Gro
 
 | Status | M1 | M2 | M3 | M4 | Total |
 |--------|----|----|----|----|-------|
-| ✅ Complete | 19 | 37 | 28 | 0 | **84** |
-| ⏳ In Progress | 0 | 0 | 5 | 0 | **5** |
+| ✅ Complete | 19 | 37 | 33 | 0 | **89** |
 | 📋 Planned | 0 | 0 | 0 | 19 | **19** |
 | **Total** | **19** | **37** | **33** | **19** | **108** |
 
@@ -296,9 +295,9 @@ This document defines all functional and non-functional requirements for the Gro
 | Categories | 5 | ✅ Complete |
 | Staples | 4 | ✅ Complete |
 | Recipes | 19 | ✅ Complete |
-| Quantities | 33 | 🔄 85% Complete |
+| Quantities | 33 | ✅ Complete |
 | Meal Planning | 19 | 📋 Planned |
-| **Total** | **85** | **78% Complete** |
+| **Total** | **85** | **82% Complete** |
 
 ### **Performance Requirements Status**
 
@@ -319,43 +318,40 @@ This document defines all functional and non-functional requirements for the Gro
 
 ## 🎯 **CURRENT REQUIREMENTS FOCUS**
 
-### **Immediate Priority: M3 Phase 6 - UI Polish & Documentation** 🚀
-**Timeline**: 1 hour  
-**Status**: In progress
+### **Immediate Priority: M4 Phase 1 - Settings Infrastructure** 🚀
+**Timeline**: 1.5 hours  
+**Status**: Ready to begin
 
 **Requirements:**
-1. **FR-QM-019**: Autocomplete validation with M3 features
-2. **FR-QM-016**: Visual indicators for quantity types
-3. **FR-QM-017**: Help documentation for users
-4. **FR-QM-018**: Completion documentation
-5. **FR-QM-020**: Performance validation
+1. **FR-MP-001**: Meal planning preferences (duration, start day, auto-naming)
+2. **FR-MP-002**: Recipe source display preferences
+3. **FR-MP-003**: UserPreferences Core Data entity
+4. **FR-MP-004**: Real-time settings validation
 
-**Validation Framework:**
-- Autocomplete works with consolidated items
-- Visual enhancements improve user experience
-- Help content accessible and clear
-- Documentation comprehensive and current
-- Performance targets maintained or exceeded
+**Dependencies:**
+- M3 Complete ✅
+- Settings tab infrastructure exists (created in M3 Phase 3) ✅
+- Core Data patterns established ✅
 
-### **Next Priority: M3 Completion** 📋
-**Timeline**: After Phase 6  
-**Status**: Ready for completion
-
-**Requirements:**
-- All 33 M3 requirements complete
-- Comprehensive learning notes
-- Updated roadmap and project tracking
-- Performance validation report
-- Ready for M4 transition
-
-### **Post-M3: M4 Implementation** 📅
-**Timeline**: 7.5-10 hours  
-**Status**: Requirements complete, ready for implementation
+### **Next Priority: M4 Phase 2 - Calendar Planning Core** 📋
+**Timeline**: 2.5 hours  
+**Status**: Requirements complete
 
 **Priority Requirements:**
-- M4.1: Settings infrastructure (1.5 hours)
-- M4.2: Meal planning core (2.5 hours)
-- M4.3: Enhanced grocery integration + scaled recipe to list (3.5-4 hours)
+- MealPlan and PlannedMeal entities
+- Calendar view with recipe display
+- Add to meal plan workflows
+- Configurable planning periods
+
+### **Post-M4.2: M4 Phase 3 - Enhanced Grocery Integration** 🛒
+**Timeline**: 3.5-4 hours  
+**Status**: Requirements complete
+
+**Priority Requirements:**
+- Generate grocery lists from meal plans
+- Recipe source tracking
+- Smart consolidation (leverages M3 Phase 5)
+- Scaled recipe to list feature (leverages M3 Phase 4)
 
 ---
 
@@ -401,7 +397,7 @@ This document defines all functional and non-functional requirements for the Gro
 | RecipeScalingView | FR-QM-021 through FR-QM-026 | ✅ Complete |
 | ConsolidationPreviewView | FR-QM-011 through FR-QM-015 | ✅ Complete |
 | SettingsView | FR-QM-009 | ✅ Complete |
-| HelpView | FR-QM-017 | ⏳ In Progress |
+| HelpView | FR-QM-017 | ✅ Complete |
 
 ---
 
@@ -421,11 +417,12 @@ This document defines all functional and non-functional requirements for the Gro
 - Template system working
 - Performance targets met
 
-**M3 Validation**: 🔄 85% Complete
-- Phases 1-5 validated ✅
-- Phase 6 in progress ⏳
+**M3 Validation**: ✅ Complete
+- All 6 phases validated ✅
+- All 33 requirements complete ✅
 - Performance targets exceeded ✅
 - User value demonstrated ✅
+- Production-ready quality ✅
 
 **M4 Validation**: 📋 Pending
 - Requirements defined
@@ -439,14 +436,14 @@ This document defines all functional and non-functional requirements for the Gro
 
 ### **Phase 1: Core Platform (M1-M4)** - In Progress
 **Goal**: Complete essential grocery and recipe workflows  
-**Timeline**: ~58-69 hours  
-**Status**: M1-M2 complete, M3 85% complete, M4 ready
+**Timeline**: ~66-79 hours  
+**Status**: M1-M3 complete (59 hours), M4 ready to begin
 
 **Value Delivered**:
-- Store-layout optimized shopping
-- Complete recipe management
-- Intelligent quantity handling
-- Meal planning automation
+- Store-layout optimized shopping ✅
+- Complete recipe management ✅
+- Intelligent quantity handling ✅
+- Meal planning automation 📋
 
 ### **Phase 2: Collaboration & Quality (M5-M6)** - Planned
 **Goal**: Family sharing and quality assurance  
@@ -475,6 +472,6 @@ This document defines all functional and non-functional requirements for the Gro
 
 **Strategic Validation**: Core platform requirements (M1-M7) provide robust foundation for advanced intelligence features (M8-M11) representing significant competitive advantage and comprehensive lifestyle optimization platform.
 
-**Last Updated**: October 14, 2025  
-**Next Update**: After M3 Phase 6 completion  
-**Current Focus**: Completing M3 UI polish and documentation
+**Last Updated**: October 20, 2025  
+**Next Update**: After M4.1 completion  
+**Current Focus**: Begin M4 Settings Infrastructure Foundation
