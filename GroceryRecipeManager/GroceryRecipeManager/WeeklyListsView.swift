@@ -3,6 +3,7 @@
 //  GroceryRecipeManager
 //
 //  PHASE 1 UPDATE: Generate from IngredientTemplate.isStaple instead of GroceryItem.isStaple
+//  FIX: Added @FetchRequest to WeeklyListRowView for live progress updates
 //
 
 import SwiftUI
@@ -32,6 +33,10 @@ struct WeeklyListsView: View {
                 Button("OK") { }
             } message: {
                 Text(errorMessage)
+            }
+            .onAppear {
+                // Refresh context when view appears to pick up any changes
+                viewContext.refreshAllObjects()
             }
     }
     
@@ -252,19 +257,35 @@ struct WeeklyListsView: View {
 struct WeeklyListRowView: View {
     @ObservedObject var weeklyList: WeeklyList
     
-    // Calculate real-time data from the relationship
-    private var itemsArray: [GroceryListItem] {
-        return (weeklyList.items as? Set<GroceryListItem>)?.sorted {
-            $0.sortOrder < $1.sortOrder
-        } ?? []
+    // FIX: Use @FetchRequest for live updates
+    @FetchRequest private var itemsFetch: FetchedResults<GroceryListItem>
+    
+    init(weeklyList: WeeklyList) {
+        self.weeklyList = weeklyList
+        
+        // Configure FetchRequest for this specific list's items
+        let listID = weeklyList.id ?? UUID()
+        _itemsFetch = FetchRequest<GroceryListItem>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \GroceryListItem.sortOrder, ascending: true)],
+            predicate: NSPredicate(format: "weeklyList.id == %@", listID as CVarArg),
+            animation: .default
+        )
     }
     
+    // Computed properties that depend on itemsFetch
+    // The key is accessing properties directly from itemsFetch, not a cached array
     private var completedItemsCount: Int {
-        itemsArray.filter { $0.isCompleted }.count
+        var count = 0
+        for item in itemsFetch {
+            if item.isCompleted {
+                count += 1
+            }
+        }
+        return count
     }
     
     private var totalItemsCount: Int {
-        itemsArray.count
+        itemsFetch.count
     }
     
     private var completionPercentage: Double {
@@ -272,7 +293,6 @@ struct WeeklyListRowView: View {
         return Double(completedItemsCount) / Double(totalItemsCount)
     }
     
-    // Use calculated completion status for accuracy
     private var isListCompleted: Bool {
         return totalItemsCount > 0 && completedItemsCount == totalItemsCount
     }
@@ -319,6 +339,7 @@ struct WeeklyListRowView: View {
                     
                     ProgressView(value: completionPercentage)
                         .tint(completionPercentage == 1.0 ? .green : .blue)
+                        .animation(.easeInOut(duration: 0.3), value: completionPercentage)
                 }
             } else {
                 Text("Empty list")

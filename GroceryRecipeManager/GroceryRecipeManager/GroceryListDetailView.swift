@@ -1,8 +1,10 @@
 //
-//  GroceryListDetailView.swift - INLINE ADD (SIMPLIFIED)
+//  GroceryListDetailView.swift - INLINE ADD (SIMPLIFIED) + PROGRESS BAR FIX
 //  GroceryRecipeManager
 //
 //  Added inline TextField for quick item entry without modal
+//  PHASE 3: New ingredient tracking with template creation
+//  FIX: Added @FetchRequest for live progress bar updates
 //
 
 import SwiftUI
@@ -32,13 +34,16 @@ struct GroceryListDetailView: View {
     @State private var newIngredientCategory = ""
     @State private var markAsStaple = false
     
+    // FIX: Use @FetchRequest instead of relationship for live progress updates
+    @FetchRequest private var listItemsFetch: FetchedResults<GroceryListItem>
+    
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \Category.sortOrder, ascending: true)
         ]
     ) private var categories: FetchedResults<Category>
     
-    // INLINE ADD: Initialize services
+    // INLINE ADD: Initialize services AND configure FetchRequest for live updates
     init(weeklyList: WeeklyList) {
         self.weeklyList = weeklyList
         
@@ -50,6 +55,14 @@ struct GroceryListDetailView: View {
         _templateService = StateObject(wrappedValue: templateSvc)
         _parsingService = StateObject(wrappedValue: parsingSvc)
         _autocompleteService = StateObject(wrappedValue: autocompleteSvc)
+        
+        // FIX: Configure FetchRequest for this specific list's items
+        let listID = weeklyList.id ?? UUID()
+        _listItemsFetch = FetchRequest<GroceryListItem>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \GroceryListItem.sortOrder, ascending: true)],
+            predicate: NSPredicate(format: "weeklyList.id == %@", listID as CVarArg),
+            animation: .default
+        )
     }
     
     var body: some View {
@@ -355,7 +368,7 @@ struct GroceryListDetailView: View {
         do {
             try viewContext.save()
             print("✅ Created new ingredient template: \(newIngredientName)")
-            print("   📁 Category: \(newIngredientCategory)")
+            print("   📂 Category: \(newIngredientCategory)")
             print("   ⭐ Staple: \(markAsStaple)")
             
             showingAddToTemplates = false
@@ -368,9 +381,9 @@ struct GroceryListDetailView: View {
     
     // MARK: - Computed Properties
     
+    // FIX: Use FetchRequest results instead of relationship access
     private var listItems: [GroceryListItem] {
-        guard let items = weeklyList.items as? Set<GroceryListItem> else { return [] }
-        return items.sorted { $0.sortOrder < $1.sortOrder }
+        Array(listItemsFetch)
     }
     
     private var groupedItems: [(key: String, value: [GroceryListItem])] {
