@@ -1,10 +1,11 @@
 //
-//  GroceryListDetailView.swift - INLINE ADD (SIMPLIFIED) + PROGRESS BAR FIX
+//  GroceryListDetailView.swift - INLINE ADD (SIMPLIFIED) + PROGRESS BAR FIX + M3 PHASE 6
 //  GroceryRecipeManager
 //
 //  Added inline TextField for quick item entry without modal
 //  PHASE 3: New ingredient tracking with template creation
 //  FIX: Added @FetchRequest for live progress bar updates
+//  M3 PHASE 6: Consolidation button with badge + visual indicators
 //
 
 import SwiftUI
@@ -18,6 +19,9 @@ struct GroceryListDetailView: View {
     @StateObject private var templateService: IngredientTemplateService
     @StateObject private var parsingService: IngredientParsingService
     @StateObject private var autocompleteService: IngredientAutocompleteService
+    
+    // M3 PHASE 6: Consolidation service
+    @StateObject private var mergeService: QuantityMergeService
     
     // INLINE ADD: State
     @State private var quickAddText = ""
@@ -33,6 +37,11 @@ struct GroceryListDetailView: View {
     @State private var newIngredientName = ""
     @State private var newIngredientCategory = ""
     @State private var markAsStaple = false
+    
+    // M3 PHASE 6: Consolidation state
+    @State private var showingConsolidation = false
+    @State private var consolidationAnalysis: MergeAnalysis?
+    @State private var consolidationOpportunities: Int = 0
     
     // FIX: Use @FetchRequest instead of relationship for live progress updates
     @FetchRequest private var listItemsFetch: FetchedResults<GroceryListItem>
@@ -55,6 +64,9 @@ struct GroceryListDetailView: View {
         _templateService = StateObject(wrappedValue: templateSvc)
         _parsingService = StateObject(wrappedValue: parsingSvc)
         _autocompleteService = StateObject(wrappedValue: autocompleteSvc)
+        
+        // M3 PHASE 6: Initialize merge service
+        _mergeService = StateObject(wrappedValue: QuantityMergeService(context: context))
         
         // FIX: Configure FetchRequest for this specific list's items
         let listID = weeklyList.id ?? UUID()
@@ -92,10 +104,30 @@ struct GroceryListDetailView: View {
         .sheet(isPresented: $showingAddToTemplates) {
             addToTemplatesSheet
         }
+        // M3 PHASE 6: Consolidation sheet
+        .sheet(isPresented: $showingConsolidation) {
+            if let analysis = consolidationAnalysis {
+                ConsolidationPreviewView(
+                    analysis: analysis,
+                    mergeService: mergeService,
+                    onComplete: {
+                        updateConsolidationAnalysis()
+                    }
+                )
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+            }
+        }
         .onAppear {
             if let firstCategory = categories.first {
                 defaultCategory = firstCategory.displayName
             }
+            // M3 PHASE 6: Initialize consolidation analysis
+            updateConsolidationAnalysis()
+        }
+        // M3 PHASE 6: Update consolidation analysis when items change
+        .onChange(of: listItems.count) { _, _ in
+            updateConsolidationAnalysis()
         }
     }
     
@@ -246,7 +278,7 @@ struct GroceryListDetailView: View {
         // Create list item
         let listItem = GroceryListItem(context: viewContext)
         listItem.id = UUID()
-        listItem.name = parsed.name  // Use parsed.name instead of displayName (they're the same)
+        listItem.name = parsed.name
         listItem.displayText = structured.displayText
         listItem.numericValue = structured.numericValue ?? 0.0
         listItem.standardUnit = structured.standardUnit
@@ -481,6 +513,24 @@ struct GroceryListDetailView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        // M3 PHASE 6: Consolidate button with badge
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button {
+                showConsolidationPreview()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.triangle.merge")
+                    if consolidationOpportunities > 0 {
+                        Text("(\(consolidationOpportunities))")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                }
+            }
+            .disabled(consolidationOpportunities == 0)
+            .foregroundColor(consolidationOpportunities > 0 ? .blue : .gray)
+        }
+        
         ToolbarItem(placement: .navigationBarTrailing) {
             Button(action: { showingAddItem = true }) {
                 Label("Add with Options", systemImage: "plus.square")
@@ -586,6 +636,22 @@ struct GroceryListDetailView: View {
             print("❌ Failed to mark all complete: \(error)")
         }
     }
+    
+    // MARK: - M3 Phase 6: Consolidation Functions
+    
+    private func updateConsolidationAnalysis() {
+        let analysis = mergeService.analyzeMergeOpportunities(for: weeklyList)
+        consolidationAnalysis = analysis
+        consolidationOpportunities = analysis.totalSavings
+    }
+    
+    private func showConsolidationPreview() {
+        updateConsolidationAnalysis()
+        
+        if let analysis = consolidationAnalysis, analysis.hasMergeOpportunities {
+            showingConsolidation = true
+        }
+    }
 }
 
 // MARK: - List Item Row Component
@@ -604,13 +670,29 @@ struct GroceryListItemRow: View {
             .buttonStyle(BorderlessButtonStyle())
             
             VStack(alignment: .leading, spacing: 4) {
+                // M3 PHASE 6: Enhanced with visual indicators
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(item.name ?? "Unknown Item")
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .strikethrough(item.isCompleted)
-                        .foregroundColor(item.isCompleted ? .secondary : .primary)
-                        .lineLimit(2)
+                    HStack(spacing: 6) {
+                        Text(item.name ?? "Unknown Item")
+                            .font(.body)
+                            .fontWeight(.medium)
+                            .strikethrough(item.isCompleted)
+                            .foregroundColor(item.isCompleted ? .secondary : (item.isParseable ? .primary : .primary.opacity(0.85)))
+                            .lineLimit(2)
+                        
+                        // M3 PHASE 6: Visual indicator for quantity type
+                        if !item.isCompleted {
+                            if item.isParseable {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.caption2)
+                                    .foregroundColor(.green.opacity(0.6))
+                            } else if let displayText = item.displayText, !displayText.isEmpty, displayText != "1" {
+                                Image(systemName: "questionmark.circle.fill")
+                                    .font(.caption2)
+                                    .foregroundColor(.orange.opacity(0.6))
+                            }
+                        }
+                    }
                     
                     if let displayText = item.displayText, !displayText.isEmpty, displayText != "1" {
                         Text("(\(displayText))")
@@ -633,12 +715,35 @@ struct GroceryListItemRow: View {
         .padding(.vertical, 4)
     }
     
+    // M3 PHASE 6: Enhanced source display with merge info
     private func sourceDisplayText(_ source: String) -> String {
+        if source.hasPrefix("merged") {
+            if source.contains("converted") {
+                if let countStr = extractCount(from: source) {
+                    return "Merged from \(countStr) items (converted)"
+                }
+                return "Merged (converted)"
+            } else {
+                if let countStr = extractCount(from: source) {
+                    return "Merged from \(countStr) items"
+                }
+                return "Merged"
+            }
+        }
+        
         switch source {
         case "staples": return "From Staples"
         case "manual": return "Added"
         case "recipe": return "From Recipe"
         default: return source.capitalized
         }
+    }
+    
+    private func extractCount(from source: String) -> String? {
+        if let startIdx = source.firstIndex(of: "("),
+           let endIdx = source.firstIndex(of: ")") {
+            return String(source[source.index(after: startIdx)..<endIdx])
+        }
+        return nil
     }
 }
