@@ -18,95 +18,23 @@ struct RecipeListView: View {
         animation: .default
     ) private var recipes: FetchedResults<Recipe>
     
-    // ENHANCED: Multi-field search with intelligent ranking
+    // M3.5: Simplified search using computed property
     private var filteredRecipes: [Recipe] {
         if searchText.isEmpty {
             return Array(recipes)
         }
         
-        let searchTerms = searchText.lowercased()
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .components(separatedBy: .whitespaces)
-            .filter { !$0.isEmpty }
-        
-        if searchTerms.isEmpty {
-            return Array(recipes)
+        // M3.5: Use computed property for search
+        return Array(recipes).filter { recipe in
+            recipe.matchesRecipeSearchQuery(searchText)
+        }.sorted { first, second in
+            // Sort by usage count (higher first)
+            if first.usageCount != second.usageCount {
+                return first.usageCount > second.usageCount
+            }
+            // Then alphabetical by title
+            return first.recipeDisplayTitle < second.recipeDisplayTitle
         }
-        
-        // Apply multi-field search with relevance scoring
-        return Array(recipes)
-            .compactMap { recipe in
-                let relevanceScore = calculateRelevanceScore(for: recipe, searchTerms: searchTerms)
-                return relevanceScore > 0 ? (recipe, relevanceScore) : nil
-            }
-            .sorted { first, second in
-                // Primary sort: Relevance score (higher first)
-                if first.1 != second.1 {
-                    return first.1 > second.1
-                }
-                // Secondary sort: Usage count (higher first)
-                if first.0.usageCount != second.0.usageCount {
-                    return first.0.usageCount > second.0.usageCount
-                }
-                // Tertiary sort: Alphabetical
-                return (first.0.title ?? "") < (second.0.title ?? "")
-            }
-            .map { $0.0 }
-    }
-    
-    // ENHANCED: Search relevance scoring algorithm
-    private func calculateRelevanceScore(for recipe: Recipe, searchTerms: [String]) -> Int {
-        var score = 0
-        let title = recipe.title?.lowercased() ?? ""
-        let instructions = recipe.instructions?.lowercased() ?? ""
-        
-        // Get ingredient names (handling Core Data relationship safely)
-        let ingredientNames = (recipe.ingredients?.allObjects as? [Ingredient])?
-            .compactMap { $0.name?.lowercased() } ?? []
-        
-        for term in searchTerms {
-            // Exact title match (highest priority): +100 points
-            if title == term {
-                score += 100
-                continue
-            }
-            
-            // Title contains term: +50 points
-            if title.contains(term) {
-                score += 50
-                continue
-            }
-            
-            // Ingredient name exact match: +30 points
-            if ingredientNames.contains(term) {
-                score += 30
-                continue
-            }
-            
-            // Ingredient name contains term: +20 points
-            if ingredientNames.contains(where: { $0.contains(term) }) {
-                score += 20
-                continue
-            }
-            
-            // Instructions contain term: +10 points
-            if instructions.contains(term) {
-                score += 10
-                continue
-            }
-            
-            // If no match found for this term, recipe doesn't match
-            return 0
-        }
-        
-        // Bonus points for highly used recipes
-        if recipe.usageCount > 5 {
-            score += 5
-        } else if recipe.usageCount > 2 {
-            score += 2
-        }
-        
-        return score
     }
     
     // ENHANCED: Search result analysis for UI indicators
@@ -336,45 +264,36 @@ struct RecipeListView: View {
                 try viewContext.save()
                 addSampleIngredientsWithTemplates(to: newRecipe, in: viewContext)
                 try viewContext.save()
-                print("Sample recipe '\(newRecipe.title ?? "Unknown")' created successfully with template integration")
+                print("Sample recipe '\(newRecipe.title ?? "Unknown")' created successfully")
             } catch {
                 print("Error creating sample recipe: \(error)")
             }
         }
     }
     
-    // M3 FIX: Updated to populate all structured quantity fields
     private func addSampleIngredientsWithTemplates(to recipe: Recipe, in context: NSManagedObjectContext) {
-        // Sample ingredients with realistic variety for template testing
         let ingredientTexts = [
             "2 cups all-purpose flour",
-            "1 cup granulated sugar",
-            "2 large eggs",
-            "1 tsp vanilla extract",
-            "1/2 cup butter, melted",
-            "1 tsp baking powder",
-            "1/2 tsp salt",
-            "1/4 cup milk"
+            "1 cup chocolate chips",
+            "1/2 cup butter",
+            "3/4 cup sugar",
+            "2 eggs",
+            "1 tsp vanilla extract"
         ]
         
-        // Initialize parsing service for structured quantities
         let templateService = IngredientTemplateService(context: context)
         let parsingService = IngredientParsingService(context: context, templateService: templateService)
         
-        // Create ingredients with proper structured quantities
         for (index, text) in ingredientTexts.enumerated() {
-            // Parse the text to get structured data
+            let parsed = parsingService.parseIngredient(text: text)
             let structured = parsingService.parseToStructured(text: text)
             
-            // Create ingredient with ALL required M3 fields
             let ingredient = Ingredient(context: context)
             ingredient.id = UUID()
-            ingredient.name = text  // Store full text as name
+            ingredient.name = parsed.originalText
             ingredient.sortOrder = Int16(index)
             ingredient.recipe = recipe
             
-            // M3: Set structured quantity fields
-            ingredient.displayText = structured.displayText
             ingredient.numericValue = structured.numericValue ?? 0.0
             ingredient.standardUnit = structured.standardUnit
             ingredient.isParseable = structured.isParseable
@@ -398,46 +317,25 @@ struct RecipeListView: View {
     }
 }
 
-// ENHANCED: Recipe Row with search indicators
+// ENHANCED: Recipe Row with search indicators - M3.5: USES COMPUTED PROPERTIES
 struct EnhancedRecipeRowView: View {
     let recipe: Recipe
     var searchText: String = ""
     let matchIndicators: [SearchMatchType]
     
-    private var formattedLastUsed: String {
-        guard let lastUsed = recipe.lastUsed else {
-            return "Never used"
-        }
-        
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return "Used \(formatter.localizedString(for: lastUsed, relativeTo: Date()))"
-    }
-    
-    private var usageText: String {
-        let count = recipe.usageCount
-        if count == 0 {
-            return "Never used"
-        } else if count == 1 {
-            return "Used 1 time"
-        } else {
-            return "Used \(count) times"
-        }
-    }
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(recipe.title ?? "Untitled Recipe")
+                    // M3.5: Use recipeDisplayTitle (handles nil)
+                    Text(recipe.recipeDisplayTitle)
                         .font(.headline)
                         .lineLimit(1)
                     
-                    if recipe.servings > 0 {
-                        Text("\(recipe.servings) servings")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
+                    // M3.5: Use recipeServingsDescription (always shows, handles 0)
+                    Text(recipe.recipeServingsDescription)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
                 
                 Spacer()
@@ -450,7 +348,8 @@ struct EnhancedRecipeRowView: View {
             }
             
             HStack {
-                Text(usageText)
+                // M3.5: Use recipeUsageDescription (replaces custom logic)
+                Text(recipe.recipeUsageDescription)
                     .font(.caption)
                     .foregroundColor(.secondary)
                 
@@ -459,15 +358,18 @@ struct EnhancedRecipeRowView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text(formattedLastUsed)
+                    // M3.5: Use recipeLastUsedDescription (replaces formatted date logic)
+                    Text(recipe.recipeLastUsedDescription)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 
                 Spacer()
                 
-                if recipe.prepTime > 0 {
-                    Label("\(recipe.prepTime)m", systemImage: "clock")
+                // M3.5: Use hasRecipeTiming check
+                if recipe.hasRecipeTiming {
+                    // M3.5: Use recipeFormattedPrepTime
+                    Label(recipe.recipeFormattedPrepTime, systemImage: "clock")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -505,7 +407,7 @@ struct EnhancedRecipeRowView: View {
     }
 }
 
-// MARK: - M3 PHASE 4: RecipeDetailView with Scaling Integration
+// MARK: - M3 PHASE 4: RecipeDetailView with Scaling Integration - M3.5: USES COMPUTED PROPERTIES
 
 struct RecipeDetailView: View {
     @ObservedObject var recipe: Recipe
@@ -544,27 +446,20 @@ struct RecipeDetailView: View {
     }
     
     private var sortedCategoryNames: [String] {
-        let grouped = groupedIngredients
-        let categoryMap = Dictionary(uniqueKeysWithValues: categories.map { ($0.displayName, $0.sortOrder) })
+        let categoryOrder = categories.compactMap { $0.name }
+        var sortedNames = groupedIngredients.keys.sorted()
         
-        return grouped.keys.sorted { category1, category2 in
-            if category1 == "Uncategorized" && category2 != "Uncategorized" { return false }
-            if category2 == "Uncategorized" && category1 != "Uncategorized" { return true }
-            if category1 == "Uncategorized" && category2 == "Uncategorized" { return false }
-            
-            let order1 = categoryMap[category1] ?? Int16.max
-            let order2 = categoryMap[category2] ?? Int16.max
-            
-            if order1 == order2 {
-                return category1 < category2
-            }
-            return order1 < order2
+        sortedNames.sort { first, second in
+            let firstIndex = categoryOrder.firstIndex(of: first) ?? Int.max
+            let secondIndex = categoryOrder.firstIndex(of: second) ?? Int.max
+            return firstIndex < secondIndex
         }
+        
+        return sortedNames
     }
     
     private var hasIngredients: Bool {
-        guard let ingredients = recipe.ingredients else { return false }
-        return !ingredients.allObjects.isEmpty
+        return !(groupedIngredients.isEmpty)
     }
     
     var body: some View {
@@ -572,92 +467,68 @@ struct RecipeDetailView: View {
             VStack(alignment: .leading, spacing: 24) {
                 recipeHeaderSection
                 
-                if recipe.prepTime > 0 || recipe.cookTime > 0 {
+                if recipe.hasRecipeTiming {
                     timingSection
                 }
                 
                 usageAnalyticsSection
                 
-                if hasIngredients {
-                    ingredientsSection
-                }
+                ingredientsSection
                 
                 if let instructions = recipe.instructions, !instructions.isEmpty {
                     instructionsSection(instructions)
                 }
-                
-                Spacer(minLength: 100)
             }
-            .padding(.horizontal)
+            .padding()
         }
-        .navigationTitle("Recipe Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                // M3 PHASE 4: Enhanced toolbar with Menu
-                Menu {
-                    Button {
-                        showingMarkUsedConfirmation = true
-                    } label: {
-                        Label("Mark as Used", systemImage: "checkmark.circle")
-                    }
-                    
-                    Button {
-                        showingEditSheet = true
-                    } label: {
-                        Label("Edit Recipe", systemImage: "pencil")
-                    }
-                    
-                    Divider()
-                    
-                    // M3 PHASE 4: Scale Recipe Button
-                    Button {
-                        showingScalingSheet = true
-                    } label: {
-                        Label("Scale Recipe", systemImage: "slider.horizontal.3")
-                    }
-                    .disabled(!hasIngredients)
-                    
-                    Divider()
-                    
-                    Button {
-                        showingAddToListSheet = true
-                    } label: {
-                        Label("Add to Shopping List", systemImage: "cart.badge.plus")
-                    }
-                    .disabled(!hasIngredients)
-                } label: {
-                    Image(systemName: "ellipsis.circle")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                // M3 PHASE 4: Scaling button
+                Button(action: {
+                    showingScalingSheet = true
+                }) {
+                    Image(systemName: "slider.horizontal.3")
+                }
+                
+                Button(action: {
+                    showingMarkUsedConfirmation = true
+                }) {
+                    Image(systemName: "checkmark.circle")
+                }
+                
+                Button(action: {
+                    showingEditSheet = true
+                }) {
+                    Image(systemName: "pencil")
                 }
             }
         }
+        .confirmationDialog("Mark Recipe as Used?", isPresented: $showingMarkUsedConfirmation) {
+            Button("Yes, Mark as Used") {
+                // M3.5: Use recordRecipeUsage() convenience method
+                recipe.recordRecipeUsage()
+                do {
+                    try viewContext.save()
+                    print("Recipe marked as used successfully")
+                } catch {
+                    print("Error marking recipe as used: \(error)")
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will increment the usage count and update the last used date.")
+        }
         .sheet(isPresented: $showingAddToListSheet) {
-            AddIngredientsToListView(recipe: recipe)
-                .environment(\.managedObjectContext, viewContext)
+            if hasIngredients {
+                AddIngredientsToListView(recipe: recipe)
+            }
         }
         .sheet(isPresented: $showingEditSheet) {
             EditRecipeView(recipe: recipe, context: viewContext)
         }
-        // M3 PHASE 4: Recipe Scaling Sheet
         .sheet(isPresented: $showingScalingSheet) {
-            NavigationStack {
-                RecipeScalingView(
-                    recipe: recipe,
-                    scalingService: scalingService
-                )
-            }
-        }
-        .confirmationDialog(
-            "Mark Recipe as Used",
-            isPresented: $showingMarkUsedConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Mark as Used Today") {
-                markRecipeAsUsed()
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("This will update the usage count and last used date for this recipe.")
+            RecipeScalingView(recipe: recipe, scalingService: scalingService)
         }
     }
     
@@ -666,7 +537,8 @@ struct RecipeDetailView: View {
     private var recipeHeaderSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(recipe.title ?? "Untitled Recipe")
+                // M3.5: Use recipeDisplayTitle
+                Text(recipe.recipeDisplayTitle)
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .lineLimit(2)
@@ -680,14 +552,13 @@ struct RecipeDetailView: View {
                 }
             }
             
-            if recipe.servings > 0 {
-                HStack {
-                    Image(systemName: "person.2")
-                        .foregroundColor(.secondary)
-                    Text("\(recipe.servings) servings")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
+            // M3.5: Use recipeServingsDescription (no need for conditional)
+            HStack {
+                Image(systemName: "person.2")
+                    .foregroundColor(.secondary)
+                Text(recipe.recipeServingsDescription)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
         }
     }
@@ -707,7 +578,8 @@ struct RecipeDetailView: View {
                         Text("Prep")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("\(recipe.prepTime)m")
+                        // M3.5: Use recipeFormattedPrepTime
+                        Text(recipe.recipeFormattedPrepTime)
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
@@ -721,7 +593,8 @@ struct RecipeDetailView: View {
                         Text("Cook")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("\(recipe.cookTime)m")
+                        // M3.5: Use recipeFormattedCookTime
+                        Text(recipe.recipeFormattedCookTime)
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
@@ -735,7 +608,8 @@ struct RecipeDetailView: View {
                         Text("Total")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("\(recipe.prepTime + recipe.cookTime)m")
+                        // M3.5: Use recipeFormattedTotalTime
+                        Text(recipe.recipeFormattedTotalTime)
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
@@ -774,12 +648,13 @@ struct RecipeDetailView: View {
                     HStack {
                         Image(systemName: "calendar")
                             .foregroundColor(.green)
-                        Text("Last Made")
+                        Text("Last Used")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
                     
-                    Text(formattedLastUsed)
+                    // M3.5: Use recipeLastUsedDescription
+                    Text(recipe.recipeLastUsedDescription)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)
@@ -870,7 +745,7 @@ struct RecipeDetailView: View {
         .cornerRadius(6)
     }
     
-    // M3: Updated to use displayText instead of quantity
+    // M3: Updated to use displayText - M3.5: USES COMPUTED PROPERTIES
     private func ingredientRowView(ingredient: Ingredient) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Circle()
@@ -879,14 +754,15 @@ struct RecipeDetailView: View {
                 .padding(.top, 6)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(ingredient.name ?? "Unknown Ingredient")
+                // M3.5: Use ingredientDisplayName (handles nil)
+                Text(ingredient.ingredientDisplayName)
                     .font(.body)
                     .foregroundColor(.primary)
                 
                 // M3: Use displayText instead of quantity
-                if let displayText = ingredient.displayText?.trimmingCharacters(in: .whitespacesAndNewlines),
-                   !displayText.isEmpty {
-                    Text(displayText)
+                // M3.5: Use bestIngredientDisplayText (better fallback handling)
+                if ingredient.hasStructuredQuantity || ingredient.displayText != nil {
+                    Text(ingredient.bestIngredientDisplayText)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 8)
@@ -943,30 +819,6 @@ struct RecipeDetailView: View {
             Text(instructions)
                 .font(.body)
                 .lineSpacing(4)
-        }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private var formattedLastUsed: String {
-        guard let lastUsed = recipe.lastUsed else {
-            return "Never"
-        }
-        
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: lastUsed, relativeTo: Date())
-    }
-    
-    private func markRecipeAsUsed() {
-        recipe.usageCount += 1
-        recipe.lastUsed = Date()
-        
-        do {
-            try viewContext.save()
-            print("Recipe marked as used successfully")
-        } catch {
-            print("Error marking recipe as used: \(error)")
         }
     }
 }

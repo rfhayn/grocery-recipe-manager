@@ -1,576 +1,339 @@
-# Next Prompt: M3.5 Phase 1 - Data Model Validation
+# M4 Phase 1: Settings Infrastructure Foundation - Development Prompt
 
-**Copy-paste this prompt to begin M3.5 Phase 1 implementation.**
-
----
-
-# START M3.5 PHASE 1: DATA MODEL VALIDATION
-
-## Context
-We're implementing M3.5 Foundation Hardening to validate our data model before M4 meal planning complexity. This phase adds Core Data validation rules to all entities to prevent bad data from ever being saved.
-
-**Current State:**
-- M3 Complete ✅ - All structured quantity features operational
-- No known data quality issues
-- All existing data should pass validation (need to verify)
-- Pre-production app - can make breaking changes if needed
-
-**Goal:** Add comprehensive validation to Recipe, Ingredient, IngredientTemplate, and GroceryListItem entities.
+**Copy and paste this prompt when ready to begin M4:**
 
 ---
 
-## Phase 1 Implementation Plan (3-4 hours)
+I'm ready to begin **M4: Meal Planning & Enhanced Grocery Integration** for my Grocery & Recipe Manager iOS app.
 
-### Task 1: Recipe Entity Validation (60 minutes)
+## M3 COMPLETE ✅
 
-**Step 1: Review Current Recipe Entity (10 min)**
-Search project knowledge for:
-- Current Recipe+CoreDataProperties.swift
-- All Recipe attributes and their types
-- Current validation (if any exists)
+**Completion Date**: October 20, 2025  
+**Total Time**: 10.5 hours (target: 8-12 hours) ✅  
+**Status**: Production Ready
 
-**Step 2: Implement Recipe Validation (35 min)**
+### **M3 Final Achievements:**
+- ✅ Structured quantity system operational (Phases 1-2)
+- ✅ Data migration complete with 100% success (Phase 3)
+- ✅ Recipe scaling with kitchen-friendly fractions (Phase 4)
+- ✅ Intelligent shopping list consolidation with unit conversion (Phase 5)
+- ✅ UI polish and comprehensive help documentation (Phase 6)
+- ✅ All performance targets met or exceeded
+- ✅ Production-ready quality achieved
 
-Create validation extension in `Recipe+CoreDataClass.swift`:
+### **Key M3 Deliverables:**
+- **Structured Data Model**: numericValue, standardUnit, displayText, isParseable, parseConfidence
+- **RecipeScalingService**: Scale recipes 0.25x-4x with fraction conversion
+- **QuantityMergeService**: Intelligent consolidation reducing list redundancy by 30-50%
+- **UnitConversionService**: Volume and weight conversions (cups ↔ tbsp ↔ tsp, lb ↔ oz)
+- **HelpView**: Comprehensive in-app user documentation
+- **Enhanced GroceryListDetailView**: Consolidation button with opportunity badge
+
+### **Foundation Ready for M4:**
+- ✅ Recipe scaling service operational
+- ✅ Consolidation service ready for meal plan lists
+- ✅ Settings infrastructure exists (created in M3 Phase 3)
+- ✅ Structured quantities enable smart grocery automation
+- ✅ Template system for ingredient consistency
+
+---
+
+## M4 Overview: Meal Planning & Enhanced Grocery Integration
+
+**Total Estimated Time**: 7.5-10 hours  
+**Priority**: HIGH - Completes core user workflow  
+**Dependencies**: M3 Complete ✅
+
+### **Strategic Value:**
+M4 completes the core grocery-recipe workflow by adding calendar-based meal planning with automated grocery list generation. This milestone leverages M3's structured quantities and scaling service to provide powerful meal planning capabilities.
+
+### **M4 Phase Breakdown:**
+
+**M4.1: Settings Infrastructure Foundation (1.5 hours)** ← **STARTING NOW**
+- Expand Settings tab with meal planning preferences
+- UserPreferences Core Data entity
+- Duration, start day, auto-naming, recipe source display settings
+- Real-time validation
+
+**M4.2: Calendar-Based Meal Planning Core (2.5 hours)**
+- MealPlan and PlannedMeal entities
+- Clean one-week calendar with recipe assignment
+- "Add to Meal Plan" buttons throughout app
+- User-configurable planning periods (3-14 days)
+
+**M4.3: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours)**
+- Generate grocery list from meal plan
+- Recipe source tags ("Ground beef [Tacos] [Spaghetti]")
+- Smart consolidation leveraging M3
+- Meal completion tracking
+- NEW: Add scaled recipes directly to shopping lists
+
+---
+
+## M4.1: Settings Infrastructure Foundation (1.5 hours)
+
+### **Goal:**
+Establish user preference management foundation supporting meal planning and future features. Expand existing Settings tab created in M3 Phase 3.
+
+### **What's Already Ready:**
+
+**From M3 Phase 3** ✅
+- Settings tab exists in main TabView
+- Professional iOS settings interface structure
+- Migration service and UI (can remain as reference)
+- Clean navigation patterns established
+
+**What We're Adding:**
+- Meal planning preferences section
+- UserPreferences Core Data entity
+- Real-time settings validation
+- Persistent configuration storage
+
+---
+
+## Phase 1 Implementation Plan
+
+### **Task 1: Core Data Model - UserPreferences Entity (30 min)**
+
+**Purpose**: Create persistent storage for user meal planning preferences.
+
+**Core Data Entity Definition:**
 ```swift
-extension Recipe {
-    // MARK: - Validation
+UserPreferences Entity:
+- id: UUID (primary key)
+- defaultMealPlanDuration: Int16 (default: 7, range: 3-14)
+- defaultStartDay: Int16 (0=Sunday, 1=Monday, etc., default: 0)
+- autoNameMealPlans: Bool (default: true)
+- showRecipeSourceTags: Bool (default: true)
+- createdDate: Date
+- modifiedDate: Date
+```
+
+**Implementation Steps:**
+1. **Open GroceryRecipeManager.xcdatamodeld** (10 min):
+   - Add new UserPreferences entity
+   - Set Codegen to "Class Definition" (like IngredientTemplate pattern)
+   - Add all properties with correct types
+   - Set default values in entity inspector
+   - Add fetch index on id field
+   - Build to verify schema compiles
+
+2. **Create UserPreferencesService** (15 min):
+   - Create new file: `Services/UserPreferencesService.swift`
+   - Singleton pattern for app-wide access
+   - Methods: getPreferences(), updatePreferences(), validateSettings()
+   - Create default preferences on first access
+   - Real-time Core Data save on updates
+   - Follow established service patterns (like IngredientTemplateService)
+
+3. **Test Core Data Integration** (5 min):
+   - Build project successfully
+   - Verify entity appears in Core Data model
+   - Test service initialization in app launch
+   - Verify default preferences created on first run
+
+**Acceptance Criteria:**
+- ✅ UserPreferences entity in Core Data model
+- ✅ UserPreferencesService operational
+- ✅ Default preferences created automatically
+- ✅ Build succeeds without errors
+- ✅ Follows established service patterns
+
+### **Task 2: Settings UI - Meal Planning Preferences Section (45 min)**
+
+**Purpose**: Add meal planning preferences to existing SettingsView.
+
+**UI Components to Add:**
+```swift
+Section(header: Text("Meal Planning")) {
+    // Default meal plan duration (3-14 days)
+    Stepper("Planning Duration: \(duration) days", 
+            value: $duration, in: 3...14)
     
-    override public func validateForInsert() throws {
-        try super.validateForInsert()
-        try validateRecipeData()
+    // Default start day (Sunday/Monday)
+    Picker("Start Day", selection: $startDay) {
+        ForEach(DayOfWeek.allCases) { day in
+            Text(day.name).tag(day.rawValue)
+        }
     }
     
-    override public func validateForUpdate() throws {
-        try super.validateForUpdate()
-        try validateRecipeData()
-    }
+    // Auto-naming toggle
+    Toggle("Auto-Name Meal Plans", isOn: $autoName)
     
-    private func validateRecipeData() throws {
-        try validateTitle()
-        try validateServings()
-        try validateTimes()
-        try validateInstructions()
-    }
-    
-    private func validateTitle() throws {
-        guard let title = title?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !title.isEmpty else {
-            throw ValidationError.emptyTitle
-        }
-        
-        guard title.count >= 3 else {
-            throw ValidationError.titleTooShort
-        }
-        
-        guard title.count <= 100 else {
-            throw ValidationError.titleTooLong
-        }
-    }
-    
-    private func validateServings() throws {
-        guard servings >= 1 else {
-            throw ValidationError.invalidServings
-        }
-        
-        guard servings <= 99 else {
-            throw ValidationError.servingsTooLarge
-        }
-    }
-    
-    private func validateTimes() throws {
-        guard prepTime >= 0 && cookTime >= 0 else {
-            throw ValidationError.negativeTimes
-        }
-        
-        guard prepTime <= 1440 && cookTime <= 1440 else {
-            throw ValidationError.timesTooLarge
-        }
-    }
-    
-    private func validateInstructions() throws {
-        guard let instructions = instructions?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !instructions.isEmpty else {
-            throw ValidationError.emptyInstructions
-        }
-        
-        guard instructions.count <= 5000 else {
-            throw ValidationError.instructionsTooLong
-        }
-    }
+    // Recipe source tags toggle
+    Toggle("Show Recipe Sources in Lists", isOn: $showSources)
 }
 ```
 
-**Step 3: Create ValidationError Enum (10 min)**
+**Implementation Steps:**
+1. **Update SettingsView.swift** (25 min):
+   - Add @StateObject for UserPreferencesService
+   - Add @State variables for all preferences bound to UI
+   - Create new "Meal Planning" section in existing Form
+   - Add Stepper for duration (3-14 days range)
+   - Add Picker for start day (enum: Sunday-Saturday)
+   - Add Toggle for auto-naming
+   - Add Toggle for recipe source display
+   - Wire all controls to save via service
 
-Create new file `GroceryRecipeManager/ValidationError.swift`:
-```swift
-import Foundation
+2. **Add DayOfWeek Enum** (10 min):
+   - Create enum for days of week (0=Sunday through 6=Saturday)
+   - CaseIterable for Picker
+   - Display names for UI
+   - Helper methods for date calculations
 
-enum ValidationError: LocalizedError {
-    // Recipe errors
-    case emptyTitle
-    case titleTooShort
-    case titleTooLong
-    case invalidServings
-    case servingsTooLarge
-    case negativeTimes
-    case timesTooLarge
-    case emptyInstructions
-    case instructionsTooLong
-    
-    // Ingredient errors
-    case emptyIngredientName
-    case emptyDisplayText
-    case invalidNumericValue
-    case invalidConfidence
-    case missingTemplate
-    
-    // Template errors
-    case emptyTemplateName
-    case duplicateTemplateName
-    case emptyCategory
-    case invalidUsageCount
-    
-    // Grocery list item errors
-    case emptyItemName
-    case emptyItemDisplayText
-    case invalidItemQuantity
-    
-    var errorDescription: String? {
-        switch self {
-        case .emptyTitle:
-            return "Recipe title cannot be empty"
-        case .titleTooShort:
-            return "Recipe title must be at least 3 characters"
-        case .titleTooLong:
-            return "Recipe title cannot exceed 100 characters"
-        case .invalidServings:
-            return "Servings must be at least 1"
-        case .servingsTooLarge:
-            return "Servings cannot exceed 99"
-        case .negativeTimes:
-            return "Prep and cook times cannot be negative"
-        case .timesTooLarge:
-            return "Times cannot exceed 24 hours (1440 minutes)"
-        case .emptyInstructions:
-            return "Recipe instructions cannot be empty"
-        case .instructionsTooLong:
-            return "Instructions cannot exceed 5000 characters"
-        case .emptyIngredientName:
-            return "Ingredient name cannot be empty"
-        case .emptyDisplayText:
-            return "Ingredient display text cannot be empty"
-        case .invalidNumericValue:
-            return "Parseable ingredients must have positive numeric value"
-        case .invalidConfidence:
-            return "Parse confidence must be between 0.0 and 1.0"
-        case .missingTemplate:
-            return "Ingredient must be linked to a template"
-        case .emptyTemplateName:
-            return "Template name cannot be empty"
-        case .emptyCategory:
-            return "Template must have a category assigned"
-        case .invalidUsageCount:
-            return "Usage count cannot be negative"
-        case .emptyItemName:
-            return "Grocery item name cannot be empty"
-        case .emptyItemDisplayText:
-            return "Grocery item display text cannot be empty"
-        case .invalidItemQuantity:
-            return "Grocery item quantity is invalid"
-        default:
-            return "Validation error"
-        }
-    }
-    
-    var recoverySuggestion: String? {
-        switch self {
-        case .emptyTitle:
-            return "Please enter a title for your recipe"
-        case .titleTooShort:
-            return "Please enter a longer title (at least 3 characters)"
-        case .titleTooLong:
-            return "Please shorten your title to 100 characters or less"
-        case .invalidServings:
-            return "Please enter a number of servings (1-99)"
-        case .servingsTooLarge:
-            return "Please enter a smaller number of servings (1-99)"
-        case .negativeTimes:
-            return "Please enter positive time values"
-        case .timesTooLarge:
-            return "Please enter times less than 24 hours"
-        case .emptyInstructions:
-            return "Please add instructions for your recipe"
-        case .instructionsTooLong:
-            return "Please shorten your instructions to 5000 characters or less"
-        case .emptyIngredientName:
-            return "Please provide an ingredient name"
-        case .emptyDisplayText:
-            return "Ingredient must have display text"
-        case .invalidNumericValue:
-            return "Please ensure parseable ingredients have valid quantities"
-        case .invalidConfidence:
-            return "System error: Invalid confidence score"
-        case .missingTemplate:
-            return "System error: Ingredient must be linked to template"
-        case .emptyTemplateName:
-            return "Template must have a name"
-        case .emptyCategory:
-            return "Please assign a category to this ingredient"
-        case .invalidUsageCount:
-            return "System error: Invalid usage count"
-        case .emptyItemName:
-            return "Please provide a name for this grocery item"
-        case .emptyItemDisplayText:
-            return "Grocery item must have display text"
-        case .invalidItemQuantity:
-            return "Please check the quantity value"
-        default:
-            return "Please check your input and try again"
-        }
-    }
-}
-```
+3. **Add Real-Time Validation** (5 min):
+   - Validate duration range (3-14) on change
+   - Immediate save on any preference change
+   - Toast/feedback for successful save (optional)
 
-**Step 4: Test Recipe Validation (5 min)**
-1. Build project - ensure no errors
-2. Test creating invalid recipe in simulator
-3. Verify error messages appear correctly
-4. Test valid recipe still saves
+4. **Add Help Text** (5 min):
+   - Add explanatory text below each setting
+   - Example: "Meal plans will default to X days starting on Y"
+   - Use .font(.caption) and .foregroundColor(.secondary)
+
+**Acceptance Criteria:**
+- ✅ Meal Planning section appears in Settings
+- ✅ All four preference controls functional
+- ✅ Settings persist across app launches
+- ✅ Validation prevents invalid values
+- ✅ Real-time save without "Save" button
+- ✅ Professional iOS settings interface maintained
+- ✅ Help text provides clarity
+
+### **Task 3: Integration Testing & Validation (15 min)**
+
+**Purpose**: Ensure settings infrastructure works end-to-end.
+
+**Testing Checklist:**
+1. **Default Preferences** (3 min):
+   - Launch app fresh (delete app if needed)
+   - Verify Settings tab accessible
+   - Confirm default values appear:
+     - Duration: 7 days
+     - Start Day: Sunday
+     - Auto-name: ON
+     - Show sources: ON
+
+2. **Preference Updates** (5 min):
+   - Change duration to 5 days → Save → Relaunch app → Verify persisted
+   - Change start day to Monday → Save → Relaunch → Verify persisted
+   - Toggle auto-name OFF → Relaunch → Verify persisted
+   - Toggle show sources OFF → Relaunch → Verify persisted
+
+3. **Validation** (3 min):
+   - Try to set duration < 3 (blocked by stepper)
+   - Try to set duration > 14 (blocked by stepper)
+   - Verify stepper shows current value correctly
+
+4. **Performance** (2 min):
+   - Settings screen loads < 0.1s
+   - Preference changes save immediately
+   - No UI lag or delays
+   - Memory usage appropriate
+
+5. **Integration Points** (2 min):
+   - UserPreferencesService accessible app-wide
+   - Can call getPreferences() from any view
+   - Settings changes immediately available
+   - Ready for M4.2 meal planning integration
+
+**Acceptance Criteria:**
+- ✅ All default values correct
+- ✅ All preferences persist correctly
+- ✅ Validation prevents invalid values
+- ✅ Performance targets met
+- ✅ Ready for M4.2 integration
+- ✅ Zero crashes or errors
 
 ---
 
-### Task 2: Ingredient Entity Validation (45 minutes)
+## Success Criteria - M4.1 Completion
 
-**Step 1: Review Current Ingredient Entity (5 min)**
-Search for Ingredient+CoreDataProperties.swift and review fields
+### **Functional Requirements:**
+- ✅ UserPreferences Core Data entity operational
+- ✅ UserPreferencesService with CRUD operations
+- ✅ Meal planning preferences section in Settings
+- ✅ Four preference controls (duration, start day, auto-name, show sources)
+- ✅ Real-time validation and persistence
+- ✅ Default preferences created on first launch
 
-**Step 2: Implement Ingredient Validation (30 min)**
+### **Non-Functional Requirements:**
+- ✅ Settings load < 0.1s
+- ✅ Preference saves immediate
+- ✅ All settings persist across app restarts
+- ✅ Professional iOS UI maintained
+- ✅ Zero build errors or warnings
+- ✅ Follows established service patterns
 
-Add to `Ingredient+CoreDataClass.swift`:
-```swift
-extension Ingredient {
-    // MARK: - Validation
-    
-    override public func validateForInsert() throws {
-        try super.validateForInsert()
-        try validateIngredientData()
-    }
-    
-    override public func validateForUpdate() throws {
-        try super.validateForUpdate()
-        try validateIngredientData()
-    }
-    
-    private func validateIngredientData() throws {
-        try validateName()
-        try validateDisplayText()
-        try validateQuantityData()
-        try validateTemplate()
-    }
-    
-    private func validateName() throws {
-        guard let name = name?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !name.isEmpty else {
-            throw ValidationError.emptyIngredientName
-        }
-    }
-    
-    private func validateDisplayText() throws {
-        guard let displayText = displayText?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !displayText.isEmpty else {
-            throw ValidationError.emptyDisplayText
-        }
-    }
-    
-    private func validateQuantityData() throws {
-        // If parseable, must have valid numeric value
-        if isParseable {
-            guard numericValue > 0 else {
-                throw ValidationError.invalidNumericValue
-            }
-        }
-        
-        // Confidence must be in valid range
-        guard parseConfidence >= 0.0 && parseConfidence <= 1.0 else {
-            throw ValidationError.invalidConfidence
-        }
-    }
-    
-    private func validateTemplate() throws {
-        guard ingredientTemplate != nil else {
-            throw ValidationError.missingTemplate
-        }
-    }
-    
-    // MARK: - Computed Properties
-    
-    var isValid: Bool {
-        do {
-            try validateIngredientData()
-            return true
-        } catch {
-            return false
-        }
-    }
-}
-```
-
-**Step 3: Test Ingredient Validation (10 min)**
-1. Build project
-2. Create ingredient through recipe creation
-3. Verify validation works
-4. Test edge cases (empty name, no template, etc.)
+### **Integration Readiness:**
+- ✅ UserPreferencesService accessible app-wide
+- ✅ Default duration (7 days) ready for M4.2
+- ✅ Default start day (Sunday) ready for M4.2
+- ✅ Settings infrastructure expandable for future features
 
 ---
 
-### Task 3: IngredientTemplate Entity Validation (30 minutes)
+## After M4.1 Completion
 
-**Step 1: Review Current Template Entity (5 min)**
+### **Immediate Next Steps:**
+1. Create learning note: `docs/learning-notes/17-m4-phase1-settings-infrastructure.md`
+2. Update `docs/current-story.md` with M4.1 completion
+3. Update `docs/next-prompt.md` for M4.2 Calendar-Based Meal Planning Core
 
-**Step 2: Implement Template Validation (20 min)**
+### **M4.2 Preview:**
+**Goal**: Calendar-based meal planning with recipe assignment  
+**Time**: 2.5 hours  
+**Dependencies**: M4.1 Complete ✅
 
-Add to `IngredientTemplate+CoreDataClass.swift` (or create if doesn't exist):
-```swift
-extension IngredientTemplate {
-    // MARK: - Validation
-    
-    override public func validateForInsert() throws {
-        try super.validateForInsert()
-        try validateTemplateData()
-    }
-    
-    override public func validateForUpdate() throws {
-        try super.validateForUpdate()
-        try validateTemplateData()
-    }
-    
-    private func validateTemplateData() throws {
-        try validateName()
-        try validateCategory()
-        try validateUsageCount()
-    }
-    
-    private func validateName() throws {
-        guard let name = name?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !name.isEmpty else {
-            throw ValidationError.emptyTemplateName
-        }
-    }
-    
-    private func validateCategory() throws {
-        guard let category = category?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !category.isEmpty else {
-            throw ValidationError.emptyCategory
-        }
-    }
-    
-    private func validateUsageCount() throws {
-        guard usageCount >= 0 else {
-            throw ValidationError.invalidUsageCount
-        }
-    }
-    
-    // MARK: - Computed Properties
-    
-    var hasValidCategory: Bool {
-        guard let category = category else { return false }
-        return !category.isEmpty
-    }
-    
-    var isUncategorized: Bool {
-        return category?.lowercased() == "uncategorized"
-    }
-}
-```
+**What We'll Build:**
+- MealPlan and PlannedMeal Core Data entities
+- Clean one-week calendar view
+- "Add to Meal Plan" buttons in recipe views
+- Modal calendar picker for date selection
+- Meal plan management (create/edit/delete)
 
-**Step 3: Test Template Validation (5 min)**
+**Foundation Ready:**
+- ✅ User preferences for duration and start day
+- ✅ Settings service for configuration
+- ✅ Recipe catalog with full CRUD
+- ✅ Navigation patterns established
 
 ---
 
-### Task 4: Add Computed Properties (45 minutes)
+## What You'll Need
 
-**Recipe Computed Properties:**
+### **Files to Create:**
+- `Services/UserPreferencesService.swift` - Preference management service
+- Modify: `GroceryRecipeManager.xcdatamodeld` - Add UserPreferences entity
+- Create enum in Models folder (if not exists): `DayOfWeek.swift`
 
-Add to `Recipe+CoreDataClass.swift`:
-```swift
-extension Recipe {
-    // MARK: - Computed Properties
-    
-    var hasValidIngredients: Bool {
-        guard let ingredients = ingredients as? Set<Ingredient> else { return false }
-        return !ingredients.isEmpty && ingredients.allSatisfy { $0.isValid }
-    }
-    
-    var totalTime: Int32 {
-        return prepTime + cookTime
-    }
-    
-    var ingredientCount: Int {
-        return (ingredients as? Set<Ingredient>)?.count ?? 0
-    }
-    
-    var formattedTotalTime: String {
-        let hours = totalTime / 60
-        let minutes = totalTime % 60
-        
-        if hours > 0 && minutes > 0 {
-            return "\(hours)h \(minutes)m"
-        } else if hours > 0 {
-            return "\(hours)h"
-        } else {
-            return "\(minutes)m"
-        }
-    }
-}
-```
+### **Files to Modify:**
+- `GroceryRecipeManager/SettingsView.swift` - Add Meal Planning section
 
-**Update UI to use computed properties where beneficial** (optional, can be done later)
+### **Documentation to Create:**
+- `docs/learning-notes/17-m4-phase1-settings-infrastructure.md` (after completion)
+
+### **Documentation to Update:**
+- `docs/current-story.md` - Mark M4.1 complete
+- `docs/next-prompt.md` - Prepare M4.2 prompt
+- `docs/project-index.md` - Add M4.1 learning note reference
 
 ---
 
-### Task 5: Validation Testing (30 minutes)
+## Current Progress
 
-**Step 1: Create Test Scenarios (10 min)**
-Document test cases:
-- Valid recipe with all fields
-- Invalid recipes (empty title, bad servings, etc.)
-- Valid/invalid ingredients
-- Valid/invalid templates
+**M3**: Complete (10.5 hours) ✅  
+**M4 Timeline:**
+- **Phase 1**: 1.5 hours ← **STARTING NOW**
+- **Phase 2**: 2.5 hours (Calendar planning)
+- **Phase 3**: 3.5-4 hours (Enhanced integration + scaled to list)
+- **Total**: 7.5-10 hours
 
-**Step 2: Manual Testing (15 min)**
-1. Test recipe creation with validation
-2. Test editing existing recipes
-3. Test ingredient parsing and validation
-4. Test template validation
-5. Verify error messages are clear
+**Milestone Status**: Ready to begin M4.1
 
-**Step 3: Run Against Existing Data (5 min)**
-
-Create a simple test in your app or run in debug console:
-```swift
-// Test helper to validate all existing data
-func validateAllExistingData() {
-    let context = PersistenceController.shared.container.viewContext
-    
-    // Test all recipes
-    let recipeRequest: NSFetchRequest<Recipe> = Recipe.fetchRequest()
-    do {
-        let recipes = try context.fetch(recipeRequest)
-        print("📊 Testing \(recipes.count) recipes...")
-        
-        for recipe in recipes {
-            do {
-                try recipe.validateForUpdate()
-                print("✅ Recipe '\(recipe.title ?? "Unknown")' is valid")
-            } catch {
-                print("❌ Recipe '\(recipe.title ?? "Unknown")' validation failed: \(error.localizedDescription)")
-            }
-        }
-    } catch {
-        print("❌ Error fetching recipes: \(error)")
-    }
-    
-    // Test all templates
-    let templateRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
-    do {
-        let templates = try context.fetch(templateRequest)
-        print("📊 Testing \(templates.count) templates...")
-        
-        for template in templates {
-            do {
-                try template.validateForUpdate()
-                print("✅ Template '\(template.name ?? "Unknown")' is valid")
-            } catch {
-                print("❌ Template '\(template.name ?? "Unknown")' validation failed: \(error.localizedDescription)")
-            }
-        }
-    } catch {
-        print("❌ Error fetching templates: \(error)")
-    }
-    
-    // Test all ingredients
-    let ingredientRequest: NSFetchRequest<Ingredient> = Ingredient.fetchRequest()
-    do {
-        let ingredients = try context.fetch(ingredientRequest)
-        print("📊 Testing \(ingredients.count) ingredients...")
-        
-        var validCount = 0
-        var invalidCount = 0
-        
-        for ingredient in ingredients {
-            do {
-                try ingredient.validateForUpdate()
-                validCount += 1
-            } catch {
-                invalidCount += 1
-                print("❌ Ingredient '\(ingredient.name ?? "Unknown")' validation failed: \(error.localizedDescription)")
-            }
-        }
-        
-        print("📊 Ingredients: \(validCount) valid, \(invalidCount) invalid")
-    } catch {
-        print("❌ Error fetching ingredients: \(error)")
-    }
-}
-```
+**Next Action**: Create UserPreferences Core Data entity and settings UI for meal planning preferences.
 
 ---
 
-## Acceptance Criteria Checklist
-
-- [ ] Recipe entity has complete validation
-- [ ] Ingredient entity has complete validation
-- [ ] IngredientTemplate entity has complete validation
-- [ ] GroceryListItem entity has complete validation (optional for Phase 1)
-- [ ] ValidationError enum with clear messages
-- [ ] Computed properties added to entities
-- [ ] All validation tests passing
-- [ ] Zero validation errors on existing data
-- [ ] Error messages are clear and helpful
-- [ ] Performance not degraded (< 0.1s validation)
-- [ ] Build successful with zero errors
-- [ ] Documentation updated
-
----
-
-## Expected Challenges & Solutions
-
-### Challenge 1: Existing Data Violations
-**If found**: Document violations, create migration script
-**Solution**: Add to validation exceptions temporarily, fix in migration
-
-### Challenge 2: Performance Impact
-**If validation slows saves**: Optimize validation checks
-**Solution**: Cache expensive checks, use lazy evaluation
-
-### Challenge 3: Unclear Error Messages
-**If users confused**: Improve errorDescription and recoverySuggestion
-**Solution**: Test with actual error scenarios, refine messages
-
----
-
-## Next Steps After Phase 1
-
-Once Phase 1 is complete:
-1. Update `docs/current-story.md` with Phase 1 completion
-2. Document any findings in learning notes
-3. Begin Phase 2: Parsing Enhancement & Testing
-4. Update `docs/next-prompt.md` for Phase 2
-
----
-
-## Questions to Answer During Implementation
-
-1. Do any existing recipes/ingredients/templates violate new rules?
-2. Are validation error messages clear enough?
-3. Does validation impact save performance?
-4. Should validation be stricter or more lenient?
-5. Are computed properties used correctly in UI?
-
----
-
-**Ready to Start**: Begin with Task 1, Step 1 - Review Recipe Entity
-
-**Estimated Session Time**: 3-4 hours for complete Phase 1
+**Please help me implement M4.1: Settings Infrastructure Foundation with Core Data entity, settings service, and meal planning preferences UI.**

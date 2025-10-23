@@ -29,10 +29,29 @@ struct SettingsView: View {
                     NavigationLink(destination: MigrationDebugView(context: viewContext)) {
                         Label("M3 Quantity Migration", systemImage: "arrow.triangle.2.circlepath")
                     }
+                    
+                    Button(action: {
+                        runIngredientTemplateValidation(context: viewContext)
+                    }) {
+                        Label("M3.5 Template Validation", systemImage: "checkmark.shield")
+                    }
+                    
+                    // M3.5 TASK 4: Computed Properties Test
+                    Button(action: {
+                        runComputedPropertiesTests(context: viewContext)
+                    }) {
+                        Label("M3.5 Computed Properties", systemImage: "function")
+                    }
+                    
+                    Button(action: {
+                        runM3ValidationTests(context: viewContext)
+                    }) {
+                        Label("M3.5 Final Validation", systemImage: "checkmark.circle.badge.xmark")
+                    }
                 } header: {
                     Text("Developer Tools")
                 } footer: {
-                    Text("Debug tools for M3 structured quantity migration")
+                    Text("Debug tools for data validation, migration, and testing. Check console output for results.")
                 }
                 
                 // About Section

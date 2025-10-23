@@ -1,6 +1,6 @@
 # Grocery & Recipe Manager - Project Index
 
-**Last Updated**: October 20, 2025  
+**Last Updated**: October 22, 2025  
 **Purpose**: Central navigation hub for all project documentation  
 **Current Milestone**: M4 Phase 1 (Settings Infrastructure Foundation)
 
@@ -96,6 +96,13 @@
 - Phase 5: Quantity consolidation (2.5 hours) ✅
 - Phase 6: UI polish & documentation (1 hour) ✅
 
+
+**M3.5: Foundation Validation & Testing (8.5 hours) - October 2025** ✅
+- Comprehensive validation with automated test suite
+- 75+ computed properties added
+- Template system validation (100% success)
+- Test automation pattern established
+- 100% validation pass rate achieved
 **Progress**: M1-M3 complete (59 hours), all major features operational, production-ready quality
 
 ---
@@ -187,7 +194,10 @@ docs/
 - [15: M3 Phase 5 Quantity Consolidation](learning-notes/15-m3-phase5-quantity-consolidation.md) - Merge service
 - [16: M3 Phase 6 UI Polish](learning-notes/16-m3-phase6-ui-polish.md) ← **NEW** - Visual polish & help docs
 
----
+
+### **M3.5: Foundation Validation & Testing** ✅ COMPLETE
+
+- [17: M3.5 Foundation Validation](learning-notes/17-m3.5-foundation-validation.md) - Test automation & debugging
 
 ## 🏗️ **ARCHITECTURE DECISION RECORDS**
 
@@ -224,6 +234,7 @@ docs/
 | M1 | 30-35h | 32h | ✅ On target | Complete |
 | M2 | 15-18h | 16.5h | ✅ On target | Complete |
 | M3 | 8-12h | 10.5h | ✅ On target | Complete |
+| M3.5 | 7h | 8.5h | ✅ On target | Complete |
 | M4 | 7.5-10h | TBD | - | In Progress |
 
 **Planning Accuracy**: Consistently accurate within estimates
@@ -234,6 +245,16 @@ docs/
 ---
 
 ## 📅 **RECENT ACTIVITY**
+
+### **October 22, 2025** - M3.5 Complete ✅
+- **Completed**: M3.5 - Foundation Validation & Testing (8.5 hours)
+- **Status**: M3.5 MILESTONE COMPLETE
+- Built automated validation test suite (6 test suites)
+- Added 75+ computed properties across Recipe/Ingredient entities
+- Achieved 100% validation pass rate
+- Established test automation pattern for future milestones
+- Documented test infrastructure and debugging process
+- **Next**: M4.1 - Settings Infrastructure Foundation
 
 ### **October 20, 2025** - M3 Complete ✅
 - **Completed**: M3 Phase 6 - UI Polish & Documentation (1 hour)
@@ -338,6 +359,6 @@ For questions about:
 
 ---
 
-**Last Updated**: October 20, 2025  
+**Last Updated**: October 22, 2025  
 **Next Update**: After M4.1 completion  
-**Status**: M3 complete, M4 ready to begin
+**Status**: M3.5 complete, M4 ready to begin
