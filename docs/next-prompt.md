@@ -1,547 +1,533 @@
-# M4.2: Calendar-Based Meal Planning Core - Development Prompt
+# M4.2.4: Multiple Meal Plans List View - Development Prompt
 
-**Copy and paste this prompt when ready to begin M4.2:**
+**Copy and paste this prompt when ready to begin M4.2.4:**
 
 ---
 
-I'm ready to begin **M4.2: Calendar-Based Meal Planning Core** for my Grocery & Recipe Manager iOS app.
+I'm ready to begin **M4.2.4: Multiple Meal Plans List View** for my Grocery & Recipe Manager iOS app.
 
-## M4.1 COMPLETE ✅
+## M4.2.1-3 COMPLETE ✅
 
-**Completion Date**: October 23, 2025  
-**Total Time**: [ACTUAL_HOURS] hours (target: 1.5 hours)  
+**Completion Date**: [TO BE FILLED]  
+**Total Time**: [ACTUAL_HOURS] hours (target: 2.5 hours)  
 **Status**: Production Ready
 
-### **M4.1 Final Achievements:**
-- ✅ UserPreferences Core Data entity with single-record pattern
-- ✅ UserPreferencesService with singleton pattern and auto-save
-- ✅ Meal Planning preferences UI in Settings (4 controls)
-- ✅ Real-time validation and persistence
-- ✅ All 5 tests passed
+### **M4.2.1-3 Final Achievements:**
+- ✅ MealPlan and PlannedMeal Core Data entities operational
+- ✅ MealPlanService with CRUD operations
+- ✅ MealPlanView with calendar display
+- ✅ Recipe assignment workflow functional
+- ✅ M4.1 preferences integrated
+- ✅ All tests passed
 - ✅ Zero regressions, production quality
 
-### **Key M4.1 Deliverables:**
-- **UserPreferencesService.shared** - Accessible app-wide
-- **mealPlanDuration** (3-14 days, default 7) - For calendar length
-- **mealPlanStartDay** (0-6, default 0/Sunday) - For calendar start
-- **autoNameMealPlans** (default true) - For automatic naming
-- **showRecipeSourceInMealPlan** (default true) - For recipe source display
+### **Key M4.2.1-3 Deliverables:**
+- **Core Data Entities**: MealPlan, PlannedMeal with relationships
+- **MealPlanService** - Plan management and recipe assignment
+- **MealPlanView** - Calendar showing assigned recipes
+- **Recipe Integration** - "Add to Meal Plan" from recipe views
+- **Performance** - All operations < 0.1s
 
-### **Foundation Ready for M4.2:**
-- ✅ User preferences operational and tested
-- ✅ Settings persist across app restarts
-- ✅ Service accessible from any view
-- ✅ Default values ready for immediate use
-- ✅ Infrastructure expandable for future features
+### **Foundation Ready for M4.2.4:**
+- ✅ Entities operational and tested
+- ✅ Service layer functional
+- ✅ Calendar view working
+- ✅ Recipe assignment tested
+- ✅ Ready to add list management layer
 
 ---
 
-## M4.2 Overview: Calendar-Based Meal Planning Core
+## M4.2.4 Overview: Multiple Meal Plans List View
 
-**Total Estimated Time**: 2.5 hours  
-**Priority**: HIGH - Core user workflow  
-**Dependencies**: M4.1 Complete ✅
+**Total Estimated Time**: 1.5 hours (90 minutes)  
+**Priority**: HIGH - Completes meal planning foundation  
+**Dependencies**: M4.2.1-3 Complete ✅  
+**PRD**: `docs/prds/m4.2.4-multiple-meal-plans-list-view-prd.md` ✅
 
 ### **Strategic Value:**
-M4.2 implements calendar-based meal planning with recipe assignment, leveraging M4.1 user preferences for customizable planning periods. This completes the meal planning foundation, with M4.3 adding grocery integration.
+Transform meal planning from single "active plan" view to comprehensive list-based architecture matching proven WeeklyListsView pattern. Enables multiple concurrent plans, historical tracking, and improved recipe usage analytics.
 
 ### **What We're Building:**
-- MealPlan and PlannedMeal Core Data entities
-- Calendar view with user-configured duration (uses M4.1 preferences)
-- "Add to Meal Plan" buttons in recipe views
-- Modal calendar picker for date selection
-- Meal plan management (create/edit/delete)
-- Recipe assignment workflow with one-recipe-per-day
+- MealPlansListView (main entry point) matching WeeklyListsView
+- MealPlanRowView (row component) with progress indicators
+- SelectMealPlanSheet (plan picker) for recipe deep linking
+- CreateMealPlanSheet (quick creation) with smart defaults
+- MealPlanDetailView (refactored from MealPlanView)
+- Active plan state machine with auto-transition
+- Date overlap validation (hard block)
+- Recipe usage tracking enhancement
 
-### **User Flow:**
-1. User taps "Meal Planning" tab (new)
-2. App checks for active meal plan
-3. If none: Create plan with user's preferences (duration & start day from M4.1)
-4. If exists: Show calendar with assigned recipes
-5. User browses recipes → "Add to Meal Plan" button
-6. Calendar picker appears showing available dates
-7. User selects date → Recipe assigned
-8. Calendar updates immediately
-9. Auto-name applied if enabled (from M4.1)
+### **Architecture Pattern:**
+```
+Before (M4.2.1-3):               After (M4.2.4):
+                                 
+Meal Planning Tab                Meal Planning Tab
+      ↓                                ↓
+MealPlanView                     MealPlansListView (NEW)
+├── Single active plan           ├── All meal plans listed
+├── Calendar display             ├── Active/Upcoming/Completed
+└── Recipe assignment            ├── Create new plan button
+                                 └── Tap → MealPlanDetailView
+                                          ├── Calendar display
+                                          └── Recipe assignment
+```
+
+### **Critical Enhancements:**
+
+**1. Active Plan State Machine:**
+```swift
+Status Logic:
+- Active:    startDate <= today <= endDate && !isCompleted
+- Upcoming:  startDate > today && !isCompleted  
+- Completed: endDate < today OR isCompleted == true
+
+Rules:
+- Only one plan active at a time
+- Plan containing today = active
+- Auto-transition on app launch
+```
+
+**2. Recipe Usage Tracking (CHANGED):**
+```swift
+// OLD (M2): Track when added to grocery list
+// NEW (M4.2.4): Track when added to meal plan
+
+func addRecipeToMealPlan(recipe: Recipe, date: Date, plan: MealPlan) {
+    // ... create PlannedMeal
+    recipe.usageCount += 1
+    recipe.lastUsed = date  // Planned meal date, not today!
+}
+
+// REMOVE tracking from AddIngredientsToListView
+```
+
+**3. Date Overlap Prevention:**
+- Hard block: No overlapping dates
+- Validation during creation/editing
+- Clear error messages
+
+**4. One Recipe Per Day:**
+- Enforced in UI
+- Replace or pick different date
+- Simple, clear user model
 
 ---
 
-## Phase 1: Core Data Model (60 minutes)
+## Implementation Plan (1.5 hours)
 
-### **Entity 1: MealPlan**
+### **Phase 1: Core Data Updates** (15 min)
 
-**Purpose**: Represents a single meal planning period (e.g., "Week of Oct 23")
-
-**Attributes:**
-```
-MealPlan Entity:
-- id: UUID (primary key, required)
-- name: String (e.g., "Week of Oct 23", optional for user override)
-- startDate: Date (first day of plan, required)
-- duration: Int16 (number of days, 3-14, required)
-- isActive: Bool (only one active plan at a time, required, default true)
-- createdDate: Date (audit trail, required)
-- modifiedDate: Date (audit trail, required)
+**Add Completion Fields:**
+```swift
+MealPlan {
+    // Existing
+    id, name, startDate, duration, isActive
+    
+    // NEW
+    isCompleted: Bool (default: false)
+    completedDate: Date? (optional)
+}
 ```
 
-**Relationships:**
-```
-MealPlan → PlannedMeal (one-to-many)
-- Name: plannedMeals
-- Destination: PlannedMeal
-- Inverse: mealPlan
-- Delete Rule: Cascade (delete meals when plan deleted)
-```
-
-**Fetch Indexes:**
-```
-Index 1: byActivePlan
-- isActive (Binary, Ascending)
-- startDate (Binary, Descending)
-
-Index 2: byDateRange
-- startDate (Binary, Ascending)
-- duration (Binary, Ascending)
-```
-
-**Codegen**: Class Definition (matches M4.1 UserPreferences pattern)
-
----
-
-### **Entity 2: PlannedMeal**
-
-**Purpose**: Links a recipe to a specific date in a meal plan
-
-**Attributes:**
-```
-PlannedMeal Entity:
-- id: UUID (primary key, required)
-- date: Date (specific day for this meal, required)
-- servings: Int16 (planned servings, optional, default from recipe)
-- scaleFactor: Double (scaling applied, optional, default 1.0)
-- isCompleted: Bool (meal consumed, default false)
-- notes: String (optional user notes)
-- createdDate: Date (audit trail, required)
-```
-
-**Relationships:**
-```
-PlannedMeal → Recipe (many-to-one)
-- Name: recipe
-- Destination: Recipe
-- Inverse: plannedMeals (add to Recipe entity)
-- Delete Rule: Nullify (keep recipe if meal deleted)
-
-PlannedMeal → MealPlan (many-to-one)
-- Name: mealPlan
-- Destination: MealPlan
-- Inverse: plannedMeals
-- Delete Rule: Nullify (orphan meal if plan deleted - shouldn't happen due to cascade)
-```
-
-**Fetch Indexes:**
-```
-Index 1: byDateInPlan
-- date (Binary, Ascending)
-- mealPlan (Binary)
-
-Index 2: byRecipeUsage
-- recipe (Binary)
-- date (Binary, Descending)
-```
-
-**Codegen**: Class Definition
-
----
-
-### **Recipe Entity Update**
-
-**Add Relationship to Existing Recipe Entity:**
-```
-Recipe → PlannedMeal (one-to-many)
-- Name: plannedMeals
-- Destination: PlannedMeal
-- Inverse: recipe
-- Delete Rule: Nullify (don't delete meals if recipe deleted - allows orphan handling)
-```
-
-**Implementation Steps:**
+**Tasks:**
 1. Open GroceryRecipeManager.xcdatamodeld
-2. Select Recipe entity
-3. Add relationship: plannedMeals
-4. Configure as above
-5. Build to verify
+2. Add isCompleted: Bool attribute
+3. Add completedDate: Date (optional)
+4. Update model version
+5. Build and verify (⌘B)
+
+**Validation:**
+- ✅ Build succeeds
+- ✅ No migration errors
+- ✅ New properties accessible
 
 ---
 
-### **Implementation Steps - Phase 1:**
+### **Phase 2: Service Layer Enhancements** (25 min)
 
-1. **Create MealPlan Entity** (20 min):
-   - Add entity with 7 attributes
-   - Set Codegen to "Class Definition"
-   - Add 2 fetch indexes
-   - Configure default values
-
-2. **Create PlannedMeal Entity** (20 min):
-   - Add entity with 7 attributes
-   - Set Codegen to "Class Definition"
-   - Add 2 fetch indexes
-   - Define both relationships
-
-3. **Update Recipe Entity** (10 min):
-   - Add plannedMeals relationship
-   - Verify inverse configuration
-   - Test build
-
-4. **Build & Verify** (10 min):
-   - Clean build folder (⌘⇧K)
-   - Build project (⌘B)
-   - Verify auto-generated classes
-   - No errors or warnings
-
-**Acceptance Criteria:**
-- ✅ MealPlan entity with 7 attributes and 2 indexes
-- ✅ PlannedMeal entity with 7 attributes and 2 indexes
-- ✅ All relationships properly configured with inverses
-- ✅ Recipe entity updated
-- ✅ Build succeeds with Class Definition codegen
-- ✅ Performance targets maintained
-
----
-
-## Phase 2: Service Layer (60 minutes)
-
-### **Service: MealPlanService**
-
-**Purpose**: Manages meal plan CRUD operations and recipe assignments
-
-**File**: `Services/MealPlanService.swift`
-
-**Key Responsibilities:**
-- Create meal plans with user preferences
-- Fetch current active plan
-- Add/remove recipes from dates
-- Validate one-recipe-per-day constraint
-- Auto-name generation (if user preference enabled)
-- Archive completed plans
-
-**Core Methods:**
+**MealPlanService New Methods:**
 ```swift
-class MealPlanService: ObservableObject {
-    @Published var activePlan: MealPlan?
-    @Published var plannedMeals: [PlannedMeal] = []
+// Date Validation
+func validatePlanDates(
+    startDate: Date,
+    duration: Int,
+    excludingPlan: MealPlan?
+) -> ValidationResult {
+    // Check for overlaps with existing plans
+    // Return .valid or .overlapsWithPlan(name: String)
+}
+
+// Status Management  
+func updateActivePlanStatus(in context: NSManagedObjectContext) {
+    // Update isActive based on dates
+    // Run on app launch
+}
+
+func updateCompletedStatus(in context: NSManagedObjectContext) {
+    // Auto-complete plans where endDate < today
+}
+
+// Query Helpers
+func getActivePlan() -> MealPlan?
+func getUpcomingPlans() -> [MealPlan]
+func getCompletedPlans() -> [MealPlan]
+```
+
+**Update Recipe Tracking:**
+```swift
+// In addRecipeToMealPlan method:
+func addRecipeToMealPlan(recipe: Recipe, date: Date, mealPlan: MealPlan) {
+    let plannedMeal = PlannedMeal(context: context)
+    plannedMeal.date = date
+    plannedMeal.mealPlan = mealPlan
+    plannedMeal.recipe = recipe
     
-    // Initialization
-    func fetchOrCreateActivePlan()
+    // NEW: Update recipe tracking
+    recipe.usageCount += 1
+    recipe.lastUsed = date  // Planned date, not today!
     
-    // Meal Plan Management
-    func createNewPlan(startDate: Date, duration: Int, name: String?) -> MealPlan
-    func archiveCurrentPlan()
-    func deletePlan(_ plan: MealPlan)
-    
-    // Recipe Assignment
-    func assignRecipe(_ recipe: Recipe, to date: Date, servings: Int16?, scaleFactor: Double?) -> PlannedMeal?
-    func removeRecipe(from date: Date)
-    func getRecipe(for date: Date) -> Recipe?
-    
-    // Validation
-    func isDateAvailable(_ date: Date) -> Bool  // Check if date already has recipe
-    func getDatesInPlan() -> [Date]
-    
-    // Auto-naming
-    func generatePlanName(startDate: Date) -> String  // "Week of Oct 23"
+    try context.save()
 }
 ```
 
-**Integration with M4.1:**
-```swift
-init(context: NSManagedObjectContext) {
-    self.context = context
-    
-    // Use UserPreferencesService for defaults
-    let prefs = UserPreferencesService.shared
-    self.defaultDuration = prefs.mealPlanDuration
-    self.defaultStartDay = prefs.mealPlanStartDay
-    self.autoName = prefs.autoNameMealPlans
-    
-    fetchOrCreateActivePlan()
-}
-```
+**Remove Old Tracking:**
+- Find AddIngredientsToListView
+- Remove: `recipe.usageCount += 1`
+- Remove: `recipe.lastUsed = Date()`
 
-**Implementation Steps:**
-
-1. **Create Service File** (20 min):
-   - Create MealPlanService.swift in Services folder
-   - Add @Published properties for reactive UI
-   - Implement initialization with M4.1 preferences
-   - Add Core Data context handling
-
-2. **Implement Plan Management** (20 min):
-   - createNewPlan() with auto-naming logic
-   - fetchOrCreateActivePlan() with active plan query
-   - archiveCurrentPlan() setting isActive = false
-   - deletePlan() with cascade handling
-
-3. **Implement Recipe Assignment** (15 min):
-   - assignRecipe() with date validation
-   - removeRecipe() with relationship cleanup
-   - getRecipe() for date lookup
-   - isDateAvailable() for conflict prevention
-
-4. **Build & Test** (5 min):
-   - Build project (⌘B)
-   - Verify service compiles
-   - Check for warnings
-
-**Acceptance Criteria:**
-- ✅ Service follows singleton/observable pattern
-- ✅ Integration with UserPreferencesService
-- ✅ All CRUD operations functional
-- ✅ One-recipe-per-day validation
-- ✅ Auto-naming based on user preference
-- ✅ Performance < 0.1s for operations
+**Validation:**
+- ✅ All methods compile
+- ✅ Date validation works
+- ✅ Status updates work
+- ✅ Recipe tracking changed
 
 ---
 
-## Phase 3: UI Implementation (30 minutes)
+### **Phase 3: Create MealPlansListView** (30 min)
 
-### **View 1: MealPlanView (Main Calendar)**
-
-**Location**: `Views/MealPlanView.swift`
-
-**Purpose**: Main meal planning interface with calendar display
-
-**Structure:**
+**Follow WeeklyListsView Pattern:**
 ```swift
-struct MealPlanView: View {
-    @StateObject private var mealPlanService: MealPlanService
-    @StateObject private var prefs = UserPreferencesService.shared
+struct MealPlansListView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \MealPlan.startDate, ascending: false)],
+        animation: .default
+    ) private var mealPlans: FetchedResults<MealPlan>
+    
+    @State private var showingCreateSheet = false
+    @State private var showCompleted = false
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                if let plan = mealPlanService.activePlan {
-                    // Calendar grid showing dates
-                    CalendarGridView(plan: plan, service: mealPlanService)
-                } else {
-                    // Empty state
-                    EmptyMealPlanView()
-                }
-            }
-            .navigationTitle("Meal Planning")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("New Plan") {
-                        // Create new plan with prefs
-                    }
-                }
-            }
-        }
+        contentView
+            .navigationTitle("Meal Plans")
+            .toolbar { toolbarContent }
+    }
+    
+    private var contentView: some View {
+        // Empty state if no plans
+        // List with sections: Active, Upcoming, Completed
     }
 }
 ```
 
-**Calendar Grid:**
-- Shows duration days (from M4.1 prefs)
-- Starts on user's preferred day (from M4.1 prefs)
-- Each cell shows date and assigned recipe (if any)
-- Tappable cells to add/remove recipes
-- Visual indicators for assigned vs empty dates
+**Sections:**
+1. **Active Plans** (green indicator)
+2. **Upcoming Plans** (blue indicator)  
+3. **Completed Plans** (collapsible, collapsed by default)
 
----
-
-### **View 2: Recipe Integration**
-
-**Update RecipeListView:**
+**Empty State:**
 ```swift
-// Add "Add to Meal Plan" button in recipe row
-Button(action: { showMealPlanPicker(recipe) }) {
+VStack {
     Image(systemName: "calendar.badge.plus")
+        .font(.system(size: 60))
+    Text("No Meal Plans Yet")
+    Text("Create your first meal plan...")
+    Button("Create Meal Plan") { ... }
 }
 ```
 
-**Update RecipeDetailView:**
+**Validation:**
+- ✅ Displays all plans correctly
+- ✅ Empty state shows when appropriate
+- ✅ Sections organized properly
+- ✅ Create button works
+
+---
+
+### **Phase 4: Create MealPlanRowView** (15 min)
+
+**Follow WeeklyListRowView Pattern:**
 ```swift
-// Add section for meal planning
-Section {
-    Button("Add to Meal Plan") {
-        showMealPlanPicker(recipe)
+struct MealPlanRowView: View {
+    @ObservedObject var mealPlan: MealPlan
+    
+    @FetchRequest private var plannedMeals: FetchedResults<PlannedMeal>
+    
+    init(mealPlan: MealPlan) {
+        self.mealPlan = mealPlan
+        
+        // Configure FetchRequest for this plan's meals
+        let planID = mealPlan.id ?? UUID()
+        let predicate = NSPredicate(format: "mealPlan.id == %@", planID as CVarArg)
+        self._plannedMeals = FetchRequest(
+            sortDescriptors: [NSSortDescriptor(keyPath: \PlannedMeal.date, ascending: true)],
+            predicate: predicate
+        )
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(mealPlan.displayName)
+            Text("\(plannedMeals.count) of \(mealPlan.duration) days planned")
+            Text(statusText)
+        }
     }
 }
 ```
 
-**Date Picker Modal:**
+**Display:**
+- Plan name or date range
+- Progress (X of Y days)
+- Status badge
+
+**Validation:**
+- ✅ Shows plan info correctly
+- ✅ Progress updates live
+- ✅ Status indicator correct
+
+---
+
+### **Phase 5: Refactor to MealPlanDetailView** (10 min)
+
+**Rename and Update:**
 ```swift
-struct DatePickerSheet: View {
+// BEFORE: MealPlanView
+struct MealPlanView: View {
+    @FetchRequest(predicate: NSPredicate(format: "isActive == YES"))
+    private var activePlans: FetchedResults<MealPlan>
+    
+    var activePlan: MealPlan? { activePlans.first }
+}
+
+// AFTER: MealPlanDetailView
+struct MealPlanDetailView: View {
+    @ObservedObject var mealPlan: MealPlan  // Passed parameter
+    
+    @FetchRequest private var plannedMeals: FetchedResults<PlannedMeal>
+    
+    init(mealPlan: MealPlan) {
+        self.mealPlan = mealPlan
+        // Filter plannedMeals for THIS plan
+    }
+}
+```
+
+**Changes:**
+1. Rename file
+2. Add mealPlan parameter
+3. Update @FetchRequest to filter by plan ID
+4. Remove isActive filtering
+5. Update navigation title
+
+**Validation:**
+- ✅ Compiles without errors
+- ✅ Calendar shows correct plan
+- ✅ All features still work
+
+---
+
+### **Phase 6: Create Supporting Views** (15 min)
+
+**SelectMealPlanSheet:**
+```swift
+struct SelectMealPlanSheet: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
+    
     let recipe: Recipe
-    @ObservedObject var mealPlanService: MealPlanService
-    @Binding var isPresented: Bool
+    var onSelect: (MealPlan, Date) -> Void
+    
+    @State private var selectedPlan: MealPlan?
+    @State private var selectedDate = Date()
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(mealPlanService.getDatesInPlan(), id: \.self) { date in
-                    Button(action: { assignToDate(date) }) {
-                        HStack {
-                            Text(date.formatted(.dateTime.month().day().weekday()))
-                            Spacer()
-                            if !mealPlanService.isDateAvailable(date) {
-                                Text("Occupied")
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-                    .disabled(!mealPlanService.isDateAvailable(date))
-                }
-            }
-            .navigationTitle("Select Date")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { isPresented = false }
-                }
+            Form {
+                // Plan picker (active pre-selected)
+                // Date picker (within plan range)
+                // Create new plan option
             }
         }
     }
 }
 ```
 
----
-
-### **View 3: Empty State**
-
+**CreateMealPlanSheet:**
 ```swift
-struct EmptyMealPlanView: View {
-    @StateObject private var prefs = UserPreferencesService.shared
+struct CreateMealPlanSheet: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var name = ""
+    @State private var startDate = Date()
+    @State private var duration = UserPreferencesService.shared.mealPlanDuration
     
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "calendar")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
-            
-            Text("No Meal Plan Yet")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            Text("Create your first \(prefs.mealPlanDuration)-day meal plan starting on \(prefs.startDayName)")
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-            
-            Button("Create Meal Plan") {
-                // Create plan with prefs
-            }
-            .buttonStyle(.borderedProminent)
+        Form {
+            // Name field (optional, auto-generates)
+            // Start date picker
+            // Duration picker (from prefs)
         }
-        .padding()
     }
 }
 ```
 
+**Validation:**
+- ✅ Sheets present correctly
+- ✅ Smart defaults work
+- ✅ Date validation works
+- ✅ Creates plans successfully
+
 ---
 
-### **Implementation Steps - Phase 3:**
+### **Phase 7: Update Tab & Integration** (10 min)
 
-1. **Create MealPlanView** (15 min):
-   - New file in Views folder
-   - Calendar grid with date cells
-   - Empty state handling
-   - Integration with MealPlanService
-   - Uses M4.1 preferences for display
+**GroceryRecipeManagerApp.swift:**
+```swift
+// BEFORE:
+TabView {
+    MealPlanView()
+        .tabItem { ... }
+}
 
-2. **Add Recipe Integration** (10 min):
-   - "Add to Meal Plan" buttons in RecipeListView
-   - "Add to Meal Plan" section in RecipeDetailView
-   - Date picker modal
-   - Assignment confirmation
+// AFTER:
+TabView {
+    NavigationView {
+        MealPlansListView()
+    }
+    .tabItem { ... }
+}
+```
 
-3. **Add Tab Bar Item** (3 min):
-   - Update GroceryRecipeManagerApp.swift
-   - Add MealPlanView() to TabView
-   - Icon: "calendar"
-   - Label: "Meal Planning"
+**RecipeListView & RecipeDetailView:**
+```swift
+// Update "Add to Meal Plan" to use SelectMealPlanSheet
+Button("Add to Meal Plan") {
+    showingMealPlanSheet = true
+}
+.sheet(isPresented: $showingMealPlanSheet) {
+    SelectMealPlanSheet(recipe: recipe) { plan, date in
+        // Add recipe to plan
+    }
+}
+```
 
-4. **Build & Test** (2 min):
-   - Build and run (⌘R)
-   - Navigate to Meal Planning tab
-   - Verify UI appears
-
-**Acceptance Criteria:**
-- ✅ Meal Planning tab accessible
-- ✅ Calendar shows user-configured duration
-- ✅ Calendar starts on user-configured day
-- ✅ Empty state shows helpful guidance
-- ✅ Recipe assignment workflow functional
-- ✅ One-recipe-per-day enforced visually
-- ✅ Auto-naming works if enabled
+**Validation:**
+- ✅ Tab shows list view
+- ✅ Navigation works smoothly
+- ✅ Recipe deep linking works
+- ✅ All flows tested
 
 ---
 
 ## Testing & Validation (Included in phases)
 
-### **Test 1: Plan Creation (Phase 2)**
-- Create new plan
-- Verify uses M4.1 preferences (duration, start day)
-- Verify auto-naming if enabled
-- **Expected**: Plan created with correct defaults
+### **Test Scenarios:**
 
-### **Test 2: Recipe Assignment (Phase 3)**
-- Add recipe to date
-- Verify appears in calendar
-- Try to add second recipe to same date
-- **Expected**: Second assignment rejected or replaces first
+**Test 1: List Display**
+- Create 3 plans (past, current, future)
+- Verify active at top
+- Verify upcoming below
+- Verify completed in collapsed section
 
-### **Test 3: Preference Integration (Phase 3)**
-- Change duration in Settings (e.g., 5 days)
-- Create new meal plan
-- **Expected**: Calendar shows 5 days
+**Test 2: Active Plan Logic**
+- Create plan containing today
+- Verify marked active
+- Create second plan containing today
+- Verify newest is active
+- Relaunch app, verify persists
 
-### **Test 4: Persistence (Phase 2-3)**
-- Create plan, add recipes
-- Kill app, relaunch
-- **Expected**: Meal plan and assignments persist
+**Test 3: Date Overlap**
+- Create plan Oct 28 - Nov 3
+- Try to create Oct 30 - Nov 6
+- Verify error shown
+- Create non-overlapping, verify success
 
-### **Test 5: Performance (All phases)**
+**Test 4: Recipe Tracking (CRITICAL)**
+- Create plan for Nov 1-7
+- Add "Tacos" to Nov 1
+- Verify usageCount = 1
+- Verify lastUsed = Nov 1 (not today!)
+- Add same recipe to Nov 5
+- Verify usageCount = 2, lastUsed = Nov 5
+
+**Test 5: Navigation**
+- List → Detail → back (smooth)
+- Create plan → auto-navigate
+- Recipe → picker → add → return
+
+**Test 6: Performance**
 - All operations < 0.1s
-- Calendar renders quickly
-- No UI lag
+- List scrolls smoothly
+- No UI lag (60fps)
 
 ---
 
-## Success Criteria - M4.2 Completion
+## Success Criteria - M4.2.4 Completion
 
 ### **Functional Requirements:**
-- ✅ MealPlan and PlannedMeal entities operational
-- ✅ Calendar view displays meal plans
-- ✅ User can assign recipes to dates
-- ✅ One-recipe-per-day constraint enforced
-- ✅ M4.1 preferences integrated (duration, start day, auto-naming)
-- ✅ Recipe views have "Add to Meal Plan" buttons
-- ✅ Empty state provides guidance
+- ✅ MealPlansListView shows all plans
+- ✅ Plans organized (Active/Upcoming/Completed)
+- ✅ Only one active plan at a time
+- ✅ Date overlap validation prevents conflicts
+- ✅ Recipe tracking changed to meal plan assignment
+- ✅ lastUsed = planned date (not today)
+- ✅ Create new plan with smart defaults
+- ✅ Navigate to detail view
+- ✅ Recipe deep linking with picker
+- ✅ Completed section collapsible
 
 ### **Non-Functional Requirements:**
-- ✅ Calendar loads < 0.1s
-- ✅ Recipe assignment < 0.1s
-- ✅ All operations performant
-- ✅ Professional iOS UI maintained
-- ✅ Zero build errors or warnings
-- ✅ Follows established service patterns
+- ✅ List loads < 0.1s
+- ✅ Navigation < 0.1s
+- ✅ All operations < 0.5s
+- ✅ Professional iOS UI
+- ✅ Matches WeeklyListsView pattern
+- ✅ Zero regressions to M4.2.1-3
+- ✅ Code documentation complete
 
-### **Integration Readiness:**
-- ✅ MealPlanService accessible for M4.3
-- ✅ Meal plan data ready for grocery list generation
-- ✅ Recipe assignments ready for source tracking
-- ✅ Calendar infrastructure expandable
+### **Integration Requirements:**
+- ✅ M4.1 preferences used for defaults
+- ✅ M4.2.1-3 calendar features work unchanged
+- ✅ Recipe views updated for multi-plan support
+- ✅ Ready for M4.3 grocery integration
 
 ---
 
-## After M4.2 Completion
+## After M4.2.4 Completion
 
 ### **Immediate Next Steps:**
-1. Create learning note: `docs/learning-notes/19-m4.2-calendar-meal-planning.md`
-2. Update `docs/current-story.md` with M4.2 completion
-3. Update `docs/next-prompt.md` for M4.3
-4. Update `docs/project-index.md` Recent Activity section
+1. Create/update learning note: `docs/learning-notes/19-m4.2-calendar-meal-planning.md`
+   - Include both calendar (M4.2.1-3) and list (M4.2.4) patterns
+   - Document recipe tracking change rationale
+   - Active plan state machine logic
+   - WeeklyListsView pattern replication
+
+2. Update `docs/current-story.md`:
+   - Mark M4.2 (all components) ✅ COMPLETE
+   - Add actual time for M4.2.4
+   - Total M4.2 time (M4.2.1-3 + M4.2.4)
+
+3. Update `docs/next-prompt.md` for M4.3:
+   - Enhanced grocery integration prompt
+   - Bulk add to shopping list
+   - Recipe source tracking
+   - Scaled recipe to list
+
+4. Update `docs/project-index.md`:
+   - Add M4.2 completion to Recent Activity
+   - Update milestone tracking
 
 ### **M4.3 Preview:**
 **Goal**: Enhanced grocery integration with meal plan automation  
@@ -549,56 +535,58 @@ struct EmptyMealPlanView: View {
 **Dependencies**: M4.2 Complete ✅
 
 **What We'll Build:**
-- Generate grocery lists from meal plans
-- Recipe source tracking in lists
+- Bulk add all recipes from plan to shopping list
+- Recipe source tracking ("Ground beef [Tacos] [Spaghetti]")
 - Smart consolidation leveraging M3
 - Scaled recipe to list feature (FEAT-001)
 - Meal completion tracking
 
 **Foundation Ready:**
+- ✅ M4.2.4 multiple plans for flexible grocery generation
 - ✅ M4.1 preferences for list scope and display
-- ✅ M4.2 meal plan data for processing
 - ✅ M3 Phase 4 scaling service for serving adjustments
 - ✅ M3 Phase 5 consolidation for list optimization
+- ✅ Improved recipe tracking for better analytics
 
 ---
 
 ## What You'll Need
 
 ### **Files to Create:**
-- `Services/MealPlanService.swift` - Meal plan management service
-- `Views/MealPlanView.swift` - Main calendar view
-- `Views/DatePickerSheet.swift` - Date selection modal
-- `Views/EmptyMealPlanView.swift` - Empty state view
+- `Views/MealPlansListView.swift` - Main list view
+- `Views/MealPlanRowView.swift` - Row component
+- `Views/SelectMealPlanSheet.swift` - Plan picker
+- `Views/CreateMealPlanSheet.swift` - Quick creation
 
 ### **Files to Modify:**
-- `GroceryRecipeManager.xcdatamodeld` - Add MealPlan and PlannedMeal entities
-- `Views/RecipeListView.swift` - Add "Add to Meal Plan" button
-- `Views/RecipeDetailView.swift` - Add "Add to Meal Plan" section
-- `GroceryRecipeManagerApp.swift` - Add Meal Planning tab
-
-### **Documentation to Create:**
-- `docs/learning-notes/19-m4.2-calendar-meal-planning.md` (after completion)
+- `GroceryRecipeManager.xcdatamodeld` - Add completion fields
+- `Services/MealPlanService.swift` - Add validation and status methods
+- `Views/MealPlanView.swift` → `Views/MealPlanDetailView.swift` - Rename and refactor
+- `GroceryRecipeManagerApp.swift` - Update tab to list view
+- `Views/RecipeListView.swift` - Update "Add to Meal Plan" button
+- `Views/RecipeDetailView.swift` - Update "Add to Meal Plan" section
+- `Views/AddIngredientsToListView.swift` - Remove old tracking
 
 ### **Documentation to Update:**
 - `docs/current-story.md` - Mark M4.2 complete
+- `docs/learning-notes/19-m4.2-calendar-meal-planning.md` - Complete journey
 - `docs/next-prompt.md` - Prepare M4.3 prompt
-- `docs/project-index.md` - Add M4.2 learning note reference
+- `docs/project-index.md` - Update recent activity
 
 ---
 
 ## Current Progress
 
 **M4 Timeline:**
-- **M4.1**: [ACTUAL_HOURS] hours ✅ COMPLETE
-- **M4.2**: 2.5 hours ← **STARTING NOW**
+- **M4.1**: 1.5 hours ✅ COMPLETE
+- **M4.2**: [M4.2.1-3 HOURS] + 1.5 hours (M4.2.4) ← **IN PROGRESS**
 - **M4.3**: 3.5-4 hours (after M4.2)
-- **Total**: [UPDATED_TOTAL] hours
+- **Total**: ~9-10 hours
 
-**Milestone Status**: M4.1 complete with production quality. Ready to begin M4.2 calendar implementation.
+**Milestone Status**: M4.1 complete with production quality. M4.2.1-3 calendar complete and tested. Ready to add M4.2.4 list management layer.
 
-**Next Action**: Create MealPlan and PlannedMeal Core Data entities with relationships and fetch indexes.
+**Next Action**: Implement M4.2.4 following phase breakdown, leveraging WeeklyListsView pattern.
 
 ---
 
-**Please help me implement M4.2: Calendar-Based Meal Planning Core with Core Data entities, meal plan service, and calendar UI leveraging M4.1 user preferences.**
+**Please help me implement M4.2.4: Multiple Meal Plans List View with list management, active plan logic, recipe tracking enhancement, and date validation following the proven WeeklyListsView architecture.**
