@@ -9,6 +9,9 @@ struct RecipeListView: View {
     @State private var showingAddRecipe = false
     @State private var searchHistory: [String] = []
     
+    // M4.2: State for showing date picker sheet when adding recipe to meal plan
+    @State private var recipeToAddToMealPlan: Recipe?
+    
     @FetchRequest(
         entity: Recipe.entity(),
         sortDescriptors: [
@@ -119,6 +122,13 @@ struct RecipeListView: View {
         .sheet(isPresented: $showingAddRecipe) {
             CreateRecipeView(context: viewContext)
         }
+        // M4.2: Sheet for selecting date when adding recipe to meal plan
+        .sheet(item: $recipeToAddToMealPlan) { recipe in
+            DatePickerSheet(recipe: recipe) { date in
+                // Successfully added to meal plan
+                print("✅ M4.2: Added \(recipe.title ?? "recipe") to meal plan on \(date)")
+            }
+        }
         .onAppear {
             loadSearchHistory()
         }
@@ -199,6 +209,15 @@ struct RecipeListView: View {
                             searchText: searchText,
                             matchIndicators: getMatchIndicators(for: recipe)
                         )
+                    }
+                    // M4.2: Swipe action to add recipe to meal plan
+                    .swipeActions(edge: .leading) {
+                        Button {
+                            recipeToAddToMealPlan = recipe
+                        } label: {
+                            Label("Add to Meal Plan", systemImage: "calendar.badge.plus")
+                        }
+                        .tint(.blue)
                     }
                 }
                 .onDelete(perform: deleteRecipes)
@@ -424,6 +443,9 @@ struct RecipeDetailView: View {
     @State private var showingMarkUsedConfirmation = false
     @State private var showingEditSheet = false
     
+    // M4.2: State for showing date picker sheet when adding to meal plan
+    @State private var showingMealPlanDatePicker = false
+    
     // M3 PHASE 4: Recipe Scaling State
     @State private var showingScalingSheet = false
     private let scalingService: RecipeScalingService
@@ -497,6 +519,17 @@ struct RecipeDetailView: View {
                     Image(systemName: "checkmark.circle")
                 }
                 
+                // M4.2: Add to Meal Plan menu
+                Menu {
+                    Button {
+                        showingMealPlanDatePicker = true
+                    } label: {
+                        Label("Add to Meal Plan", systemImage: "calendar.badge.plus")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                
                 Button(action: {
                     showingEditSheet = true
                 }) {
@@ -529,6 +562,13 @@ struct RecipeDetailView: View {
         }
         .sheet(isPresented: $showingScalingSheet) {
             RecipeScalingView(recipe: recipe, scalingService: scalingService)
+        }
+        // M4.2: Sheet for selecting date when adding to meal plan
+        .sheet(isPresented: $showingMealPlanDatePicker) {
+            DatePickerSheet(recipe: recipe) { date in
+                // Successfully added to meal plan
+                print("✅ M4.2: Added \(recipe.title ?? "recipe") to meal plan on \(date)")
+            }
         }
     }
     

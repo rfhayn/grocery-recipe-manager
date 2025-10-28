@@ -92,6 +92,36 @@
             <fetchIndexElement property="usageCount" type="Binary" order="descending"/>
         </fetchIndex>
     </entity>
+    <entity name="MealPlan" representedClassName="MealPlan" syncable="YES" codeGenerationType="class">
+        <attribute name="completedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" attributeType="Integer 16" defaultValueString="7" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isActive" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="plannedMeals" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PlannedMeal" inverseName="mealPlan" inverseEntity="PlannedMeal"/>
+        <fetchIndex name="byisActiveandstateDate">
+            <fetchIndexElement property="isActive" type="Binary" order="ascending"/>
+            <fetchIndexElement property="startDate" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="PlannedMeal" representedClassName="PlannedMeal" syncable="YES" codeGenerationType="class">
+        <attribute name="completedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="scaleFactor" attributeType="Double" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="servings" attributeType="Integer 16" defaultValueString="4" usesScalarValueType="YES"/>
+        <relationship name="mealPlan" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MealPlan" inverseName="plannedMeals" inverseEntity="MealPlan"/>
+        <relationship name="recipe" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recipe" inverseName="plannedMeals" inverseEntity="Recipe"/>
+        <fetchIndex name="bydateandisCompleted">
+            <fetchIndexElement property="date" type="Binary" order="ascending"/>
+            <fetchIndexElement property="isCompleted" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
     <entity name="Recipe" representedClassName="Recipe" syncable="YES">
         <attribute name="cookTime" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -105,6 +135,7 @@
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="usageCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ingredient" inverseName="recipe" inverseEntity="Ingredient"/>
+        <relationship name="plannedMeals" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PlannedMeal" inverseName="recipe" inverseEntity="PlannedMeal"/>
         <fetchIndex name="byPropertyIndex">
             <fetchIndexElement property="usageCount" type="Binary" order="ascending"/>
             <fetchIndexElement property="lastUsed" type="Binary" order="ascending"/>

@@ -1,5 +1,6 @@
 // GroceryRecipeManagerApp.swift
 // Updated with Settings Tab - M3 Phase 3
+// Updated with Meal Planning Tab - M4.2
 
 import SwiftUI
 
@@ -29,6 +30,12 @@ struct GroceryRecipeManagerApp: App {
                     Label("Recipes", systemImage: "book.pages")
                 }
                 
+                // M4.2: Meal Planning Tab
+                MealPlanView()
+                    .tabItem {
+                        Label("Meal Plan", systemImage: "calendar")
+                    }
+                
                 NavigationView {
                     ManageCategoriesView()
                 }
@@ -36,7 +43,7 @@ struct GroceryRecipeManagerApp: App {
                     Label("Categories", systemImage: "folder.badge.gearshape")
                 }
                 
-                // NEW: Settings Tab (replaces DEBUG-only Migration tab)
+                // M3 Phase 3: Settings Tab (replaces DEBUG-only Migration tab)
                 SettingsView()
                     .tabItem {
                         Label("Settings", systemImage: "gear")
