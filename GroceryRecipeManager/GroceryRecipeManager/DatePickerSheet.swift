@@ -4,6 +4,7 @@
 //
 //  Created for M4.2: Calendar-Based Meal Planning Core
 //  Modal sheet for selecting a date to add a recipe to the meal plan
+//  Updated for M4.2.4: Multi-plan support
 //
 
 import SwiftUI
@@ -180,13 +181,22 @@ struct DatePickerSheet: View {
     
     // MARK: - Actions
     
-    // M4.2: Handles date selection
+    // M4.2.4: Handles date selection
     // Adds recipe to selected date with chosen servings
+    // Updated to pass mealPlan parameter for multi-plan support
     private func handleDateSelection(_ date: Date) {
+        // Ensure we have an active meal plan
+        guard let activePlan = mealPlanService.activeMealPlan else {
+            print("No active meal plan available")
+            return
+        }
+        
         // Add recipe to meal plan with selected servings
+        // M4.2.4: Now passes mealPlan parameter
         if let meal = mealPlanService.addRecipeToMealPlan(
             recipe: recipe,
             date: date,
+            mealPlan: activePlan,
             servings: Int16(servings)
         ) {
             onDateSelected(date)

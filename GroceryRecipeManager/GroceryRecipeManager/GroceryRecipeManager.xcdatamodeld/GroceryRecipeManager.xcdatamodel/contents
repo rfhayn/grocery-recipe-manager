@@ -98,6 +98,7 @@
         <attribute name="duration" attributeType="Integer 16" defaultValueString="7" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isActive" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="isCompleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="plannedMeals" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PlannedMeal" inverseName="mealPlan" inverseEntity="PlannedMeal"/>

@@ -4,11 +4,43 @@
 //
 //  Created for M4.2: Calendar-Based Meal Planning Core
 //  Manages meal plans and recipe assignments to dates
+//  Updated for M4.2.4: Multiple meal plans support with validation
 //
 
 import Foundation
 import CoreData
 import Combine
+
+// M4.2.4: Result type for meal plan date validation
+// Provides specific feedback about why validation failed
+enum ValidationResult: Equatable {
+    case valid
+    case overlapsWithPlan(name: String, startDate: Date, endDate: Date)
+    case invalidDuration
+    case invalidDate
+    
+    var isValid: Bool {
+        if case .valid = self {
+            return true
+        }
+        return false
+    }
+    
+    var errorMessage: String? {
+        switch self {
+        case .valid:
+            return nil
+        case .overlapsWithPlan(let name, let start, let end):
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            return "Dates overlap with '\(name)' (\(formatter.string(from: start)) - \(formatter.string(from: end)))"
+        case .invalidDuration:
+            return "Duration must be between 3 and 14 days"
+        case .invalidDate:
+            return "Invalid date selected"
+        }
+    }
+}
 
 // M4.2: Meal plan management service
 // Handles creation, retrieval, and management of meal plans
@@ -160,6 +192,212 @@ class MealPlanService: ObservableObject {
         }
     }
     
+    // MARK: - M4.2.4: Date Validation
+    
+    // M4.2.4: Validates that proposed meal plan dates don't overlap with existing plans
+    // Checks all existing plans except the one being edited (if provided)
+    // Returns validation result with specific overlap information
+    // Performance target: < 0.1s
+    func validatePlanDates(
+        startDate: Date,
+        duration: Int,
+        excludingPlan: MealPlan? = nil
+    ) -> ValidationResult {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        
+        // Validate duration
+        guard duration >= 3 && duration <= 14 else {
+            return .invalidDuration
+        }
+        
+        // Calculate end date
+        guard let endDate = Calendar.current.date(byAdding: .day, value: duration - 1, to: startDate) else {
+            return .invalidDate
+        }
+        
+        // Fetch all existing plans
+        let fetchRequest: NSFetchRequest<MealPlan> = MealPlan.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: true)]
+        
+        do {
+            let existingPlans = try context.fetch(fetchRequest)
+            
+            // Check each plan for overlap
+            for plan in existingPlans {
+                // Skip the plan being edited
+                if let excludingPlan = excludingPlan, plan.id == excludingPlan.id {
+                    continue
+                }
+                
+                guard let planStart = plan.startDate else { continue }
+                guard let planEnd = Calendar.current.date(byAdding: .day, value: Int(plan.duration) - 1, to: planStart) else { continue }
+                
+                // Check for overlap: (StartA <= EndB) and (EndA >= StartB)
+                let hasOverlap = (startDate <= planEnd) && (endDate >= planStart)
+                
+                if hasOverlap {
+                    lastOperationDuration = CFAbsoluteTimeGetCurrent() - startTime
+                    return .overlapsWithPlan(
+                        name: plan.name ?? "Unnamed Plan",
+                        startDate: planStart,
+                        endDate: planEnd
+                    )
+                }
+            }
+            
+            lastOperationDuration = CFAbsoluteTimeGetCurrent() - startTime
+            return .valid
+        } catch {
+            lastError = error
+            print("Error validating plan dates: \(error)")
+            return .invalidDate
+        }
+    }
+    
+    // MARK: - M4.2.4: Status Management
+    
+    // M4.2.4: Updates active plan status based on current date
+    // Only one plan should be active at a time - the one containing today's date
+    // Run on app launch and when plans are modified
+    // Performance target: < 0.1s
+    func updateActivePlanStatus() {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        let today = Calendar.current.startOfDay(for: Date())
+        
+        let fetchRequest: NSFetchRequest<MealPlan> = MealPlan.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
+        
+        do {
+            let allPlans = try context.fetch(fetchRequest)
+            var foundActivePlan = false
+            
+            for plan in allPlans {
+                guard let startDate = plan.startDate else { continue }
+                let startDay = Calendar.current.startOfDay(for: startDate)
+                
+                guard let endDate = Calendar.current.date(byAdding: .day, value: Int(plan.duration) - 1, to: startDay) else { continue }
+                
+                // Check if plan contains today and is not completed
+                let containsToday = (startDay <= today) && (today <= endDate)
+                let shouldBeActive = containsToday && !plan.isCompleted
+                
+                if shouldBeActive && !foundActivePlan {
+                    // This is the active plan
+                    plan.isActive = true
+                    foundActivePlan = true
+                } else {
+                    // Deactivate this plan
+                    plan.isActive = false
+                }
+            }
+            
+            try context.save()
+            lastOperationDuration = CFAbsoluteTimeGetCurrent() - startTime
+            
+            // Reload active plan if status changed
+            loadActiveMealPlan()
+        } catch {
+            lastError = error
+            print("Error updating active plan status: \(error)")
+        }
+    }
+    
+    // M4.2.4: Auto-completes plans where end date has passed
+    // Updates isCompleted flag and sets completedDate
+    // Run on app launch and periodically
+    // Performance target: < 0.1s
+    func updateCompletedStatus() {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        let today = Calendar.current.startOfDay(for: Date())
+        
+        let fetchRequest: NSFetchRequest<MealPlan> = MealPlan.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isCompleted == NO")
+        
+        do {
+            let incompletePlans = try context.fetch(fetchRequest)
+            
+            for plan in incompletePlans {
+                guard let startDate = plan.startDate else { continue }
+                let startDay = Calendar.current.startOfDay(for: startDate)
+                
+                guard let endDate = Calendar.current.date(byAdding: .day, value: Int(plan.duration) - 1, to: startDay) else { continue }
+                
+                // If end date is before today, mark as completed
+                if endDate < today {
+                    plan.isCompleted = true
+                    plan.completedDate = endDate
+                    plan.isActive = false
+                }
+            }
+            
+            try context.save()
+            lastOperationDuration = CFAbsoluteTimeGetCurrent() - startTime
+        } catch {
+            lastError = error
+            print("Error updating completed status: \(error)")
+        }
+    }
+    
+    // MARK: - M4.2.4: Query Helpers
+    
+    // M4.2.4: Returns the currently active meal plan (if any)
+    // Only one plan should be active at a time
+    // Performance target: < 0.1s
+    func getActivePlan() -> MealPlan? {
+        let fetchRequest: NSFetchRequest<MealPlan> = MealPlan.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isActive == YES AND isCompleted == NO")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let plans = try context.fetch(fetchRequest)
+            return plans.first
+        } catch {
+            lastError = error
+            print("Error fetching active plan: \(error)")
+            return nil
+        }
+    }
+    
+    // M4.2.4: Returns all upcoming meal plans (start date in the future)
+    // Sorted by start date ascending
+    // Performance target: < 0.1s
+    func getUpcomingPlans() -> [MealPlan] {
+        let today = Calendar.current.startOfDay(for: Date())
+        
+        let fetchRequest: NSFetchRequest<MealPlan> = MealPlan.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "startDate > %@ AND isCompleted == NO", today as NSDate)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: true)]
+        
+        do {
+            return try context.fetch(fetchRequest)
+        } catch {
+            lastError = error
+            print("Error fetching upcoming plans: \(error)")
+            return []
+        }
+    }
+    
+    // M4.2.4: Returns all completed meal plans
+    // Sorted by completion date descending (most recent first)
+    // Performance target: < 0.1s
+    func getCompletedPlans() -> [MealPlan] {
+        let fetchRequest: NSFetchRequest<MealPlan> = MealPlan.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "isCompleted == YES")
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "completedDate", ascending: false),
+            NSSortDescriptor(key: "startDate", ascending: false)
+        ]
+        
+        do {
+            return try context.fetch(fetchRequest)
+        } catch {
+            lastError = error
+            print("Error fetching completed plans: \(error)")
+            return []
+        }
+    }
+    
     // MARK: - Planned Meal Management
     
     // M4.2: Loads all planned meals for a specific meal plan
@@ -182,34 +420,64 @@ class MealPlanService: ObservableObject {
         }
     }
     
-    // M4.2: Adds a recipe to a specific date in the active meal plan
+    // M4.2.4: Adds a recipe to a specific date in a meal plan
+    // NOW accepts mealPlan parameter for multi-plan support
+    // Includes recipe usage tracking (usageCount and lastUsed)
     // Enforces one-recipe-per-day constraint by checking for existing meals
     // Returns the created PlannedMeal or nil if date already has a meal
-    func addRecipeToMealPlan(recipe: Recipe, date: Date, servings: Int16? = nil) -> PlannedMeal? {
-        guard let plan = activeMealPlan else {
-            print("No active meal plan to add recipe to")
+    // Performance target: < 0.1s
+    func addRecipeToMealPlan(recipe: Recipe, date: Date, mealPlan: MealPlan, servings: Int16? = nil) -> PlannedMeal? {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        
+        // Check if date already has a planned meal in this specific plan
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let fetchRequest: NSFetchRequest<PlannedMeal> = PlannedMeal.fetchRequest()
+        fetchRequest.predicate = NSPredicate(
+            format: "mealPlan == %@ AND date >= %@ AND date < %@",
+            mealPlan,
+            startOfDay as NSDate,
+            Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)! as NSDate
+        )
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let existingMeals = try context.fetch(fetchRequest)
+            if !existingMeals.isEmpty {
+                print("Date \(date) already has a planned meal in this plan")
+                return nil
+            }
+        } catch {
+            lastError = error
+            print("Error checking for existing meal: \(error)")
             return nil
         }
         
-        // Check if date already has a planned meal
-        if hasPlannedMeal(on: date) {
-            print("Date \(date) already has a planned meal")
-            return nil
-        }
-        
+        // Create the planned meal
         let plannedMeal = PlannedMeal(context: context)
         plannedMeal.id = UUID()
-        plannedMeal.date = date
-        plannedMeal.servings = servings ?? recipe.servings
+        plannedMeal.date = startOfDay
+        plannedMeal.servings = servings ?? Int16(recipe.servings)
         plannedMeal.scaleFactor = Double(plannedMeal.servings) / Double(recipe.servings)
         plannedMeal.isCompleted = false
         plannedMeal.createdDate = Date()
-        plannedMeal.mealPlan = plan
+        plannedMeal.mealPlan = mealPlan
         plannedMeal.recipe = recipe
+        
+        // M4.2.4: NEW - Update recipe usage tracking
+        // Track when added to meal plan (better signal than grocery list)
+        // Use the planned meal date, not today
+        recipe.usageCount += 1
+        recipe.lastUsed = startOfDay
         
         do {
             try context.save()
-            loadPlannedMeals(for: plan) // Reload to update published array
+            
+            // Update published plannedMeals if this is for the active plan
+            if mealPlan == activeMealPlan {
+                loadPlannedMeals(for: mealPlan)
+            }
+            
+            lastOperationDuration = CFAbsoluteTimeGetCurrent() - startTime
             return plannedMeal
         } catch {
             lastError = error
