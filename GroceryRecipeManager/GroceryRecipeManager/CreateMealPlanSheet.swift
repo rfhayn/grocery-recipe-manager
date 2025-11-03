@@ -189,11 +189,11 @@ struct CreateMealPlanSheet: View {
     
     // MARK: - Helper Functions
     
-    // M4.2.4: Format date with day of week and date
-    // Returns "Mon, Nov 3" or "Sun, Nov 9"
+    // M4.2.4: Format date with day of week only
+    // Returns "Mon" or "Sun"
     private func formatDateWithDay(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEE, MMM d"  // "Mon, Nov 3"
+        formatter.dateFormat = "EEE"  // "Mon", "Tue", etc.
         return formatter.string(from: date)
     }
     
@@ -212,7 +212,7 @@ struct CreateMealPlanSheet: View {
         let days = calculatedDuration
         let dayText = days == 1 ? "day" : "days"
         
-        return "Plan will run from \(formatDateWithDay(startDate)) to \(formatDateWithDay(endDate)) (\(days) \(dayText))"
+        return "Plan will run from \(formatter.string(from: startDate)) to \(formatter.string(from: endDate)) (\(days) \(dayText))"
     }
     
     // M4.2.4: Validate dates using MealPlanService
@@ -253,9 +253,11 @@ struct CreateMealPlanSheet: View {
     }
     
     // M4.2.4: Generate auto-name if user didn't provide one
-    // Uses "Week of [start] - [end]" format with short dates
+    // Uses "Week of [start] - [end]" format with medium dates
     private func generateAutoName() -> String {
-        return "Week of \(formatDateWithDay(startDate)) - \(formatDateWithDay(endDate))"
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return "Week of \(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
     }
     
     // M4.2.4: Create the meal plan with validation
