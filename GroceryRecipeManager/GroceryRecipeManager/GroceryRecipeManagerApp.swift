@@ -30,11 +30,15 @@ struct GroceryRecipeManagerApp: App {
                     Label("Recipes", systemImage: "book.pages")
                 }
                 
-                // M4.2: Meal Planning Tab
-                MealPlanView()
-                    .tabItem {
-                        Label("Meal Plan", systemImage: "calendar")
-                    }
+                // M4.2.4 PHASE 7: Updated to use MealPlansListView for multi-plan support
+                // Changed from single MealPlanView to list-based architecture
+                // Enables multiple concurrent plans, historical tracking, and improved navigation
+                NavigationView {
+                    MealPlansListView()
+                }
+                .tabItem {
+                    Label("Meal Plans", systemImage: "calendar")
+                }
                 
                 NavigationView {
                     ManageCategoriesView()

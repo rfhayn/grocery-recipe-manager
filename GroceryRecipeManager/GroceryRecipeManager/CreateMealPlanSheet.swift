@@ -3,267 +3,318 @@
 //  GroceryRecipeManager
 //
 //  Created for M4.2.4: Multiple Meal Plans List View
-//  Sheet for creating new meal plans with smart defaults from M4.1 preferences
-//  Includes date overlap validation to maintain data integrity
+//  Quick plan creation with smart defaults from M4.1 user preferences
+//  Can be used standalone or inline within SelectMealPlanSheet
 //
 
 import SwiftUI
 import CoreData
 
-// M4.2.4: Sheet for creating new meal plans
-// Uses M4.1 UserPreferencesService for smart defaults
-// Validates dates to prevent overlaps with existing plans
+// M4.2.4: Quick meal plan creation sheet
+// Uses M4.1 user preferences for smart defaults
+// Validates dates to prevent overlaps
+// Supports both modal and inline modes
 struct CreateMealPlanSheet: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     
-    // M4.2.4: Meal plan service for creation and validation
-    @StateObject private var mealPlanService = MealPlanService.shared
+    // M4.2.4: User preferences for smart defaults
+    @StateObject private var prefs = UserPreferencesService.shared
     
-    // M4.2.4: User preferences for smart defaults (from M4.1)
-    @StateObject private var preferences = UserPreferencesService.shared
+    // M4.2.4: Inline mode support for use within other sheets
+    var isInline: Bool = false
+    var onCreated: ((MealPlan) -> Void)? = nil
+    var onCancel: (() -> Void)? = nil
     
-    // M4.2.4: Form state
+    // M4.2.4: Form fields with smart defaults
     @State private var name = ""
     @State private var startDate = Date()
-    @State private var duration = 7  // Default, will be set from preferences
+    @State private var duration: Int
     
     // M4.2.4: Validation state
-    @State private var validationResult: ValidationResult = .valid
-    @State private var showingError = false
-    @State private var isCreating = false
+    @State private var validationError: String?
+    @State private var isValidating = false
     
-    // M4.2.4: Initialize with smart defaults from preferences
-    init() {
-        // Duration will be set in onAppear from preferences
+    // M4.2.4: Initialize with user preferences
+    init(isInline: Bool = false, onCreated: ((MealPlan) -> Void)? = nil, onCancel: (() -> Void)? = nil) {
+        self.isInline = isInline
+        self.onCreated = onCreated
+        self.onCancel = onCancel
+        
+        // Initialize duration from preferences
+        let prefsDuration = UserPreferencesService.shared.mealPlanDuration
+        _duration = State(initialValue: prefsDuration)
     }
     
     var body: some View {
-        NavigationView {
-            Form {
-                // M4.2.4: Name section (optional, auto-generates if empty)
-                Section {
-                    TextField("Plan Name (optional)", text: $name)
-                        .autocapitalization(.words)
-                } header: {
-                    Text("Plan Name")
-                } footer: {
-                    if preferences.autoNameMealPlans {
-                        Text("Leave empty to auto-generate from dates")
-                            .font(.caption)
-                    }
-                }
-                
-                // M4.2.4: Date and duration section
-                Section {
-                    // Start date picker
-                    DatePicker(
-                        "Start Date",
-                        selection: $startDate,
-                        displayedComponents: [.date]
-                    )
-                    .onChange(of: startDate) { _ in
-                        validateDates()
-                    }
-                    
-                    // Duration stepper (3-14 days, from M4.1 preferences)
-                    Stepper(
-                        value: $duration,
-                        in: 3...14,
-                        step: 1
-                    ) {
-                        HStack {
-                            Text("Duration")
-                            Spacer()
-                            Text("\(duration) days")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .onChange(of: duration) { _ in
-                        validateDates()
-                    }
-                } header: {
-                    Text("Schedule")
-                } footer: {
-                    Text(dateRangeText)
-                        .font(.caption)
-                }
-                
-                // M4.2.4: Validation error section
-                if !validationResult.isValid {
-                    Section {
-                        HStack(spacing: 12) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.orange)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Date Conflict")
-                                    .font(.headline)
-                                    .foregroundColor(.orange)
-                                
-                                if let errorMessage = validationResult.errorMessage {
-                                    Text(errorMessage)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
+        if isInline {
+            // Inline mode - no NavigationView wrapper
+            formContent
+        } else {
+            // Modal mode - wrapped in NavigationView
+            NavigationView {
+                formContent
+                    .navigationTitle("Create Meal Plan")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                dismiss()
                             }
                         }
-                        .padding(.vertical, 4)
-                    }
-                }
-                
-                // M4.2.4: Helpful tips section
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("One plan at a time", systemImage: "checkmark.circle")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
                         
-                        Label("Plan must not overlap with existing plans", systemImage: "calendar.badge.exclamationmark")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Label("Add recipes from Recipe tab", systemImage: "book.fill")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Create") {
+                                createMealPlan()
+                            }
+                            .disabled(isValidating)
+                        }
                     }
-                } header: {
-                    Text("Tips")
-                }
-            }
-            .navigationTitle("New Meal Plan")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                // Cancel button
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .disabled(isCreating)
-                }
-                
-                // Create button
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(isCreating ? "Creating..." : "Create") {
-                        createMealPlan()
-                    }
-                    .disabled(!validationResult.isValid || isCreating)
-                    .fontWeight(.semibold)
-                }
-            }
-            .onAppear {
-                // M4.2.4: Set smart defaults from M4.1 preferences
-                setupSmartDefaults()
-                validateDates()
             }
         }
     }
     
-    // MARK: - Computed Properties
+    // MARK: - Form Content
     
-    // M4.2.4: Date range text showing calculated end date
-    private var dateRangeText: String {
-        let endDate = Calendar.current.date(byAdding: .day, value: duration - 1, to: startDate) ?? startDate
+    // M4.2.4: Main form layout
+    // Shows smart defaults with user customization options
+    private var formContent: some View {
+        Form {
+            nameSection
+            dateSection
+            durationSection
+            
+            if let error = validationError {
+                validationErrorSection(error)
+            }
+            
+            if isInline {
+                actionButtonsSection
+            }
+        }
+    }
+    
+    // M4.2.4: Optional name field with auto-generation hint
+    private var nameSection: some View {
+        Section {
+            TextField("Plan name (optional)", text: $name)
+        } header: {
+            Text("Name")
+        } footer: {
+            if name.isEmpty {
+                Text("If left empty, a name will be auto-generated based on the date range")
+                    .font(.caption)
+            }
+        }
+    }
+    
+    // M4.2.4: Start date picker
+    // Smart default: Next occurrence of user's preferred start day
+    private var dateSection: some View {
+        Section {
+            DatePicker(
+                "Start Date",
+                selection: $startDate,
+                displayedComponents: .date
+            )
+            .onChange(of: startDate) { oldValue, newValue in
+                validateDates()
+            }
+        } header: {
+            Text("Dates")
+        } footer: {
+            Text(dateRangeDescription)
+                .font(.caption)
+        }
+    }
+    
+    // M4.2.4: Duration picker with user preference default
+    private var durationSection: some View {
+        Section {
+            Stepper(value: $duration, in: 3...14) {
+                HStack {
+                    Text("Duration")
+                    Spacer()
+                    Text("\(duration) days")
+                        .foregroundColor(.secondary)
+                }
+            }
+            .onChange(of: duration) { oldValue, newValue in
+                validateDates()
+            }
+        } footer: {
+            Text("Choose between 3 and 14 days. Your preference is \(prefs.mealPlanDuration) days.")
+                .font(.caption)
+        }
+    }
+    
+    // M4.2.4: Display validation errors
+    private func validationErrorSection(_ message: String) -> some View {
+        Section {
+            Label(message, systemImage: "exclamationmark.triangle.fill")
+                .font(.subheadline)
+                .foregroundColor(.red)
+        }
+    }
+    
+    // M4.2.4: Inline action buttons (for use within other sheets)
+    private var actionButtonsSection: some View {
+        Section {
+            Button(action: createMealPlan) {
+                HStack {
+                    Spacer()
+                    if isValidating {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                    } else {
+                        Text("Create Plan")
+                            .fontWeight(.semibold)
+                    }
+                    Spacer()
+                }
+            }
+            .disabled(isValidating)
+            
+            if let cancel = onCancel {
+                Button("Cancel", role: .cancel, action: cancel)
+            }
+        }
+    }
+    
+    // MARK: - Helper Functions
+    
+    // M4.2.4: Description of date range based on current inputs
+    private var dateRangeDescription: String {
+        guard let endDate = Calendar.current.date(byAdding: .day, value: duration - 1, to: startDate) else {
+            return ""
+        }
+        
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
+        
         return "Plan will run from \(formatter.string(from: startDate)) to \(formatter.string(from: endDate))"
     }
     
-    // MARK: - Actions
-    
-    // M4.2.4: Setup smart defaults from M4.1 UserPreferencesService
-    // Uses user's preferred duration and calculates optimal start date
-    private func setupSmartDefaults() {
-        // Set duration from preferences
-        duration = preferences.mealPlanDuration
-        
-        // Calculate next preferred start day
-        // If user prefers Sunday starts, find next Sunday
-        let preferredStartDay = preferences.mealPlanStartDay
-        let calendar = Calendar.current
-        let today = Date()
-        
-        // Find next occurrence of preferred day
-        if let nextStartDay = calendar.nextDate(
-            after: today,
-            matching: DateComponents(weekday: preferredStartDay + 1), // +1 because weekday is 1-7
-            matchingPolicy: .nextTime
-        ) {
-            startDate = nextStartDay
-        } else {
-            // Fallback to today if calculation fails
-            startDate = today
-        }
-    }
-    
-    // M4.2.4: Validate dates against existing plans
-    // Prevents overlapping meal plans to maintain data integrity
+    // M4.2.4: Validate dates using MealPlanService
+    // Checks for overlaps with existing plans
     private func validateDates() {
-        validationResult = mealPlanService.validatePlanDates(
+        isValidating = true
+        
+        // Use MealPlanService validation
+        let service = MealPlanService.shared
+        let result = service.validatePlanDates(
             startDate: startDate,
             duration: duration,
             excludingPlan: nil
         )
-    }
-    
-    // M4.2.4: Create new meal plan
-    // Uses M4.1 auto-naming preference if name is empty
-    // Navigates to detail view on success
-    private func createMealPlan() {
-        guard validationResult.isValid else { return }
         
-        isCreating = true
-        
-        // Create plan with service
-        let plan = MealPlan(context: viewContext)
-        plan.id = UUID()
-        plan.createdDate = Date()
-        plan.startDate = startDate
-        plan.duration = Int16(duration)
-        
-        // M4.2.4: Use auto-naming from M4.1 preferences
-        if preferences.autoNameMealPlans {
-            if name.isEmpty {
-                // Auto-generate name
-                let formatter = DateFormatter()
-                formatter.dateFormat = "MMM d"
-                let endDate = Calendar.current.date(byAdding: .day, value: duration - 1, to: startDate) ?? startDate
-                plan.name = "Week of \(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
-            } else {
-                // Use custom name
-                plan.name = name
-            }
+        if result.isValid {
+            validationError = nil
         } else {
-            // Always require name if auto-naming disabled
-            plan.name = name.isEmpty ? "Unnamed Plan" : name
+            validationError = result.errorMessage
         }
         
-        // Determine if this plan should be active
-        let today = Calendar.current.startOfDay(for: Date())
-        let startDay = Calendar.current.startOfDay(for: startDate)
-        let endDate = Calendar.current.date(byAdding: .day, value: duration - 1, to: startDay) ?? startDay
-        plan.isActive = (startDay <= today) && (today <= endDate)
+        isValidating = false
+    }
+    
+    // M4.2.4: Generate auto-name if user didn't provide one
+    // Uses "Week of [start date] - [end date]" format
+    private func generateAutoName() -> String {
+        guard let endDate = Calendar.current.date(byAdding: .day, value: duration - 1, to: startDate) else {
+            return "Meal Plan"
+        }
+        
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        
+        return "Week of \(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
+    }
+    
+    // M4.2.4: Create the meal plan with validation
+    // Calls appropriate callback based on mode (inline vs modal)
+    private func createMealPlan() {
+        // Final validation check
+        validateDates()
+        
+        if validationError != nil {
+            return
+        }
+        
+        // Create the plan
+        let plan = MealPlan(context: viewContext)
+        plan.id = UUID()
+        plan.name = name.isEmpty ? generateAutoName() : name
+        plan.startDate = Calendar.current.startOfDay(for: startDate)
+        plan.duration = Int16(duration)
+        plan.createdDate = Date()
+        plan.isActive = false // Will be set by updateActivePlanStatus
         plan.isCompleted = false
         
         do {
             try viewContext.save()
             
-            // M4.2.4: Update active plan status to ensure only one active
-            mealPlanService.updateActivePlanStatus()
+            // Update active status
+            MealPlanService.shared.updateActivePlanStatus()
             
-            // Success - dismiss sheet
-            dismiss()
+            // Handle callbacks based on mode
+            if isInline, let callback = onCreated {
+                callback(plan)
+            } else {
+                dismiss()
+            }
         } catch {
             print("Error creating meal plan: \(error)")
-            showingError = true
-            isCreating = false
+            validationError = "Failed to create meal plan. Please try again."
         }
     }
 }
 
 // MARK: - Preview
 
-#Preview {
-    CreateMealPlanSheet()
-        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+#Preview("Modal Mode") {
+    let context = PersistenceController.preview.container.viewContext
+    
+    return CreateMealPlanSheet()
+        .environment(\.managedObjectContext, context)
+}
+
+#Preview("Inline Mode") {
+    let context = PersistenceController.preview.container.viewContext
+    
+    return NavigationView {
+        Form {
+            Section {
+                Text("Parent Form Content")
+            }
+            
+            CreateMealPlanSheet(
+                isInline: true,
+                onCreated: { plan in
+                    print("Created plan: \(plan.name ?? "unnamed")")
+                },
+                onCancel: {
+                    print("Cancelled")
+                }
+            )
+        }
+        .navigationTitle("Test Container")
+    }
+    .environment(\.managedObjectContext, context)
+}
+
+#Preview("With Existing Plans") {
+    let context = PersistenceController.preview.container.viewContext
+    
+    // Create existing plan to test overlap validation
+    let existingPlan = MealPlan(context: context)
+    existingPlan.id = UUID()
+    existingPlan.name = "Existing Plan"
+    existingPlan.startDate = Date()
+    existingPlan.duration = 7
+    existingPlan.isActive = true
+    
+    try? context.save()
+    
+    return CreateMealPlanSheet()
+        .environment(\.managedObjectContext, context)
 }

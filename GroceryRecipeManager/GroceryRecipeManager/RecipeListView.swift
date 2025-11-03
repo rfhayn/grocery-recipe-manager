@@ -9,8 +9,9 @@ struct RecipeListView: View {
     @State private var showingAddRecipe = false
     @State private var searchHistory: [String] = []
     
-    // M4.2: State for showing date picker sheet when adding recipe to meal plan
-    @State private var recipeToAddToMealPlan: Recipe?
+    // M4.2.4 PHASE 7: Updated to use SelectMealPlanSheet for multi-plan support
+    @State private var showingMealPlanSheet = false
+    @State private var selectedRecipeForMealPlan: Recipe?
     
     @FetchRequest(
         entity: Recipe.entity(),
@@ -122,11 +123,22 @@ struct RecipeListView: View {
         .sheet(isPresented: $showingAddRecipe) {
             CreateRecipeView(context: viewContext)
         }
-        // M4.2: Sheet for selecting date when adding recipe to meal plan
-        .sheet(item: $recipeToAddToMealPlan) { recipe in
-            DatePickerSheet(recipe: recipe) { date in
-                // Successfully added to meal plan
-                print("✅ M4.2: Added \(recipe.title ?? "recipe") to meal plan on \(date)")
+        // M4.2.4 PHASE 7: Updated to use SelectMealPlanSheet for multi-plan support
+        .sheet(isPresented: $showingMealPlanSheet) {
+            if let recipe = selectedRecipeForMealPlan {
+                SelectMealPlanSheet(recipe: recipe) { plan, date in
+                    // M4.2.4: Add recipe to selected plan and date
+                    // Recipe tracking now happens in MealPlanService.addRecipeToMealPlan
+                    if let _ = MealPlanService.shared.addRecipeToMealPlan(
+                        recipe: recipe,
+                        date: date,
+                        mealPlan: plan
+                    ) {
+                        print("✅ M4.2.4: Added \(recipe.title ?? "recipe") to \(plan.name ?? "plan") on \(date)")
+                    } else {
+                        print("❌ M4.2.4: Failed to add recipe (date may already be occupied)")
+                    }
+                }
             }
         }
         .onAppear {
@@ -213,7 +225,8 @@ struct RecipeListView: View {
                     // M4.2: Swipe action to add recipe to meal plan
                     .swipeActions(edge: .leading) {
                         Button {
-                            recipeToAddToMealPlan = recipe
+                            selectedRecipeForMealPlan = recipe
+                            showingMealPlanSheet = true
                         } label: {
                             Label("Add to Meal Plan", systemImage: "calendar.badge.plus")
                         }
@@ -443,8 +456,8 @@ struct RecipeDetailView: View {
     @State private var showingMarkUsedConfirmation = false
     @State private var showingEditSheet = false
     
-    // M4.2: State for showing date picker sheet when adding to meal plan
-    @State private var showingMealPlanDatePicker = false
+    // M4.2.4 PHASE 7: Updated to use SelectMealPlanSheet for multi-plan support
+    @State private var showingMealPlanSheet = false
     
     // M3 PHASE 4: Recipe Scaling State
     @State private var showingScalingSheet = false
@@ -522,7 +535,7 @@ struct RecipeDetailView: View {
                 // M4.2: Add to Meal Plan menu
                 Menu {
                     Button {
-                        showingMealPlanDatePicker = true
+                        showingMealPlanSheet = true
                     } label: {
                         Label("Add to Meal Plan", systemImage: "calendar.badge.plus")
                     }
@@ -563,11 +576,20 @@ struct RecipeDetailView: View {
         .sheet(isPresented: $showingScalingSheet) {
             RecipeScalingView(recipe: recipe, scalingService: scalingService)
         }
-        // M4.2: Sheet for selecting date when adding to meal plan
-        .sheet(isPresented: $showingMealPlanDatePicker) {
-            DatePickerSheet(recipe: recipe) { date in
-                // Successfully added to meal plan
-                print("✅ M4.2: Added \(recipe.title ?? "recipe") to meal plan on \(date)")
+        // M4.2.4 PHASE 7: Updated to use SelectMealPlanSheet for multi-plan support
+        .sheet(isPresented: $showingMealPlanSheet) {
+            SelectMealPlanSheet(recipe: recipe) { plan, date in
+                // M4.2.4: Add recipe to selected plan and date
+                // Recipe tracking now happens in MealPlanService.addRecipeToMealPlan
+                if let _ = MealPlanService.shared.addRecipeToMealPlan(
+                    recipe: recipe,
+                    date: date,
+                    mealPlan: plan
+                ) {
+                    print("✅ M4.2.4: Added \(recipe.title ?? "recipe") to \(plan.name ?? "plan") on \(date)")
+                } else {
+                    print("❌ M4.2.4: Failed to add recipe (date may already be occupied)")
+                }
             }
         }
     }
