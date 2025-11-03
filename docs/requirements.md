@@ -197,53 +197,55 @@ This document defines all functional and non-functional requirements for the Gro
 **M3.5 Validation**: Comprehensive validation completed with automated test suite. 75+ computed properties added, 100% test pass rate achieved, test automation pattern established for future milestones.
 ---
 
-## 📋 **M4: MEAL PLANNING & SETTINGS - READY TO BEGIN**
+## 📋 **M4: MEAL PLANNING & SETTINGS - IN PROGRESS**
 
-**Status**: 📋 Ready to Begin - October 2025  
-**Estimated Time**: 7.5-10 hours  
+**Status**: 🔄 In Progress (M4.1 ✅, M4.2 ✅, M4.3 next)  
+**Total Time**: 7.5-11 hours (M4.1: 1.5h actual, M4.2: ~4h actual, M4.3: 3.5-4h estimated)  
 **Summary**: Calendar-based meal planning with enhanced grocery automation
 
 **Dependencies**: M3 Complete ✅, M3.5 Complete ✅
+
 ### **Functional Requirements - Settings Infrastructure**
 
-| ID | Requirement | Implementation | Milestone | Value |
-|----|-------------|----------------|-----------|-------|
-| **FR-MP-001** | **Meal planning preferences** | 📋 Duration (3-14 days), start day, auto-naming | M4.1 | 🎯 **Personalization** |
-| **FR-MP-002** | **Recipe source display preferences** | 📋 Show/hide recipe sources in lists | M4.1 | 🎯 **User control** |
-| **FR-MP-003** | **UserPreferences entity** | 📋 Core Data entity for settings persistence | M4.1 | 🎯 **Data persistence** |
-| **FR-MP-004** | **Real-time validation** | 📋 Validate settings as user changes them | M4.1 | 🎯 **Error prevention** |
+| ID | Requirement | Implementation | Milestone | Value | Status |
+|----|-------------|----------------|-----------|-------|--------|
+| **FR-MP-001** | **Meal planning preferences** | ✅ Duration (3-14 days), start day, auto-naming | M4.1 | 🎯 **Personalization** | ✅ **COMPLETE** |
+| **FR-MP-002** | **Recipe source display preferences** | ✅ Show/hide recipe sources in lists | M4.1 | 🎯 **User control** | ✅ **COMPLETE** |
+| **FR-MP-003** | **UserPreferences entity** | ✅ Core Data entity for settings persistence | M4.1 | 🎯 **Data persistence** | ✅ **COMPLETE** |
+| **FR-MP-004** | **Real-time validation** | ✅ Validate settings as user changes them | M4.1 | 🎯 **Error prevention** | ✅ **COMPLETE** |
 
 ### **Functional Requirements - Meal Planning Core**
 
-| ID | Requirement | Implementation | Milestone | Value |
-|----|-------------|----------------|-----------|-------|
-| **FR-MP-005** | **MealPlan entity** | 📋 Core Data entity with date range | M4.2 | 🎯 **Data structure** |
-| **FR-MP-006** | **PlannedMeal entity** | 📋 Date-recipe relationship tracking | M4.2 | 🎯 **Meal assignments** |
-| **FR-MP-007** | **Calendar view** | 📋 Clean weekly calendar with recipe display | M4.2 | 🎯 **Visual planning** |
-| **FR-MP-008** | **Add to meal plan** | 📋 Modal calendar picker from recipe views | M4.2 | 🎯 **Easy assignment** |
-| **FR-MP-009** | **Configurable periods** | 📋 3-14 day planning periods | M4.2 | 🎯 **Flexibility** |
-| **FR-MP-010** | **Meal plan management** | 📋 Create, edit, delete meal plans | M4.2 | 🎯 **Plan control** |
+| ID | Requirement | Implementation | Milestone | Value | Status |
+|----|-------------|----------------|-----------|-------|--------|
+| **FR-MP-005** | **MealPlan entity** | ✅ Core Data entity with date range | M4.2 | 🎯 **Data structure** | ✅ **COMPLETE** |
+| **FR-MP-006** | **PlannedMeal entity** | ✅ Date-recipe relationship tracking | M4.2 | 🎯 **Meal assignments** | ✅ **COMPLETE** |
+| **FR-MP-007** | **Calendar view** | ✅ Calendar grid with tap-to-add (M4.2.1-3) | M4.2 | 🎯 **Visual planning** | ✅ **COMPLETE** |
+| **FR-MP-008** | **Add to meal plan** | ✅ RecipePickerSheet with search/servings | M4.2 | 🎯 **Easy assignment** | ✅ **COMPLETE** |
+| **FR-MP-009** | **Configurable periods** | ✅ User-defined date ranges | M4.2 | 🎯 **Flexibility** | ✅ **COMPLETE** |
+| **FR-MP-010** | **Meal plan management** | ✅ Create meal plans with date pickers | M4.2 | 🎯 **Plan control** | ✅ **COMPLETE** |
+| **FR-MP-017** | **Recipe usage tracking** | ✅ usageCount and lastUsed on assignment | M4.2 | 🎯 **Analytics data** | ✅ **COMPLETE** |
 
 ### **Functional Requirements - Enhanced Grocery Integration**
 
-| ID | Requirement | Implementation | Milestone | Value |
-|----|-------------|----------------|-----------|-------|
-| **FR-MP-011** | **Generate list from meal plan** | 📋 One-tap grocery list creation | M4.3 | 🎯 **Automation** |
-| **FR-MP-012** | **Recipe source tags** | 📋 "Ground beef [Tacos] [Spaghetti]" display | M4.3 | 🎯 **Transparency** |
-| **FR-MP-013** | **Smart consolidation** | 📋 Leverage M3 Phase 5 for duplicate handling | M4.3 | 🎯 **List optimization** |
-| **FR-MP-014** | **Meal completion tracking** | 📋 Mark meals as completed | M4.3 | 🎯 **Progress tracking** |
-| **FR-MP-015** | **Scaled recipe to list** | 📋 Add scaled ingredients directly to shopping list | M4.3 | 🎯 **Party planning** |
-| **FR-MP-016** | **Scaling metadata** | 📋 Preserve scale factor for meal planning | M4.3 | 🎯 **Context preservation** |
+| ID | Requirement | Implementation | Milestone | Value | Status |
+|----|-------------|----------------|-----------|-------|--------|
+| **FR-MP-011** | **Generate list from meal plan** | 📋 One-tap grocery list creation | M4.3 | 🎯 **Automation** | ⏳ **NEXT** |
+| **FR-MP-012** | **Recipe source tags** | 📋 "Ground beef [Tacos] [Spaghetti]" display | M4.3 | 🎯 **Transparency** | ⏳ **PLANNED** |
+| **FR-MP-013** | **Smart consolidation** | 📋 Leverage M3 Phase 5 for duplicate handling | M4.3 | 🎯 **List optimization** | ⏳ **PLANNED** |
+| **FR-MP-014** | **Meal completion tracking** | 📋 Mark meals as completed | M4.3 | 🎯 **Progress tracking** | ⏳ **PLANNED** |
+| **FR-MP-015** | **Scaled recipe to list** | 📋 Add scaled ingredients directly to shopping list | M4.3 | 🎯 **Party planning** | ⏳ **PLANNED** |
+| **FR-MP-016** | **Scaling metadata** | 📋 Preserve scale factor for meal planning | M4.3 | 🎯 **Context preservation** | ⏳ **PLANNED** |
 
 ### **Non-Functional Requirements - M4**
 
-| ID | Requirement | Target | Milestone | Value |
-|----|-------------|--------|-----------|-------|
-| **NFR-M4-001** | **List generation performance** | < 1s for 7-day plan | M4.3 | 🎯 **Fast automation** |
-| **NFR-M4-002** | **Calendar rendering** | < 0.5s | M4.2 | 🎯 **Responsive UI** |
-| **NFR-M4-003** | **Settings persistence** | Immediate save | M4.1 | 🎯 **Reliability** |
+| ID | Requirement | Target | Milestone | Value | Status |
+|----|-------------|--------|-----------|-------|--------|
+| **NFR-M4-001** | **List generation performance** | < 1s for 7-day plan | M4.3 | 🎯 **Fast automation** | ⏳ **PLANNED** |
+| **NFR-M4-002** | **Calendar rendering** | < 0.5s | M4.2 | 🎯 **Responsive UI** | ✅ **COMPLETE** |
+| **NFR-M4-003** | **Settings persistence** | Immediate save | M4.1 | 🎯 **Reliability** | ✅ **COMPLETE** |
 
-**M4 Summary**: 19 requirements defined, ready for implementation after M3 completion. Leverages M3 scaling and consolidation services.
+**M4 Progress**: 11 of 19 requirements complete (58%). M4.1 and M4.2 functional, M4.3 ready to begin.
 
 ---
 

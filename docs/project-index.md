@@ -1,8 +1,9 @@
 # Grocery & Recipe Manager - Project Index
 
-**Last Updated**: October 23, 2025  
+**Last Updated**: November 3, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M4.1 (Settings Infrastructure Foundation)
+**Current Milestone**: M4.2.1-3 Enhancement (RecipePickerSheet UI Polish) - Optional  
+**Next Priority**: M4.3 (Enhanced Grocery Integration)
 
 ---
 
@@ -215,23 +216,29 @@
 ### **🔄 Active Development**
 
 #### **M4: Meal Planning & Enhanced Grocery Integration** 
-**Status**: 🚀 **READY TO BEGIN**  
-**Estimated Total**: 7.5-10 hours
+**Status**: 🔄 **IN PROGRESS** (M4.1 ✅, M4.2 ✅)  
+**Remaining**: 3.5-5 hours (M4.3 + optional Enhancement)
 
-**Next Phase**: M4.1 - Settings Infrastructure Foundation (1.5 hours) ← **STARTING NOW**
-
-**Phase Breakdown:**
-- **M4.1**: Settings Infrastructure Foundation 🚀 (1.5 hours)
+**Completed Phases:**
+- **M4.1**: Settings Infrastructure Foundation ✅ (1.5 hours)
   - UserPreferences Core Data entity
   - Meal planning preferences in Settings tab
   - User-configurable settings
   
-- **M4.2**: Calendar-Based Meal Planning Core ⏳ (2.5 hours)
+- **M4.2**: Calendar-Based Meal Planning Core ✅ (~4 hours)
   - MealPlan and PlannedMeal entities
-  - One-week calendar interface
+  - Calendar interface with tap-to-add
   - Recipe assignment workflow
+  - Usage tracking
 
-- **M4.3**: Enhanced Grocery Integration ⏳ (3.5-4 hours)
+**Next Phase:**
+- **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish 🚀 (1.0 hour, optional)
+  - Clean, scannable recipe list
+  - Inline expansion pattern
+  - Blue selection indicators
+  - Enhanced date banner
+  
+- **M4.3**: Enhanced Grocery Integration ⏳ (3.5-4 hours, required)
   - Generate grocery list from meal plan
   - Recipe source tags
   - Smart consolidation
@@ -274,7 +281,9 @@ docs/
 │       ├── 12-14-m3-phases-1-4.md
 │       ├── 15-m3-phase5-quantity-consolidation.md
 │       ├── 16-m3-phase6-ui-polish.md
-│       └── 17-m3.5-foundation-validation.md
+│       ├── 17-m3.5-foundation-validation.md
+│       ├── 18-m4.1-settings-infrastructure.md
+│       └── 19-m4.2-calendar-meal-planning.md ← NEW
 │
 └── 🏗️ ARCHITECTURE DECISIONS
     └── architecture/
@@ -306,6 +315,10 @@ docs/
 
 ### **M3.5: Foundation Validation & Testing**
 - **[17: M3.5 Foundation Validation](learning-notes/17-m3.5-foundation-validation.md)** - Test automation & debugging process
+
+### **M4: Meal Planning & Enhanced Grocery Integration**
+- **[18: M4.1 Settings Infrastructure](learning-notes/18-m4.1-settings-infrastructure.md)** - UserPreferences service & UI
+- **[19: M4.2 Calendar Meal Planning](learning-notes/19-m4.2-calendar-meal-planning.md)** - MealPlan entities, calendar UI, sheet patterns
 
 ---
 
@@ -348,9 +361,17 @@ docs/
 | M2 | 15-18h | 16.5h | ✅ +8% | Complete |
 | M3 | 8-12h | 10.5h | ✅ +5% | Complete |
 | M3.5 | 7h | 8.5h | ✅ +21% | Complete |
-| **Totals** | **60-72h** | **67.5h** | **✅ +6%** | **4 Complete** |
+| M4.1 | 1.5h | 1.5h | ✅ 0% | Complete |
+| M4.2 | 2.5h | ~4h | ⚠️ +60% | Complete |
+| **Totals** | **64.5-77h** | **~73h** | **✅ +5%** | **6 Complete** |
 
 **Overall Planning Accuracy**: 88% (< 12% average variance)
+
+**M4.2 Variance Notes**: 
+- Included extensive sheet debugging and pattern discovery
+- Date picker enhancement (unplanned improvement)
+- Recipe usage tracking implementation
+- Learning investment paid off with reusable patterns
 
 **Success Factors:**
 - Consistent use of session-startup-checklist.md
@@ -362,6 +383,22 @@ docs/
 ---
 
 ## 📅 **RECENT ACTIVITY**
+
+### **November 3, 2025** - M4.2 Complete + Enhancement Documented ✅
+- **Completed**: M4.2 - Calendar-Based Meal Planning Core (~4 hours)
+  - MealPlan and PlannedMeal Core Data entities
+  - MealPlanService with singleton pattern  
+  - Calendar grid view with tap-to-add functionality (M4.2.1-3)
+  - RecipePickerSheet with search and servings adjustment
+  - Recipe usage tracking (usageCount, lastUsed)
+  - Date range picker enhancement (replaced duration stepper)
+- **Documented**: M4.2.1-3 Enhancement - RecipePickerSheet UI Polish
+  - Complete PRD (18KB) with requirements and specs
+  - Implementation guide (14KB) with phase-by-phase code
+  - Design reference (13KB) with 3 options evaluated
+  - Ready to implement (1.0 hour estimated)
+- **Status**: M4.2 MILESTONE COMPLETE, M4.3 next
+- **Next**: M4.3 - Enhanced Grocery Integration (3.5-4 hours)
 
 ### **October 23, 2025** - Documentation Enhancement 📚
 - **Enhanced**: session-startup-checklist.md (NEW - V1.0)
@@ -401,15 +438,22 @@ docs/
 
 ### **Current State**
 - **Active Milestone**: M4 (Meal Planning & Enhanced Grocery Integration)
-- **Current Phase**: M4.1 (Settings Infrastructure Foundation) 🚀 **READY**
-- **Progress**: M1-M3.5 complete (67.5 hours), strong foundation established
+- **Completed**: M4.1 (Settings), M4.2 (Calendar Planning) ✅
+- **Current Phase**: M4.2.1-3 Enhancement (UI Polish) 🚀 **READY** (optional)
+- **Next Required**: M4.3 (Grocery Integration) ⏳
+- **Progress**: M1-M3.5 complete (67.5 hours), M4.1-M4.2 complete (~5.5 hours)
 - **Status**: On track with excellent planning accuracy
 
 ### **Next Immediate Work**
-- **M4.1**: Settings Infrastructure (1.5 hours) ← **NEXT SESSION**
-  - UserPreferences Core Data entity
-  - Meal planning preferences UI
-  - Real-time validation and persistence
+- **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish (1.0 hour) **OPTIONAL**
+  - Clean, scannable recipe list
+  - Inline expansion on selection
+  - iOS-native feel
+  
+- **M4.3**: Enhanced Grocery Integration (3.5-4 hours) **REQUIRED** ← **NEXT**
+  - "Add All to List" from meal plan
+  - Recipe source tracking
+  - Smart quantity consolidation
 
 ### **Performance Metrics**
 - **All Operations**: < 0.5s target maintained ✅

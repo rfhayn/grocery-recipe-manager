@@ -1,8 +1,8 @@
 # Grocery & Recipe Manager - Development Roadmap
 
-**Last Updated**: October 22, 2025  
-**Current Phase**: M4 Phase 1 (Settings Infrastructure Foundation)  
-**Status**: M3.5 complete, M4 ready to begin
+**Last Updated**: November 3, 2025  
+**Current Phase**: M4.3 (Enhanced Grocery Integration) - Next  
+**Status**: M4.2 complete, M4.3 ready to begin
 
 ---
 
@@ -62,14 +62,35 @@
 
 **M3.5 Completion**: Test automation pattern established, 100% validation success, production-ready
 
+**M4.1: Settings Infrastructure Foundation (1.5 hours) - October 2025** ✅
+- UserPreferences Core Data entity (single-record pattern)
+- UserPreferencesService with singleton pattern and auto-save
+- Meal Planning preferences UI in SettingsView
+- Real-time validation and persistence
+- Duration (3-14 days) and start day (Sun-Sat) configuration
+
+**M4.1 Completion**: Settings infrastructure complete, M4.2 ready to use preferences
+
+**M4.2: Calendar-Based Meal Planning Core (~4 hours) - November 2025** ✅
+- MealPlan and PlannedMeal Core Data entities with relationships
+- MealPlanService with singleton pattern
+- Calendar grid view with tap-to-add recipe functionality (M4.2.1-3)
+- RecipePickerSheet with search, servings adjustment, manual fetching
+- Date range picker enhancement (replaced duration stepper)
+- Recipe usage tracking (usageCount, lastUsed)
+- Sheet pattern discovery and fix (`.sheet(item:)` vs `.sheet(isPresented:)`)
+
+**M4.2 Completion**: Functional meal planning operational, M4.3 ready for grocery integration
+
 ---
 
 ## 🚀 **IMMEDIATE NEXT STEPS**
 
 ### **Immediate Development Path**
-1. **M4.1**: Settings Infrastructure Foundation (1.5 hours) ← **NEXT**
-2. **M4.2**: Calendar Planning Core (2.5 hours)
-3. **M4.3**: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours)
+1. **M4.1**: Settings Infrastructure Foundation (1.5 hours) ✅ **COMPLETE**
+2. **M4.2**: Calendar Planning Core (~4 hours) ✅ **COMPLETE**
+3. **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish (1.0 hour) 🚀 **READY** (optional)
+4. **M4.3**: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours) ← **NEXT**
 
 ### **Strategic Integration Points:**
 - **M3 Phase 4 → M4.3**: Recipe scaling service enables scaled-to-list feature ✅
@@ -79,13 +100,15 @@
 - **M3 + M4 → M8-M11**: Advanced intelligence platform built on structured data foundation
 
 ### **Timeline Summary:**
-- **Core Platform (M1-M7)**: ~73-89 hours total
+- **Core Platform (M1-M7)**: ~77-95 hours total (updated with M4.2 actual time)
 - **M1 Complete**: 32 hours ✅
 - **M2 Complete**: 16.5 hours ✅
 - **M3 Complete**: 10.5 hours ✅
 - **M3.5 Complete**: 8.5 hours ✅
-- **M4 Ready**: 7.5-10 hours
-- **Remaining (M5-M7)**: ~24-30 hours
+- **M4.1 Complete**: 1.5 hours ✅
+- **M4.2 Complete**: ~4 hours ✅
+- **M4 Remaining**: 3.5-5 hours (M4.3 required, M4.2.1-3 Enhancement optional)
+- **Future (M5-M7)**: ~24-30 hours
 
 ---
 
@@ -197,8 +220,8 @@
 
 ### **M4: Meal Planning & Enhanced Grocery Integration** 📋
 
-**Status**: Ready to begin  
-**Estimated Time**: 7.5-10 hours  
+**Status**: 🔄 In Progress (M4.1 ✅, M4.2 ✅, M4.3 next)  
+**Total Time**: 7.5-11 hours (M4.1: 1.5h, M4.2: ~4h, M4.3: 3.5-4h, Enhancement: 1h optional)  
 **Priority**: HIGH - Completes core user workflow
 
 **Strategic Overview:**
@@ -206,25 +229,34 @@ M4 completes the core grocery-recipe workflow with calendar-based meal planning,
 
 #### **Phase Breakdown:**
 
-**M4.1: Settings Infrastructure Foundation (1.5 hours)** ← **NEXT**
-- Expand Settings tab with meal planning preferences
-- Duration settings (3-14 days, default 7)
-- Start day preference (Sunday/Monday, default Sunday)
-- Auto-naming toggle for meal plans
-- Recipe source display preferences
-- UserPreferences Core Data entity
-- Real-time settings validation
+**M4.1: Settings Infrastructure Foundation (1.5 hours)** ✅ **COMPLETE**
+- Expand Settings tab with meal planning preferences ✅
+- Duration settings (3-14 days, default 7) ✅
+- Start day preference (Sunday-Saturday) ✅
+- Auto-naming toggle for meal plans ✅
+- Recipe source display preferences ✅
+- UserPreferences Core Data entity (single-record pattern) ✅
+- Real-time settings validation with auto-save ✅
 
-**M4.2: Calendar-Based Meal Planning Core (2.5 hours)**
-- MealPlan and PlannedMeal Core Data entities
-- Date-based relationships and queries
-- Clean one-week calendar view with recipe assignment
-- "Add to Meal Plan" buttons in recipe views
-- Modal calendar picker for date selection
-- User-configurable planning periods (3-14 days)
-- Meal plan management (create/edit/delete)
+**M4.2: Calendar-Based Meal Planning Core (~4 hours)** ✅ **COMPLETE**
+- MealPlan and PlannedMeal Core Data entities ✅
+- MealPlanService with singleton pattern ✅
+- Date-based relationships and queries ✅
+- Calendar grid view with tap-to-add functionality (M4.2.1-3) ✅
+- RecipePickerSheet with search and servings adjustment ✅
+- Date range picker (replaced duration stepper for better UX) ✅
+- Recipe usage tracking (usageCount, lastUsed) ✅
+- Sheet pattern fix (`.sheet(item:)` vs `.sheet(isPresented:)`) ✅
+- Manual Core Data fetching in sheets (avoids @FetchRequest issues) ✅
 
-**M4.3: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours)**
+**M4.2.1-3 Enhancement: RecipePickerSheet UI Polish (1.0 hour)** 🚀 **READY (Optional)**
+- Clean, scannable recipe list (reduced visual clutter)
+- Inline expansion on selection (blue indicators)
+- iOS-native feel (Settings app pattern)
+- Enhanced date banner
+- Fully documented with PRD and implementation guide
+
+**M4.3: Enhanced Grocery Integration + Scaled Recipe to List (3.5-4 hours)** ⏳ **NEXT**
 
 **Original M4.3 Scope (2 hours):**
 - Generate grocery list from meal plan
@@ -398,12 +430,15 @@ M4 completes the core grocery-recipe workflow with calendar-based meal planning,
 | M1 | 30-35 hours | 32 hours | On target | ✅ Complete |
 | M2 | 15-18 hours | 16.5 hours | On target | ✅ Complete |
 | M3 | 8-12 hours | 10.5 hours | On target | ✅ Complete |
-| M4 | 7.5-10 hours | TBD | - | 📋 Ready |
+| M3.5 | 7 hours | 8.5 hours | On target | ✅ Complete |
+| M4.1 | 1.5 hours | 1.5 hours | On target | ✅ Complete |
+| M4.2 | 2.5 hours | ~4 hours | +60% | ✅ Complete |
+| M4.3 | 3.5-4 hours | TBD | - | 📋 Ready |
 | M5 | 10-12 hours | TBD | - | 📋 Planned |
 | M6 | 8-10 hours | TBD | - | 📋 Planned |
 | M7 | 6-8 hours | TBD | - | 📋 Planned |
 
-**Total Core Platform (M1-M7)**: ~73-89 hours estimated
+**Total Core Platform (M1-M7)**: ~77-95 hours estimated (updated with M4.2 actual)
 
 ### **Planning Accuracy:**
 - **Phase-level estimates**: Consistently accurate within ±15 minutes
@@ -439,7 +474,16 @@ M4 completes the core grocery-recipe workflow with calendar-based meal planning,
 - ✅ Comprehensive documentation complete
 
 ### **M4: Meal Planning & Enhanced Grocery Integration**
-- [ ] Settings infrastructure with meal planning preferences
+- [x] Settings infrastructure with meal planning preferences (M4.1) ✅
+- [x] UserPreferences entity with duration and start day (M4.1) ✅
+- [x] Calendar-based meal planning interface (M4.2) ✅
+- [x] MealPlan and PlannedMeal Core Data entities (M4.2) ✅
+- [x] Recipe assignment with tap-to-add workflow (M4.2) ✅
+- [x] Recipe usage tracking (usageCount, lastUsed) (M4.2) ✅
+- [ ] "Add All to Shopping List" from meal plan (M4.3)
+- [ ] Recipe source tracking in grocery lists (M4.3)
+- [ ] Smart quantity consolidation for meal plans (M4.3)
+- [ ] Meal completion tracking (M4.3)
 - [ ] Calendar-based meal planning (3-14 day configurable periods)
 - [ ] "Add to Meal Plan" workflows from recipes
 - [ ] Generate grocery lists from meal plans
