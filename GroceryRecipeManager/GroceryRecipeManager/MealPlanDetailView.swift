@@ -2,80 +2,87 @@
 //  MealPlanDetailView.swift
 //  GroceryRecipeManager
 //
-//  Enhanced for M4.2.1-3: Calendar Recipe Assignment with Tap-to-Add
-//  Displays calendar view for a specific meal plan with recipe assignment
-//  Users can tap any day to add a recipe
+//  Enhanced for M4.2.1-3 Enhancement: Inline Autocomplete Meal Planning
+//  Each day has its own search field for quick recipe assignment
+//  Type-to-filter workflow similar to ingredient autocomplete
 //
 
 import SwiftUI
 import CoreData
 
-// M4.2.1-3: Meal plan detail view with calendar display and tap-to-add
-// Shows calendar grid with recipe assignments for the specific plan
-// Allows tapping on any day to add or change recipes
+// M4.2.1-3 Enhancement: Meal plan detail view with inline autocomplete per day
+// Clean list format where each day has its own search field
+// Type to filter recipes, tap to assign - no modals needed
 struct MealPlanDetailView: View {
     
     // MARK: - Properties
     
-    // M4.2.4: The meal plan to display (passed from list view)
+    // M4.2.4: The meal plan to display
     @ObservedObject var mealPlan: MealPlan
     
-    // M4.2.4: Core Data context for fetching planned meals
+    // M4.2.4: Core Data context
     @Environment(\.managedObjectContext) private var viewContext
     
-    // M4.2.4: Fetch planned meals for THIS specific meal plan
+    // M4.2.4: Fetch planned meals for this meal plan
     @FetchRequest private var plannedMeals: FetchedResults<PlannedMeal>
     
-    // M4.2.4: User preferences for display options
-    @StateObject private var preferences = UserPreferencesService.shared
-    
-    // M4.2.1-3 ENHANCEMENT: State for showing recipe picker
-    // FIXED: Use item-based sheet to prevent blank-first-render bug
-    @State private var recipePickerPayload: RecipePickerPayload?
-    
-    // M4.2.1-3 ENHANCEMENT: State for showing replace confirmation
-    @State private var showingReplaceAlert = false
-    @State private var recipeToReplace: PlannedMeal?
+    // M4.2.1-3 Enhancement: All recipes loaded for autocomplete
+    @State private var allRecipes: [Recipe] = []
     
     // MARK: - Initialization
     
-    // M4.2.4: Initialize with specific meal plan
     init(mealPlan: MealPlan) {
         self.mealPlan = mealPlan
         
-        // Configure FetchRequest to fetch only meals for this plan
+        // Configure FetchRequest for this specific meal plan
         let planID = mealPlan.id ?? UUID()
-        let predicate = NSPredicate(format: "mealPlan.id == %@", planID as CVarArg)
-        
-        _plannedMeals = FetchRequest(
+        _plannedMeals = FetchRequest<PlannedMeal>(
             sortDescriptors: [NSSortDescriptor(keyPath: \PlannedMeal.date, ascending: true)],
-            predicate: predicate,
-            animation: .default
+            predicate: NSPredicate(format: "mealPlan.id == %@", planID as CVarArg)
         )
+    }
+    
+    // MARK: - Computed Properties
+    
+    // M4.2.1-3 Enhancement: Generate array of dates for the meal plan
+    private var daysInPlan: [Date] {
+        guard let startDate = mealPlan.startDate else { return [] }
+        let duration = Int(mealPlan.duration)
+        
+        return (0..<duration).compactMap { offset in
+            Calendar.current.date(byAdding: .day, value: offset, to: startDate)
+        }
+    }
+    
+    // M4.2.1-3 Enhancement: Get planned meal for a specific date
+    private func plannedMeal(for date: Date) -> PlannedMeal? {
+        plannedMeals.first { meal in
+            guard let mealDate = meal.date else { return false }
+            return Calendar.current.isDate(mealDate, inSameDayAs: date)
+        }
     }
     
     // MARK: - Body
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // Plan header with name and date range
+            VStack(spacing: 0) {
+                // Plan header
                 planHeaderView
+                    .padding(.bottom, 16)
                 
-                // Help text for tap-to-add
-                helpTextView
-                
-                // Calendar grid
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 12) {
-                    ForEach(getDatesInMealPlan(), id: \.self) { date in
-                        CalendarDayCell(
+                // Days list with inline autocomplete
+                VStack(spacing: 12) {
+                    ForEach(daysInPlan, id: \.self) { date in
+                        DayRowView(
                             date: date,
-                            plannedMeal: getPlannedMeal(for: date),
-                            showRecipeSource: preferences.showRecipeSourceInMealPlan,
-                            onTap: {
-                                handleDayTap(date: date)
+                            plannedMeal: plannedMeal(for: date),
+                            allRecipes: allRecipes,
+                            mealPlan: mealPlan,
+                            onRecipeAdded: { recipe, servings in
+                                addRecipeToDay(recipe: recipe, date: date, servings: servings)
                             },
-                            onRemove: { meal in
+                            onRecipeRemoved: { meal in
                                 removePlannedMeal(meal)
                             }
                         )
@@ -83,52 +90,19 @@ struct MealPlanDetailView: View {
                 }
                 .padding(.horizontal)
             }
-            .padding(.vertical)
         }
-        .navigationTitle(mealPlan.name ?? formatDateRange(startDate: mealPlan.startDate ?? Date(), duration: Int(mealPlan.duration)))
+        .navigationTitle(mealPlan.name ?? "Meal Plan")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $recipePickerPayload) { payload in
-            RecipePickerSheet(
-                date: payload.date,
-                mealPlan: payload.mealPlan,
-                onRecipeSelected: { _ in
-                    // Recipe was added successfully
-                    recipePickerPayload = nil
-                }
-            )
-            .environment(\.managedObjectContext, viewContext)
-        }
-        .alert("Replace Recipe?", isPresented: $showingReplaceAlert) {
-            Button("Cancel", role: .cancel) {
-                recipeToReplace = nil
-            }
-            
-            Button("Replace", role: .destructive) {
-                if let meal = recipeToReplace, let date = meal.date {
-                    removePlannedMeal(meal)
-                    // FIXED: Create payload after removal
-                    recipePickerPayload = RecipePickerPayload(date: date, mealPlan: mealPlan)
-                }
-            }
-        } message: {
-            if let meal = recipeToReplace,
-               let recipe = meal.recipe {
-                Text("This will remove '\(recipe.title ?? "Untitled")' from this day and let you select a new recipe.")
-            }
+        .onAppear {
+            loadAllRecipes()
         }
     }
     
     // MARK: - Plan Header
     
-    // M4.2.4: Header showing meal plan name and date range
     private var planHeaderView: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            if let name = mealPlan.name {
-                Text(name)
-                    .font(.title2)
-                    .fontWeight(.bold)
-            }
-            
+        VStack(alignment: .leading, spacing: 8) {
+            // Date range
             if let startDate = mealPlan.startDate {
                 Text(formatDateRange(startDate: startDate, duration: Int(mealPlan.duration)))
                     .font(.subheadline)
@@ -143,44 +117,48 @@ struct MealPlanDetailView: View {
             .font(.caption)
             .foregroundColor(.secondary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
+        .padding(.top, 8)
     }
     
-    // MARK: - Help Text
+    // MARK: - Helper Functions
     
-    // M4.2.1-3 ENHANCEMENT: Help text explaining tap-to-add functionality
-    private var helpTextView: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "info.circle.fill")
-                .foregroundColor(.blue)
-                .font(.caption)
-            
-            Text("Tap any day to add or change recipes")
-                .font(.caption)
-                .foregroundColor(.secondary)
+    // M4.2.1-3 Enhancement: Load all recipes for autocomplete
+    private func loadAllRecipes() {
+        let fetchRequest: NSFetchRequest<Recipe> = Recipe.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Recipe.title, ascending: true)]
+        
+        do {
+            allRecipes = try viewContext.fetch(fetchRequest)
+        } catch {
+            print("Error fetching recipes: \(error)")
+            allRecipes = []
         }
-        .padding(.horizontal)
-        .padding(.vertical, 4)
     }
     
-    // MARK: - Actions
-    
-    // M4.2.1-3 ENHANCEMENT: Handle tap on calendar day cell
-    // Opens recipe picker for empty days or shows replace alert for occupied days
-    // FIXED: Create payload for item-based sheet presentation
-    private func handleDayTap(date: Date) {
-        // Check if this date already has a meal
-        if let existingMeal = getPlannedMeal(for: date) {
-            // Show replace confirmation
-            recipeToReplace = existingMeal
-            showingReplaceAlert = true
+    // M4.2.1-3 Enhancement: Add recipe to specific day
+    private func addRecipeToDay(recipe: Recipe, date: Date, servings: Int) {
+        // Check if there's already a meal on this day
+        if let existingMeal = plannedMeal(for: date) {
+            // Remove existing meal first
+            removePlannedMeal(existingMeal)
+        }
+        
+        // Add new recipe
+        if let _ = MealPlanService.shared.addRecipeToMealPlan(
+            recipe: recipe,
+            date: date,
+            mealPlan: mealPlan,
+            servings: Int16(servings)
+        ) {
+            // Success - meal added
         } else {
-            // No meal on this date - show recipe picker with payload
-            recipePickerPayload = RecipePickerPayload(date: date, mealPlan: mealPlan)
+            print("Error adding recipe to meal plan")
         }
     }
     
-    // M4.2.4: Remove a planned meal from this plan
+    // M4.2.1-3: Remove planned meal
     private func removePlannedMeal(_ meal: PlannedMeal) {
         viewContext.delete(meal)
         
@@ -191,272 +169,252 @@ struct MealPlanDetailView: View {
         }
     }
     
-    // MARK: - Helper Functions
-    
-    // M4.2.4: Generate array of dates in this meal plan
-    private func getDatesInMealPlan() -> [Date] {
-        guard let startDate = mealPlan.startDate else { return [] }
-        
-        let calendar = Calendar.current
-        var dates: [Date] = []
-        
-        for dayOffset in 0..<Int(mealPlan.duration) {
-            if let date = calendar.date(byAdding: .day, value: dayOffset, to: startDate) {
-                dates.append(calendar.startOfDay(for: date))
-            }
-        }
-        
-        return dates
-    }
-    
-    // M4.2.4: Get planned meal for a specific date in this plan
-    private func getPlannedMeal(for date: Date) -> PlannedMeal? {
-        let calendar = Calendar.current
-        let targetDate = calendar.startOfDay(for: date)
-        
-        return plannedMeals.first { meal in
-            guard let mealDate = meal.date else { return false }
-            let mealStartOfDay = calendar.startOfDay(for: mealDate)
-            return mealStartOfDay == targetDate
-        }
-    }
-    
-    // M4.2.4: Format date range for display
+    // M4.2.1-3: Format date range for display
     private func formatDateRange(startDate: Date, duration: Int) -> String {
+        let endDate = Calendar.current.date(byAdding: .day, value: duration - 1, to: startDate) ?? startDate
+        
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateFormat = "MMM d"
         
-        let calendar = Calendar.current
-        if let endDate = calendar.date(byAdding: .day, value: duration - 1, to: startDate) {
-            return "\(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
-        }
+        let startString = formatter.string(from: startDate)
+        let endString = formatter.string(from: endDate)
         
-        return formatter.string(from: startDate)
+        let yearFormatter = DateFormatter()
+        yearFormatter.dateFormat = "yyyy"
+        let year = yearFormatter.string(from: startDate)
+        
+        return "\(startString) - \(endString), \(year)"
     }
 }
 
-// MARK: - Calendar Day Cell
+// MARK: - Day Row View
 
-// M4.2.1-3 ENHANCED: Individual calendar cell with tap-to-add functionality
-// Shows the date and any assigned recipe, tappable to add/change recipe
-struct CalendarDayCell: View {
+// M4.2.1-3 Enhancement: Individual day row with inline autocomplete
+// Each day has its own search field for quick recipe assignment
+struct DayRowView: View {
     let date: Date
     let plannedMeal: PlannedMeal?
-    let showRecipeSource: Bool
-    let onTap: () -> Void  // M4.2.1-3 ENHANCEMENT: Tap handler
-    let onRemove: (PlannedMeal) -> Void
+    let allRecipes: [Recipe]
+    let mealPlan: MealPlan
+    let onRecipeAdded: (Recipe, Int) -> Void
+    let onRecipeRemoved: (PlannedMeal) -> Void
     
-    // MARK: - State
+    // M4.2.1-3 Enhancement: Search text for this day's autocomplete
+    @State private var searchText = ""
     
-    @State private var showingRemoveConfirmation = false
+    // M4.2.1-3 Enhancement: Focus state for search field
+    @FocusState private var isSearchFocused: Bool
     
-    // MARK: - Date Formatting
+    // M4.2.1-3 Enhancement: Servings for selected recipe
+    @State private var selectedServings: Int = 4
     
-    private var dayFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "E" // Mon, Tue, etc.
-        return formatter
-    }
-    
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d" // Oct 27
-        return formatter
-    }
-    
-    // MARK: - Computed Properties
-    
-    private var isToday: Bool {
-        Calendar.current.isDateInToday(date)
-    }
-    
-    // MARK: - Body
+    // M4.2.1-3 Enhancement: Show servings adjuster
+    @State private var showServingsAdjuster = false
+    @State private var pendingRecipe: Recipe?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Date header
-            VStack(alignment: .leading, spacing: 2) {
-                Text(dayFormatter.string(from: date))
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(isToday ? .blue : .secondary)
-                
-                Text(dateFormatter.string(from: date))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
+            // Day header
+            dayHeader
             
-            Divider()
-            
-            // Recipe content or empty state
-            if let meal = plannedMeal,
-               let recipe = meal.recipe {
-                recipeContentView(meal: meal, recipe: recipe)
+            // Assigned recipe (if exists)
+            if let meal = plannedMeal {
+                assignedRecipeView(meal: meal)
             } else {
-                emptyDayView
-            }
-        }
-        .padding(12)
-        .frame(minHeight: 120)
-        .background(cellBackgroundColor)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(isToday ? Color.blue : Color.clear, lineWidth: 2)
-        )
-        .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-        .contentShape(Rectangle())  // M4.2.1-3: Makes entire cell tappable
-        .onTapGesture {  // M4.2.1-3 ENHANCEMENT: Tap to add/change recipe
-            onTap()
-        }
-        .alert("Remove Recipe?", isPresented: $showingRemoveConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Remove", role: .destructive) {
-                if let meal = plannedMeal {
-                    onRemove(meal)
+                // Autocomplete search field
+                autocompleteSearchField
+                
+                // Filtered recipe results (when typing)
+                if !searchText.isEmpty && !filteredRecipes.isEmpty {
+                    recipeResultsList
                 }
             }
-        } message: {
-            if let recipe = plannedMeal?.recipe {
-                Text("Remove '\(recipe.title ?? "Untitled")' from \(dateFormatter.string(from: date))?")
-            }
         }
+        .padding()
+        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .cornerRadius(12)
     }
     
-    // MARK: - Recipe Content View
+    // MARK: - View Components
     
-    // M4.2: Shows assigned recipe with details
-    @ViewBuilder
-    private func recipeContentView(meal: PlannedMeal, recipe: Recipe) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Image(systemName: "fork.knife.circle.fill")
-                    .foregroundColor(.green)
-                    .font(.caption)
-                
-                Spacer()
-                
-                // Remove button (long press or context menu alternative)
+    // M4.2.1-3 Enhancement: Day header with formatted date
+    private var dayHeader: some View {
+        Text(formattedDate)
+            .font(.headline)
+            .foregroundColor(.primary)
+    }
+    
+    // M4.2.1-3 Enhancement: Autocomplete search field (like ingredient input)
+    private var autocompleteSearchField: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+                .font(.subheadline)
+            
+            TextField("Add recipe...", text: $searchText)
+                .focused($isSearchFocused)
+                .textFieldStyle(.plain)
+                .autocorrectionDisabled()
+            
+            if !searchText.isEmpty {
                 Button {
-                    showingRemoveConfirmation = true
+                    searchText = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.gray)
-                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                }
+            }
+        }
+        .padding(10)
+        .background(Color(UIColor.tertiarySystemGroupedBackground))
+        .cornerRadius(8)
+    }
+    
+    // M4.2.1-3 Enhancement: Filtered recipe results list
+    private var recipeResultsList: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(filteredRecipes.prefix(5), id: \.id) { recipe in
+                Button {
+                    handleRecipeSelection(recipe)
+                } label: {
+                    HStack {
+                        Image(systemName: "fork.knife")
+                            .foregroundColor(.blue)
+                            .font(.caption)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(recipe.title ?? "Untitled")
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                            
+                            Text("\(recipe.ingredients?.count ?? 0) ingredients • Serves \(Int(recipe.servings))")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.blue)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+                    .background(Color(UIColor.tertiarySystemGroupedBackground))
+                    .cornerRadius(8)
                 }
                 .buttonStyle(.plain)
             }
             
-            Text(recipe.title ?? "Untitled Recipe")
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .lineLimit(2)
+            if filteredRecipes.count > 5 {
+                Text("+ \(filteredRecipes.count - 5) more...")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 10)
+            }
+        }
+    }
+    
+    // M4.2.1-3 Enhancement: Assigned recipe display
+    private func assignedRecipeView(meal: PlannedMeal) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "fork.knife.circle.fill")
+                .foregroundColor(.blue)
+                .font(.title3)
             
-            // Servings info
-            if meal.servings > 0 {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(meal.recipe?.title ?? "Untitled Recipe")
+                    .font(.body)
+                    .fontWeight(.medium)
+                
                 Text("\(Int(meal.servings)) servings")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
             
-            // Recipe source (if enabled in preferences)
-            if showRecipeSource,
-               let sourceURL = recipe.sourceURL,
-               !sourceURL.isEmpty {
-                Text(sourceURL)
-                    .font(.caption2)
-                    .foregroundColor(.blue)
-                    .lineLimit(1)
-            }
-        }
-    }
-    
-    // MARK: - Empty Day View
-    
-    // M4.2.1-3 ENHANCED: Shows "Tap to add" prompt for empty days
-    private var emptyDayView: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "plus.circle")
-                .font(.title2)
-                .foregroundColor(.gray.opacity(0.5))
+            Spacer()
             
-            Text("Tap to add")
-                .font(.caption2)
-                .foregroundColor(.secondary)
+            // Remove button
+            Button {
+                onRecipeRemoved(meal)
+            } label: {
+                Image(systemName: "trash")
+                    .foregroundColor(.red)
+                    .font(.subheadline)
+            }
+            .buttonStyle(.plain)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(12)
+        .background(Color.blue.opacity(0.1))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.blue, lineWidth: 1)
+        )
     }
     
-    // MARK: - Cell Background Color
+    // MARK: - Helper Functions
     
-    private var cellBackgroundColor: Color {
-        if plannedMeal != nil {
-            return Color(UIColor.systemBackground)
-        } else {
-            return Color(UIColor.secondarySystemGroupedBackground)
+    // M4.2.1-3 Enhancement: Filter recipes based on search text
+    private var filteredRecipes: [Recipe] {
+        if searchText.isEmpty {
+            return []
         }
+        
+        return allRecipes.filter { recipe in
+            guard let title = recipe.title else { return false }
+            return title.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+    
+    // M4.2.1-3 Enhancement: Handle recipe selection
+    private func handleRecipeSelection(_ recipe: Recipe) {
+        // Add with default servings
+        let servings = Int(recipe.servings)
+        onRecipeAdded(recipe, servings)
+        
+        // Clear search
+        searchText = ""
+        isSearchFocused = false
+    }
+    
+    // M4.2.1-3 Enhancement: Format date for display
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMM d"  // "Friday, Nov 7"
+        return formatter.string(from: date)
     }
 }
 
 // MARK: - Preview
 
-#Preview("With Meals") {
-    let context = PersistenceController.preview.container.viewContext
-    
-    // Create sample meal plan
-    let plan = MealPlan(context: context)
-    plan.id = UUID()
-    plan.name = "This Week's Meals"
-    plan.startDate = Date()
-    plan.duration = 7
-    plan.isActive = true
-    
-    // Create sample recipes
-    let recipe1 = Recipe(context: context)
-    recipe1.id = UUID()
-    recipe1.title = "Spaghetti Carbonara"
-    recipe1.servings = 4
-    
-    let recipe2 = Recipe(context: context)
-    recipe2.id = UUID()
-    recipe2.title = "Chicken Stir Fry"
-    recipe2.servings = 4
-    
-    // Create planned meals
-    let meal1 = PlannedMeal(context: context)
-    meal1.id = UUID()
-    meal1.date = Date()
-    meal1.servings = 4
-    meal1.recipe = recipe1
-    meal1.mealPlan = plan
-    
-    let meal2 = PlannedMeal(context: context)
-    meal2.id = UUID()
-    meal2.date = Calendar.current.date(byAdding: .day, value: 2, to: Date())
-    meal2.servings = 4
-    meal2.recipe = recipe2
-    meal2.mealPlan = plan
-    
-    try? context.save()
-    
-    return NavigationView {
-        MealPlanDetailView(mealPlan: plan)
+struct MealPlanDetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        let context = PersistenceController.preview.container.viewContext
+        
+        // Create sample meal plan
+        let plan = MealPlan(context: context)
+        plan.id = UUID()
+        plan.name = "This Week"
+        plan.startDate = Date()
+        plan.duration = 7
+        
+        // Create sample recipes
+        let recipe1 = Recipe(context: context)
+        recipe1.id = UUID()
+        recipe1.title = "Hot Dog and Tortellini"
+        recipe1.servings = 4
+        
+        let recipe2 = Recipe(context: context)
+        recipe2.id = UUID()
+        recipe2.title = "Chocolate Chip Cookies"
+        recipe2.servings = 24
+        
+        try? context.save()
+        
+        return NavigationStack {
+            MealPlanDetailView(mealPlan: plan)
+                .environment(\.managedObjectContext, context)
+        }
     }
-    .environment(\.managedObjectContext, context)
-}
-
-#Preview("Empty Plan") {
-    let context = PersistenceController.preview.container.viewContext
-    
-    let plan = MealPlan(context: context)
-    plan.id = UUID()
-    plan.name = nil  // Auto-generated name
-    plan.startDate = Date()
-    plan.duration = 7
-    plan.isActive = false
-    
-    return NavigationView {
-        MealPlanDetailView(mealPlan: plan)
-    }
-    .environment(\.managedObjectContext, context)
 }

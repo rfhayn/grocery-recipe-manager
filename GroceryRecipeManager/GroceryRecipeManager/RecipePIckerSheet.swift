@@ -3,8 +3,8 @@
 //  GroceryRecipeManager
 //
 //  Created for M4.2.1-3: Calendar Recipe Assignment Enhancement
+//  Autocomplete-style recipe picker with search-as-you-type
 //  Modal sheet for selecting a recipe to add to a specific date in meal plan
-//  Used when user taps on an empty day in the calendar
 //
 
 import SwiftUI
@@ -18,8 +18,8 @@ struct RecipePickerPayload: Identifiable {
     let mealPlan: MealPlan
 }
 
-// M4.2.1-3 ENHANCEMENT: Recipe picker for calendar tap-to-add
-// Shows list of all recipes with search, allows selection to assign to date
+// M4.2.1-3: Autocomplete-style recipe picker for calendar tap-to-add
+// Clean list with search-as-you-type filtering, similar to ingredient autocomplete
 struct RecipePickerSheet: View {
     
     // MARK: - Properties
@@ -42,18 +42,22 @@ struct RecipePickerSheet: View {
     // M4.2.1-3: All recipes - loaded manually
     @State private var recipes: [Recipe] = []
     
-    // M4.2.1-3: Search text for filtering recipes
+    // M4.2.1-3: Search text for autocomplete filtering
     @State private var searchText = ""
+    
+    // M4.2.1-3: Focus state for search field
+    @FocusState private var isSearchFocused: Bool
     
     // M4.2.1-3: Selected servings (defaults to recipe servings)
     @State private var selectedServings: [UUID: Int] = [:]
     
     // MARK: - Computed Properties
     
-    // M4.2.1-3: Filter recipes based on search text
+    // M4.2.1-3: Filter recipes based on search text (autocomplete behavior)
+    // Empty search = show all recipes, otherwise filter by title
     private var filteredRecipes: [Recipe] {
         if searchText.isEmpty {
-            return Array(recipes)
+            return recipes
         } else {
             return recipes.filter { recipe in
                 guard let title = recipe.title else { return false }
@@ -62,25 +66,29 @@ struct RecipePickerSheet: View {
         }
     }
     
-    // M4.2.1-3: Date formatter for display
-    private var dateFormatter: DateFormatter {
+    // M4.2.1-3: Short date format for banner
+    private var formattedShortDate: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter
+        formatter.dateFormat = "EEE, MMM d"  // "Fri, Nov 7"
+        return formatter.string(from: date)
     }
     
     // MARK: - Body
     
     var body: some View {
         NavigationStack {
-            Group {
+            VStack(spacing: 0) {
+                // Date context banner
+                dateContextBanner
+                
+                // Search field at top (autocomplete pattern)
+                searchField
+                
+                // Recipe list
                 if filteredRecipes.isEmpty {
                     emptyStateView
                 } else {
-                    VStack(spacing: 0) {
-                        dateContextBanner
-                        recipeList
-                    }
+                    recipeList
                 }
             }
             .navigationTitle("Add Recipe")
@@ -92,38 +100,65 @@ struct RecipePickerSheet: View {
                     }
                 }
             }
-            .searchable(text: $searchText, prompt: "Search recipes")
         }
         .onAppear {
             loadRecipes()
+            // Auto-focus search field for quick typing
+            isSearchFocused = true
         }
     }
     
-    // MARK: - Date Context Banner
+    // MARK: - View Components
     
-    // M4.2.1-3: Shows which date the recipe will be assigned to
+    // M4.2.1-3: Enhanced date context banner
     private var dateContextBanner: some View {
-        HStack {
+        HStack(spacing: 8) {
             Image(systemName: "calendar")
+                .font(.title3)
                 .foregroundColor(.blue)
             
-            Text("Adding to \(dateFormatter.string(from: date))")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            Text("Adding to \(formattedShortDate)")
+                .font(.headline)
             
             Spacer()
         }
         .padding()
-        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .background(Color.blue.opacity(0.1))
     }
     
-    // MARK: - Recipe List
+    // M4.2.1-3: Search field with autocomplete behavior
+    // Similar to ingredient input pattern - filters as you type
+    private var searchField: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+            
+            TextField("Search recipes...", text: $searchText)
+                .focused($isSearchFocused)
+                .textFieldStyle(.plain)
+                .autocorrectionDisabled()
+            
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding(12)
+        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .cornerRadius(10)
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+    }
     
-    // M4.2.1-3: Scrollable list of all recipes
+    // M4.2.1-3: Clean recipe list (autocomplete results)
     private var recipeList: some View {
         List {
             ForEach(filteredRecipes, id: \.id) { recipe in
-                RecipeRowButton(
+                RecipeRowView(
                     recipe: recipe,
                     servings: getServings(for: recipe),
                     onServingsChange: { newServings in
@@ -138,35 +173,31 @@ struct RecipePickerSheet: View {
         .listStyle(.plain)
     }
     
-    // MARK: - Empty State
-    
-    // M4.2.1-3: Shown when no recipes exist or search returns no results
+    // M4.2.1-3: Empty state when no recipes or search returns nothing
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: searchText.isEmpty ? "fork.knife.circle" : "magnifyingglass")
                 .font(.system(size: 60))
                 .foregroundColor(.gray)
             
-            Text(searchText.isEmpty ? "No Recipes" : "No Results")
-                .font(.title2)
-                .fontWeight(.semibold)
+            Text(searchText.isEmpty ? "No Recipes Yet" : "No Matching Recipes")
+                .font(.headline)
             
             Text(searchText.isEmpty ?
-                 "Create recipes in the Recipes tab to add them to your meal plan" :
-                 "No recipes match '\(searchText)'")
+                 "Create some recipes to add them to your meal plan" :
+                 "Try a different search term")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxHeight: .infinity)
         .padding()
     }
     
-    // MARK: - Helper Functions
+    // MARK: - Data Loading & Management
     
-    // M4.2.1-3: Load recipes from Core Data manually
-    // Avoids @FetchRequest context issues in sheets
+    // M4.2.1-3: Load recipes from Core Data
+    // Uses manual fetch instead of @FetchRequest for better control in sheets
     private func loadRecipes() {
         let fetchRequest: NSFetchRequest<Recipe> = Recipe.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Recipe.title, ascending: true)]
@@ -179,7 +210,7 @@ struct RecipePickerSheet: View {
         }
     }
     
-    // M4.2.1-3: Get servings for recipe (defaults to recipe servings)
+    // M4.2.1-3: Get servings for recipe (uses selected value or default)
     private func getServings(for recipe: Recipe) -> Int {
         guard let recipeID = recipe.id else { return Int(recipe.servings) }
         return selectedServings[recipeID] ?? Int(recipe.servings)
@@ -213,143 +244,125 @@ struct RecipePickerSheet: View {
     }
 }
 
-// MARK: - Recipe Row Button
+// MARK: - Recipe Row View
 
-// M4.2.1-3: Individual recipe row with servings adjuster and tap-to-select
-struct RecipeRowButton: View {
+// M4.2.1-3: Individual recipe row with inline servings adjuster
+// Clean, compact design similar to ingredient autocomplete results
+struct RecipeRowView: View {
     let recipe: Recipe
     let servings: Int
     let onServingsChange: (Int) -> Void
     let onSelect: () -> Void
     
     var body: some View {
-        Button(action: onSelect) {
-            VStack(alignment: .leading, spacing: 8) {
-                // Recipe title
-                HStack {
-                    Image(systemName: "fork.knife.circle.fill")
-                        .foregroundColor(.blue)
-                    
-                    Text(recipe.title ?? "Untitled Recipe")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+        VStack(alignment: .leading, spacing: 8) {
+            // Recipe header
+            HStack {
+                Image(systemName: "fork.knife")
+                    .foregroundColor(.blue)
+                    .font(.body)
                 
-                // Recipe details
-                HStack(spacing: 12) {
-                    Label("\(recipe.ingredients?.count ?? 0) ingredients",
-                          systemImage: "list.bullet")
-                    
-                    if recipe.servings > 0 {
-                        Label("Serves \(Int(recipe.servings))",
-                              systemImage: "person.2")
-                    }
-                }
+                Text(recipe.title ?? "Untitled Recipe")
+                    .font(.body)
+                    .fontWeight(.medium)
+                
+                Spacer()
+            }
+            
+            // Recipe metadata
+            Text("\(recipe.ingredients?.count ?? 0) ingredients • Serves \(Int(recipe.servings))")
                 .font(.caption)
                 .foregroundColor(.secondary)
+            
+            // Servings adjuster
+            HStack {
+                Text("Servings:")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
                 
-                // Servings adjuster
-                HStack {
-                    Text("Servings:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    // Decrement button
-                    Button {
-                        if servings > 1 {
-                            onServingsChange(servings - 1)
-                        }
-                    } label: {
-                        Image(systemName: "minus.circle.fill")
-                            .foregroundColor(servings > 1 ? .blue : .gray)
+                Spacer()
+                
+                // Minus button
+                Button {
+                    if servings > 1 {
+                        onServingsChange(servings - 1)
                     }
-                    .buttonStyle(.plain)
-                    .disabled(servings <= 1)
-                    
-                    // Current servings
-                    Text("\(servings)")
-                        .font(.headline)
-                        .frame(minWidth: 30)
-                    
-                    // Increment button
-                    Button {
-                        if servings < 99 {
-                            onServingsChange(servings + 1)
-                        }
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(servings < 99 ? .blue : .gray)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(servings >= 99)
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(servings > 1 ? .blue : .gray)
                 }
-                .padding(.top, 4)
+                .buttonStyle(.plain)
+                .disabled(servings <= 1)
+                
+                // Current value
+                Text("\(servings)")
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .frame(minWidth: 30)
+                
+                // Plus button
+                Button {
+                    if servings < 99 {
+                        onServingsChange(servings + 1)
+                    }
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(servings < 99 ? .blue : .gray)
+                }
+                .buttonStyle(.plain)
+                .disabled(servings >= 99)
             }
-            .padding(.vertical, 8)
+            
+            // Add button
+            Button(action: onSelect) {
+                Text("Add to Plan")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+        .padding(.vertical, 8)
     }
 }
 
 // MARK: - Preview
 
-#Preview("With Recipes") {
-    let context = PersistenceController.preview.container.viewContext
-    
-    // Create sample meal plan
-    let plan = MealPlan(context: context)
-    plan.id = UUID()
-    plan.name = "This Week"
-    plan.startDate = Date()
-    plan.duration = 7
-    
-    // Create sample recipes
-    let recipe1 = Recipe(context: context)
-    recipe1.id = UUID()
-    recipe1.title = "Spaghetti Carbonara"
-    recipe1.servings = 4
-    
-    let recipe2 = Recipe(context: context)
-    recipe2.id = UUID()
-    recipe2.title = "Chicken Stir Fry"
-    recipe2.servings = 2
-    
-    let recipe3 = Recipe(context: context)
-    recipe3.id = UUID()
-    recipe3.title = "Vegetable Soup"
-    recipe3.servings = 6
-    
-    try? context.save()
-    
-    return RecipePickerSheet(
-        date: Date(),
-        mealPlan: plan,
-        onRecipeSelected: { _ in }
-    )
-    .environment(\.managedObjectContext, context)
-}
-
-#Preview("Empty State") {
-    let context = PersistenceController.preview.container.viewContext
-    
-    let plan = MealPlan(context: context)
-    plan.id = UUID()
-    plan.name = "Empty Week"
-    plan.startDate = Date()
-    plan.duration = 7
-    
-    return RecipePickerSheet(
-        date: Date(),
-        mealPlan: plan,
-        onRecipeSelected: { _ in }
-    )
-    .environment(\.managedObjectContext, context)
+struct RecipePickerSheet_Previews: PreviewProvider {
+    static var previews: some View {
+        let context = PersistenceController.preview.container.viewContext
+        
+        // Create sample meal plan
+        let mealPlan = MealPlan(context: context)
+        mealPlan.id = UUID()
+        mealPlan.name = "Weekly Plan"
+        mealPlan.startDate = Date()
+        mealPlan.duration = 7
+        
+        // Create sample recipes
+        let recipe1 = Recipe(context: context)
+        recipe1.id = UUID()
+        recipe1.title = "Chocolate Chip Cookies"
+        recipe1.servings = 24
+        
+        let recipe2 = Recipe(context: context)
+        recipe2.id = UUID()
+        recipe2.title = "Pasta Carbonara"
+        recipe2.servings = 4
+        
+        try? context.save()
+        
+        return RecipePickerSheet(
+            date: Date(),
+            mealPlan: mealPlan,
+            onRecipeSelected: { _ in }
+        )
+        .environment(\.managedObjectContext, context)
+    }
 }
