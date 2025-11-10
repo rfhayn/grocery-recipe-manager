@@ -16,6 +16,8 @@ import CoreData
 struct MealPlansListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
+    @Binding var popToRoot: Bool
+    
     // M4.2.4: Fetch all meal plans, sorted by start date (newest first)
     // Uses @FetchRequest for automatic UI updates when plans change
     @FetchRequest(
@@ -46,6 +48,9 @@ struct MealPlansListView: View {
                 mealPlanService.updateActivePlanStatus()
                 mealPlanService.updateCompletedStatus()
                 viewContext.refreshAllObjects()
+            }
+            .onChange(of: popToRoot) { _, _ in
+                if showingCreateSheet { showingCreateSheet = false }
             }
     }
     
@@ -308,7 +313,7 @@ enum MealPlanStatus {
 
 #Preview {
     NavigationView {
-        MealPlansListView()
+        MealPlansListView(popToRoot: .constant(false))
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

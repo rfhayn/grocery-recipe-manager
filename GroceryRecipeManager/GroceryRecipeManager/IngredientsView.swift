@@ -17,6 +17,8 @@ struct CategoryChangePayload: Identifiable {
 struct IngredientsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
+    @Binding var popToRoot: Bool
+    
     // MARK: - Core Data Fetch
     @FetchRequest(
         sortDescriptors: [
@@ -151,6 +153,15 @@ struct IngredientsView: View {
             }
         } message: {
             Text(errorMessage)
+        }
+        .onChange(of: popToRoot) { _, _ in
+            if showingAddForm { showingAddForm = false }
+            if categoryChangePayload != nil { categoryChangePayload = nil }
+            if showingError { showingError = false }
+            if isEditMode {
+                isEditMode = false
+                selectedIngredients.removeAll()
+            }
         }
     }
     
@@ -714,5 +725,12 @@ struct IngredientRowView: View {
         case "snacks, drinks, & other": return .purple
         default: return .gray
         }
+    }
+}
+
+#Preview {
+    NavigationView {
+        IngredientsView(popToRoot: .constant(false))
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

@@ -3,6 +3,9 @@ import CoreData
 
 struct RecipeListView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    
+    @Binding var popToRoot: Bool
+    
     @StateObject private var recipeService = OptimizedRecipeDataService(context: PersistenceController.shared.container.viewContext)
     
     @State private var searchText = ""
@@ -148,6 +151,11 @@ struct RecipeListView: View {
             if !searchText.isEmpty {
                 addToSearchHistory(searchText)
             }
+        }
+        .onChange(of: popToRoot) { _, _ in
+            if showingAddRecipe { showingAddRecipe = false }
+            if showingMealPlanSheet { showingMealPlanSheet = false }
+            if selectedRecipeForMealPlan != nil { selectedRecipeForMealPlan = nil }
         }
     }
     
@@ -919,7 +927,7 @@ enum SearchMatchType: CaseIterable, Hashable {
 
 #Preview {
     NavigationView {
-        RecipeListView()
+        RecipeListView(popToRoot: .constant(false))
     }
     .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

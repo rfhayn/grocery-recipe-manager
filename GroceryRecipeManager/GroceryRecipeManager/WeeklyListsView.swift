@@ -12,6 +12,8 @@ import CoreData
 struct WeeklyListsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
+    @Binding var popToRoot: Bool
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \WeeklyList.dateCreated, ascending: false)],
         animation: .default
@@ -37,6 +39,9 @@ struct WeeklyListsView: View {
             .onAppear {
                 // Refresh context when view appears to pick up any changes
                 viewContext.refreshAllObjects()
+            }
+            .onChange(of: popToRoot) { _, _ in
+                if showingError { showingError = false }
             }
     }
     
@@ -355,7 +360,7 @@ struct WeeklyListRowView: View {
 
 #Preview {
     NavigationView {
-        WeeklyListsView()
+        WeeklyListsView(popToRoot: .constant(false))
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

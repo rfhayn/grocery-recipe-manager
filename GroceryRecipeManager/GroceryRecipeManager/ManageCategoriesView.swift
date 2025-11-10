@@ -5,6 +5,8 @@ struct ManageCategoriesView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     
+    @Binding var popToRoot: Bool
+    
     // Fetch categories sorted by current order
     @FetchRequest(
         sortDescriptors: [
@@ -82,6 +84,16 @@ struct ManageCategoriesView: View {
             Button("OK") { }
         } message: {
             Text(successMessage)
+        }
+        .onChange(of: popToRoot) { _, _ in
+            if showingAddCategory { showingAddCategory = false }
+            if showingDeleteAlert { showingDeleteAlert = false }
+            if showingReassignmentDialog { showingReassignmentDialog = false }
+            if showingError { showingError = false }
+            if showingSuccessAlert { showingSuccessAlert = false }
+            if isReordering {
+                isReordering = false
+            }
         }
     }
     
@@ -644,9 +656,9 @@ struct CategoryRowView: View {
 
 #Preview {
     NavigationView {
-        ManageCategoriesView()
+        ManageCategoriesView(popToRoot: .constant(false))  // ← ADD PARAMETER HERE
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
-    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
 
 // MARK: - Category Selection View
@@ -728,5 +740,11 @@ struct CategorySelectionRow: View {
         case "Uncategorized": return "📋"
         default: return "📂"
         }
+    }
+}
+#Preview {
+    NavigationView {
+        ManageCategoriesView(popToRoot: .constant(false))
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
