@@ -1,7 +1,7 @@
 // GroceryRecipeManagerApp.swift
 // Updated with Settings Tab - M3 Phase 3
 // Updated with Meal Planning Tab - M4.2
-// Updated with Tap-to-Pop-to-Root - Tab Bar UX Enhancement
+// CORRECTED: Tap-to-Pop-to-Root with NavigationStack and path arrays
 
 import SwiftUI
 
@@ -9,9 +9,17 @@ import SwiftUI
 struct GroceryRecipeManagerApp: App {
     let persistenceController = PersistenceController.shared
     
-    // Tab selection and pop-to-root state management
-    // Enables standard iOS behavior: tapping active tab pops navigation to root
+    // Tab selection tracking
     @State private var selectedTab: Tab = .lists
+    
+    // Navigation paths for each tab (for pop-to-root functionality)
+    @State private var listsPath = NavigationPath()
+    @State private var ingredientsPath = NavigationPath()
+    @State private var recipesPath = NavigationPath()
+    @State private var mealPlansPath = NavigationPath()
+    @State private var categoriesPath = NavigationPath()
+    
+    // Pop-to-root triggers for sheet dismissal
     @State private var listsPopToRoot = false
     @State private var ingredientsPopToRoot = false
     @State private var recipesPopToRoot = false
@@ -21,7 +29,7 @@ struct GroceryRecipeManagerApp: App {
     var body: some Scene {
         WindowGroup {
             TabView(selection: $selectedTab) {
-                NavigationView {
+                NavigationStack(path: $listsPath) {
                     WeeklyListsView(popToRoot: $listsPopToRoot)
                 }
                 .tabItem {
@@ -29,7 +37,7 @@ struct GroceryRecipeManagerApp: App {
                 }
                 .tag(Tab.lists)
                 
-                NavigationView {
+                NavigationStack(path: $ingredientsPath) {
                     IngredientsView(popToRoot: $ingredientsPopToRoot)
                 }
                 .tabItem {
@@ -37,16 +45,15 @@ struct GroceryRecipeManagerApp: App {
                 }
                 .tag(Tab.ingredients)
                 
-                RecipeListView(popToRoot: $recipesPopToRoot)
+                NavigationStack(path: $recipesPath) {
+                    RecipeListView(popToRoot: $recipesPopToRoot)
+                }
                 .tabItem {
                     Label("Recipes", systemImage: "book.pages")
                 }
                 .tag(Tab.recipes)
                 
-                // M4.2.4 PHASE 7: Updated to use MealPlansListView for multi-plan support
-                // Changed from single MealPlanView to list-based architecture
-                // Enables multiple concurrent plans, historical tracking, and improved navigation
-                NavigationView {
+                NavigationStack(path: $mealPlansPath) {
                     MealPlansListView(popToRoot: $mealPlansPopToRoot)
                 }
                 .tabItem {
@@ -54,7 +61,7 @@ struct GroceryRecipeManagerApp: App {
                 }
                 .tag(Tab.mealPlans)
                 
-                NavigationView {
+                NavigationStack(path: $categoriesPath) {
                     ManageCategoriesView(popToRoot: $categoriesPopToRoot)
                 }
                 .tabItem {
@@ -82,19 +89,23 @@ struct GroceryRecipeManagerApp: App {
     
     // MARK: - Tab Pop-to-Root Handler
     
-    // Triggers pop-to-root for the specified tab
-    // Each tab watches its respective @Binding and dismisses navigation when triggered
+    // Clears navigation path and triggers sheet dismissal for the specified tab
     private func handlePopToRoot(for tab: Tab) {
         switch tab {
         case .lists:
+            listsPath = NavigationPath()
             listsPopToRoot.toggle()
         case .ingredients:
+            ingredientsPath = NavigationPath()
             ingredientsPopToRoot.toggle()
         case .recipes:
+            recipesPath = NavigationPath()
             recipesPopToRoot.toggle()
         case .mealPlans:
+            mealPlansPath = NavigationPath()
             mealPlansPopToRoot.toggle()
         case .categories:
+            categoriesPath = NavigationPath()
             categoriesPopToRoot.toggle()
         case .settings:
             break // Settings has no navigation stack

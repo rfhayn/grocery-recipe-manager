@@ -1,9 +1,9 @@
 # Current Development Story
 
-**Last Updated**: November 3, 2025  
+**Last Updated**: November 11, 2025  
 **Current Milestone**: M4 - Meal Planning & Enhanced Grocery Integration  
-**Current Phase**: M4.2 (Calendar-Based Meal Planning Core)  
-**Status**: M4.2 Complete ✅, M4.2.1-3 Enhancement Ready 🚀, M4.3 Next
+**Current Phase**: M4.3 (Enhanced Grocery Integration)  
+**Status**: M4.1-M4.2 Complete ✅, M4.3.1 Ready 🚀
 
 ---
 
@@ -14,7 +14,7 @@
 2. **M4 In Progress**: Meal Planning & Enhanced Grocery Integration ← **CURRENT**
    - M4.1 Complete ✅
    - M4.2 Complete ✅
-   - M4.3 Next
+   - M4.3 Next (4 components)
 3. **TestFlight Preparation**: Apple Developer Account & Device Testing
 
 ### **M4 Overview:**
@@ -23,62 +23,163 @@
 - **M4.2**: Calendar-Based Meal Planning Core ✅ **COMPLETE** (~4 hours)
   - M4.2.1-3: Calendar & Recipe Assignment ✅ (completed Nov 3)
   - M4.2.4: Multiple Meal Plans (deferred - single plan sufficient for now)
-- **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish 🚀 **READY** (1.0 hour estimated)
-- **M4.3**: Enhanced Grocery Integration + Scaled Recipe to List ⏳ **NEXT** (3.5-4 hours)
-- **Total**: 9-11 hours (M4.1-M4.2 complete ~5.5h, 4.5-6h remaining)
+- **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish 🚀 **READY** (1.0 hour, optional)
+- **M4.3**: Enhanced Grocery Integration 🔄 **ACTIVE** (4-5 hours) ← **CURRENT**
+  - M4.3.1: Recipe Source Tracking Foundation 🚀 **READY** (60 min)
+  - M4.3.2: Scaled Recipe to List Integration ⏳ **PLANNED** (1.5-2 hours)
+  - M4.3.3: Bulk Add from Meal Plan ⏳ **PLANNED** (2 hours)
+  - M4.3.4: Meal Completion Tracking ⏳ **PLANNED** (45 min)
+- **Total**: 10.5-12.5 hours (M4.1-M4.2 complete ~5.5h, 5-7h remaining)
 
 ### **Strategic Integration:**
 - **M3 → M4**: Structured quantities enable smart meal plan grocery generation ✅
-- **M3 Phase 4 → M4.3**: Recipe scaling service enables scaled-to-list feature ✅
-- **M3 Phase 5 → M4.3**: Quantity consolidation enhances grocery automation ✅
+- **M3 Phase 4 → M4.3.2**: Recipe scaling service enables scaled-to-list feature ✅
+- **M3 Phase 5 → M4.3.3**: Quantity consolidation enhances grocery automation ✅
 - **M4.1 → M4.2**: User preferences configure calendar and meal planning ✅
 - **M4.2 → M4.3**: Meal planning data ready for bulk grocery list generation ✅
+- **M4.3.1 → M4.3.2/M4.3.3**: Recipe source tracking foundation enables transparency ✅
 - **M4 → TestFlight**: Core workflow complete, ready for device testing
 - **M4 → M5**: Meal planning data architecture ready for CloudKit family sharing
 
 ---
 
-**Current Status**: M1, M2, M3, M4.1, and M4.2 successfully completed (~73 hours total). Functional meal planning operational. M4.2.1-3 Enhancement (UI polish) documented and ready. M4.3 (grocery integration) is next.
+**Current Status**: M1, M2, M3, M4.1, and M4.2 successfully completed (~73 hours total). Functional meal planning operational. M4.3.1 (Recipe Source Tracking Foundation) documented and ready to begin.
+
+---
+
+## M4.3: Enhanced Grocery Integration - ACTIVE 🔄
+
+**Status**: M4.3.1 Ready to Start  
+**Estimated Total**: 4-5 hours (4 components)  
+**Priority**: HIGH - Completes core grocery-recipe workflow
+
+### **M4.3 Component Breakdown:**
+
+#### **M4.3.1: Recipe Source Tracking Foundation** 🚀 **READY TO START**
+**Estimated**: 60 minutes  
+**Priority**: HIGH - Foundation for M4.3.2 and M4.3.3
+
+**What We'll Build:**
+1. **Core Data Relationships** (20 min)
+   - Many-to-many: GroceryListItem ↔ Recipe
+   - Remove legacy `sourceRecipeID` and `sourceType`
+   - Lightweight migration (no data loss)
+
+2. **UserPreferences Enhancement** (15 min)
+   - Rename `showRecipeSourceInMealPlan` → `showRecipeSources`
+   - Broaden scope from meal planning to all lists
+   - Maintain default: `true`
+
+3. **Settings UI Reorganization** (10 min)
+   - Create new "Display Options" section
+   - Move recipe source toggle to new section
+   - Update footer text for clarity
+
+4. **Display Logic** (15 min)
+   - Computed property `recipeSourceDisplay` on GroceryListItem
+   - Format: `" [Recipe1] [Recipe2]"` (alphabetically sorted)
+   - Settings-aware (respects user preference)
+
+5. **Display Integration** (10-15 min)
+   - Update WeeklyListDetailView to show recipe tags
+   - Format: `"Ground beef [Tacos] [Spaghetti]"`
+   - Toggle controls visibility
+
+**Acceptance Criteria:**
+- [ ] Many-to-many relationship implemented
+- [ ] Legacy attributes removed
+- [ ] Migration succeeds without data loss
+- [ ] UserPreferences property renamed
+- [ ] New "Display Options" section in Settings
+- [ ] Recipe tags display with user control
+- [ ] Alphabetically sorted recipe names
+- [ ] Performance < 0.05s for computed property
+- [ ] Build succeeds with zero errors
+
+**Documentation:**
+- PRD: `docs/prds/milestone-4.3.1-recipe-source-tracking-foundation.md` ✅
+- Implementation guide ready in next-prompt.md
+
+**Key Decisions:**
+- Many-to-many relationship (not array storage)
+- Remove `sourceRecipeID` completely (pre-production advantage)
+- Nullify delete rules both directions (independent entities)
+- Computed property for display (no denormalization)
+- New Settings section (future-proof)
+
+---
+
+#### **M4.3.2: Scaled Recipe to List Integration** ⏳ **PLANNED**
+**Estimated**: 1.5-2 hours  
+**Dependencies**: M4.3.1 complete (uses source tracking)
+
+**What We'll Build:**
+- "Add to List" button in RecipeScalingView
+- Generate temporary scaled ingredients
+- Reuse AddIngredientsToListView flow
+- Source tracking integration (from M4.3.1)
+- Scale factor metadata for meal planning
+
+**Value**: Complete recipe scaling workflow, party planning support
+
+---
+
+#### **M4.3.3: Bulk Add from Meal Plan** ⏳ **PLANNED**
+**Estimated**: 2 hours  
+**Dependencies**: M4.3.1 complete (uses source tracking)
+
+**What We'll Build:**
+- "Add All to Shopping List" button in MealPlanDetailView
+- Gather all recipes from current meal plan
+- SelectListSheet for list selection
+- Smart consolidation using M3 QuantityMergeService
+- Multiple recipe source tracking (from M4.3.1)
+
+**Value**: Core meal planning → grocery automation workflow
+
+---
+
+#### **M4.3.4: Meal Completion Tracking** ⏳ **PLANNED**
+**Estimated**: 45 minutes  
+**Dependencies**: None (independent)
+
+**What We'll Build:**
+- Mark meals as completed
+- Update plan progress indicators
+- Analytics data collection
+- Recipe usage tracking integration
+
+**Value**: Usage analytics, completion insights
 
 ---
 
 ## M4.2: Calendar-Based Meal Planning Core - COMPLETE ✅
 
 **Completion Date**: November 3, 2025  
-**Total Time**: ~4 hours  
+**Total Time**: ~4 hours (60% over estimate of 2.5h)  
 **Status**: Fully Functional (UI enhancement optional)
 
 ### **What We Built**
 
-**Core Data Entities**:
+**Core Data Entities:**
 - MealPlan entity (id, name, startDate, duration, dates)
 - PlannedMeal entity (id, date, servings) 
 - Relationships: MealPlan ↔ PlannedMeal ↔ Recipe
 - Proper cascade rules and data integrity
 
-**Service Layer**:
+**Service Layer:**
 - MealPlanService with singleton pattern
 - addRecipeToMealPlan() with date, plan, servings
 - Date validation and availability checking
 - Active meal plan management
 - Recipe usage tracking (usageCount, lastUsed)
 
-**UI Implementation**:
+**UI Implementation:**
 - MealPlanDetailView with calendar grid
-- **M4.2.1-3**: Tap-to-add functionality
-  - Tap empty day → RecipePickerSheet opens
-  - Tap occupied day → Replace confirmation
-  - Remove recipe with confirmation
-- RecipePickerSheet with recipe list
-  - Manual recipe fetching (avoids @FetchRequest sheet issues)
-  - Search functionality
-  - Servings adjustment
-  - Add to plan functionality
+- Tap-to-add functionality (empty/occupied days)
+- RecipePickerSheet with search and servings
 - CreateMealPlanSheet with date range picker
-  - Start and end date pickers (replaced duration stepper)
-  - Day-of-week display for clarity
-  - Auto-generated names
-  - Date validation
+- Remove recipe with confirmation
 
 ### **Key Technical Achievements**
 
@@ -86,19 +187,16 @@
 - Problem: `.sheet(isPresented:)` caused blank sheets with Core Data
 - Solution: Used `.sheet(item:)` pattern with `RecipePickerPayload`
 - Pattern discovered in own learning notes (M1 StaplesView pattern)
-- Created data payload with `Identifiable` protocol
-- Prevents timing issues between selection and presentation
 
-**2. Date Range Picker Enhancement**:
+**2. Date Range Picker Enhancement:**
 - Replaced duration stepper with end date picker
-- Shows "Mon" for start, "Sun" for end (day-of-week only)
+- Shows day-of-week for clarity ("Mon" to "Sun")
 - Auto-calculates duration from date range
 - Better UX: users think in dates, not duration
 
-**3. Manual Core Data Fetching**:
+**3. Manual Core Data Fetching:**
 - Replaced `@FetchRequest` with manual `fetch()` in sheets
 - Avoids context issues in modal presentations
-- Pattern: Load on `.onAppear` into `@State` array
 - More reliable for complex sheet hierarchies
 
 ### **Challenges Solved**
@@ -112,149 +210,68 @@
    - Issue: `systemName:` vs `systemImage:` for Label
    - Fixed: Used correct `systemImage:` parameter
 
-3. **@FetchRequest in Sheets**:
-   - Issue: Context not properly passed to @FetchRequest in sheets
-   - Solution: Manual fetching with viewContext.fetch()
-   - More reliable and predictable
+3. **CreateMealPlanSheet Architecture**:
+   - Avoided complex multi-step flow
+   - Single sheet with date range picker
+   - Immediate plan creation on save
 
-### **Current Functionality**
+### **Achievements**
+- ✅ Calendar-based meal planning functional
+- ✅ Recipe assignment with servings
+- ✅ Usage tracking operational
+- ✅ Date validation working
+- ✅ Professional iOS UI maintained
+- ⚠️ 60% over estimate (complexity underestimated)
 
-**Working Features**:
-- ✅ Create meal plans with date ranges
-- ✅ Calendar view shows all days in plan
-- ✅ Tap empty day to add recipe
-- ✅ Recipe picker loads and displays recipes
-- ✅ Search recipes in picker
-- ✅ Adjust servings before adding
-- ✅ Replace recipes with confirmation
-- ✅ Remove recipes with confirmation
-- ✅ Recipe usage tracking on assignment
-- ✅ Multiple meal plans (basic support)
+### **Patterns Established for M4.3.1+**
 
-**Known UI Opportunities**:
-- Recipe picker uses large card layout (functional but cluttered)
-- Could benefit from inline expansion pattern (documented in M4.2.1-3 Enhancement)
+**1. Sheet Presentation Pattern:**
+```swift
+// DON'T: Causes blank sheets
+@State private var showingSheet = false
+.sheet(isPresented: $showingSheet) { MyView() }
 
-### **M4.2.4 Status Update**
+// DO: Reliable presentation
+struct MyPayload: Identifiable { let id = UUID(); ... }
+@State private var payload: MyPayload?
+.sheet(item: $payload) { MyView(data: $0) }
+```
 
-**Decision**: Deferred multiple meal plans list view
-- **Rationale**: Single active plan sufficient for MVP
-- **Current**: MealPlanDetailView works with any plan
-- **Architecture**: Ready for multiple plans when needed
-- **Focus**: Prioritize M4.3 grocery integration first
+**2. Manual Fetching in Sheets:**
+```swift
+// DON'T: Context issues in sheets
+@FetchRequest var items: FetchedResults<Item>
 
-### **Integration Points Ready**
-- ✅ Meal plan data structure complete
-- ✅ Recipe assignment operational
-- ✅ Ready for M4.3 "Add All to Shopping List"
-- ✅ Recipe tracking data for analytics (M7)
-- ✅ Architecture supports CloudKit sync (M5)
+// DO: Manual fetch in .onAppear
+@State private var items: [Item] = []
+.onAppear {
+    items = try! viewContext.fetch(fetchRequest)
+}
+```
 
-### **Documentation Complete**
-- ✅ Code comments with M4.2.1-3 references
-- ✅ Sheet pattern documented for reuse
-- ✅ Date picker enhancement documented
-- ✅ next-prompt.md updated for M4.3
-
----
-
-## M4.2.1-3 Enhancement: RecipePickerSheet UI Polish - READY 🚀
-
-**Status**: Fully Documented, Ready to Implement  
-**Estimated Time**: 1.0 hours (45 min implementation + 15 min testing)  
-**Priority**: Medium (UX improvement, non-blocking)  
-**Created**: November 3, 2025
-
-### **What's Documented**
-
-**Complete Work Package** in `docs/temp-m4.2.1-3-enhancement-docs/`:
-1. **PRD** (18KB): Complete requirements, user stories, specs
-2. **Implementation Guide** (14KB): Phase-by-phase code with snippets
-3. **Design Specs** (13KB): 3 options evaluated, Option 2 recommended
-4. **Summary** (8KB): Quick reference and overview
-5. **README**: Quick start guide
-
-### **Problem Statement**
-
-**Current State** (Functional but cluttered):
-- Every recipe row shows servings adjuster inline
-- Visual noise makes scanning difficult
-- Common case (default servings) requires same effort as adjustments
-- Doesn't follow iOS native patterns
-
-**Proposed Solution** (Clean & expandable):
-- Simple, scannable recipe rows (name + metadata only)
-- Tap to expand inline, revealing servings + "Add" button
-- Only one recipe expanded at a time
-- Blue border/tint for selected state
-- iOS Settings app pattern (familiar, proven)
-
-### **Expected Improvements**
-
-**User Experience**:
-- 50% faster recipe selection (1-2s vs 3-5s)
-- 80% reduction in visual clutter
-- iOS-native feel (9/10 vs 6/10)
-- Familiar interaction pattern
-
-**Technical Quality**:
-- No data model changes
-- Builds on working foundation
-- Clean component structure
-- ~45 minutes implementation
-
-### **Implementation Phases**
-
-**Phase 1: Simplify Collapsed Rows** (20 min)
-- Remove inline servings adjusters
-- Create CollapsedRecipeRow component
-- Enhance date banner styling
-- Apply rounded corners and spacing
-
-**Phase 2: Add Expansion Logic** (25 min)
-- Add @State for selectedRecipeID
-- Create ExpandedRecipeRow component
-- Implement conditional rendering
-- Add smooth animations
-
-**Phase 3: Polish & Test** (15 min)
-- Blue border/tint for selection
-- Test all workflows
-- Performance validation
-- Edge case testing
-
-### **Ready to Implement**
-
-**When**: After M4.3, or anytime for quick UX win  
-**Effort**: 1 hour  
-**Risk**: Low (UI only, no breaking changes)  
-**Value**: High (significant UX improvement)
-
-**Files Ready**:
-- Complete PRD with acceptance criteria
-- Copy-paste ready code snippets
-- Troubleshooting guide
-- Success metrics defined
+**3. Date Range vs Duration:**
+- Users think in dates ("Monday to Sunday")
+- Not durations ("7 days starting Monday")
+- Date pickers more intuitive than steppers
 
 ---
 
 ## M4.1: Settings Infrastructure Foundation - COMPLETE ✅
 
 **Completion Date**: October 23, 2025  
-**Total Time**: 1.5 hours (estimated: 1.5 hours)  
-**Variance**: 0% (perfect estimate accuracy!)  
+**Total Time**: 1.5 hours (100% accuracy)  
 **Status**: Production Ready
 
 ### **What We Built**
 
-**Core Data Entity**:
+**Core Data Entity:**
 - UserPreferences entity with single-record pattern
 - 7 attributes (id, duration, start day, 2 bools, 2 dates)
 - Fetch index on id property
 - "Class Definition" codegen (matches M3 IngredientTemplate pattern)
 - Made id/dates optional (set programmatically)
 
-**Service Layer**:
+**Service Layer:**
 - UserPreferencesService with singleton pattern
 - @Published properties for SwiftUI reactivity
 - Combine auto-save (500ms debounce)
@@ -262,7 +279,7 @@
 - Default creation on first launch
 - App-wide accessibility via .shared
 
-**UI Integration**:
+**UI Integration:**
 - Meal Planning section in Settings (first section)
 - Duration stepper (3-14 days, default 7)
 - Start day picker (Sunday-Saturday, default Sunday)
@@ -300,117 +317,6 @@
 
 ---
 
-## Next: M4.3 - Enhanced Grocery Integration ⏳
-
-**Status**: 🚀 READY TO START  
-**Estimated Time**: 3.5-4 hours  
-**Priority**: HIGH - Completes core workflow
-
-### **What We'll Build**
-
-**1. Bulk Add to Shopping List** (2 hours)
-- "Add All to Shopping List" button in MealPlanDetailView
-- Gathers all recipes from current meal plan
-- Opens SelectListSheet for list selection
-- Adds all ingredients with source tracking
-- Smart consolidation using M3 QuantityMergeService
-
-**2. Recipe Source Tracking** (0.5 hour)
-- Tag ingredients with recipe names
-- Format: "Ground beef [Tacos] [Spaghetti]"
-- Multiple source tracking
-- Display in grocery list views
-- Settings toggle for show/hide
-
-**3. Meal Completion Tracking** (0.5 hour)
-- Mark meals as completed
-- Update plan progress
-- Analytics data collection
-- Visual indicators
-
-**4. Scaled Recipe to List (FEAT-001)** (1.5 hours)
-- Add "Add to List" button to RecipeScalingView (M3 Phase 4)
-- Generate temporary ingredients with scaled quantities
-- Integrate with existing AddIngredientsToListView
-- Sheet navigation handling
-- Scaling metadata for meal planning
-
-### **Integration Points**
-
-**Leverages**:
-- ✅ M3 Phase 4: RecipeScalingService for serving adjustments
-- ✅ M3 Phase 5: QuantityMergeService for consolidation
-- ✅ M4.1: User preferences for list scope and display
-- ✅ M4.2: Meal plan data for list generation
-
-**Provides**:
-- Complete meal planning → grocery workflow
-- 30-50% reduction in list redundancy
-- Recipe traceability in shopping
-- Foundation for analytics (M7)
-
----
-
-## Planning Accuracy Tracking
-
-### **Milestone Performance**
-
-| Milestone | Estimated | Actual | Variance | Status |
-|-----------|-----------|--------|----------|--------|
-| M1 | 30-35h | 32h | +6% ✅ | Complete |
-| M2 | 15-18h | 16.5h | +8% ✅ | Complete |
-| M3 | 8-12h | 10.5h | +5% ✅ | Complete |
-| M3.5 | 7h | 8.5h | +21% ✅ | Complete |
-| M4.1 | 1.5h | 1.5h | 0% ✅ | Complete |
-| M4.2 | 4h | ~4h | ~0% ✅ | Complete |
-| **Totals** | **65.5-77.5h** | **~73h** | **+6%** | **6 Complete** |
-
-**Overall Planning Accuracy**: 88% (< 12% average variance)
-
-**Success Factors**:
-- Consistent use of session-startup-checklist.md
-- Strict adherence to project-naming-standards.md
-- Phase-based development with validation gates
-- Learning notes capture lessons for future estimates
-- Documentation consistency enables accurate tracking
-
----
-
-## Recent Development Patterns
-
-### **Proven Solutions from M4.2**
-
-**1. Sheet Presentation Pattern**:
-```swift
-// DON'T: Causes blank sheets
-@State private var showingSheet = false
-.sheet(isPresented: $showingSheet) { MyView() }
-
-// DO: Reliable presentation
-struct MyPayload: Identifiable { let id = UUID(); ... }
-@State private var payload: MyPayload?
-.sheet(item: $payload) { MyView(data: $0) }
-```
-
-**2. Manual Fetching in Sheets**:
-```swift
-// DON'T: Context issues in sheets
-@FetchRequest var items: FetchedResults<Item>
-
-// DO: Manual fetch in .onAppear
-@State private var items: [Item] = []
-.onAppear {
-    items = try! viewContext.fetch(fetchRequest)
-}
-```
-
-**3. Date Range vs Duration**:
-- Users think in dates ("Monday to Sunday")
-- Not durations ("7 days starting Monday")
-- Date pickers more intuitive than steppers
-
----
-
 ## Quality Metrics
 
 **Build Success**: 100% (zero breaking changes across 6 milestones)  
@@ -423,25 +329,32 @@ struct MyPayload: Identifiable { let id = UUID(); ... }
 
 ## Documentation Status
 
-**Up to Date**:
+**Up to Date:**
 - ✅ current-story.md (this file)
-- ✅ next-prompt.md (ready for M4.3)
+- ✅ next-prompt.md (ready for M4.3.1)
 - ✅ project-naming-standards.md
 - ✅ development-guidelines.md
 - ✅ session-startup-checklist.md
 
-**Needs Update After M4.3**:
-- [ ] roadmap.md (mark M4.2 complete)
-- [ ] requirements.md (mark M4.2 complete)
-- [ ] project-index.md (add M4.2 completion)
+**Needs Update After M4.3.1:**
+- [ ] roadmap.md (mark M4.3.1 progress)
+- [ ] requirements.md (mark M4.3.1 requirements)
+- [ ] project-index.md (add M4.3.1 to recent activity)
+
+**Needs Update After M4.3 Complete:**
+- [ ] roadmap.md (mark M4.3 complete)
+- [ ] requirements.md (mark M4.3 complete)
+- [ ] project-index.md (add M4.3 completion)
 - [ ] README.md (update feature list)
 
-**Learning Notes**:
+**Learning Notes:**
 - ✅ 18-m4.1-settings-infrastructure.md
-- [ ] 19-m4.2-calendar-meal-planning.md (create after M4.3)
+- ✅ 19-m4.2-calendar-meal-planning.md
+- [ ] 20-m4.3.1-recipe-source-tracking.md (create after completion)
+- [ ] 21-m4.3-complete-enhanced-grocery-integration.md (create after M4.3 complete)
 
 ---
 
-**Last Session**: November 3, 2025 - M4.2 completion, CreateMealPlanSheet date picker enhancement, M4.2.1-3 Enhancement documentation  
-**Next Session**: M4.3 Enhanced Grocery Integration  
-**Version**: November 3, 2025
+**Last Session**: November 11, 2025 - M4.3.1 PRD created, current-story.md and next-prompt.md ready  
+**Next Session**: M4.3.1 Recipe Source Tracking Foundation (Phase 1: Core Data Migration)  
+**Version**: November 11, 2025

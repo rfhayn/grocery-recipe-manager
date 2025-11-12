@@ -95,7 +95,6 @@ struct RecipeListView: View {
     }
 
     var body: some View {
-        NavigationView {
             Group {
                 if filteredRecipes.isEmpty {
                     enhancedEmptyStateView
@@ -122,7 +121,6 @@ struct RecipeListView: View {
                     }
                 }
             }
-        }
         .sheet(isPresented: $showingAddRecipe) {
             CreateRecipeView(context: viewContext)
         }
