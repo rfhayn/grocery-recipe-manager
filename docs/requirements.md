@@ -1,8 +1,8 @@
 # Grocery & Recipe Manager - Requirements Document
 
-**Last Updated**: October 22, 2025  
-**Version**: 3.6  
-**Current Milestone**: M4 Phase 1 (Settings Infrastructure Foundation)
+**Last Updated**: November 12, 2025  
+**Version**: 3.7  
+**Current Milestone**: M4.3.1 (Recipe Source Tracking Foundation)
 
 ---
 

@@ -1,493 +1,357 @@
-# Next Prompt: M4.2.1-3 Enhancement - RecipePickerSheet UI Redesign
+# Implementation Guide: M4.3.1 - Recipe Source Tracking Foundation
 
-**Status**: 🚀 READY  
-**Estimated Time**: 1.0 hours  
-**Last Updated**: November 3, 2025
-
----
-
-## 📋 Session Startup Checklist
-
-**Before starting, complete these steps:**
-
-1. ✅ Read [session-startup-checklist.md](session-startup-checklist.md)
-2. ✅ Read [project-naming-standards.md](project-naming-standards.md)
-3. ✅ Read [current-story.md](current-story.md)
-4. ✅ Read this file (next-prompt.md)
-5. ✅ Read PRD: [milestone-4.2.1-3-enhancement-recipe-picker-ui-redesign.md](prds/milestone-4.2.1-3-enhancement-recipe-picker-ui-redesign.md)
+**Phase 1 of 5**: Core Data Relationship Migration  
+**Estimated Time**: 20 minutes  
+**Last Updated**: November 11, 2025  
+**Status**: 🚀 READY TO START
 
 ---
 
-## 🎯 What We're Building
+## 🎯 What We're Building (M4.3.1 Complete)
 
-**Enhancement**: RecipePickerSheet UI Polish  
-**Goal**: Transform cluttered recipe list into clean, scannable interface with inline expansion
-
-**Current State**: ✅ Functional but cluttered - every recipe shows servings adjuster  
-**Target State**: Clean list that expands inline when tapped, revealing servings + Add button
-
----
-
-## 📁 Files to Modify
-
-**Primary**:
-- `RecipePickerSheet.swift` - Main redesign work happens here
-
-**No Changes Needed**:
-- `MealPlanDetailView.swift` - Sheet presentation already fixed
-- `MealPlanService.swift` - Service layer unchanged
-- Core Data - No data model changes
+Enable grocery list items to track which recipe(s) contributed ingredients, with user-controlled display:
+- Many-to-many relationship: GroceryListItem ↔ Recipe
+- Recipe source tags: `"Ground beef [Tacos] [Spaghetti]"`
+- Settings toggle: Show/hide recipe sources
+- Foundation for M4.3.2 (Scaled Recipe to List) and M4.3.3 (Bulk Add from Meal Plan)
 
 ---
 
-## 🏗️ Implementation Plan
+## 📋 Phase 1: Core Data Relationship Migration
 
-### **Phase 1: Simplify Collapsed Rows** (20 min)
+**Goal**: Add many-to-many relationship, remove legacy UUID tracking
 
-**Goal**: Remove servings adjuster, clean up recipe rows
+**Time**: 20 minutes  
+**Complexity**: Low (lightweight migration, well-tested pattern)
 
-**Changes to RecipePickerSheet.swift:**
+---
 
-1. **Extract New Component**: `CollapsedRecipeRow`
-```swift
-// M4.2.1-3 Enhancement: Simplified recipe row (collapsed state)
-struct CollapsedRecipeRow: View {
-    let recipe: Recipe
-    let onTap: () -> Void
-    
-    var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Image(systemName: "fork.knife")
-                        .foregroundColor(.blue)
-                    
-                    Text(recipe.title ?? "Untitled Recipe")
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Text("\(recipe.ingredients?.count ?? 0) ingredients • Serves \(Int(recipe.servings))")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            .background(Color(UIColor.secondarySystemGroupedBackground))
-            .cornerRadius(10)
-        }
-        .buttonStyle(.plain)
-    }
-}
-```
+### **Tasks**
 
-2. **Update Recipe List Section**:
-```swift
-// Replace existing recipeList computed property
-private var recipeList: some View {
-    List {
-        ForEach(filteredRecipes, id: \.id) { recipe in
-            if selectedRecipeID == recipe.id {
-                ExpandedRecipeRow(...)  // Will create in Phase 2
-            } else {
-                CollapsedRecipeRow(
-                    recipe: recipe,
-                    onTap: { handleRecipeTap(recipe) }
-                )
-            }
-        }
-    }
-    .listStyle(.plain)
-}
-```
+#### **1. Open Core Data Model** (2 min)
 
-3. **Enhance Date Banner**:
-```swift
-private var dateContextBanner: some View {
-    HStack(spacing: 8) {
-        Image(systemName: "calendar")
-            .font(.title3)  // Larger icon
-            .foregroundColor(.blue)
-        
-        Text("Adding to \(formattedShortDate)")  // New formatter
-            .font(.headline)  // More prominent
-        
-        Spacer()
-    }
-    .padding()
-    .background(Color.blue.opacity(0.1))  // Light blue background
-}
+**Location**: `GroceryRecipeManager.xcdatamodeld`
 
-// Add new date formatter
-private var formattedShortDate: String {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "EEE, MMM d"  // "Thu, Nov 6"
-    return formatter.string(from: date)
-}
-```
+**Action**: Open in Xcode:
+- Navigate to project root
+- Find `GroceryRecipeManager.xcdatamodeld`
+- Click to open Core Data model editor
+
+---
+
+#### **2. Add Relationship to GroceryListItem** (5 min)
+
+**Entity**: GroceryListItem
+
+**Add Relationship**:
+1. Select GroceryListItem entity
+2. Click "+" under Relationships section
+3. Configure:
+   - **Name**: `sourceRecipes`
+   - **Destination**: Recipe
+   - **Type**: To Many
+   - **Inverse**: groceryListItems (will create next)
+   - **Delete Rule**: Nullify
+   - **Optional**: Yes (checked)
+
+**Why Nullify**: Recipe deletion removes tag from item but keeps item on list
 
 **Validation**:
-- ✅ Recipe list renders cleanly
-- ✅ No servings adjusters visible
-- ✅ Rows are scannable
-- ✅ Date banner more prominent
+- [ ] Relationship name exactly `sourceRecipes` (plural)
+- [ ] Destination is Recipe entity
+- [ ] Type is "To Many" (checkbox checked)
+- [ ] Delete Rule is "Nullify"
 
 ---
 
-### **Phase 2: Add Expansion Logic** (25 min)
+#### **3. Add Inverse Relationship to Recipe** (5 min)
 
-**Goal**: Implement inline expansion when recipe tapped
+**Entity**: Recipe
 
-**Changes to RecipePickerSheet.swift:**
+**Add Relationship**:
+1. Select Recipe entity
+2. Click "+" under Relationships section
+3. Configure:
+   - **Name**: `groceryListItems`
+   - **Destination**: GroceryListItem
+   - **Type**: To Many
+   - **Inverse**: sourceRecipes
+   - **Delete Rule**: Nullify
+   - **Optional**: Yes (checked)
 
-1. **Add State Variable**:
-```swift
-// M4.2.1-3 Enhancement: Track selected recipe for expansion
-@State private var selectedRecipeID: UUID?
-```
-
-2. **Create Tap Handler**:
-```swift
-// M4.2.1-3 Enhancement: Handle recipe selection
-// Toggles expansion: tap same = collapse, tap different = switch
-private func handleRecipeTap(_ recipe: Recipe) {
-    withAnimation(.easeInOut(duration: 0.25)) {
-        if selectedRecipeID == recipe.id {
-            // Tapping same recipe = collapse
-            selectedRecipeID = nil
-        } else {
-            // Tapping different recipe = expand (auto-collapses previous)
-            selectedRecipeID = recipe.id
-        }
-    }
-}
-```
-
-3. **Create Expanded Row Component**:
-```swift
-// M4.2.1-3 Enhancement: Expanded recipe row with servings adjuster and add button
-struct ExpandedRecipeRow: View {
-    let recipe: Recipe
-    let servings: Int
-    let onServingsChange: (Int) -> Void
-    let onAdd: () -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header
-            HStack {
-                Image(systemName: "fork.knife")
-                    .foregroundColor(.blue)
-                
-                Text(recipe.title ?? "Untitled Recipe")
-                    .font(.body)
-                    .fontWeight(.semibold)  // Bold when selected
-                
-                Spacer()
-            }
-            
-            // Metadata
-            Text("\(recipe.ingredients?.count ?? 0) ingredients • Serves \(Int(recipe.servings))")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            
-            Divider()
-            
-            // Servings Adjuster
-            HStack {
-                Text("Servings:")
-                    .font(.subheadline)
-                
-                Spacer()
-                
-                // Minus Button
-                Button {
-                    if servings > 1 {
-                        onServingsChange(servings - 1)
-                    }
-                } label: {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(servings > 1 ? .blue : .gray)
-                }
-                .disabled(servings <= 1)
-                
-                // Current Value
-                Text("\(servings)")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .frame(minWidth: 40)
-                
-                // Plus Button
-                Button {
-                    if servings < 99 {
-                        onServingsChange(servings + 1)
-                    }
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(servings < 99 ? .blue : .gray)
-                }
-                .disabled(servings >= 99)
-            }
-            
-            // Add Button
-            Button(action: onAdd) {
-                Text("Add to Plan")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(10)
-            }
-        }
-        .padding()
-        .background(Color.blue.opacity(0.1))  // Blue tint
-        .cornerRadius(10)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.blue, lineWidth: 2)  // Blue border
-        )
-    }
-}
-```
-
-4. **Update Recipe List with Conditional Rendering**:
-```swift
-private var recipeList: some View {
-    List {
-        ForEach(filteredRecipes, id: \.id) { recipe in
-            if selectedRecipeID == recipe.id {
-                // Expanded state
-                ExpandedRecipeRow(
-                    recipe: recipe,
-                    servings: getServings(for: recipe),
-                    onServingsChange: { newServings in
-                        setServings(newServings, for: recipe)
-                    },
-                    onAdd: {
-                        handleRecipeSelection(recipe)
-                    }
-                )
-            } else {
-                // Collapsed state
-                CollapsedRecipeRow(
-                    recipe: recipe,
-                    onTap: { handleRecipeTap(recipe) }
-                )
-            }
-        }
-    }
-    .listStyle(.plain)
-}
-```
+**Why Nullify**: List item deletion doesn't affect recipe
 
 **Validation**:
-- ✅ Tapping recipe expands it
-- ✅ Tapping another recipe collapses previous
-- ✅ Animation smooth (< 0.3s)
-- ✅ Servings adjuster works
-- ✅ Add button calls existing handler
+- [ ] Relationship name exactly `groceryListItems` (plural)
+- [ ] Destination is GroceryListItem entity
+- [ ] Inverse is sourceRecipes
+- [ ] Type is "To Many"
+- [ ] Delete Rule is "Nullify"
 
 ---
 
-### **Phase 3: Polish & Test** (15 min)
+#### **4. Remove Legacy Attributes** (3 min)
 
-**Goal**: Final polish and validation
+**Entity**: GroceryListItem
 
-**Tasks**:
+**Delete Attributes**:
+1. Select GroceryListItem entity
+2. Find and delete:
+   - `sourceRecipeID` (UUID? - no longer needed)
+   - `sourceType` (String? - no longer needed)
+3. Confirm deletion
 
-1. **Test Workflow**:
-   - Open meal plan
-   - Tap day
-   - Search for recipe
-   - Tap recipe (should expand)
-   - Adjust servings
-   - Tap "Add to Plan"
-   - Verify recipe appears on calendar
-
-2. **Test Edge Cases**:
-   - No recipes (empty state)
-   - Search with no results
-   - 1 recipe in list
-   - 50+ recipes in list
-   - Rapid tapping between recipes
-
-3. **Performance Check**:
-   - Smooth scrolling with many recipes
-   - Animation doesn't drop frames
-   - No memory issues
-
-4. **Visual Polish**:
-   - Colors match design spec
-   - Spacing feels right
-   - Typography hierarchy clear
-   - Blue selection treatment visible
+**Why Remove**: Replaced by proper Core Data relationship
 
 **Validation**:
-- ✅ All workflows functional
-- ✅ No crashes or errors
-- ✅ Performance smooth
-- ✅ Visual design polished
+- [ ] `sourceRecipeID` attribute deleted
+- [ ] `sourceType` attribute deleted
+- [ ] No compilation errors about missing attributes
 
 ---
 
-## 📝 Code Documentation Requirements
+#### **5. Save and Build** (5 min)
 
-**Function Headers**:
+**Actions**:
+1. **Save**: Cmd+S to save Core Data model
+2. **Clean Build**: Cmd+Shift+K
+3. **Build**: Cmd+B
+
+**Expected Outcome**:
+- Xcode auto-generates Core Data classes
+- `GroceryListItem+CoreDataProperties.swift` regenerated with `sourceRecipes`
+- `Recipe+CoreDataProperties.swift` regenerated with `groceryListItems`
+- Lightweight migration applied automatically
+
+**If Build Fails**:
+- Check for any code referencing `sourceRecipeID` or `sourceType`
+- Search project (Cmd+Shift+F) for these properties
+- Remove or comment out any references (we'll fix properly in later phases)
+
+**Validation**:
+- [ ] Build succeeds (zero errors)
+- [ ] No Core Data warnings in console
+- [ ] App launches successfully
+- [ ] Sample data loads (grocery lists visible)
+
+---
+
+### **Verification Steps**
+
+**After successful build:**
+
+1. **Run App**: Launch in simulator
+2. **Check App Launch**: Should open without errors
+3. **Navigate to Lists**: Verify grocery lists load
+4. **Check Recipes**: Verify recipes load
+5. **No Crashes**: App should function normally
+
+**What's Changed**:
+- Core Data schema updated
+- Managed object classes regenerated
+- Lightweight migration applied
+- Legacy attributes removed
+
+**What's NOT Changed Yet**:
+- No UI changes (that's Phase 3-5)
+- No Settings changes (that's Phase 2-3)
+- No display logic (that's Phase 4)
+- Relationship not yet populated (that's future M4.3.2/M4.3.3)
+
+---
+
+## 🔍 Core Data Schema Reference
+
+**Before (Legacy)**:
 ```swift
-// M4.2.1-3 Enhancement: Handles recipe selection and expansion
-// Toggles between collapsed and expanded states
-// Only one recipe can be expanded at a time
-private func handleRecipeTap(_ recipe: Recipe) {
-    // Implementation
-}
+// GroceryListItem
+sourceRecipeID: UUID?      // Single recipe only
+sourceType: String?        // Manual vs Recipe
+
+// Recipe
+// No relationship to list items
 ```
 
-**Component Headers**:
+**After (M4.3.1 Phase 1)**:
 ```swift
-// M4.2.1-3 Enhancement: Simplified recipe row (collapsed state)
-// Shows only name and metadata for quick scanning
-// Tapping expands to show servings adjuster and add button
-struct CollapsedRecipeRow: View {
-    // Implementation
-}
-```
+// GroceryListItem
+sourceRecipes: Set<Recipe>  // Multiple recipes (many-to-many)
 
-**MARK Comments**:
-```swift
-// MARK: - M4.2.1-3 Enhancement: Collapsed Row Component
-// MARK: - M4.2.1-3 Enhancement: Expanded Row Component
-// MARK: - M4.2.1-3 Enhancement: Selection Logic
+// Recipe  
+groceryListItems: Set<GroceryListItem>  // Inverse relationship
 ```
 
 ---
 
-## 🎯 Acceptance Criteria
+## 🚨 Troubleshooting
 
-**Must Pass**:
-- [ ] Recipe list displays cleanly without clutter
-- [ ] Tapping recipe expands it inline
-- [ ] Servings adjuster appears in expanded state
-- [ ] "Add to Plan" button functional
-- [ ] Only one recipe expanded at a time
-- [ ] Smooth animation (< 0.3s)
-- [ ] Selected recipe has blue border + tint
-- [ ] Date banner enhanced with better styling
-- [ ] Performance smooth with 50+ recipes
-- [ ] Code follows project naming standards
+### **Issue**: Build errors about sourceRecipeID
 
-**Quality Gates**:
-- [ ] Build succeeds with zero warnings
-- [ ] No regressions to existing functionality
-- [ ] VoiceOver labels present (if time permits)
-- [ ] Code documented with M4.2.1-3 Enhancement references
+**Cause**: Code still references deleted attribute  
+**Fix**: 
+```bash
+# Search for references
+Cmd+Shift+F → search "sourceRecipeID"
+# Comment out or remove references
+# Will fix properly in later phases
+```
+
+### **Issue**: Core Data validation warnings
+
+**Cause**: Relationship misconfigured  
+**Fix**:
+- Check inverse relationships match
+- Verify delete rules are "Nullify"
+- Ensure both are "To Many"
+
+### **Issue**: App crashes on launch
+
+**Cause**: Migration issue  
+**Fix**:
+1. Delete app from simulator
+2. Clean build folder (Cmd+Shift+K + Cmd+Option+Shift+K)
+3. Rebuild and run
+4. Sample data will recreate
+
+### **Issue**: Managed object classes not regenerated
+
+**Cause**: Xcode needs explicit regeneration  
+**Fix**:
+1. Editor → Create NSManagedObject Subclass
+2. Select GroceryRecipeManager model
+3. Select GroceryListItem and Recipe entities
+4. Generate (will overwrite existing)
 
 ---
 
-## 🔧 Troubleshooting
+## ✅ Phase 1 Completion Checklist
 
-**Issue**: Animation jerky or slow
-- **Fix**: Check that animation only applies to selectedRecipeID changes
-- **Fix**: Ensure List uses .listStyle(.plain)
+**Before moving to Phase 2:**
 
-**Issue**: Multiple rows expanded
-- **Fix**: Verify selectedRecipeID is UUID? (singular, not Set)
-- **Fix**: Check conditional rendering logic
+- [ ] `sourceRecipes` relationship added to GroceryListItem
+- [ ] `groceryListItems` relationship added to Recipe
+- [ ] Both relationships are "To Many"
+- [ ] Both have "Nullify" delete rule
+- [ ] Inverse relationships correctly configured
+- [ ] `sourceRecipeID` attribute deleted from GroceryListItem
+- [ ] `sourceType` attribute deleted from GroceryListItem
+- [ ] Core Data model saved
+- [ ] Build succeeds with zero errors
+- [ ] App launches without crashes
+- [ ] Grocery lists and recipes load normally
 
-**Issue**: Tapping doesn't expand
-- **Fix**: Verify handleRecipeTap is called
-- **Fix**: Check @State variable is properly declared
-- **Fix**: Ensure animation wrapper present
+**Time Tracking**:
+- [ ] Note actual time spent (target: 20 min)
+- [ ] Compare to estimate for planning accuracy
 
-**Issue**: Blue border not visible
-- **Fix**: Check z-order of overlay
-- **Fix**: Verify Color.blue stroke width (should be 2pt)
+---
+
+## 📝 Documentation Requirements
+
+**After Phase 1:**
+
+1. **Update current-story.md**:
+```markdown
+### M4.3.1 Phase 1: Core Data Migration ✅ COMPLETE (XX min)
+- Added sourceRecipes many-to-many relationship
+- Removed legacy sourceRecipeID and sourceType
+- Lightweight migration successful
+- Build succeeds, app functional
+```
+
+2. **No learning note yet** (wait until all 5 phases complete)
+
+3. **Inline Comments**: None needed (schema changes self-documenting)
+
+---
+
+## 🚀 Next Steps
+
+**After Phase 1 Complete:**
+
+Update `next-prompt.md` for Phase 2:
+- UserPreferences property rename
+- Settings UI reorganization  
+- Estimated: 25 minutes (15 min + 10 min combined)
+
+**Do NOT proceed until**:
+- [ ] Phase 1 acceptance criteria all met
+- [ ] Build succeeds with zero errors
+- [ ] App launches and functions normally
+
+---
+
+## 🎯 Phase 2 Preview
+
+**Next: UserPreferences Enhancement (15 min)**
+
+**What we'll do:**
+1. Rename `showRecipeSourceInMealPlan` → `showRecipeSources`
+2. Update UserPreferencesService
+3. Create new "Display Options" section in Settings
+4. Move recipe source toggle to new section
+
+**Why wait**: Core Data foundation must be solid before UI changes
 
 ---
 
 ## 📚 Reference Materials
 
 **Similar Patterns**:
-- Learning Note 07: Professional staples management (inline patterns)
-- iOS Settings app: Expandable rows
-- CategoryAssignmentModal: Selection patterns
+- Learning Note 03: Core Data Fundamentals (relationship patterns)
+- Learning Note 09: M1 Completion (many-to-many relationships)
+- M3 Phase 3: isStaple migration (lightweight migration pattern)
 
-**Key Files**:
-- `RecipePickerSheet.swift` - Main file to modify
-- `MealPlanDetailView.swift` - Already correct (no changes)
-- PRD: `milestone-4.2.1-3-enhancement-recipe-picker-ui-redesign.md`
+**Key Files Modified**:
+- `GroceryRecipeManager.xcdatamodeld/GroceryRecipeManager.xcdatamodel/contents`
+- `GroceryListItem+CoreDataProperties.swift` (auto-regenerated)
+- `Recipe+CoreDataProperties.swift` (auto-regenerated)
 
-**Design Specs**:
-- Colors: Blue tint 0.1 opacity, border 2pt
-- Typography: .body/.medium collapsed, .body/.semibold expanded
-- Spacing: 12pt between sections, 16pt padding
-- Animation: .easeInOut, 0.25s duration
+**PRD Reference**:
+- Full PRD: `docs/prds/milestone-4.3.1-recipe-source-tracking-foundation.md`
+- Section: "Implementation Plan → Phase 1"
 
 ---
 
-## ✅ Completion Checklist
-
-**After implementation:**
-
-- [ ] Code compiles without warnings
-- [ ] All acceptance criteria met
-- [ ] Manual testing complete
-- [ ] Update current-story.md: Mark M4.2.1-3 Enhancement ✅ COMPLETE with hours
-- [ ] Update project-index.md: Add to Recent Activity
-- [ ] Create learning note with:
-  - [ ] Inline expansion pattern details
-  - [ ] Visual design decisions
-  - [ ] Code examples for reference
-  - [ ] Any challenges encountered
-
-**Files to update:**
-1. `docs/current-story.md` - Status + hours
-2. `docs/project-index.md` - Recent Activity
-3. `docs/learning-notes/XX-m4.2.1-3-recipe-picker-ui-enhancement.md` - New note
-
----
-
-## 🚀 Ready to Start?
+## 💬 Ready to Start?
 
 **Copy-paste this to begin:**
 
 ```
-I'm ready to implement M4.2.1-3 Enhancement: RecipePickerSheet UI Redesign.
+I'm ready to implement M4.3.1 Phase 1: Core Data Relationship Migration.
 
-I've reviewed:
-- session-startup-checklist.md
-- project-naming-standards.md  
-- current-story.md
-- next-prompt.md (this file)
-- PRD: milestone-4.2.1-3-enhancement-recipe-picker-ui-redesign.md
+I've completed the mandatory session startup:
+✅ Read session-startup-checklist.md
+✅ Read project-naming-standards.md
+✅ Read current-story.md (M4.3.1 is 🚀 READY)
+✅ Read next-prompt.md (this file)
+✅ Reviewed PRD: milestone-4.3.1-recipe-source-tracking-foundation.md
 
-Let's start with Phase 1: Simplifying the collapsed recipe rows. 
-Please create the updated RecipePickerSheet.swift with Phase 1 changes.
+I understand we're:
+1. Adding sourceRecipes (to-many) relationship to GroceryListItem
+2. Adding groceryListItems (to-many) inverse to Recipe
+3. Deleting legacy sourceRecipeID and sourceType attributes
+4. Both delete rules: Nullify
+5. Expecting lightweight migration and clean build
+
+Please guide me through Phase 1 step-by-step.
+Time estimate: 20 minutes.
 ```
 
 ---
 
-**Estimated Time**: 1.0 hours  
-**Phase Breakdown**:
-- Phase 1: Simplify (20 min)
-- Phase 2: Expansion (25 min)  
-- Phase 3: Polish (15 min)
+**Ready When You Are!** 🚀
 
-**Total**: 60 minutes
-
-Good luck! This is a straightforward enhancement that will make a big UX difference! 🎨
+This is a straightforward Core Data change following proven migration patterns from M3. The relationship addition is low-risk because:
+- ✅ Lightweight migration (automatic)
+- ✅ No data loss (new relationships start empty)
+- ✅ Pre-production (can rebuild if needed)
+- ✅ Proven pattern (similar to M1-M3 work)
 
 ---
 
 **Version**: 1.0  
-**Created**: November 3, 2025  
-**Last Updated**: November 3, 2025  
-**Status**: 🚀 READY
+**Created**: November 11, 2025  
+**Phase**: 1 of 5 (Core Data Migration)  
+**Next Phase**: UserPreferences + Settings UI (25 min)  
+**Total M4.3.1**: 60 minutes (5 phases)
