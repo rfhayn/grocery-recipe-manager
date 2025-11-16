@@ -47,63 +47,97 @@
 
 ---
 
-## M4.3: Enhanced Grocery Integration - ACTIVE 🔄
-
-**Status**: M4.3.1 Ready to Start  
-**Estimated Total**: 4-5 hours (4 components)  
-**Priority**: HIGH - Completes core grocery-recipe workflow
-
-### **M4.3 Component Breakdown:**
-
-#### **M4.3.1: Recipe Source Tracking Foundation** 🚀 **READY TO START**
+#### **M4.3.1: Recipe Source Tracking Foundation** 🔄 **ACTIVE**
 **Estimated**: 60 minutes  
 **Priority**: HIGH - Foundation for M4.3.2 and M4.3.3
 
-**What We'll Build:**
-1. **Core Data Relationships** (20 min)
-   - Many-to-many: GroceryListItem ↔ Recipe
-   - Remove legacy `sourceRecipeID` and `sourceType`
-   - Lightweight migration (no data loss)
+---
 
-2. **UserPreferences Enhancement** (15 min)
-   - Rename `showRecipeSourceInMealPlan` → `showRecipeSources`
-   - Broaden scope from meal planning to all lists
-   - Maintain default: `true`
+##### **Phase 1: Core Data Migration** ✅ **COMPLETE** (20 min)
+**Completion Date**: November 13, 2025
 
-3. **Settings UI Reorganization** (10 min)
-   - Create new "Display Options" section
-   - Move recipe source toggle to new section
-   - Update footer text for clarity
+**What We Built:**
+- Added `sourceRecipes` many-to-many relationship to GroceryListItem
+- Added `groceryListItems` inverse relationship to Recipe
+- Removed legacy `sourceRecipeID` and `sourceType` attributes
+- Lightweight migration successful
+- Build succeeds, app functional
 
-4. **Display Logic** (15 min)
-   - Computed property `recipeSourceDisplay` on GroceryListItem
-   - Format: `" [Recipe1] [Recipe2]"` (alphabetically sorted)
-   - Settings-aware (respects user preference)
+**Technical Details:**
+- Both relationships: To Many, Nullify delete rule, Optional
+- Managed object classes auto-regenerated
+- Zero data loss during migration
+- Zero build errors
 
-5. **Display Integration** (10-15 min)
-   - Update WeeklyListDetailView to show recipe tags
-   - Format: `"Ground beef [Tacos] [Spaghetti]"`
-   - Toggle controls visibility
+**Time Tracking:**
+- Estimated: 20 minutes
+- Actual: 20 minutes
+- Accuracy: 100%
 
-**Acceptance Criteria:**
-- [ ] Many-to-many relationship implemented
-- [ ] Legacy attributes removed
-- [ ] Migration succeeds without data loss
+##### **Phase 2: UserPreferences Enhancement** ✅ **COMPLETE** (15 min)
+**Completion Date**: November 13, 2025
+
+**What We Built:**
+- Renamed Core Data attribute: `showRecipeSourceInMealPlan` → `showRecipeSources`
+- Updated UserPreferencesService with new property
+- Updated Settings UI bindings
+- Broadened scope from meal planning to all recipe source displays
+
+**Time Tracking:**
+- Estimated: 15 minutes
+- Actual: 15 minutes
+- Accuracy: 100%
+
+##### **Phase 3: Settings UI Reorganization** ✅ **COMPLETE** (10 min)
+**Completion Date**: November 13, 2025
+
+**What We Built:**
+- Created new "Display Options" section in Settings
+- Moved recipe sources toggle to new section
+- Updated section headers and footer text for clarity
+- Improved Settings organization for future display preferences
+
+**Time Tracking:**
+- Estimated: 10 minutes
+- Actual: 10 minutes
+- Accuracy: 100%
+
+---
+
+##### **Remaining Phases:**
+
+**Phase 4: Display Logic** (15 min)
+- Computed property `recipeSourceDisplay` on GroceryListItem
+- Format: `" [Recipe1] [Recipe2]"` (alphabetically sorted)
+- Settings-aware (respects user preference)
+
+**Phase 5: Display Integration** (10-15 min)
+- Update WeeklyListDetailView to show recipe tags
+- Format: `"Ground beef [Tacos] [Spaghetti]"`
+- Toggle controls visibility
+
+---
+
+**Overall Acceptance Criteria:**
+- [ ] Many-to-many relationship implemented ✅
+- [ ] Legacy attributes removed ✅
+- [ ] Migration succeeds without data loss ✅
 - [ ] UserPreferences property renamed
 - [ ] New "Display Options" section in Settings
 - [ ] Recipe tags display with user control
 - [ ] Alphabetically sorted recipe names
 - [ ] Performance < 0.05s for computed property
-- [ ] Build succeeds with zero errors
+- [ ] Build succeeds with zero errors ✅
 
 **Documentation:**
 - PRD: `docs/prds/milestone-4.3.1-recipe-source-tracking-foundation.md` ✅
-- Implementation guide ready in next-prompt.md
+- Implementation guide in next-prompt.md ✅
+- Learning note: To be created after M4.3.1 complete
 
 **Key Decisions:**
-- Many-to-many relationship (not array storage)
-- Remove `sourceRecipeID` completely (pre-production advantage)
-- Nullify delete rules both directions (independent entities)
+- Many-to-many relationship (not array storage) ✅
+- Remove `sourceRecipeID` completely (pre-production advantage) ✅
+- Nullify delete rules both directions (independent entities) ✅
 - Computed property for display (no denormalization)
 - New Settings section (future-proof)
 

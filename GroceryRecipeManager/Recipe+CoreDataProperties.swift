@@ -2,13 +2,15 @@
 //  Recipe+CoreDataProperties.swift
 //  GroceryRecipeManager
 //
-//  Created by Richard Hayn on 9/7/25.
+//  Created by Richard Hayn on 11/13/25.
 //
 //
 
-import Foundation
-import CoreData
+public import Foundation
+public import CoreData
 
+
+public typealias RecipeCoreDataPropertiesSet = NSSet
 
 extension Recipe {
 
@@ -27,7 +29,26 @@ extension Recipe {
     @NSManaged public var sourceURL: String?
     @NSManaged public var title: String?
     @NSManaged public var usageCount: Int32
+    @NSManaged public var groceryListItems: NSSet?
     @NSManaged public var ingredients: NSSet?
+    @NSManaged public var plannedMeals: PlannedMeal?
+
+}
+
+// MARK: Generated accessors for groceryListItems
+extension Recipe {
+
+    @objc(addGroceryListItemsObject:)
+    @NSManaged public func addToGroceryListItems(_ value: GroceryListItem)
+
+    @objc(removeGroceryListItemsObject:)
+    @NSManaged public func removeFromGroceryListItems(_ value: GroceryListItem)
+
+    @objc(addGroceryListItems:)
+    @NSManaged public func addToGroceryListItems(_ values: NSSet)
+
+    @objc(removeGroceryListItems:)
+    @NSManaged public func removeFromGroceryListItems(_ values: NSSet)
 
 }
 

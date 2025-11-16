@@ -43,9 +43,8 @@
         <attribute name="parseConfidence" attributeType="Float" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="source" optional="YES" attributeType="String"/>
-        <attribute name="sourceRecipeID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="sourceType" optional="YES" attributeType="String"/>
         <attribute name="standardUnit" optional="YES" attributeType="String"/>
+        <relationship name="sourceRecipes" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recipe" inverseName="groceryListItems" inverseEntity="Recipe"/>
         <relationship name="weeklyList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WeeklyList" inverseName="items" inverseEntity="WeeklyList"/>
         <fetchIndex name="byQuantityFields">
             <fetchIndexElement property="numericValue" type="Binary" order="ascending"/>
@@ -135,6 +134,7 @@
         <attribute name="sourceURL" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="usageCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="groceryListItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryListItem" inverseName="sourceRecipes" inverseEntity="GroceryListItem"/>
         <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ingredient" inverseName="recipe" inverseEntity="Ingredient"/>
         <relationship name="plannedMeals" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PlannedMeal" inverseName="recipe" inverseEntity="PlannedMeal"/>
         <fetchIndex name="byPropertyIndex">
@@ -156,7 +156,7 @@
         <attribute name="mealPlanDuration" attributeType="Integer 16" defaultValueString="7" usesScalarValueType="YES"/>
         <attribute name="mealPlanStartDay" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="modifiedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="showRecipeSourceInMealPlan" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="showRecipeSources" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <fetchIndex name="byUserPreferencesId">
             <fetchIndexElement property="id" type="Binary" order="ascending"/>
         </fetchIndex>

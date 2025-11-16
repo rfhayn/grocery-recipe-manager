@@ -491,9 +491,9 @@ struct PersistenceController {
             let itemsToMigrate = try context.fetch(request)
             if !itemsToMigrate.isEmpty {
                 print("🔄 Migrating \(itemsToMigrate.count) items to category relationships")
-                for item in itemsToMigrate {
-                    item.migrateToCategory(in: context)
-                }
+                //for item in itemsToMigrate {
+                //    item.migrateToCategory(in: context)
+                //}
             }
         } catch {
             print("❌ Migration failed: \(error)")

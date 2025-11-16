@@ -44,7 +44,7 @@ class UserPreferencesService: ObservableObject {
     
     // M4.1: Show recipe source in meal plan displays
     // Controls whether "From: [Recipe Name]" appears in M4.2
-    @Published var showRecipeSourceInMealPlan: Bool = true
+    @Published var showRecipeSources: Bool = true
     
     // MARK: - Private Properties
     
@@ -82,7 +82,7 @@ class UserPreferencesService: ObservableObject {
                 mealPlanDuration = Int(existing.mealPlanDuration)
                 mealPlanStartDay = Int(existing.mealPlanStartDay)
                 autoNameMealPlans = existing.autoNameMealPlans
-                showRecipeSourceInMealPlan = existing.showRecipeSourceInMealPlan
+                showRecipeSources = existing.showRecipeSources
             } else {
                 // Create default preferences on first launch
                 createDefaultPreferences()
@@ -102,7 +102,7 @@ class UserPreferencesService: ObservableObject {
         newPreferences.mealPlanDuration = 7
         newPreferences.mealPlanStartDay = 0 // Sunday
         newPreferences.autoNameMealPlans = true
-        newPreferences.showRecipeSourceInMealPlan = true
+        newPreferences.showRecipeSources = true
         newPreferences.createdDate = Date()
         newPreferences.modifiedDate = Date()
         
@@ -122,7 +122,7 @@ class UserPreferencesService: ObservableObject {
             $mealPlanDuration,
             $mealPlanStartDay,
             $autoNameMealPlans,
-            $showRecipeSourceInMealPlan
+            $showRecipeSources
         )
         .dropFirst() // Ignore initial values from loadPreferences()
         .debounce(for: .milliseconds(500), scheduler: RunLoop.main) // Batch rapid changes
@@ -157,7 +157,7 @@ class UserPreferencesService: ObservableObject {
         prefs.mealPlanDuration = Int16(validatedDuration)
         prefs.mealPlanStartDay = Int16(validatedStartDay)
         prefs.autoNameMealPlans = autoName
-        prefs.showRecipeSourceInMealPlan = showSource
+        prefs.showRecipeSources = showSource
         prefs.modifiedDate = Date()
         
         // Persist to disk
@@ -204,7 +204,7 @@ class UserPreferencesService: ObservableObject {
             duration: mealPlanDuration,
             startDay: mealPlanStartDay,
             autoName: autoNameMealPlans,
-            showSource: showRecipeSourceInMealPlan
+            showSource: showRecipeSources
         )
     }
     

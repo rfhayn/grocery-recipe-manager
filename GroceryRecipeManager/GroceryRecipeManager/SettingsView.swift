@@ -3,6 +3,7 @@
 //  GroceryRecipeManager
 //
 //  Enhanced for M4.1: Added Meal Planning Preferences Section
+//  Enhanced for M4.3.1: Added Display Options Section
 //
 
 import SwiftUI
@@ -17,8 +18,11 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
-                // M4.1: NEW SECTION - Meal Planning Preferences
+                // M4.1: Meal Planning Preferences
                 mealPlanningSection
+                
+                // M4.3.1: Display Options
+                displayOptionsSection
                 
                 // Existing section - Data Management with Migration
                 migrationSection
@@ -53,14 +57,28 @@ struct SettingsView: View {
             // When enabled, generates names like "Week of Oct 23"
             Toggle("Auto-name Meal Plans", isOn: $preferencesService.autoNameMealPlans)
             
-            // Show source toggle
-            // Controls whether recipe source appears in meal plan displays
-            Toggle("Show Recipe Sources", isOn: $preferencesService.showRecipeSourceInMealPlan)
-            
         } header: {
             Text("Meal Planning")
         } footer: {
-            Text("Meal plans will default to \(preferencesService.mealPlanDuration) days starting on \(preferencesService.startDayName).")
+            Text("Configure how meal plans are created and displayed. Meal plans will default to \(preferencesService.mealPlanDuration) days starting on \(preferencesService.startDayName).")
+                .font(.caption)
+        }
+    }
+    
+    // MARK: - M4.3.1: Display Options Section
+    
+    // Display preferences for recipe source visibility
+    // Controls whether recipe sources appear throughout the app
+    private var displayOptionsSection: some View {
+        Section {
+            // Show recipe sources toggle
+            // When enabled, shows recipe tags like "[Tacos] [Spaghetti]"
+            Toggle("Show Recipe Sources", isOn: $preferencesService.showRecipeSources)
+            
+        } header: {
+            Text("Display Options")
+        } footer: {
+            Text("When enabled, grocery list items will show which recipes they came from (e.g., \"Ground beef [Tacos]\").")
                 .font(.caption)
         }
     }
