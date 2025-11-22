@@ -673,6 +673,7 @@ struct GroceryListItemRow: View {
                 // M3 PHASE 6: Enhanced with visual indicators
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     HStack(spacing: 6) {
+                        // M4.3.1: Show item name without recipe tags
                         Text(item.name ?? "Unknown Item")
                             .font(.body)
                             .fontWeight(.medium)
@@ -705,7 +706,25 @@ struct GroceryListItemRow: View {
                     Spacer()
                 }
                 
-                if let source = item.source {
+                // M4.3.1: Recipe source badges
+                if !item.sourceRecipeNames.isEmpty {
+                    HStack(spacing: 4) {
+                        ForEach(item.sourceRecipeNames, id: \.self) { recipeName in
+                            Text(recipeName)
+                                .font(.caption2)
+                                .fontWeight(.medium)
+                                .foregroundColor(.blue)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(4)
+                        }
+                    }
+                }
+                
+                // M4.3.1 FIX: Only show source text for MERGED items, not regular recipes
+                // Recipe items now show badges above, so don't duplicate with text
+                if let source = item.source, source.hasPrefix("merged") {
                     Text(sourceDisplayText(source))
                         .font(.caption)
                         .foregroundColor(.secondary)

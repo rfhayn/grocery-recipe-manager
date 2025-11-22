@@ -626,11 +626,21 @@ struct CreateRecipeView: View {
                 let trimmed = ingredientInput.fullText.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmed.isEmpty else { continue }
                 
+                // M4.3.1 FIX: Parse ingredient to get structured quantity fields
+                let parsed = parsingService.parseToStructured(text: trimmed)
+                
                 let ingredient = Ingredient(context: viewContext)
                 ingredient.id = UUID()
                 ingredient.name = trimmed // Full text with quantity
                 ingredient.sortOrder = Int16(index)
                 ingredient.recipe = recipe
+                
+                // M4.3.1 FIX: Populate structured quantity fields from parsing
+                ingredient.displayText = parsed.displayText
+                ingredient.numericValue = parsed.numericValue ?? 0.0
+                ingredient.standardUnit = parsed.standardUnit
+                ingredient.isParseable = parsed.isParseable
+                ingredient.parseConfidence = parsed.parseConfidence
                 
                 // Link to template (READ-ONLY reference)
                 if let template = ingredientInput.template {

@@ -366,14 +366,29 @@ struct AddIngredientsToListView: View {
                 let existingDisplayText = existingItem.displayText ?? ""
                 let newDisplayText = fullIngredientText
                 
-                if !newDisplayText.isEmpty && !existingDisplayText.isEmpty {
+                // M4.3.1: Only merge non-empty displayText to avoid empty strings
+                if !newDisplayText.isEmpty && newDisplayText != "1" && !existingDisplayText.isEmpty {
                     existingItem.displayText = "\(existingDisplayText) + \(newDisplayText)"
-                } else if !newDisplayText.isEmpty {
+                } else if !newDisplayText.isEmpty && newDisplayText != "1" {
                     existingItem.displayText = newDisplayText
                 }
                 
+                // M4.3.1: Add recipe to sourceRecipes relationship
+                existingItem.addToSourceRecipes(recipe)
+                
+                // TEMPORARY DEBUG
+                print("🔍 DEBUG: Added recipe '\(recipe.title ?? "nil")' to item '\(cleanName)'")
+                if let recipes = existingItem.sourceRecipes as? Set<Recipe> {
+                    print("🔍 DEBUG: Item now has \(recipes.count) source recipes:")
+                    for r in recipes {
+                        print("   - \(r.title ?? "nil")")
+                    }
+                } else {
+                    print("🔍 DEBUG: sourceRecipes is nil or not a Set!")
+                }
+                
                 mergeCount += 1
-                print("Merged quantities for '\(cleanName)'")
+                print("Merged quantities for '\(cleanName)' and added recipe source")
             } else {
                 // Create new item
                 let listItem = GroceryListItem(context: viewContext)
@@ -389,6 +404,9 @@ struct AddIngredientsToListView: View {
                 
                 listItem.isCompleted = false
                 listItem.source = "Recipe: \(recipe.title ?? "Unknown Recipe")"
+                
+                // M4.3.1: Add recipe to sourceRecipes relationship
+                listItem.addToSourceRecipes(recipe)
                 
                 // Use proper category assignment logic
                 if let template = ingredient.ingredientTemplate,

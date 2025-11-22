@@ -195,7 +195,7 @@ struct RecipeListView: View {
                 }) {
                     HStack {
                         Image(systemName: "plus.circle.fill")
-                        Text("Add Sample Recipe")
+                        Text("Generate 6 Test Recipes")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
@@ -285,60 +285,211 @@ struct RecipeListView: View {
         }
     }
     
+    // M4.3.1: Updated to create 6 test recipes with overlapping ingredients
     private func createSampleRecipe() {
+        createAllTestRecipes()
+    }
+    
+    private func createAllTestRecipes() {
         withAnimation {
-            let newRecipe = Recipe(context: viewContext)
-            newRecipe.id = UUID()
-            newRecipe.title = "Sample Chocolate Chip Cookies"
-            newRecipe.instructions = "1. Preheat oven to 375°F\n2. Mix dry ingredients\n3. Combine wet ingredients\n4. Mix everything together\n5. Drop spoonfuls on baking sheet\n6. Bake for 9-11 minutes"
-            newRecipe.servings = 24
-            newRecipe.prepTime = 15
-            newRecipe.cookTime = 10
-            newRecipe.usageCount = 0
-            newRecipe.dateCreated = Date()
-            newRecipe.isFavorite = false
+            // Recipe 1: Chocolate Chip Cookies
+            createRecipe(
+                title: "Chocolate Chip Cookies",
+                instructions: """
+                1. Preheat oven to 375°F
+                2. Mix dry ingredients
+                3. Combine wet ingredients
+                4. Mix everything together
+                5. Drop spoonfuls on baking sheet
+                6. Bake for 9-11 minutes
+                """,
+                servings: 24,
+                prepTime: 15,
+                cookTime: 10,
+                ingredients: [
+                    "2 eggs",
+                    "1/2 cup butter",
+                    "2 cups flour",
+                    "1 cup chocolate chips",
+                    "3/4 cup sugar",
+                    "1 tsp vanilla extract"
+                ]
+            )
             
-            do {
-                try viewContext.save()
-                addSampleIngredientsWithTemplates(to: newRecipe, in: viewContext)
-                try viewContext.save()
-                print("Sample recipe '\(newRecipe.title ?? "Unknown")' created successfully")
-            } catch {
-                print("Error creating sample recipe: \(error)")
-            }
+            // Recipe 2: Pancakes
+            createRecipe(
+                title: "Pancakes",
+                instructions: """
+                1. Mix dry ingredients in bowl
+                2. Whisk eggs, milk, melted butter, vanilla
+                3. Combine wet and dry ingredients
+                4. Heat griddle to medium heat
+                5. Pour 1/4 cup batter per pancake
+                6. Flip when bubbles form
+                7. Cook until golden brown
+                """,
+                servings: 8,
+                prepTime: 5,
+                cookTime: 15,
+                ingredients: [
+                    "2 eggs",
+                    "1 cup flour",
+                    "1 cup milk",
+                    "2 tbsp butter",
+                    "1 tsp vanilla extract",
+                    "2 tsp baking powder",
+                    "1 tbsp sugar"
+                ]
+            )
+            
+            // Recipe 3: Scrambled Eggs
+            createRecipe(
+                title: "Scrambled Eggs",
+                instructions: """
+                1. Crack eggs into bowl
+                2. Add milk, salt, pepper
+                3. Whisk until combined
+                4. Melt butter in pan over medium heat
+                5. Pour in egg mixture
+                6. Stir gently until cooked
+                7. Serve immediately
+                """,
+                servings: 2,
+                prepTime: 2,
+                cookTime: 5,
+                ingredients: [
+                    "4 eggs",
+                    "2 tbsp butter",
+                    "1/4 cup milk",
+                    "1/4 tsp salt",
+                    "1/8 tsp pepper"
+                ]
+            )
+            
+            // Recipe 4: Sugar Cookies
+            createRecipe(
+                title: "Sugar Cookies",
+                instructions: """
+                1. Cream butter and sugar
+                2. Beat in egg and vanilla
+                3. Mix dry ingredients separately
+                4. Combine wet and dry ingredients
+                5. Roll dough 1/4 inch thick
+                6. Cut into shapes
+                7. Bake at 350°F for 8-10 minutes
+                """,
+                servings: 36,
+                prepTime: 20,
+                cookTime: 8,
+                ingredients: [
+                    "1 egg",
+                    "1/2 cup butter",
+                    "2 cups flour",
+                    "1 cup sugar",
+                    "1 tsp vanilla extract",
+                    "1 tsp baking powder",
+                    "1/4 tsp salt"
+                ]
+            )
+            
+            // Recipe 5: French Toast
+            createRecipe(
+                title: "French Toast",
+                instructions: """
+                1. Whisk eggs, milk, vanilla, cinnamon, sugar
+                2. Heat butter in large pan
+                3. Dip bread in egg mixture
+                4. Cook 2-3 minutes per side until golden
+                5. Serve with syrup and berries
+                """,
+                servings: 4,
+                prepTime: 5,
+                cookTime: 10,
+                ingredients: [
+                    "3 eggs",
+                    "1/2 cup milk",
+                    "1 tbsp butter",
+                    "1 tsp vanilla extract",
+                    "8 slices bread",
+                    "1/2 tsp cinnamon",
+                    "1 tbsp sugar"
+                ]
+            )
+            
+            // Recipe 6: Brownies
+            createRecipe(
+                title: "Brownies",
+                instructions: """
+                1. Preheat oven to 350°F
+                2. Melt butter and chocolate chips
+                3. Stir in sugar and eggs
+                4. Add cocoa, flour, vanilla, salt
+                5. Pour into greased 8x8 pan
+                6. Bake 25-30 minutes
+                7. Cool before cutting
+                """,
+                servings: 16,
+                prepTime: 10,
+                cookTime: 25,
+                ingredients: [
+                    "2 eggs",
+                    "1/2 cup butter",
+                    "1 cup flour",
+                    "1 cup chocolate chips",
+                    "1 cup sugar",
+                    "1/3 cup cocoa powder",
+                    "1/2 tsp vanilla extract",
+                    "1/4 tsp salt"
+                ]
+            )
+            
+            print("✅ Created 6 test recipes with overlapping ingredients")
         }
     }
     
-    private func addSampleIngredientsWithTemplates(to recipe: Recipe, in context: NSManagedObjectContext) {
-        let ingredientTexts = [
-            "2 cups all-purpose flour",
-            "1 cup chocolate chips",
-            "1/2 cup butter",
-            "3/4 cup sugar",
-            "2 eggs",
-            "1 tsp vanilla extract"
-        ]
+    // Helper function to create a recipe with ingredients
+    private func createRecipe(title: String, instructions: String, servings: Int16, prepTime: Int16, cookTime: Int16, ingredients: [String]) {
+        let newRecipe = Recipe(context: viewContext)
+        newRecipe.id = UUID()
+        newRecipe.title = title
+        newRecipe.instructions = instructions
+        newRecipe.servings = servings
+        newRecipe.prepTime = prepTime
+        newRecipe.cookTime = cookTime
+        newRecipe.usageCount = 0
+        newRecipe.dateCreated = Date()
+        newRecipe.isFavorite = false
         
+        do {
+            try viewContext.save()
+            addIngredientsWithParsing(to: newRecipe, ingredients: ingredients, in: viewContext)
+            try viewContext.save()
+            print("✅ Created recipe: '\(title)'")
+        } catch {
+            print("❌ Error creating recipe '\(title)': \(error)")
+        }
+    }
+    
+    private func addIngredientsWithParsing(to recipe: Recipe, ingredients: [String], in context: NSManagedObjectContext) {
         let templateService = IngredientTemplateService(context: context)
         let parsingService = IngredientParsingService(context: context, templateService: templateService)
         
-        for (index, text) in ingredientTexts.enumerated() {
-            let parsed = parsingService.parseIngredient(text: text)
+        for (index, text) in ingredients.enumerated() {
             let structured = parsingService.parseToStructured(text: text)
             
             let ingredient = Ingredient(context: context)
             ingredient.id = UUID()
-            ingredient.name = parsed.originalText
+            ingredient.name = text
             ingredient.sortOrder = Int16(index)
             ingredient.recipe = recipe
             
+            // M4.3.1 FIX: Populate all structured quantity fields
+            ingredient.displayText = structured.displayText
             ingredient.numericValue = structured.numericValue ?? 0.0
             ingredient.standardUnit = structured.standardUnit
             ingredient.isParseable = structured.isParseable
             ingredient.parseConfidence = structured.parseConfidence
         }
-        
-        print("✅ Created \(ingredientTexts.count) sample ingredients with structured quantities")
     }
     
     private func deleteRecipes(offsets: IndexSet) {
@@ -827,17 +978,9 @@ struct RecipeDetailView: View {
                     .font(.body)
                     .foregroundColor(.primary)
                 
-                // M3: Use displayText instead of quantity
-                // M3.5: Use bestIngredientDisplayText (better fallback handling)
-                if ingredient.hasStructuredQuantity || ingredient.displayText != nil {
-                    Text(ingredient.bestIngredientDisplayText)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(4)
-                }
+                // M4.3.1: Removed redundant displayText tag
+                // The ingredient name already includes quantity info
+                // Only show notes if they exist
                 
                 if let notes = ingredient.notes?.trimmingCharacters(in: .whitespacesAndNewlines),
                    !notes.isEmpty {

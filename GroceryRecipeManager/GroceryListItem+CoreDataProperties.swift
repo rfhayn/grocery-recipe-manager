@@ -2,7 +2,7 @@
 //  GroceryListItem+CoreDataProperties.swift
 //  GroceryRecipeManager
 //
-//  Created by Richard Hayn on 11/13/25.
+//  Created by Rich Hayn on 11/18/25.
 //
 //
 
@@ -31,8 +31,25 @@ extension GroceryListItem {
     @NSManaged public var sortOrder: Int16
     @NSManaged public var source: String?
     @NSManaged public var standardUnit: String?
-    @NSManaged public var sourceRecipes: Recipe?
+    @NSManaged public var sourceRecipes: NSSet?
     @NSManaged public var weeklyList: WeeklyList?
+
+}
+
+// MARK: Generated accessors for sourceRecipes
+extension GroceryListItem {
+
+    @objc(addSourceRecipesObject:)
+    @NSManaged public func addToSourceRecipes(_ value: Recipe)
+
+    @objc(removeSourceRecipesObject:)
+    @NSManaged public func removeFromSourceRecipes(_ value: Recipe)
+
+    @objc(addSourceRecipes:)
+    @NSManaged public func addToSourceRecipes(_ values: NSSet)
+
+    @objc(removeSourceRecipes:)
+    @NSManaged public func removeFromSourceRecipes(_ values: NSSet)
 
 }
 

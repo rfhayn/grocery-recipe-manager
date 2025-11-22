@@ -46,4 +46,29 @@ extension GroceryListItem {
         let tags = recipeNames.map { "[\($0)]" }.joined(separator: " ")
         return " \(tags)"
     }
+    
+    // MARK: - M4.3.1: Recipe Source Names Array (for badge display)
+    
+    /// Returns array of recipe names for badge-style display
+    /// Returns empty array if no sources or user preference disabled
+    ///
+    /// Performance: < 0.05s (optimized for UI display)
+    @MainActor
+    var sourceRecipeNames: [String] {
+        // Check user preference first
+        guard UserPreferencesService.shared.showRecipeSources else {
+            return []
+        }
+        
+        // Get source recipes from relationship
+        guard let recipes = sourceRecipes as? Set<Recipe>,
+              !recipes.isEmpty else {
+            return []
+        }
+        
+        // Extract and sort recipe names alphabetically
+        return recipes
+            .compactMap { $0.title }
+            .sorted()
+    }
 }

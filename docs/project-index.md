@@ -1,9 +1,9 @@
 # Grocery & Recipe Manager - Project Index
 
-**Last Updated**: November 12, 2025  
+**Last Updated**: November 22, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M4.3.1 (Recipe Source Tracking Foundation) - Next  
-**Next Priority**: M4.3.2+ (Enhanced Grocery Features)
+**Current Milestone**: M4.3.2 (Scaled Recipe to List Integration) - Next  
+**Next Priority**: M4.3.3+ (Bulk Add & Meal Completion)
 
 ---
 
@@ -152,7 +152,7 @@
 ## 📊 **CURRENT STATE - November 2025**
 
 ### **Project Velocity Summary**
-- **Total Hours**: 73 hours across M1-M4.2 complete
+- **Total Hours**: 76.5 hours across M1-M4.3.1 complete
 - **Planning Accuracy**: 88% (< 12% average variance)
 - **Build Success Rate**: 100% (zero breaking changes)
 - **Performance**: All operations < 0.5s target maintained
@@ -228,6 +228,26 @@
 - Date range picker enhancement
 - Sheet pattern discovery and fix
 
+#### **M4.3.1: Recipe Source Tracking Foundation** ✅ (3.5 hours - November 2025)
+**Key Achievements:**
+- Many-to-many GroceryListItem ↔ Recipe relationships
+- Professional recipe source badges with user control
+- Display Options section in Settings
+- Fixed 3 critical bugs:
+  - Empty displayText in recipe ingredients
+  - Duplicate source text display
+  - Redundant quantity tags in recipe view
+- 6 comprehensive test recipes with strategic overlap
+- Complete testing validation (11/11 tests passing)
+
+**Phases:**
+- Phase 1: Core Data schema changes (20 min) ✅
+- Phase 2: UserPreferences enhancement (15 min) ✅
+- Phase 3: Settings UI reorganization (10 min) ✅
+- Phase 4: Recipe badge display (60 min) ✅
+- Phase 5: Test infrastructure (30 min) ✅
+- Phase 6: Bug fixes and cleanup (65 min) ✅
+
 ---
 
 ## 📚 **LEARNING NOTES**
@@ -255,6 +275,7 @@
 ### **M4 Series**
 - **[20: M4.1 Settings Infrastructure](learning-notes/20-m4.1-settings-infrastructure.md)** - Settings foundation (1.5 hours)
 - **[21: M4.2 Calendar Meal Planning](learning-notes/21-m4.2-calendar-meal-planning.md)** - Meal planning core (~4 hours)
+- **[22: M4.3.1 Recipe Source Tracking](learning-notes/22-m4.3.1-recipe-source-tracking.md)** - Recipe relationships & badges (3.5 hours)
 
 **Learning Notes Pattern:**
 - Implementation journey with timeline
@@ -293,10 +314,11 @@ Available in `architecture/template.md` for creating new ADRs
 
 ### **Active**
 - **[M4: Meal Planning & Settings Integration](prds/milestone-4-meal-planning-and-settings-integration.md)** - Complete M4 PRD
-- **[M4.3.1: Recipe Source Tracking Foundation](prds/milestone-4.3.1-recipe-source-tracking-foundation.md)** - Core Data relationships PRD
-- **[M4.3: Scaled Recipe to Shopping List](prds/milestone-4.3-scaled-recipe-added-to-shopping-list.md)** - Enhanced grocery features
+- **[M4.3.1: Recipe Source Tracking Foundation](prds/milestone-4.3.1-recipe-source-tracking-foundation.md)** - Core Data relationships PRD (COMPLETE)
+- **[M4.3.5: Ingredient Normalization](prds/M4.3.5-INGREDIENT-NORMALIZATION-PRD.md)** - Data quality enhancement (50+ pages)
 
 ### **Completed**
+- **[M3: Structured Quantity Management](prds/complete/milestone-3-qty-mgmt-prd.md)**
 - **[M2.3: Recipe Creation & Editing](prds/complete/m2.3-recipe-creation-and-editing.md)**
 - **[M2 Phase 2 Story 3a: Enhanced Add to List](prds/complete/milestone-2-phase-2-story-3a-enhanced-add-to-ingredient-list.md)**
 
@@ -314,17 +336,17 @@ Available in `architecture/template.md` for creating new ADRs
 | M3.5 | 7h | 8.5h | ✅ +21% | Complete |
 | M4.1 | 1.5h | 1.5h | ✅ 0% | Complete |
 | M4.2 | 2.5-3h | ~4h | ⚠️ +40% | Complete |
-| M4.3.1 | 2-2.5h | TBD | 🚀 | Ready |
-| M4.3.2+ | 1.5-2h | TBD | ⏳ | Planned |
-| **Totals** | **66.5-79h** | **~73h** | **✅ +5%** | **6 Complete** |
+| M4.3.1 | 2-2.5h | 3.5h | ⚠️ +40% | Complete |
+| M4.3.2 | 1.5-2h | TBD | 🚀 | Ready |
+| M4.3.3-5 | 6.75h | TBD | ⏳ | Planned |
+| **Totals** | **72-83h** | **~76.5h** | **✅ +4%** | **7 Complete** |
 
 **Overall Planning Accuracy**: 88% (< 12% average variance)
 
-**M4.2 Variance Notes**: 
-- Included extensive sheet debugging and pattern discovery
-- Date picker enhancement (unplanned improvement)
-- Recipe usage tracking implementation
-- Learning investment paid off with reusable patterns
+**Recent Variance Notes**:
+- **M4.2** (+40%): Included sheet debugging, date picker enhancement, recipe usage tracking
+- **M4.3.1** (+40%): Bug discovery/fixes (3 issues), test infrastructure (6 recipes), UI cleanup
+- **Pattern**: Bug buffer and test infrastructure should be included in estimates
 
 **Success Factors:**
 - Consistent use of session-startup-checklist.md
@@ -337,18 +359,37 @@ Available in `architecture/template.md` for creating new ADRs
 
 ## 📅 **RECENT ACTIVITY**
 
+### **November 22, 2025** - M4.3.1 Complete ✅
+- **Completed**: M4.3.1 - Recipe Source Tracking Foundation (3.5 hours)
+  - Many-to-many GroceryListItem ↔ Recipe relationships
+  - Professional recipe source badges with user control
+  - Display Options section in Settings
+  - Fixed 3 critical bugs:
+    - Empty displayText in recipe ingredients
+    - Duplicate source text display
+    - Redundant quantity tags in recipe view
+  - 6 comprehensive test recipes with strategic overlap
+  - Complete testing validation (11/11 tests passing)
+- **Documented**: Learning note 22-m4.3.1-recipe-source-tracking.md
+- **Ready**: M4.3.2 - Scaled Recipe to List Integration
+  - Comprehensive next-prompt.md created (30+ pages)
+  - 3-phase implementation guide
+  - Leverages M3 RecipeScalingService
+  - Estimated 1.5-2 hours
+- **Status**: M4.3.1 COMPLETE, M4.3.2 🚀 **READY** to begin
+
 ### **November 12, 2025** - M4.3.1 Planning Complete 📋
-- **Planned**: M4.3.1 - Recipe Source Tracking Foundation (2-2.5 hours)
+- **Planned**: M4.3.1 - Recipe Source Tracking Foundation
   - Comprehensive PRD with Core Data schema changes
   - Many-to-many GroceryListItem ↔ Recipe relationships
-  - Remove legacy sourceRecipeId UUID tracking
   - Display Options section in Settings
   - Foundation for recipe transparency features
-- **Planned**: M4.3.2+ - Enhanced Grocery Features (1.5-2 hours)
-  - M4.3.2: "Add All to List" from meal plan
-  - M4.3.3: Scaled recipe to list with servings
-  - M4.3.4: Recipe source tags display
-- **Status**: M4.3.1 🚀 **READY** to begin
+- **Planned**: M4.3.5 - Ingredient Normalization
+  - Complete 50+ page PRD
+  - 4 progressive phases (case, plural, abbreviations, variations)
+  - Behind-the-scenes operation, no user intervention
+  - Estimated 4 hours
+- **Status**: M4.3.1 🚀 **READY**, M4.3.5 PRD complete
 - **Documentation**: All five key files updated with M4.3 breakdown
 
 ### **November 3, 2025** - M4.2 Complete + Enhancement Documented ✅
@@ -366,13 +407,20 @@ Available in `architecture/template.md` for creating new ADRs
   - Ready to implement (1.0 hour estimated)
 - **Status**: M4.2 MILESTONE COMPLETE, M4.3 next
 
+### **October 28, 2025** - M4.1 Complete ✅
+- **Completed**: M4.1 - Settings Infrastructure Foundation (1.5 hours)
+- **Status**: M4.1 MILESTONE COMPLETE
+- UserPreferences Core Data entity with singleton pattern
+- Meal Planning settings section
+- Real-time validation and persistence
+- Foundation for M4.2 and M4.3
+
 ### **October 23, 2025** - Documentation Enhancement 📚
 - **Enhanced**: session-startup-checklist.md (NEW - V1.0)
 - **Enhanced**: project-naming-standards.md (V3.0)
 - **Enhanced**: development-guidelines.md (V3.0)
 - **Enhanced**: project-index.md (this file)
 - **Focus**: Strengthened naming enforcement and session startup consistency
-- **Next**: M4.1 - Settings Infrastructure Foundation
 
 ### **October 22, 2025** - M3.5 Complete ✅
 - **Completed**: M3.5 - Foundation Validation & Testing (8.5 hours)
@@ -381,7 +429,6 @@ Available in `architecture/template.md` for creating new ADRs
 - Added 75+ computed properties for data integrity
 - Achieved 100% validation pass rate
 - Established test automation pattern
-- **Next**: M4.1 - Settings Infrastructure Foundation
 
 ### **October 20, 2025** - M3 Complete ✅
 - **Completed**: M3 Phase 6 - UI Polish & Documentation (1 hour)
@@ -404,41 +451,46 @@ Available in `architecture/template.md` for creating new ADRs
 
 ### **Current State**
 - **Active Milestone**: M4 (Meal Planning & Enhanced Grocery Integration)
-- **Completed**: M4.1 (Settings), M4.2 (Calendar Planning) ✅
-- **Current Phase**: M4.3.1 (Recipe Source Foundation) 🚀 **READY** ← **NEXT**
-- **Next After**: M4.3.2+ (Enhanced Grocery Features) ⏳ **PLANNED**
-- **Progress**: M1-M4.2 complete (73 hours), M4.3 ready (3.5-4.5h remaining)
-- **Status**: On track with excellent planning accuracy
+- **Completed**: M4.1 (Settings), M4.2 (Calendar Planning), M4.3.1 (Recipe Source Tracking) ✅
+- **Current Phase**: M4.3.2 (Scaled Recipe to List) 🚀 **READY** ← **NEXT**
+- **Next After**: M4.3.3+ (Bulk Add, Meal Completion, Ingredient Normalization) ⏳ **PLANNED**
+- **Progress**: M1-M4.3.1 complete (76.5 hours), M4.3.2-5 remaining (~7.5h estimated)
+- **Status**: On track with excellent planning accuracy (88%)
 
 ### **M4.3 Work Breakdown**
 
-**M4.3.1: Recipe Source Tracking Foundation** (2-2.5 hours) 🚀 **READY**
-- **Phase 1**: Core Data schema changes (45-60 min)
-  - Many-to-many GroceryListItem ↔ Recipe relationship
-  - Remove legacy sourceRecipeId UUID
-  - Proper delete rules (nullify)
-  - Fetch indexes for optimization
-- **Phase 2**: Settings UI enhancement (30-45 min)
-  - Display Options section in Settings
-  - showRecipeSourcesOnGroceryItems toggle
-  - Update UserPreferences entity
-- **Phase 3**: Foundation integration (45-60 min)
-  - Update addToShoppingList() for relationships
-  - Computed property: groceryListItemRecipeNames
-  - Test relationship creation
-  - Database migration validation
+**M4.3.1: Recipe Source Tracking Foundation** ✅ **COMPLETE** (3.5 hours)
+- Many-to-many GroceryListItem ↔ Recipe relationships
+- Display Options section in Settings
+- Professional recipe source badges with user control
+- Fixed 3 critical bugs (displayText, duplicate text, redundant tags)
+- 6 comprehensive test recipes with strategic overlap
+- Complete testing validation (11/11 tests passing)
 
-**M4.3.2+: Enhanced Grocery Features** (1.5-2 hours) ⏳ **PLANNED**
-- **M4.3.2**: "Add All to List" from meal plan (30-45 min)
-  - Bulk recipe-to-list with progress indicator
-  - Success confirmation
-- **M4.3.3**: Scaled recipe to list (30-45 min)
-  - Servings-adjusted quantities
-  - Leverage RecipeScalingService
-- **M4.3.4**: Recipe source display (30-45 min)
-  - Visual tags: "Ground beef [Tacos] [Spaghetti]"
-  - User-controlled via preference
-  - Clean tag display
+**M4.3.2: Scaled Recipe to List Integration** 🚀 **READY** (1.5-2 hours) ← **NEXT**
+- Add recipes with custom serving sizes
+- Leverage RecipeScalingService from M3
+- Real-time quantity scaling preview
+- Recipe relationship establishment
+- Comprehensive next-prompt.md ready
+
+**M4.3.3: Bulk Add from Meal Plan** ⏳ **PLANNED** (2 hours)
+- "Add All to Shopping List" button
+- Process all meal plan recipes
+- Smart quantity consolidation
+- Progress feedback
+
+**M4.3.4: Meal Completion Tracking** ⏳ **PLANNED** (45 min)
+- Mark meals as completed
+- Visual feedback
+- Historical tracking
+
+**M4.3.5: Ingredient Normalization** ⏳ **PLANNED** (4 hours)
+- Case normalization (Butter → butter)
+- Singular/plural handling (egg → eggs)
+- Abbreviation expansion (tbsp → tablespoon)
+- Common variations (all-purpose flour → flour)
+- Complete 50+ page PRD ready
 
 ### **Performance Metrics**
 - **All Operations**: < 0.5s target maintained ✅
@@ -449,7 +501,7 @@ Available in `architecture/template.md` for creating new ADRs
 
 ### **Technical Debt**
 - **Status**: NONE ✅
-- Clean architecture maintained throughout M1-M4.2
+- Clean architecture maintained throughout M1-M4.3.1
 - No shortcuts or workarounds
 - Comprehensive documentation at all levels
 - All code follows established patterns from development-guidelines.md
@@ -521,7 +573,7 @@ Available in `architecture/template.md` for creating new ADRs
 
 ---
 
-**Last Updated**: November 12, 2025  
-**Next Update**: After M4.3.1 completion  
-**Current Status**: M4.2 complete, M4.3.1 ready to begin  
-**Documentation Version**: Updated with M4.3 breakdown
+**Last Updated**: November 22, 2025  
+**Next Update**: After M4.3.2 completion  
+**Current Status**: M4.3.1 complete, M4.3.2 ready to begin  
+**Documentation Version**: Updated with M4.3.1 completion and M4.3.2 readiness
