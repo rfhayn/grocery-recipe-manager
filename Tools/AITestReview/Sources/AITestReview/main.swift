@@ -56,24 +56,42 @@ func collectRepoContext() throws -> RepoContext {
     let roadmap = safeReadFile("roadmap.md", maxLength: 4000)
     let projectIndex = safeReadFile("project-index.md", maxLength: 4000)
 
-    // 2. Determine base and head for diff
-    let base = try runShell("git merge-base HEAD origin/main || echo origin/main")
+    // 2. Determine head
     let head = try runShell("git rev-parse HEAD")
 
-    // 3. Changed files
-    let changedFilesOutput = try runShell("git diff --name-only \(base)...\(head)")
+    // 3. First attempt: diff vs origin/main (good for PRs/CI)
+    var base = try runShell("git merge-base HEAD origin/main || echo origin/main")
+    var changedFilesOutput = try runShell("git diff --name-only \(base)...\(head)")
+    var diffOutput = try runShell("git diff \(base)...\(head)")
+
+    // 4. If no changes vs origin/main (common when you just pushed to main),
+    //    fall back to last commit (HEAD^...HEAD) so local runs still show something.
+    if changedFilesOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        // Best-effort: if HEAD^ doesn’t exist (e.g., first commit), keep origin/main
+        if let previous = try? runShell("git rev-parse HEAD^") {
+            base = previous
+            changedFilesOutput = try runShell("git diff --name-only \(base)...\(head)")
+            diffOutput = try runShell("git diff \(base)...\(head)")
+            fputs("AI Test Review: Using HEAD^ as diff base (local fallback).\n", stderr)
+        } else {
+            fputs("AI Test Review: No previous commit, diff vs origin/main is empty.\n", stderr)
+        }
+    } else {
+        fputs("AI Test Review: Using origin/main as diff base.\n", stderr)
+    }
+
+    // 5. Build changed files list
     let changedFiles = changedFilesOutput
         .split(separator: "\n")
         .map(String.init)
         .filter { !$0.isEmpty }
 
-    // 4. Unified diff (truncate to avoid huge prompts)
-    let diffOutput = try runShell("git diff \(base)...\(head)")
+    // 6. Truncate diff for token safety
     let diff = diffOutput.count > 12000
         ? String(diffOutput.prefix(12000))
         : diffOutput
 
-    // 5. Related test files (initially: all *Tests.swift)
+    // 7. Test files (still naive: all *Tests.swift, capped)
     let testFilesListOutput = try runShell("git ls-files \"*Tests.swift\" || echo \"\"")
     let testFiles = testFilesListOutput
         .split(separator: "\n")
