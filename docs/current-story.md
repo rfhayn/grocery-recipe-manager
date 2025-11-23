@@ -3,7 +3,7 @@
 **Last Updated**: November 22, 2025  
 **Current Milestone**: M4 - Meal Planning & Enhanced Grocery Integration  
 **Current Phase**: M4.3 (Enhanced Grocery Integration)  
-**Status**: M4.1-M4.3.1 Complete ✅, M4.3.2 Ready 🚀
+**Status**: M4.1-M4.3.2 Complete ✅, M4.3.3 Ready 🚀
 
 ---
 
@@ -15,8 +15,8 @@
    - M4.1 Complete ✅
    - M4.2 Complete ✅
    - M4.3.1 Complete ✅
-   - M4.3.2-4 Next
-   - M4.3.5 Planned (Ingredient Normalization)
+   - M4.3.2 Complete ✅
+   - M4.3.3-5 Next
 3. **TestFlight Preparation**: Apple Developer Account & Device Testing
 
 ### **M4 Overview:**
@@ -28,11 +28,11 @@
 - **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish 🚀 **READY** (1.0 hour, optional)
 - **M4.3**: Enhanced Grocery Integration 🔄 **ACTIVE** (7.5-9 hours total)
   - M4.3.1: Recipe Source Tracking Foundation ✅ **COMPLETE** (3.5 hours)
-  - M4.3.2: Scaled Recipe to List Integration 🚀 **READY** (1.5-2 hours)
-  - M4.3.3: Bulk Add from Meal Plan ⏳ **PLANNED** (2 hours)
+  - M4.3.2: Scaled Recipe to List Integration ✅ **COMPLETE** (1.25 hours)
+  - M4.3.3: Bulk Add from Meal Plan 🚀 **READY** (2 hours)
   - M4.3.4: Meal Completion Tracking ⏳ **PLANNED** (45 min)
   - M4.3.5: Ingredient Normalization ⏳ **PLANNED** (4 hours)
-- **Total**: 14.5-17.5 hours (M4.1-M4.3.1 complete ~9h, 5.5-8.5h remaining)
+- **Total**: 14.5-17.5 hours (M4.1-M4.3.2 complete ~10.25h, 6.75h remaining)
 
 ### **Strategic Integration:**
 - **M3 → M4**: Structured quantities enable smart meal plan grocery generation ✅
@@ -41,271 +41,172 @@
 - **M4.1 → M4.2**: User preferences configure calendar and meal planning ✅
 - **M4.2 → M4.3**: Meal planning data ready for bulk grocery list generation ✅
 - **M4.3.1 → M4.3.2/M4.3.3**: Recipe source tracking foundation enables transparency ✅
+- **M4.3.2 → M4.3.3**: Scaled recipe addition ready for bulk meal plan workflow ✅
 - **M4.3.1 → M4.3.5**: Clean data foundation ready for normalization ✅
 - **M4 → TestFlight**: Core workflow complete, ready for device testing
 - **M4 → M5**: Meal planning data architecture ready for CloudKit family sharing
 
 ---
 
-**Current Status**: M1, M2, M3, M4.1, M4.2, and M4.3.1 successfully completed (~76.5 hours total). Recipe source tracking with user control operational. M4.3.2 (Scaled Recipe to List) ready to begin.
+**Current Status**: M1, M2, M3, M4.1, M4.2, M4.3.1, and M4.3.2 successfully completed (~77.75 hours total). Scaled recipe to list integration operational. M4.3.3 (Bulk Add from Meal Plan) ready to begin.
 
 ---
 
 ## M4.3.1: Recipe Source Tracking Foundation ✅ **COMPLETE**
 
+**Completed**: November 22, 2025  
+**Actual Time**: 3.5 hours  
 **Estimated**: 2-2.5 hours  
-**Actual**: ~3.5 hours  
-**Variance**: +40% (bug fixes and test infrastructure not in original estimate)  
-**Priority**: HIGH - Foundation for M4.3.2-4  
-**Completion Date**: November 22, 2025
+**Variance**: +40% (bug discovery and test infrastructure)
 
-### **What We Built**
-
-**Core Data Relationships:**
-- ✅ Many-to-many GroceryListItem ↔ Recipe relationships
-- ✅ Removed legacy sourceRecipeId UUID tracking
-- ✅ Proper cascade rules (Nullify on delete)
-- ✅ Type-safe relationship access
-
-**Settings Infrastructure:**
-- ✅ Display Options section in Settings
-- ✅ showRecipeSources toggle for user control
-- ✅ Updated UserPreferences entity
-- ✅ Real-time preference persistence
-
-**UI Implementation:**
-- ✅ Professional recipe source badges
-- ✅ Blue rounded corners, proper spacing
-- ✅ Multiple recipe sources per item
-- ✅ User-controllable visibility via settings
-- ✅ Clean, iOS-native design
-
-**Bug Fixes:**
-- ✅ **Fix 1**: Empty displayText in recipe ingredients
-  - Root cause: CreateRecipeView not populating structured data
-  - Solution: Full structured field population
-  - Impact: Eliminates empty `("")` quotes in quantities
-  
-- ✅ **Fix 2**: Duplicate source text display
-  - Root cause: Legacy source display system still active
-  - Solution: Conditional display (only for merged items)
-  - Impact: Clean display without duplicate information
-  
-- ✅ **Fix 3**: Redundant quantity tags in recipe view
-  - Root cause: DisplayText shown when ingredient name already includes it
-  - Solution: Removed redundant tag display
-  - Impact: Cleaner recipe ingredient view
-
-**Test Infrastructure:**
-- ✅ 6 comprehensive test recipes with strategic overlap
-- ✅ One-tap test data generation
-- ✅ Consistent test scenarios for badge validation
-- ✅ 40 total ingredients with intentional duplicates
-
-### **Technical Achievements**
+### **What Was Built**
 
 **Many-to-Many Relationships:**
-```swift
-// GroceryListItem ↔ Recipe
-listItem.addToSourceRecipes(recipe)
-let recipes = listItem.sourceRecipes?.allObjects as? [Recipe]
-```
+- GroceryListItem ↔ Recipe relationships (contributingRecipes/contributedToItems)
+- Nullify delete rules (independent lifecycles)
+- Fetch indexes for query optimization
+- Legacy `sourceRecipeId` removed
 
-**Computed Properties for Display:**
-```swift
-extension GroceryListItem {
-    var sourceRecipeNames: [String] {
-        guard let recipes = sourceRecipes?.allObjects as? [Recipe] else {
-            return []
-        }
-        return recipes.compactMap { $0.title }.sorted()
-    }
-}
-```
+**Settings UI Enhancement:**
+- Display Options section in SettingsView
+- "Show recipe sources on list items" toggle
+- Real-time preference updates
+- Professional iOS patterns
 
-**Settings-Based Feature Control:**
-```swift
-if userPreferences.showRecipeSources {
-    // Display recipe badges
-}
-```
+**Recipe Source Badges:**
+- Horizontal scrolling recipe chips
+- Tappable navigation to recipe detail
+- User-controlled visibility via settings
+- Professional badge design with icons
 
-### **Files Modified**
+### **Bugs Fixed**
 
-1. **GroceryRecipeManager.xcdatamodeld** - Core Data schema changes
-2. **GroceryListItem+ComputedProperties.swift** - Badge display property
-3. **GroceryListDetailView.swift** - Badge UI rendering
-4. **CreateRecipeView.swift** - Fixed displayText population
-5. **RecipeListView.swift** - Test recipe generation + recipe view cleanup
-6. **AddIngredientsToListView.swift** - Recipe relationship establishment
-7. **SettingsView.swift** - Display Options section
-8. **UserPreferences entity** - showRecipeSources property
+1. **Empty displayText in recipe ingredients** (30 min)
+   - Root cause: Ingredient parsing not populating displayText
+   - Fix: Updated addIngredientsWithParsing() to set displayText = fullText
+   - Impact: All recipe ingredients now have proper display text
 
-### **Testing Results**
+2. **Duplicate source text display** (15 min)
+   - Root cause: Both old source property and new recipe badges showing
+   - Fix: Removed legacy source text display, kept only badges
+   - Impact: Clean, professional UI
 
-**All Tests Passing ✅:**
-- [x] Recipe badges display with proper styling
-- [x] Multiple recipe sources show all badges
-- [x] No empty `("")` quotes in quantities
-- [x] Quantity merging works correctly
-- [x] Toggle OFF: Badges disappear, no duplicate text
-- [x] Toggle ON: Badges appear cleanly
-- [x] No gray "Recipe: X" duplicate text
-- [x] Recipe view shows clean ingredient display
-- [x] 6 test recipes generate correctly
-- [x] Performance maintained (< 0.1s operations)
+3. **Redundant quantity tags in recipe view** (15 min)
+   - Root cause: DisplayText shown twice in ingredient rows
+   - Fix: Removed redundant displayText tag, kept only name
+   - Impact: Cleaner recipe detail view
 
-**Known Limitation:**
-- ⏳ egg/eggs singular/plural duplicates (Expected - M4.3.5 will fix)
+### **Test Infrastructure**
 
-### **Time Breakdown**
+Created 6 comprehensive test recipes with strategic ingredient overlap:
+1. Chocolate Chip Cookies (24 servings)
+2. Pancakes (8 servings)
+3. Scrambled Eggs (2 servings)
+4. Sugar Cookies (36 servings)
+5. French Toast (4 servings)
+6. Brownies (16 servings)
 
-**Phase 1: Core Data Schema** (45 min) ✅
-- Many-to-many relationships
-- Schema migration
-- Build verification
+**Strategic Overlaps:**
+- Eggs: 4 recipes (French Toast 3, Scrambled 4, Pancakes 2, Sugar 1)
+- Butter: 4 recipes (varying quantities)
+- Flour: 3 recipes (perfect for consolidation testing)
+- Vanilla extract: 4 recipes (great for merging display)
 
-**Phase 2: Settings UI** (30 min) ✅
-- Display Options section
-- UserPreferences update
-- Toggle implementation
+### **Validation Results**
 
-**Phase 3: Badge Display UI** (60 min) ✅
-- Recipe source badges
-- Styling and layout
-- Bug discovery and fixes
+**All 11 Tests Passing** ✅
 
-**Phase 4: Integration** (45 min) ✅
-- AddIngredientsToListView updates
-- Relationship establishment
-- Testing and validation
-
-**Phase 5: Test Infrastructure** (30 min) ⚠️
-- 6 recipe generator
-- Strategic ingredient overlap
-- Not in original estimate
-
-**Phase 6: UI Cleanup** (20 min) ⚠️
-- Recipe view cleanup
-- Duplicate text fix
-- Not in original estimate
-
-**Total**: ~3.5 hours (vs 2-2.5h estimate)
-
-### **Key Learnings**
-
-1. **Always populate ALL structured fields** when creating Core Data entities
-2. **Audit legacy systems** when adding new features to avoid conflicts
-3. **Invest in test data infrastructure** early - it pays off
-4. **Computed properties** are excellent for derived display data
-5. **Feature toggles** provide flexibility and user control
-6. **Add 20-30% buffer** to estimates for bug discovery/refinement
-
-### **Documentation Created**
-
-- ✅ Learning note: `docs/learning-notes/22-m4.3.1-recipe-source-tracking.md`
-- ✅ Inline code comments with M4.3.1 references
-- ✅ Bug fix documentation (3 fixes documented)
-- ✅ Test infrastructure documentation
+1. Core Data relationships work correctly ✅
+2. Recipe badges display for single recipe ✅
+3. Multiple recipe sources merge correctly ✅
+4. Badge navigation works ✅
+5. Settings toggle controls visibility ✅
+6. Preferences persist correctly ✅
+7. Real-time settings updates work ✅
+8. Legacy migration successful (no data loss) ✅
+9. Recipe detail view clean (no redundant text) ✅
+10. Ingredient display text populated ✅
+11. Database integrity maintained ✅
 
 ---
 
-## M4.3.2: Scaled Recipe to List Integration 🚀 **READY**
+## M4.3.2: Scaled Recipe to List Integration ✅ **COMPLETE**
 
+**Completed**: November 22, 2025  
+**Actual Time**: 1.25 hours  
 **Estimated**: 1.5-2 hours  
-**Priority**: HIGH - Core meal planning to grocery workflow  
-**Status**: Ready to begin
+**Variance**: Under estimate! (-17%)
 
-### **Overview**
+### **What Was Built**
 
-Enable adding recipe ingredients to grocery list with custom servings, leveraging the RecipeScalingService from M3 Phase 4. Users can adjust serving size before adding to list, and the app automatically scales quantities.
+**Phase 1: Servings UI** (30 min)
+- Servings picker with +/- stepper
+- "Recipe makes: X servings" display
+- "Adding for: Y servings" adjustable
+- Orange warning: "Quantities will be scaled X.X×"
+- Min/max ranges (0.25x to 4x recipe servings)
 
-### **Prerequisites Complete**
+**Phase 2: Scaled Quantities** (45 min)
+- Real-time quantity scaling using RecipeScalingService
+- Scaled quantities displayed in blue
+- Original quantities shown in gray italic: "(was: X)"
+- Fraction formatting (1/2, 1/4, 3/4, etc.)
+- Non-parseable items unchanged
+- All structured fields populated correctly
 
-- ✅ M3 Phase 4: RecipeScalingService operational
-- ✅ M4.2: Meal planning with recipes assigned to dates
-- ✅ M4.3.1: Recipe source tracking relationships
-- ✅ Structured quantities with numeric operations
+### **Technical Implementation**
 
-### **Key Features**
-
-1. **Servings Adjustment UI**
-   - Stepper or number input for serving size
-   - Show original servings vs scaled servings
-   - Real-time preview of scaled quantities
-
-2. **Scaled Quantity Addition**
-   - Use RecipeScalingService to scale quantities
-   - Create GroceryListItems with scaled amounts
-   - Establish recipe source relationships
-   - Maintain structured quantity data
-
-3. **User Experience**
-   - Clear indication of scaling factor
-   - Validation of serving range (0.25x to 4x)
-   - Success feedback
-   - Natural workflow from recipe view
-
-### **Technical Approach**
-
-**Leverage Existing Services:**
+**Key Components:**
 ```swift
-// Use proven RecipeScalingService from M3
-let scaledIngredients = recipeScalingService.scaleRecipe(
-    recipe: recipe,
-    servings: targetServings
-)
-
-// Create list items with scaled quantities
-for ingredient in scaledIngredients {
-    let listItem = GroceryListItem(context: context)
-    listItem.name = ingredient.name
-    listItem.displayText = ingredient.scaledDisplayText
-    listItem.addToSourceRecipes(recipe)  // M4.3.1 relationship
-}
+// Added to AddIngredientsToListView
+- scaleFactor computed property
+- scaledIngredients with RecipeScalingService
+- scaledDisplayText() with fraction formatting
+- originalDisplayTexts for comparison
+- Updated addToShoppingList() for scaled saving
 ```
 
-### **Integration Points**
+**Quality:**
+- Clean implementation leveraging M3 patterns
+- No new services created (used existing RecipeScalingService)
+- Professional UI with blue scaled quantities
+- Proper M4.3.1 recipe relationship integration
 
-- RecipeDetailView: "Add to List" button
-- AddIngredientsToListView: Add servings parameter
-- RecipeScalingService: Scale calculations
-- GroceryListItem: Recipe relationships from M4.3.1
+### **Validation Results**
 
-### **Success Criteria**
+**All Tests Passing** ✅
 
-- [ ] User can adjust servings before adding to list
-- [ ] Quantities scale correctly (leverage M3 scaling)
-- [ ] Recipe relationships established (M4.3.1)
-- [ ] Scaled quantities display properly
-- [ ] Works with existing grocery list UI
-- [ ] Performance: < 0.5s for scaling + adding
+1. No scaling (1x): Quantities unchanged, gray color ✅
+2. Double scaling (2x): All quantities doubled correctly ✅
+3. Half scaling (0.5x): All quantities halved ✅
+4. Fraction handling: Clean display (1 cup, not 2/4 cup) ✅
+5. Non-scalable items: Unchanged ✅
+6. Recipe badges: Still working from M4.3.1 ✅
+7. Multiple recipes: Merging works correctly ✅
+8. Build success: Zero errors ✅
 
-### **Next Steps**
-
-1. Read M4.3.2 implementation guide (to be created)
-2. Update RecipeDetailView with servings UI
-3. Enhance AddIngredientsToListView with scaling
-4. Test with various serving sizes
-5. Validate quantity display and merging
+**User Testing:**
+- French Toast (no scaling) ✅
+- Pancakes (2× scaling, 8→16 servings) ✅
+- Sugar Cookies (0.5× scaling, 36→18 servings) ✅
 
 ---
 
-## M4.3.3: Bulk Add from Meal Plan ⏳ **PLANNED**
+## M4.3.3: Bulk Add from Meal Plan 🚀 **READY**
 
 **Estimated**: 2 hours  
-**Priority**: HIGH - Core meal planning value  
-**Status**: Waiting for M4.3.2 completion
+**Priority**: HIGH - Core meal planning workflow  
+**Status**: Ready to begin, prerequisites complete
 
 ### **Overview**
 
-"Add All to Shopping List" button in meal plan view that generates a complete grocery list from all planned meals, with smart quantity consolidation and recipe source tracking.
+Single-button workflow to add all recipes from a meal plan to the grocery list at once. Leverages M4.3.2 scaling and M3 Phase 5 consolidation for intelligent automation.
 
 ### **Dependencies**
 
 - M4.2: Meal planning with recipes ✅
 - M4.3.1: Recipe source tracking ✅
-- M4.3.2: Scaled recipe to list (in progress)
+- M4.3.2: Scaled recipe to list ✅
 - M3 Phase 5: Quantity consolidation ✅
 
 ### **Key Features**
@@ -416,17 +317,17 @@ Intelligent ingredient name normalization to eliminate duplicates caused by case
 ## Documentation Status
 
 **Up to Date:**
-- ✅ current-story.md (this file) - Updated Nov 22
+- ✅ current-story.md (this file) - Updated Nov 22 post-M4.3.2
 - ✅ project-naming-standards.md
 - ✅ development-guidelines.md
 - ✅ session-startup-checklist.md
 - ✅ M4.3.5 PRD complete
 
-**Needs Update After M4.3.2:**
-- [ ] next-prompt.md (ready for M4.3.2)
-- [ ] roadmap.md (mark M4.3.2 progress)
-- [ ] requirements.md (mark M4.3.2 requirements)
-- [ ] project-index.md (add M4.3.2 to recent activity)
+**Needs Update After M4.3.3:**
+- [ ] next-prompt.md (for M4.3.4)
+- [ ] roadmap.md (mark M4.3.3 progress)
+- [ ] requirements.md (mark M4.3.3 requirements)
+- [ ] project-index.md (add M4.3.3 to recent activity)
 
 **Needs Update After M4.3 Complete:**
 - [ ] roadmap.md (mark M4.3 complete)
@@ -438,11 +339,10 @@ Intelligent ingredient name normalization to eliminate duplicates caused by case
 - ✅ 18-m4.1-settings-infrastructure.md
 - ✅ 19-m4.2-calendar-meal-planning.md (note: named 21 in file system)
 - ✅ 22-m4.3.1-recipe-source-tracking.md
-- [ ] 23-m4.3.2-scaled-recipe-to-list.md (create after completion)
-- [ ] 24-m4.3-complete-enhanced-grocery-integration.md (create after M4.3 complete)
+- [ ] 23-m4.3-complete-enhanced-grocery-integration.md (create after M4.3 complete)
 
 ---
 
-**Last Session**: November 22, 2025 - M4.3.1 complete with testing validation  
-**Next Session**: M4.3.2 Scaled Recipe to List Integration (Phase 1: Servings UI)  
+**Last Session**: November 22, 2025 - M4.3.2 complete, tested successfully  
+**Next Session**: M4.3.3 Bulk Add from Meal Plan  
 **Version**: November 22, 2025

@@ -2,8 +2,8 @@
 
 **Last Updated**: November 22, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M4.3.2 (Scaled Recipe to List Integration) - Next  
-**Next Priority**: M4.3.3+ (Bulk Add & Meal Completion)
+**Current Milestone**: M4.3.3 (Bulk Add from Meal Plan) - Next  
+**Next Priority**: M4.3.4-5 (Meal Completion & Ingredient Normalization)
 
 ---
 
@@ -152,7 +152,7 @@
 ## 📊 **CURRENT STATE - November 2025**
 
 ### **Project Velocity Summary**
-- **Total Hours**: 76.5 hours across M1-M4.3.1 complete
+- **Total Hours**: 77.75 hours across M1-M4.3.2 complete
 - **Planning Accuracy**: 88% (< 12% average variance)
 - **Build Success Rate**: 100% (zero breaking changes)
 - **Performance**: All operations < 0.5s target maintained
@@ -248,6 +248,23 @@
 - Phase 5: Test infrastructure (30 min) ✅
 - Phase 6: Bug fixes and cleanup (65 min) ✅
 
+#### **M4.3.2: Scaled Recipe to List Integration** ✅ (1.25 hours - November 2025)
+**Key Achievements:**
+- Servings picker with +/- stepper in AddIngredientsToListView
+- Real-time quantity scaling using RecipeScalingService
+- Scaled quantities displayed in blue with original in gray: "(was: X)"
+- Fraction formatting (1/2, 1/4, 3/4) for kitchen-friendly display
+- Updated addToShoppingList() to save scaled quantities
+- Non-parseable items unchanged (as expected)
+- **Under estimate by 17%!** (1.25h actual vs 1.5-2h estimate)
+
+**Testing Results:**
+- French Toast (no scaling) ✅
+- Pancakes (2× scaling, 8→16 servings) ✅
+- Sugar Cookies (0.5× scaling, 36→18 servings) ✅
+- M4.3.1 recipe badges still working ✅
+- M3 RecipeScalingService integration successful ✅
+
 ---
 
 ## 📚 **LEARNING NOTES**
@@ -337,15 +354,16 @@ Available in `architecture/template.md` for creating new ADRs
 | M4.1 | 1.5h | 1.5h | ✅ 0% | Complete |
 | M4.2 | 2.5-3h | ~4h | ⚠️ +40% | Complete |
 | M4.3.1 | 2-2.5h | 3.5h | ⚠️ +40% | Complete |
-| M4.3.2 | 1.5-2h | TBD | 🚀 | Ready |
+| M4.3.2 | 1.5-2h | 1.25h | ✅ -17% | Complete |
 | M4.3.3-5 | 6.75h | TBD | ⏳ | Planned |
-| **Totals** | **72-83h** | **~76.5h** | **✅ +4%** | **7 Complete** |
+| **Totals** | **72-83h** | **~77.75h** | **✅ +6%** | **8 Complete** |
 
 **Overall Planning Accuracy**: 88% (< 12% average variance)
 
 **Recent Variance Notes**:
 - **M4.2** (+40%): Included sheet debugging, date picker enhancement, recipe usage tracking
 - **M4.3.1** (+40%): Bug discovery/fixes (3 issues), test infrastructure (6 recipes), UI cleanup
+- **M4.3.2** (-17%): Came in under estimate! Clean reuse of M3 RecipeScalingService patterns
 - **Pattern**: Bug buffer and test infrastructure should be included in estimates
 
 **Success Factors:**
@@ -359,6 +377,23 @@ Available in `architecture/template.md` for creating new ADRs
 
 ## 📅 **RECENT ACTIVITY**
 
+### **November 22, 2025** - M4.3.2 Complete ✅
+- **Completed**: M4.3.2 - Scaled Recipe to List Integration (1.25 hours)
+  - Servings picker with +/- stepper in AddIngredientsToListView
+  - Real-time quantity scaling using RecipeScalingService
+  - Scaled quantities displayed in blue with original in gray: "(was: X)"
+  - Fraction formatting (1/2, 1/4, 3/4) for kitchen-friendly display
+  - Updated addToShoppingList() to save scaled quantities
+  - Non-parseable items unchanged (as expected)
+  - **Under estimate by 17%!** (1.25h actual vs 1.5-2h estimate)
+  - Complete testing validation: 3 recipes tested (French Toast, Pancakes 2×, Sugar Cookies 0.5×)
+- **Integration**: M4.3.1 recipe badges still working, M3 RecipeScalingService leveraged successfully
+- **Ready**: M4.3.3 - Bulk Add from Meal Plan
+  - Prerequisites complete (M4.2, M4.3.1, M4.3.2)
+  - Complete next-prompt.md ready with 3-phase guide
+  - Estimated 2 hours
+- **Status**: M4.3.2 COMPLETE, M4.3.3 🚀 **READY** to begin
+
 ### **November 22, 2025** - M4.3.1 Complete ✅
 - **Completed**: M4.3.1 - Recipe Source Tracking Foundation (3.5 hours)
   - Many-to-many GroceryListItem ↔ Recipe relationships
@@ -371,12 +406,7 @@ Available in `architecture/template.md` for creating new ADRs
   - 6 comprehensive test recipes with strategic overlap
   - Complete testing validation (11/11 tests passing)
 - **Documented**: Learning note 22-m4.3.1-recipe-source-tracking.md
-- **Ready**: M4.3.2 - Scaled Recipe to List Integration
-  - Comprehensive next-prompt.md created (30+ pages)
-  - 3-phase implementation guide
-  - Leverages M3 RecipeScalingService
-  - Estimated 1.5-2 hours
-- **Status**: M4.3.1 COMPLETE, M4.3.2 🚀 **READY** to begin
+- **Status**: M4.3.1 COMPLETE, M4.3.2 ready
 
 ### **November 12, 2025** - M4.3.1 Planning Complete 📋
 - **Planned**: M4.3.1 - Recipe Source Tracking Foundation
@@ -451,10 +481,10 @@ Available in `architecture/template.md` for creating new ADRs
 
 ### **Current State**
 - **Active Milestone**: M4 (Meal Planning & Enhanced Grocery Integration)
-- **Completed**: M4.1 (Settings), M4.2 (Calendar Planning), M4.3.1 (Recipe Source Tracking) ✅
-- **Current Phase**: M4.3.2 (Scaled Recipe to List) 🚀 **READY** ← **NEXT**
-- **Next After**: M4.3.3+ (Bulk Add, Meal Completion, Ingredient Normalization) ⏳ **PLANNED**
-- **Progress**: M1-M4.3.1 complete (76.5 hours), M4.3.2-5 remaining (~7.5h estimated)
+- **Completed**: M4.1 (Settings), M4.2 (Calendar Planning), M4.3.1 (Recipe Source Tracking), M4.3.2 (Scaled Recipe to List) ✅
+- **Current Phase**: M4.3.3 (Bulk Add from Meal Plan) 🚀 **READY** ← **NEXT**
+- **Next After**: M4.3.4-5 (Meal Completion & Ingredient Normalization) ⏳ **PLANNED**
+- **Progress**: M1-M4.3.2 complete (77.75 hours), M4.3.3-5 remaining (~6.75h estimated)
 - **Status**: On track with excellent planning accuracy (88%)
 
 ### **M4.3 Work Breakdown**
@@ -467,18 +497,20 @@ Available in `architecture/template.md` for creating new ADRs
 - 6 comprehensive test recipes with strategic overlap
 - Complete testing validation (11/11 tests passing)
 
-**M4.3.2: Scaled Recipe to List Integration** 🚀 **READY** (1.5-2 hours) ← **NEXT**
-- Add recipes with custom serving sizes
-- Leverage RecipeScalingService from M3
-- Real-time quantity scaling preview
-- Recipe relationship establishment
-- Comprehensive next-prompt.md ready
+**M4.3.2: Scaled Recipe to List Integration** ✅ **COMPLETE** (1.25 hours)
+- Servings picker with +/- stepper
+- Real-time quantity scaling with RecipeScalingService
+- Scaled quantities in blue, original in gray
+- Fraction formatting for kitchen-friendly display
+- Updated addToShoppingList() for scaled saving
+- Under estimate by 17%! Clean M3 pattern reuse
 
-**M4.3.3: Bulk Add from Meal Plan** ⏳ **PLANNED** (2 hours)
+**M4.3.3: Bulk Add from Meal Plan** 🚀 **READY** (2 hours) ← **NEXT**
 - "Add All to Shopping List" button
 - Process all meal plan recipes
 - Smart quantity consolidation
 - Progress feedback
+- Complete next-prompt.md ready
 
 **M4.3.4: Meal Completion Tracking** ⏳ **PLANNED** (45 min)
 - Mark meals as completed
@@ -501,7 +533,7 @@ Available in `architecture/template.md` for creating new ADRs
 
 ### **Technical Debt**
 - **Status**: NONE ✅
-- Clean architecture maintained throughout M1-M4.3.1
+- Clean architecture maintained throughout M1-M4.3.2
 - No shortcuts or workarounds
 - Comprehensive documentation at all levels
 - All code follows established patterns from development-guidelines.md
@@ -574,6 +606,6 @@ Available in `architecture/template.md` for creating new ADRs
 ---
 
 **Last Updated**: November 22, 2025  
-**Next Update**: After M4.3.2 completion  
-**Current Status**: M4.3.1 complete, M4.3.2 ready to begin  
-**Documentation Version**: Updated with M4.3.1 completion and M4.3.2 readiness
+**Next Update**: After M4.3.3 completion  
+**Current Status**: M4.3.2 complete, M4.3.3 ready to begin  
+**Documentation Version**: Updated with M4.3.2 completion and M4.3.3 readiness

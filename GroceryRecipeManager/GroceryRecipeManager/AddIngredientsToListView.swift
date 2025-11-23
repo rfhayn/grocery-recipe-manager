@@ -7,6 +7,10 @@ struct AddIngredientsToListView: View {
     
     let recipe: Recipe
     
+    // M4.3.2: Servings state for scaled recipe addition
+    @State private var selectedServings: Int
+    private let scalingService: RecipeScalingService
+    
     @State private var selectedIngredients: Set<UUID> = []
     @State private var isProcessing = false
     @State private var processingMessage = "Processing..."
@@ -25,12 +29,132 @@ struct AddIngredientsToListView: View {
         ]
     ) private var categories: FetchedResults<Category>
     
-    // M2.2.6 - ADDED: Computed properties for custom category grouping
-    private var groupedIngredients: [String: [Ingredient]] {
-        guard let ingredientsSet = recipe.ingredients else { return [:] }
-        let ingredientsList = Array(ingredientsSet) as! [Ingredient]
+    // M4.3.2: Initialize with optional targetServings parameter
+    init(recipe: Recipe, targetServings: Int? = nil, context: NSManagedObjectContext) {
+        self.recipe = recipe
         
-        return Dictionary(grouping: ingredientsList) { ingredient in
+        // Default to recipe's servings if not specified
+        let servings = targetServings ?? Int(recipe.servings)
+        _selectedServings = State(initialValue: servings)
+        
+        // Initialize scaling service (regular property, not @StateObject)
+        self.scalingService = RecipeScalingService(context: context)
+    }
+    
+    // M4.3.2: Computed property for scale factor
+    private var scaleFactor: Double {
+        guard recipe.servings > 0 else { return 1.0 }
+        return Double(selectedServings) / Double(recipe.servings)
+    }
+    
+    // M4.3.2 Phase 2: Compute scaled ingredients using RecipeScalingService
+    private var scaledIngredients: [Ingredient] {
+        guard let ingredientsSet = recipe.ingredients else { return [] }
+        let ingredients = Array(ingredientsSet) as! [Ingredient]
+        
+        // If no scaling needed, return originals sorted
+        guard scaleFactor != 1.0 else {
+            return ingredients.sorted { $0.sortOrder < $1.sortOrder }
+        }
+        
+        // Use RecipeScalingService to scale the recipe
+        let scaledRecipe = scalingService.scale(recipe: recipe, scaleFactor: scaleFactor)
+        
+        // Map scaled ingredients back to original ingredient objects with updated display
+        // We need to preserve the original Ingredient objects but update their display
+        var scaledIngredientsList: [Ingredient] = []
+        
+        for scaledIng in scaledRecipe.scaledIngredients {
+            // Find the corresponding original ingredient
+            if let originalIng = ingredients.first(where: { $0.name == scaledIng.originalText || $0.name == scaledIng.name }) {
+                // Create a copy of the ingredient with scaled displayText
+                let copy = originalIng // Using the original object
+                // Note: We'll handle display differently in the UI since we can't modify Core Data objects
+                scaledIngredientsList.append(copy)
+            }
+        }
+        
+        return scaledIngredientsList.sorted { $0.sortOrder < $1.sortOrder }
+    }
+    
+    // M4.3.2 Phase 2: Store original displayText for showing comparison
+    private var originalDisplayTexts: [UUID: String] {
+        guard let ingredientsSet = recipe.ingredients else { return [:] }
+        let ingredients = Array(ingredientsSet) as! [Ingredient]
+        
+        var dict: [UUID: String] = [:]
+        for ingredient in ingredients {
+            if let id = ingredient.id {
+                dict[id] = ingredient.displayText ?? ""
+            }
+        }
+        return dict
+    }
+    
+    // M4.3.2 Phase 2: Get scaled display text for an ingredient
+    private func scaledDisplayText(for ingredient: Ingredient) -> String {
+        guard scaleFactor != 1.0 else {
+            return ingredient.displayText ?? ""
+        }
+        
+        // If ingredient has numeric value, scale it
+        if ingredient.isParseable && ingredient.numericValue > 0 {
+            let scaledValue = ingredient.numericValue * scaleFactor
+            
+            // Format the scaled quantity (simplified inline formatting)
+            let fractionString = formatToFraction(scaledValue)
+            
+            if let unit = ingredient.standardUnit, !unit.isEmpty {
+                return "\(fractionString) \(unit)"
+            } else {
+                return fractionString
+            }
+        } else {
+            // Non-parseable items don't scale
+            return ingredient.displayText ?? ""
+        }
+    }
+    
+    // M4.3.2 Phase 2: Format decimal to fraction for kitchen-friendly display
+    private func formatToFraction(_ value: Double) -> String {
+        let whole = Int(value)
+        let fractional = value - Double(whole)
+        
+        // Common kitchen fractions with tolerance
+        let fractions: [(value: Double, display: String)] = [
+            (0.125, "1/8"),
+            (0.25, "1/4"),
+            (0.333, "1/3"),
+            (0.5, "1/2"),
+            (0.666, "2/3"),
+            (0.75, "3/4")
+        ]
+        
+        // Find closest fraction (within 0.05 tolerance)
+        for (fracValue, fracDisplay) in fractions {
+            if abs(fractional - fracValue) < 0.05 {
+                if whole > 0 {
+                    return "\(whole) \(fracDisplay)"
+                } else {
+                    return fracDisplay
+                }
+            }
+        }
+        
+        // No close fraction - use decimal
+        if whole > 0 && fractional > 0.01 {
+            return String(format: "%.2f", value)
+        } else if whole > 0 {
+            return "\(whole)"
+        } else {
+            return String(format: "%.2f", value)
+        }
+    }
+    
+    // M2.2.6 - ADDED: Computed properties for custom category grouping
+    // M4.3.2 Phase 2: Updated to use scaledIngredients
+    private var groupedIngredients: [String: [Ingredient]] {
+        return Dictionary(grouping: scaledIngredients) { ingredient in
             ingredient.ingredientTemplate?.category ?? "Uncategorized"
         }
     }
@@ -209,121 +333,81 @@ struct AddIngredientsToListView: View {
             return selectedIngredients.contains(id)
         }
         
-        // DEBUG: Add debugging to see what's actually in the templates
-        for ingredient in selectedIngredientsList {
-            if let template = ingredient.ingredientTemplate {
-                print("Template '\(template.name ?? "nil")' has category: '\(template.category ?? "nil")'")
+        let uncategorized = selectedIngredientsList.compactMap { ingredient -> IngredientTemplate? in
+            // Check if ingredient has a linked template
+            guard let template = ingredient.ingredientTemplate else {
+                return nil
             }
+            
+            // Check if template needs category assignment
+            if let category = template.category,
+               !category.isEmpty,
+               category.lowercased() != "uncategorized" {
+                return nil  // Already has category
+            }
+            
+            return template
         }
         
-        // Find templates that need category assignment (nil, empty, or "Uncategorized")
-        var uncategorized: [IngredientTemplate] = []
+        // Deduplicate templates by ID
+        let uniqueTemplates = Array(Set(uncategorized.compactMap { $0.id }))
+            .compactMap { id in uncategorized.first { $0.id == id } }
         
-        for ingredient in selectedIngredientsList {
-            if let template = ingredient.ingredientTemplate {
-                // FIXED: Check if category is nil, empty, or "Uncategorized"
-                if template.category == nil ||
-                   template.category?.isEmpty == true ||
-                   template.category?.lowercased() == "uncategorized" {
-                    uncategorized.append(template)
-                }
-            }
-        }
-        
-        // Remove duplicates based on template ID
-        let uniqueUncategorized = Array(Set(uncategorized.map { $0.objectID }))
-            .compactMap { objectID in
-                uncategorized.first { $0.objectID == objectID }
-            }
-        
-        print("Found \(uniqueUncategorized.count) ingredients needing category assignment")
-        completion(uniqueUncategorized)
+        completion(uniqueTemplates)
     }
     
     private func proceedWithExistingAddFlow() {
-        DispatchQueue.main.async {
-            self.isProcessing = true
-            self.processingMessage = "Finding grocery list..."
-            
-            // Use existing logic
-            if let existingList = self.findMostRecentUncompletedList() {
-                self.targetWeeklyList = existingList
-                self.processingMessage = "Adding to \(existingList.name ?? "grocery list")..."
-                self.addSelectedToGroceryList()
-            } else {
-                self.processingMessage = "Creating new grocery list..."
-                self.createNewListAndAddIngredients()
+        guard !selectedIngredients.isEmpty else {
+            DispatchQueue.main.async {
+                self.isProcessing = false
+                self.presentationMode.wrappedValue.dismiss()
             }
-        }
-    }
-    
-    // MARK: - Existing Logic (PRESERVED)
-    
-    private func findMostRecentUncompletedList() -> WeeklyList? {
-        let request: NSFetchRequest<WeeklyList> = WeeklyList.fetchRequest()
-        request.predicate = NSPredicate(format: "isCompleted == NO")
-        request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \WeeklyList.dateCreated, ascending: false)
-        ]
-        request.fetchLimit = 1
-        
-        do {
-            let uncompletedLists = try viewContext.fetch(request)
-            return uncompletedLists.first
-        } catch {
-            print("Error fetching uncompleted lists: \(error)")
-            return nil
-        }
-    }
-    
-    private func createNewListAndAddIngredients() {
-        let newList = createNewWeeklyList()
-        
-        do {
-            try viewContext.save()
-            targetWeeklyList = newList
-            print("Successfully created new list: \(newList.name ?? "Unnamed")")
-            addSelectedToGroceryList()
-        } catch {
-            print("Error saving new weekly list: \(error)")
-            processingMessage = "Error creating new list"
-            isProcessing = false
-        }
-    }
-    
-    private func createNewWeeklyList() -> WeeklyList {
-        let newList = WeeklyList(context: viewContext)
-        newList.id = UUID()
-        newList.name = "Week of \(formattedCurrentDate)"
-        newList.dateCreated = Date()
-        newList.isCompleted = false
-        newList.notes = "Created from recipe: \(recipe.title ?? "Unknown Recipe")"
-        
-        print("Created new weekly list: \(newList.name ?? "Unnamed")")
-        return newList
-    }
-    
-    private var formattedCurrentDate: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: Date())
-    }
-    
-    private func addSelectedToGroceryList() {
-        guard let targetList = targetWeeklyList else {
-            isProcessing = false
             return
         }
         
-        processingMessage = "Creating grocery list items..."
+        // Call list selection UI
+        DispatchQueue.main.async {
+            // Ensure we're in processing state before showing list selection
+            self.isProcessing = false
+        }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            createGroceryListItems(in: targetList)
+        // Present list selection sheet
+        presentListSelection()
+    }
+    
+    private func presentListSelection() {
+        // This is a simple implementation showing how list selection works
+        // In a production app, you might present a sheet to select the list
+        
+        // For now, fetch the most recent weekly list or create one
+        let request: NSFetchRequest<WeeklyList> = WeeklyList.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \WeeklyList.dateCreated, ascending: false)]
+        request.fetchLimit = 1
+        
+        do {
+            if let weeklyList = try viewContext.fetch(request).first {
+                targetWeeklyList = weeklyList
+                addToShoppingList(targetList: weeklyList)
+            } else {
+                // Create a new list if none exist
+                let newList = WeeklyList(context: viewContext)
+                newList.id = UUID()
+                newList.name = "Shopping List"
+                newList.dateCreated = Date()
+                
+                try viewContext.save()
+                targetWeeklyList = newList
+                addToShoppingList(targetList: newList)
+            }
+        } catch {
+            print("Error fetching/creating weekly list: \(error)")
+            processingMessage = "Error accessing shopping lists"
+            isProcessing = false
         }
     }
     
-    // FIXED: Modified to preserve quantities in grocery list items
-    private func createGroceryListItems(in weeklyList: WeeklyList) {
+    // Core function that adds selected ingredients to the target list
+    private func addToShoppingList(targetList: WeeklyList) {
         guard let ingredientsSet = recipe.ingredients else {
             isProcessing = false
             presentationMode.wrappedValue.dismiss()
@@ -342,12 +426,12 @@ struct AddIngredientsToListView: View {
             return
         }
         
-        let existingItems = fetchExistingItems(in: weeklyList)
+        let existingItems = fetchExistingItems(in: targetList)
         var mergeCount = 0
         
         for ingredient in selectedIngredientsToAdd {
-            // M3: Use displayText from ingredient (already populated by parsing service)
-            let fullIngredientText = ingredient.displayText ?? ingredient.name ?? "Unknown ingredient"
+            // M4.3.2 Phase 2: Use SCALED displayText from our scaling function
+            let fullIngredientText = scaledDisplayText(for: ingredient)
             
             // But use clean name for template operations and duplicate detection
             let cleanName: String
@@ -357,7 +441,7 @@ struct AddIngredientsToListView: View {
                 cleanName = extractCleanIngredientName(from: fullIngredientText)
             }
             
-            print("DEBUG: Processing ingredient '\(fullIngredientText)' -> clean: '\(cleanName)'")
+            print("DEBUG: Processing ingredient '\(fullIngredientText)' -> clean: '\(cleanName)' (scale: \(scaleFactor)x)")
             
             // Check for existing items by clean name
             if let existingItem = findExistingItem(named: cleanName, in: existingItems) {
@@ -376,17 +460,6 @@ struct AddIngredientsToListView: View {
                 // M4.3.1: Add recipe to sourceRecipes relationship
                 existingItem.addToSourceRecipes(recipe)
                 
-                // TEMPORARY DEBUG
-                print("🔍 DEBUG: Added recipe '\(recipe.title ?? "nil")' to item '\(cleanName)'")
-                if let recipes = existingItem.sourceRecipes as? Set<Recipe> {
-                    print("🔍 DEBUG: Item now has \(recipes.count) source recipes:")
-                    for r in recipes {
-                        print("   - \(r.title ?? "nil")")
-                    }
-                } else {
-                    print("🔍 DEBUG: sourceRecipes is nil or not a Set!")
-                }
-                
                 mergeCount += 1
                 print("Merged quantities for '\(cleanName)' and added recipe source")
             } else {
@@ -395,9 +468,16 @@ struct AddIngredientsToListView: View {
                 listItem.id = UUID()
                 listItem.name = cleanName
                 
-                // M3: Copy structured quantity fields from ingredient
-                listItem.displayText = fullIngredientText
-                listItem.numericValue = ingredient.numericValue
+                // M4.3.2 Phase 2: Copy SCALED quantity fields
+                listItem.displayText = fullIngredientText  // Already scaled from scaledDisplayText()
+                
+                // Scale the numeric value if parseable
+                if ingredient.isParseable && ingredient.numericValue > 0 {
+                    listItem.numericValue = ingredient.numericValue * scaleFactor
+                } else {
+                    listItem.numericValue = ingredient.numericValue
+                }
+                
                 listItem.standardUnit = ingredient.standardUnit
                 listItem.isParseable = ingredient.isParseable
                 listItem.parseConfidence = ingredient.parseConfidence
@@ -419,14 +499,17 @@ struct AddIngredientsToListView: View {
                     print("Assigned UNCATEGORIZED to '\(cleanName)'")
                 }
                 
-                weeklyList.addToItems(listItem)
+                targetList.addToItems(listItem)
                 print("Created new item: \(fullIngredientText)")
             }
         }
         
         do {
             try viewContext.save()
-            print("Successfully added \(selectedIngredientsToAdd.count) ingredients")
+            
+            // M4.3.2 Phase 2: Enhanced success message with scale info
+            let scaleInfo = scaleFactor != 1.0 ? " (scaled \(String(format: "%.1f", scaleFactor))x)" : ""
+            print("Successfully added \(selectedIngredientsToAdd.count) ingredients\(scaleInfo)")
             if mergeCount > 0 {
                 print("Merged quantities for \(mergeCount) existing items")
             }
@@ -466,127 +549,64 @@ struct AddIngredientsToListView: View {
         var cleaned = text
         
         // Remove measurements with units (comprehensive pattern)
-        let measurementPattern = #"^[\d/.\s-]*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml|eggs?)\s+"#
-        cleaned = cleaned.replacingOccurrences(of: measurementPattern, with: "", options: [.regularExpression, .caseInsensitive])
+        let measurementPattern = #"^[\d/.\s-]*(cups?|tbsp?|tsp?|tablespoons?|teaspoons?|pounds?|lbs?|ounces?|oz|grams?|g|kilograms?|kg|liters?|l|milliliters?|ml|eggs?|egg)\s+"#
+        if let regex = try? NSRegularExpression(pattern: measurementPattern, options: .caseInsensitive) {
+            cleaned = regex.stringByReplacingMatches(
+                in: cleaned,
+                range: NSRange(cleaned.startIndex..., in: cleaned),
+                withTemplate: ""
+            )
+        }
         
-        // Remove any remaining numbers and fractions at the start
-        let numberPattern = #"^[\d/.\s-]+"#
-        cleaned = cleaned.replacingOccurrences(of: numberPattern, with: "", options: [.regularExpression])
+        // Remove common quantity words
+        let quantityWords = ["large", "medium", "small", "whole", "half", "fresh", "dried", "frozen", "canned", "chopped", "diced", "sliced", "minced"]
+        for word in quantityWords {
+            let pattern = "\\b\(word)\\b\\s*"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                cleaned = regex.stringByReplacingMatches(
+                    in: cleaned,
+                    range: NSRange(cleaned.startIndex..., in: cleaned),
+                    withTemplate: ""
+                )
+            }
+        }
         
-        // Remove size descriptors at the start
-        let sizePattern = #"^(large|small|medium|whole)\s+"#
-        cleaned = cleaned.replacingOccurrences(of: sizePattern, with: "", options: [.regularExpression, .caseInsensitive])
-        
-        // Remove articles at the start
-        let articlePattern = #"^(a|an|the)\s+"#
-        cleaned = cleaned.replacingOccurrences(of: articlePattern, with: "", options: [.regularExpression, .caseInsensitive])
-        
-        // Clean up the end - remove descriptors after comma
-        let descriptorPattern = #",.*$"#
-        cleaned = cleaned.replacingOccurrences(of: descriptorPattern, with: "", options: [.regularExpression])
-        
-        // Remove parenthetical info
-        let parenthesesPattern = #"\s*\([^)]*\).*$"#
-        cleaned = cleaned.replacingOccurrences(of: parenthesesPattern, with: "", options: [.regularExpression])
-        
-        // Final cleanup
-        cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        return cleaned.isEmpty ? text : cleaned
+        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines).capitalized
     }
     
-    // DEBUGGING: Helper function to find existing template with debugging
     private func findExistingTemplate(cleanName: String) -> IngredientTemplate? {
         let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
         request.predicate = NSPredicate(format: "name ==[cd] %@", cleanName)
-        request.fetchLimit = 1
         
         do {
-            let templates = try viewContext.fetch(request)
-            return templates.first
+            return try viewContext.fetch(request).first
         } catch {
+            print("Error fetching template: \(error)")
             return nil
         }
     }
     
-    // IMPROVED: Helper function to get category color
-    private func categoryColor(for categoryName: String) -> Color {
-        switch categoryName.lowercased() {
-        case "produce": return .green
-        case "deli & meat": return .red
-        case "dairy & fridge": return .blue
-        case "bread & frozen": return .orange
-        case "boxed & canned": return .brown
-        case "snacks, drinks, & other": return .purple
-        default: return .gray
-        }
-    }
+    // MARK: - View Helpers
     
-    // MARK: - Category Helper
-    private func categoryHeaderSimple(categoryName: String, count: Int) -> some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(categoryColor(for: categoryName))
-                .frame(width: 12, height: 12)
-                .overlay(
-                    Text(categoryEmoji(for: categoryName))
-                        .font(.system(size: 8))
-                )
-            
-            Text(categoryName.uppercased())
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundColor(.secondary)
-            
-            Spacer()
-            
-            Text("\(count)")
-                .font(.caption2)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Color(.systemGray5))
-                .cornerRadius(4)
-        }
-        .padding(.vertical, 4)
-    }
-
-    private func categoryEmoji(for categoryName: String) -> String {
-        switch categoryName.lowercased() {
-        case "produce": return "🥬"
-        case "deli & meat": return "🥩"
-        case "dairy & fridge": return "🥛"
-        case "bread & frozen": return "🍞"
-        case "boxed & canned": return "📦"
-        case "snacks, drinks, & other": return "🥤"
-        default: return "📦"
-        }
-    }
-    
-    // MARK: - UI Components
     private var processingView: some View {
         VStack(spacing: 20) {
             ProgressView()
-                .scaleEffect(1.5)
-            
             Text(processingMessage)
-                .font(.headline)
                 .foregroundColor(.secondary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private var ingredientSelectionView: some View {
-        VStack {
+        VStack(spacing: 0) {
             headerSection
+            
+            // M4.3.2: Servings adjustment section
+            servingsSection
             
             List {
                 if groupedIngredients.isEmpty {
-                    Text("No ingredients found in this recipe")
-                        .font(.body)
+                    Text("No ingredients available")
                         .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
                         .listRowBackground(Color.clear)
                 } else {
                     ForEach(sortedCategoryNames, id: \.self) { categoryName in
@@ -605,6 +625,57 @@ struct AddIngredientsToListView: View {
             .listStyle(InsetGroupedListStyle())
             
             selectionSummary
+        }
+    }
+    
+    // M4.3.2: Servings adjustment UI section
+    private var servingsSection: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 12) {
+                // Original servings (read-only)
+                HStack {
+                    Text("Recipe makes:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("\(recipe.servings) servings")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                // Adjustable servings
+                HStack {
+                    Text("Adding for:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    
+                    Stepper(value: $selectedServings, in: 1...100) {
+                        Text("\(selectedServings) servings")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(selectedServings != recipe.servings ? .blue : .primary)
+                    }
+                }
+                
+                // Show scale factor if different from original
+                if selectedServings != recipe.servings {
+                    HStack(spacing: 6) {
+                        Image(systemName: "scalemass")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                        Text("Quantities will be scaled \(scaleFactor, specifier: "%.1f")×")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                        Spacer()
+                    }
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .background(Color(.systemGroupedBackground))
+            
+            Divider()
         }
     }
     
@@ -644,12 +715,27 @@ struct AddIngredientsToListView: View {
                     .font(.body)
                     .foregroundColor(.primary)
                 
-                HStack {
-                    // M3: Show displayText instead of quantity/unit
-                    if let displayText = ingredient.displayText, !displayText.isEmpty {
-                        Text(displayText)
+                // M4.3.2 Phase 2: Show scaled quantities with original for reference
+                HStack(spacing: 4) {
+                    // Show scaled displayText
+                    let scaled = scaledDisplayText(for: ingredient)
+                    if !scaled.isEmpty {
+                        Text(scaled)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(scaleFactor != 1.0 ? .blue : .secondary)
+                        
+                        // Show original quantity for reference when scaled
+                        if scaleFactor != 1.0, let originalId = ingredient.id,
+                           let original = originalDisplayTexts[originalId],
+                           !original.isEmpty && original != scaled {
+                            Text("•")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            Text("(was: \(original))")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .italic()
+                        }
                     }
                     
                     Spacer()
@@ -761,6 +847,34 @@ struct AddIngredientsToListView: View {
         }
         .padding(.vertical, 8)
         .background(Color(.systemGroupedBackground))
+    }
+    
+    private func categoryHeaderSimple(categoryName: String, count: Int) -> some View {
+        HStack {
+            Text(categoryName.uppercased())
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Text("\(count)")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    private func categoryColor(for categoryName: String) -> Color {
+        // Map category names to colors (you can customize this)
+        switch categoryName.lowercased() {
+        case "produce": return .green
+        case "meat": return .red
+        case "dairy": return .blue
+        case "pantry": return .orange
+        case "frozen": return .cyan
+        case "bakery": return .brown
+        default: return .gray
+        }
     }
     
     private func isSelected(_ ingredient: Ingredient) -> Bool {

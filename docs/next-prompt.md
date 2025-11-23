@@ -1,10 +1,10 @@
-# Next Prompt: M4.3.2 - Scaled Recipe to List Integration
+# Next Prompt: M4.3.3 - Bulk Add from Meal Plan
 
-**Milestone**: M4.3.2 - Scaled Recipe to List Integration  
+**Milestone**: M4.3.3 - Bulk Add from Meal Plan  
 **Status**: 🚀 READY  
-**Estimated Time**: 1.5-2 hours  
+**Estimated Time**: 2 hours  
 **Priority**: HIGH - Core meal planning to grocery workflow  
-**Prerequisites**: M3 Phase 4 (RecipeScalingService) ✅, M4.3.1 (Recipe Source Tracking) ✅
+**Prerequisites**: M4.2 (Meal Planning) ✅, M4.3.1 (Recipe Source Tracking) ✅, M4.3.2 (Scaled Recipe Addition) ✅
 
 ---
 
@@ -12,693 +12,483 @@
 
 ### **What We're Building**
 
-Enable users to add recipe ingredients to grocery list with **custom serving sizes**. Users can:
-- Adjust servings before adding to list (e.g., recipe serves 4, but need 8)
-- See real-time preview of scaled quantities
-- Add scaled ingredients with proper recipe source tracking
-- Leverage existing RecipeScalingService from M3
+Single-button workflow to add ALL recipes from a meal plan to a grocery list at once. Leverages M4.3.2 scaling, M4.3.1 source tracking, and M3 quantity consolidation for intelligent automation.
 
 ### **User Flow**
 
 ```
-1. User views recipe (Chocolate Chip Cookies - Serves 24)
-2. Taps "Add to List" button
-3. Sheet appears with servings adjuster
-   - Original: 24 servings
-   - Adjustable: Stepper or picker (6-96 servings)
-   - Preview: Shows scaled quantities
-4. User adjusts to 48 servings (2x scale)
-5. Taps "Add to List"
-6. Ingredients added with 2x quantities
-7. Recipe relationship established (M4.3.1)
-8. Success feedback shown
+1. User viewing meal plan (7 days, 5 recipes assigned)
+2. Taps "Add All to Shopping List" button
+3. Confirmation dialog appears:
+   - Shows count: "Add 5 recipes (12 ingredients) to list?"
+   - List selection dropdown
+   - "Confirm" / "Cancel" buttons
+4. User taps "Confirm"
+5. Progress indicator shows
+6. System processes all recipes:
+   - Extracts ingredients from each recipe
+   - Uses serving sizes from meal plan assignments
+   - Consolidates duplicates (butter from 3 recipes → single entry)
+   - Establishes recipe relationships (M4.3.1)
+7. Success message: "Added 12 ingredients from 5 recipes to Shopping List"
+8. Sheet dismisses, grocery list updated
 ```
 
 ### **Key Technical Points**
 
-- **Leverage M3 Phase 4**: RecipeScalingService already handles math
-- **Use M4.3.1**: Recipe relationships for source tracking
-- **Maintain Data Quality**: All structured quantity fields populated
-- **Performance**: < 0.5s for scaling + adding
+- **Leverage M4.3.2**: Use same scaling logic for each recipe
+- **Leverage M4.3.1**: Establish many-to-many recipe relationships
+- **Leverage M3**: Use QuantityMergeService for consolidation
+- **Performance**: Async processing with progress feedback
+- **Data Quality**: All structured quantity fields populated
 
 ---
 
-## 📋 PHASE BREAKDOWN
+## 📋 IMPLEMENTATION GUIDE
 
-### **Phase 1: Servings UI in RecipeDetailView** (30-45 min)
+### **Phase 1: UI Button & Confirmation** (30-45 min)
 
-**Objective**: Add servings adjustment UI to "Add to List" flow
+**Objective**: Add "Add All to Shopping List" button with confirmation dialog
 
-**Current State:**
-```swift
-// RecipeDetailView.swift - Current "Add to List" button
-Button(action: {
-    showingAddToListSheet = true
-}) {
-    HStack(spacing: 4) {
-        Image(systemName: "cart.badge.plus")
-        Text("Add to List")
-    }
-}
-```
+**Files to Modify**:
+- `MealPlanDetailView.swift` - Add button and confirmation logic
 
 **What to Build:**
 
-**1. Add State Variables:**
+**1. Add Button to MealPlanDetailView:**
 ```swift
-// RecipeDetailView.swift
-@State private var showingAddToListSheet = false
-@State private var selectedServings: Int = 0  // NEW: Default to recipe servings
-@State private var showingScaledPreview = false  // NEW: For preview sheet
-```
-
-**2. Update Sheet Presentation:**
-```swift
-.sheet(isPresented: $showingAddToListSheet) {
-    AddIngredientsToListView(
-        recipe: recipe,
-        targetServings: selectedServings  // NEW: Pass servings
-    )
-    .environment(\.managedObjectContext, viewContext)
-}
-```
-
-**3. Add Servings Picker in Sheet Header:**
-```swift
-// Inside AddIngredientsToListView
-Section {
-    VStack(alignment: .leading, spacing: 8) {
-        Text("Servings")
-            .font(.headline)
-        
-        HStack {
-            Text("Original: \(recipe.servings)")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            
-            Spacer()
-            
-            Stepper("\(targetServings) servings", value: $targetServings, in: minServings...maxServings)
-                .labelsHidden()
-            
-            Text("\(targetServings)")
-                .font(.body)
-                .fontWeight(.medium)
-        }
-        
-        if scaleFactor != 1.0 {
-            Text("Scaling by \(scaleFactor, specifier: "%.2f")x")
-                .font(.caption)
-                .foregroundColor(.orange)
-        }
+// Add to MealPlanDetailView.swift toolbar or bottom of view
+Button(action: {
+    showingBulkAddConfirmation = true
+}) {
+    HStack(spacing: 8) {
+        Image(systemName: "cart.fill.badge.plus")
+        Text("Add All to Shopping List")
     }
+    .font(.headline)
+    .foregroundColor(.white)
+    .padding()
+    .frame(maxWidth: .infinity)
+    .background(Color.green)
+    .cornerRadius(12)
 }
+.disabled(plannedMeals.isEmpty)  // Disable if no recipes
+```
 
-// Computed properties
-var minServings: Int {
-    max(1, Int(Double(recipe.servings) * 0.25))  // 0.25x minimum
-}
+**2. Add State Variables:**
+```swift
+// MealPlanDetailView.swift
+@State private var showingBulkAddConfirmation = false
+@State private var showingListSelection = false
+@State private var isProcessing = false
+@State private var processingMessage = "Processing..."
+@State private var targetWeeklyList: WeeklyList?
+```
 
-var maxServings: Int {
-    Int(Double(recipe.servings) * 4.0)  // 4x maximum
-}
-
-var scaleFactor: Double {
-    Double(targetServings) / Double(recipe.servings)
+**3. Add Confirmation Dialog:**
+```swift
+.confirmationDialog(
+    "Add to Shopping List",
+    isPresented: $showingBulkAddConfirmation
+) {
+    Button("Add \(totalIngredientCount) ingredients from \(plannedMeals.count) recipes") {
+        showingListSelection = true
+    }
+    Button("Cancel", role: .cancel) {}
+} message: {
+    Text("This will add all ingredients from your meal plan to a shopping list.")
 }
 ```
 
-**Files to Modify:**
-- `RecipeDetailView.swift` - Pass targetServings parameter
-- `AddIngredientsToListView.swift` - Add servings UI section
+**4. Computed Properties:**
+```swift
+// Count total unique ingredients across all recipes
+private var totalIngredientCount: Int {
+    // Calculate estimated count (before consolidation)
+    let allIngredients = plannedMeals.flatMap { meal in
+        meal.recipe?.ingredients?.allObjects as? [Ingredient] ?? []
+    }
+    return allIngredients.count
+}
+```
 
 **Testing:**
-- [ ] Servings picker appears in sheet
-- [ ] Default servings = recipe.servings
-- [ ] Can adjust servings with stepper
-- [ ] Scale factor displays correctly
-- [ ] Min/max ranges work (0.25x to 4x)
+- [ ] Button appears when meal plan has recipes
+- [ ] Button disabled when no recipes
+- [ ] Confirmation dialog shows correct counts
+- [ ] Can cancel without side effects
 
 ---
 
-### **Phase 2: Scaled Quantity Calculation** (30-45 min)
+### **Phase 2: Bulk Processing Logic** (60-75 min)
 
-**Objective**: Use RecipeScalingService to calculate scaled quantities
+**Objective**: Process all recipes and add to grocery list with consolidation
+
+**Files to Modify**:
+- `MealPlanDetailView.swift` - Add bulk processing logic
 
 **What to Build:**
 
-**1. Add RecipeScalingService:**
+**1. Add Bulk Processing Function:**
 ```swift
-// AddIngredientsToListView.swift
-@StateObject private var scalingService: RecipeScalingService
-
-// Initialization
-init(recipe: Recipe, targetServings: Int) {
-    self.recipe = recipe
-    self._targetServings = State(initialValue: targetServings)
-    self._scalingService = StateObject(wrappedValue: RecipeScalingService())
-    // ... other inits
-}
-```
-
-**2. Calculate Scaled Ingredients:**
-```swift
-// Computed property for scaled ingredients
-var scaledIngredients: [Ingredient] {
-    guard targetServings != recipe.servings else {
-        // No scaling needed
-        return Array(recipe.ingredients?.allObjects as? [Ingredient] ?? [])
-    }
+// MealPlanDetailView.swift
+private func addAllToShoppingList(targetList: WeeklyList) {
+    isProcessing = true
+    processingMessage = "Adding ingredients..."
     
-    // Use RecipeScalingService from M3
-    return scalingService.scaleIngredients(
-        ingredients: Array(recipe.ingredients?.allObjects as? [Ingredient] ?? []),
-        originalServings: Int(recipe.servings),
-        targetServings: targetServings
-    )
-}
-```
-
-**3. Display Scaled Quantities in Preview:**
-```swift
-// Update ingredient list display
-ForEach(scaledIngredients, id: \.objectID) { ingredient in
-    HStack {
-        Toggle(isOn: binding(for: ingredient)) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(ingredient.ingredientDisplayName)
-                    .font(.body)
-                
-                // Show scaled quantity
-                if let displayText = ingredient.displayText, !displayText.isEmpty {
-                    Text(displayText)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    // Show original if scaled
-                    if scaleFactor != 1.0, let original = originalDisplayText(ingredient) {
-                        Text("(was: \(original))")
-                            .font(.caption2)
-                            .foregroundColor(.orange)
-                    }
-                }
+    // Use background context for heavy operation
+    let context = viewContext
+    
+    DispatchQueue.global(qos: .userInitiated).async {
+        var allIngredients: [ProcessedIngredient] = []
+        
+        // Process each planned meal
+        for plannedMeal in plannedMeals {
+            guard let recipe = plannedMeal.recipe else { continue }
+            guard let ingredientsSet = recipe.ingredients else { continue }
+            
+            let ingredients = Array(ingredientsSet) as! [Ingredient]
+            let servings = plannedMeal.servings ?? recipe.servings
+            let scaleFactor = Double(servings) / Double(recipe.servings)
+            
+            // Scale each ingredient (reuse M4.3.2 logic)
+            for ingredient in ingredients {
+                let scaled = scaleIngredient(ingredient, by: scaleFactor)
+                allIngredients.append(ProcessedIngredient(
+                    ingredient: scaled,
+                    sourceRecipe: recipe,
+                    scaleFactor: scaleFactor
+                ))
             }
         }
+        
+        // Consolidate duplicates
+        let consolidated = consolidateIngredients(allIngredients)
+        
+        // Add to list on main thread
+        DispatchQueue.main.async {
+            addConsolidatedToList(consolidated, targetList: targetList, context: context)
+        }
+    }
+}
+
+struct ProcessedIngredient {
+    let ingredient: Ingredient
+    let sourceRecipe: Recipe
+    let scaleFactor: Double
+}
+```
+
+**2. Add Scaling Helper:**
+```swift
+private func scaleIngredient(_ ingredient: Ingredient, by factor: Double) -> Ingredient {
+    // Create temporary copy with scaled quantities
+    // Reuse logic from M4.3.2 AddIngredientsToListView
+    
+    guard factor != 1.0 else { return ingredient }
+    
+    if ingredient.isParseable && ingredient.numericValue > 0 {
+        // Create scaled copy
+        let scaled = Ingredient(context: viewContext)
+        scaled.name = ingredient.name
+        scaled.numericValue = ingredient.numericValue * factor
+        scaled.standardUnit = ingredient.standardUnit
+        scaled.displayText = formatScaledQuantity(ingredient.numericValue * factor, unit: ingredient.standardUnit)
+        scaled.isParseable = ingredient.isParseable
+        scaled.parseConfidence = ingredient.parseConfidence
+        scaled.ingredientTemplate = ingredient.ingredientTemplate
+        return scaled
+    } else {
+        return ingredient  // Non-parseable, return as-is
     }
 }
 ```
 
-**Key Integration Points:**
-
-**RecipeScalingService Methods to Use:**
+**3. Add Consolidation Logic:**
 ```swift
-// From M3 Phase 4 - Already implemented!
-func scaleIngredients(
-    ingredients: [Ingredient],
-    originalServings: Int,
-    targetServings: Int
-) -> [Ingredient]
+private func consolidateIngredients(_ ingredients: [ProcessedIngredient]) -> [ConsolidatedIngredient] {
+    // Group by ingredient name (normalized)
+    var grouped: [String: [ProcessedIngredient]] = [:]
+    
+    for processed in ingredients {
+        let name = processed.ingredient.ingredientTemplate?.name ?? processed.ingredient.name ?? "Unknown"
+        grouped[name, default: []].append(processed)
+    }
+    
+    // Consolidate each group
+    return grouped.map { name, group in
+        ConsolidatedIngredient(
+            name: name,
+            totalQuantity: group.reduce(0.0) { $0 + $1.ingredient.numericValue },
+            unit: group.first?.ingredient.standardUnit ?? "",
+            sourceRecipes: Array(Set(group.map { $0.sourceRecipe })),
+            displayText: formatConsolidated(group),
+            template: group.first?.ingredient.ingredientTemplate
+        )
+    }
+}
 
-func scaleQuantity(
-    numericValue: Double,
-    unit: String?,
-    scaleFactor: Double
-) -> (value: Double, unit: String?)
+struct ConsolidatedIngredient {
+    let name: String
+    let totalQuantity: Double
+    let unit: String
+    let sourceRecipes: [Recipe]
+    let displayText: String
+    let template: IngredientTemplate?
+}
 ```
 
-**Files to Modify:**
-- `AddIngredientsToListView.swift` - Add scaling logic
-
-**Testing:**
-- [ ] Scaled quantities display correctly
-- [ ] Original quantities shown for reference
-- [ ] 2x scaling doubles quantities (e.g., 1 cup → 2 cups)
-- [ ] 0.5x scaling halves quantities
-- [ ] Fractions handled properly (1/2 cup → 1 cup)
-- [ ] Non-scalable items unchanged (e.g., "pinch of salt")
-
----
-
-### **Phase 3: Add Scaled Items to List** (30-45 min)
-
-**Objective**: Create GroceryListItems with scaled quantities and recipe relationships
-
-**What to Build:**
-
-**1. Update addToShoppingList() Function:**
+**4. Add to List Function:**
 ```swift
-// AddIngredientsToListView.swift
-private func addToShoppingList() {
-    guard !selectedIngredients.isEmpty else { return }
-    
-    let ingredientsToAdd = scaledIngredients.filter { selectedIngredients.contains($0.objectID) }
-    
-    for ingredient in ingredientsToAdd {
-        let listItem = GroceryListItem(context: viewContext)
+private func addConsolidatedToList(_ consolidated: [ConsolidatedIngredient], targetList: WeeklyList, context: NSManagedObjectContext) {
+    for item in consolidated {
+        let listItem = GroceryListItem(context: context)
         listItem.id = UUID()
-        listItem.name = ingredient.ingredientDisplayName
+        listItem.name = item.name
+        listItem.displayText = item.displayText
+        listItem.numericValue = item.totalQuantity
+        listItem.standardUnit = item.unit
+        listItem.isParseable = true
+        listItem.parseConfidence = 0.9
         listItem.isCompleted = false
+        listItem.source = "Meal Plan: \(mealPlan.name ?? "Untitled")"
         
-        // M4.3.2: Use SCALED quantities
-        if scaleFactor != 1.0 {
-            // Ingredient already scaled by RecipeScalingService
-            listItem.displayText = ingredient.displayText
-            listItem.numericValue = ingredient.numericValue
-            listItem.standardUnit = ingredient.standardUnit
-            listItem.isParseable = ingredient.isParseable
-            listItem.parseConfidence = ingredient.parseConfidence
+        // M4.3.1: Add all source recipes
+        for recipe in item.sourceRecipes {
+            listItem.addToSourceRecipes(recipe)
+        }
+        
+        // Category assignment
+        if let template = item.template,
+           let categoryString = template.category,
+           !categoryString.isEmpty {
+            listItem.categoryName = categoryString
         } else {
-            // No scaling, use original values
-            listItem.displayText = ingredient.displayText
-            listItem.numericValue = ingredient.numericValue
-            listItem.standardUnit = ingredient.standardUnit
-            listItem.isParseable = ingredient.isParseable
-            listItem.parseConfidence = ingredient.parseConfidence
+            listItem.categoryName = "UNCATEGORIZED"
         }
         
-        // M4.3.1: Establish recipe relationship
-        listItem.addToSourceRecipes(recipe)
-        
-        // Set category and other properties
-        if let template = ingredient.ingredientTemplate {
-            listItem.category = template.category
-        }
-        
-        // Add to selected list
         targetList.addToItems(listItem)
     }
     
-    // Save context
     do {
-        try viewContext.save()
-        showSuccess = true
+        try context.save()
+        print("✅ Successfully added \(consolidated.count) consolidated ingredients from \(plannedMeals.count) recipes")
         
-        // Analytics (optional)
-        print("✅ Added \(ingredientsToAdd.count) scaled ingredients (scale: \(scaleFactor)x)")
+        DispatchQueue.main.async {
+            self.isProcessing = false
+            self.processingMessage = "Complete!"
+            // Show success and dismiss
+        }
     } catch {
-        print("❌ Error adding ingredients: \(error)")
-    }
-}
-```
-
-**2. Success Feedback with Scale Info:**
-```swift
-// Update success message
-if showSuccess {
-    VStack {
-        Image(systemName: "checkmark.circle.fill")
-            .font(.largeTitle)
-            .foregroundColor(.green)
-        
-        if scaleFactor != 1.0 {
-            Text("Added \(selectedIngredients.count) ingredients (scaled \(scaleFactor, specifier: "%.1f")x)")
-                .font(.headline)
-        } else {
-            Text("Added \(selectedIngredients.count) ingredients")
-                .font(.headline)
+        print("❌ Error saving bulk add: \(error)")
+        DispatchQueue.main.async {
+            self.isProcessing = false
+            self.processingMessage = "Error occurred"
         }
     }
 }
 ```
 
-**Critical Data Quality Check:**
-```swift
-// IMPORTANT: Verify ALL structured fields populated
-// This prevents empty quotes bug from M4.3.1
-assert(listItem.displayText != nil, "displayText must be populated")
-assert(listItem.isParseable != nil, "isParseable must be set")
-```
-
-**Files to Modify:**
-- `AddIngredientsToListView.swift` - Update addToShoppingList()
-
 **Testing:**
-- [ ] Scaled items added to list correctly
-- [ ] Quantities are scaled (2x recipe → 2x quantities)
-- [ ] Recipe relationships established (badges appear)
-- [ ] No empty displayText (`""` quotes)
-- [ ] All structured fields populated
-- [ ] Success message shows scale factor
-- [ ] Performance: < 0.5s for adding
+- [ ] Processes all recipes correctly
+- [ ] Scaling works for each recipe
+- [ ] Consolidation merges duplicates (e.g., butter from 3 recipes)
+- [ ] Recipe relationships established for all items
+- [ ] Categories assigned correctly
+- [ ] Performance < 2s for 10 recipes
 
 ---
 
-## 🎯 TECHNICAL REQUIREMENTS
+### **Phase 3: Progress Feedback & Polish** (30-45 min)
 
-### **Integration with M3 Phase 4 (RecipeScalingService)**
+**Objective**: Add progress indicator and success messaging
 
-**Service Already Exists - Just Use It!**
+**What to Build:**
+
+**1. Add Processing Overlay:**
 ```swift
-// From M3 Phase 4 - RecipeScalingService.swift
-class RecipeScalingService: ObservableObject {
-    // Scale all ingredients in a recipe
-    func scaleIngredients(
-        ingredients: [Ingredient],
-        originalServings: Int,
-        targetServings: Int
-    ) -> [Ingredient]
-    
-    // Scale a single quantity
-    func scaleQuantity(
-        numericValue: Double,
-        unit: String?,
-        scaleFactor: Double
-    ) -> (value: Double, unit: String?)
-    
-    // Convert to display-friendly format
-    func formatScaledQuantity(
-        value: Double,
-        unit: String?
-    ) -> String
+// MealPlanDetailView.swift
+.overlay {
+    if isProcessing {
+        ZStack {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                Text(processingMessage)
+                    .font(.headline)
+                    .foregroundColor(.white)
+            }
+            .padding(32)
+            .background(Color(.systemGray6))
+            .cornerRadius(16)
+        }
+    }
 }
 ```
 
-**What RecipeScalingService Handles:**
-- ✅ Numeric scaling (multiply by scale factor)
-- ✅ Fraction conversion (1.5 → "1 1/2")
-- ✅ Unit conversion (48 tsp → 1 cup)
-- ✅ Rounding to sensible values
-- ✅ Display formatting
-
-**What You Need to Do:**
-- Initialize the service
-- Pass ingredients + servings
-- Use scaled results
-- That's it!
-
-### **Integration with M4.3.1 (Recipe Source Tracking)**
-
-**Recipe Relationships - Already Working!**
+**2. Add Success Message:**
 ```swift
-// From M4.3.1
-listItem.addToSourceRecipes(recipe)  // Establishes many-to-many relationship
+@State private var showingSuccessMessage = false
+@State private var successMessage = ""
 
-// Recipe badges will automatically appear in grocery list
-// No additional work needed!
+// After successful save:
+self.successMessage = "Added \(consolidated.count) ingredients from \(plannedMeals.count) recipes"
+self.showingSuccessMessage = true
+
+// Dismiss after delay
+DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+    self.showingSuccessMessage = false
+}
 ```
 
-### **Data Quality Requirements**
-
-**CRITICAL: Populate ALL Structured Fields**
+**3. Add List Selection Sheet:**
 ```swift
-// Learned from M4.3.1 bugs - MUST populate everything:
-listItem.displayText = ingredient.displayText           // ✅ Required
-listItem.numericValue = ingredient.numericValue         // ✅ Required
-listItem.standardUnit = ingredient.standardUnit         // ✅ Required
-listItem.isParseable = ingredient.isParseable           // ✅ Required
-listItem.parseConfidence = ingredient.parseConfidence   // ✅ Required
-
-// This prevents empty "" quotes in quantities
+.sheet(isPresented: $showingListSelection) {
+    // Reuse existing list selection pattern
+    WeeklyListPickerSheet { selectedList in
+        targetWeeklyList = selectedList
+        addAllToShoppingList(targetList: selectedList)
+        showingListSelection = false
+    }
+}
 ```
+
+**Testing:**
+- [ ] Progress indicator appears during processing
+- [ ] Success message shows with correct counts
+- [ ] List selection works correctly
+- [ ] UI responsive during processing
+- [ ] No crashes or freezes
+
+---
+
+## ✅ ACCEPTANCE CRITERIA
+
+**Core Functionality:**
+- [ ] "Add All to Shopping List" button appears in meal plan view
+- [ ] Button disabled when no recipes in plan
+- [ ] Confirmation dialog shows correct ingredient/recipe counts
+- [ ] User can select target grocery list
+- [ ] All recipes processed and added to list
+- [ ] Duplicate ingredients consolidated (butter × 3 → butter with combined quantity)
+- [ ] Recipe relationships established for all items (M4.3.1)
+- [ ] Categories assigned correctly
+- [ ] Success message displays with accurate counts
+
+**Performance:**
+- [ ] Processing completes in < 2s for 10 recipes
+- [ ] No UI freezing during processing
+- [ ] Progress feedback clear and responsive
+
+**Edge Cases:**
+- [ ] Empty meal plan: Button disabled
+- [ ] Single recipe: Works correctly (no consolidation needed)
+- [ ] Non-parseable items: Included without scaling
+- [ ] Mixed units: Preserved (no forced conversion)
+- [ ] Cancel during processing: Graceful handling
+
+**Integration:**
+- [ ] M4.3.1 recipe badges appear in grocery list
+- [ ] M4.3.2 scaling logic reused successfully
+- [ ] Grocery list UI displays items correctly
+- [ ] Existing list functionality unaffected
+
+---
+
+## 🎯 TESTING SCENARIOS
+
+### **Test 1: Basic Bulk Add**
+1. Create meal plan with 3 recipes
+2. Tap "Add All to Shopping List"
+3. Confirm addition
+4. Verify all ingredients added
+5. Check recipe badges appear
+
+### **Test 2: Consolidation**
+1. Create meal plan with Pancakes + French Toast (both use eggs, milk, butter)
+2. Tap "Add All"
+3. Verify:
+   - Eggs consolidated (2 + 3 = 5 eggs)
+   - Milk consolidated (1 cup + 1/2 cup = 1 1/2 cups)
+   - Butter consolidated (2 tbsp + 1 tbsp = 3 tbsp)
+   - Recipe badges show both recipes
+
+### **Test 3: Scaled Recipes**
+1. Create meal plan
+2. Assign Pancakes at 2× servings (16 instead of 8)
+3. Assign French Toast at 1× servings (4)
+4. Tap "Add All"
+5. Verify Pancakes ingredients doubled
+6. Verify French Toast ingredients unchanged
+
+### **Test 4: Performance**
+1. Create meal plan with 10 recipes
+2. Tap "Add All"
+3. Verify completion < 2s
+4. Verify no UI freezing
 
 ---
 
 ## 📁 FILES TO MODIFY
 
-### **Primary Files**
+**Primary Files:**
+1. **MealPlanDetailView.swift** - Add button, confirmation, bulk processing logic (~150 lines)
 
-**1. RecipeDetailView.swift**
-- Add selectedServings state
-- Pass targetServings to sheet
-- Update sheet presentation
-- ~20 lines changed
-
-**2. AddIngredientsToListView.swift** (Major changes)
-- Add targetServings parameter
-- Add RecipeScalingService
-- Add servings picker UI
-- Update ingredient display with scaling
-- Update addToShoppingList() for scaled quantities
-- ~100 lines changed
-
-### **Supporting Files**
-
-**3. RecipeScalingService.swift** (No changes needed!)
-- Already exists from M3 Phase 4
-- Already handles all scaling math
-- Just import and use
+**No New Files Needed** - Reuses existing patterns
 
 ---
 
-## ✅ TESTING CHECKLIST
+## 💡 TIPS & REMINDERS
 
-### **Phase 1: Servings UI**
-- [ ] Servings picker appears in AddIngredientsToListView
-- [ ] Default servings equals recipe.servings
-- [ ] Can adjust servings with stepper
-- [ ] Min/max ranges enforced (0.25x to 4x)
-- [ ] Scale factor displays when != 1.0
-- [ ] UI responsive, no lag
-
-### **Phase 2: Scaling Calculation**
-- [ ] 2x scaling doubles quantities (1 cup → 2 cups)
-- [ ] 0.5x scaling halves quantities (2 cups → 1 cup)
-- [ ] Fractions handled (1/2 → 1, 1 → 2, etc.)
-- [ ] Unit conversion works (48 tsp → 1 cup)
-- [ ] Non-numeric items unchanged ("pinch", "to taste")
-- [ ] Original quantities shown for reference
-
-### **Phase 3: Adding to List**
-- [ ] Scaled items added correctly
-- [ ] Recipe relationships established
-- [ ] Recipe badges appear in grocery list
-- [ ] No empty displayText ("" quotes)
-- [ ] All structured fields populated
-- [ ] Success feedback shows scale factor
-- [ ] List updates immediately
-
-### **Integration Testing**
-- [ ] Works with multiple recipes
-- [ ] Recipe source badges show all sources (M4.3.1)
-- [ ] Quantity merging works (M3 Phase 5)
-- [ ] Settings toggle controls badge visibility
-- [ ] Performance: < 0.5s for complete flow
-
-### **Edge Cases**
-- [ ] Scaling 1x (no change)
-- [ ] Scaling 0.25x (minimum)
-- [ ] Scaling 4x (maximum)
-- [ ] Recipe with no quantities (non-numeric)
-- [ ] Recipe with mixed parseable/non-parseable
-- [ ] Very large quantities (100+ cups)
-
----
-
-## 🎨 UI/UX GUIDELINES
-
-### **Servings Picker Design**
-
-**Layout:**
-```
-┌────────────────────────────────────┐
-│ Servings                           │
-│                                    │
-│ Original: 24    [-] 48 [+]        │
-│ Scaling by 2.00x                   │
-└────────────────────────────────────┘
-```
-
-**Colors:**
-- Scale factor text: `.orange` (when != 1.0)
-- Stepper: System blue
-- Headers: `.headline` font
-
-**Behavior:**
-- Stepper increments by recipe.servings/4 (smart steps)
-- Immediate visual feedback
-- No "Apply" button needed (live updates)
-
-### **Ingredient Display with Scaling**
-
-**Layout:**
-```
-☐ butter
-   1 cup
-   (was: 1/2 cup)    ← Orange text when scaled
-```
-
-**Visual Indicators:**
-- Original quantity in parentheses (orange)
-- Scaled quantity prominent
-- Clear differentiation
-
----
-
-## 🚦 SUCCESS CRITERIA
-
-### **Must Have**
-- ✅ User can adjust servings before adding
-- ✅ Quantities scale correctly (math verified)
-- ✅ Recipe relationships established
-- ✅ All structured fields populated
-- ✅ No empty displayText
-- ✅ Recipe badges appear in grocery list
-
-### **Should Have**
-- ✅ Scale factor displayed clearly
-- ✅ Original quantities shown for reference
-- ✅ Success feedback with scale info
-- ✅ Smart stepper increments
-
-### **Nice to Have**
-- ✅ Keyboard input for servings (instead of just stepper)
-- ✅ Preview of scaled quantities before adding
-- ✅ Validation of extreme scales
-
----
-
-## 🐛 COMMON PITFALLS TO AVOID
-
-### **1. Forgetting to Populate Structured Fields**
+### **Reuse M4.3.2 Patterns**
 ```swift
-// ❌ BAD (causes empty quotes)
-listItem.name = ingredient.name
-listItem.displayText = nil  // Missing!
-
-// ✅ GOOD
-listItem.displayText = ingredient.displayText
-listItem.numericValue = ingredient.numericValue
-listItem.standardUnit = ingredient.standardUnit
-// ... etc
+// From AddIngredientsToListView - scaledDisplayText logic
+// Reuse the fraction formatting and scaling math
 ```
 
-### **2. Scaling Unscalable Items**
+### **Reuse M4.3.1 Patterns**
 ```swift
-// ❌ BAD (tries to scale "pinch of salt")
-let scaled = ingredient.numericValue * scaleFactor
-
-// ✅ GOOD (check if parseable first)
-if ingredient.isParseable {
-    let scaled = ingredient.numericValue * scaleFactor
-} else {
-    // Use original for non-numeric
-}
-```
-
-### **3. Not Establishing Recipe Relationships**
-```swift
-// ❌ BAD (no recipe tracking)
-targetList.addToItems(listItem)
-
-// ✅ GOOD (establishes relationship)
+// From addToShoppingList() - recipe relationship establishment
 listItem.addToSourceRecipes(recipe)
-targetList.addToItems(listItem)
 ```
 
-### **4. UI Not Updating After Servings Change**
-```swift
-// ❌ BAD (scaledIngredients not computed)
-var scaledIngredients = /* calculated once */
-
-// ✅ GOOD (recomputes when servings change)
-var scaledIngredients: [Ingredient] {
-    // Computed property updates automatically
-}
-```
-
----
-
-## 📊 PERFORMANCE TARGETS
-
-### **Operation Times**
-- Servings UI rendering: < 0.05s
-- Scaling calculation (20 ingredients): < 0.1s
-- Adding to list (20 ingredients): < 0.3s
-- **Total flow (adjust + add)**: < 0.5s ✅
-
-### **Optimization Tips**
-- RecipeScalingService already optimized (M3)
-- Use computed properties for live updates
+### **Performance**
+- Use background thread for heavy processing
 - Batch Core Data saves
-- No need for background threads (fast enough)
+- Pre-calculate ingredient counts for UI
 
----
-
-## 🔗 RELATED DOCUMENTATION
-
-**Prerequisites:**
-- M3 Phase 4 Learning Notes: Recipe scaling implementation
-- M4.3.1 Learning Notes: Recipe source tracking
-- RecipeScalingService.swift: Scaling algorithms
-
-**References:**
-- `docs/learning-notes/14-m3-phase4-recipe-scaling.md`
-- `docs/learning-notes/22-m4.3.1-recipe-source-tracking.md`
-- `Services/RecipeScalingService.swift`
-
-**Related PRDs:**
-- M3 Structured Quantity Management
-- M4 Meal Planning & Enhanced Grocery Integration
-
----
-
-## 💡 IMPLEMENTATION TIPS
-
-### **Tip 1: Start with UI, Then Logic**
-1. Add servings picker (visual feedback)
-2. Add scaling display (see it work)
-3. Wire up scaling service (math works)
-4. Add to list (complete flow)
-
-### **Tip 2: Use RecipeScalingService Liberally**
-```swift
-// It's already tested and works!
-// Just pass ingredients and servings
-let scaled = scalingService.scaleIngredients(...)
-```
-
-### **Tip 3: Test with Real Recipes**
-- Use the 6 test recipes from M4.3.1
-- Try different scales (0.5x, 1x, 2x, 4x)
-- Verify fractions display correctly
-- Check unit conversions
-
-### **Tip 4: Leverage M4.3.1 Foundation**
-```swift
-// Recipe relationships "just work"
-listItem.addToSourceRecipes(recipe)
-
-// Badges appear automatically in grocery list
-// Settings toggle already controls visibility
-// No additional UI work needed!
-```
-
----
-
-## 🎯 PHASE SUMMARY
-
-| Phase | Time | Key Deliverable |
-|-------|------|-----------------|
-| **Phase 1** | 30-45 min | Servings picker UI |
-| **Phase 2** | 30-45 min | Scaled quantity calculation |
-| **Phase 3** | 30-45 min | Add scaled items to list |
-| **Total** | **1.5-2 hours** | Complete scaled recipe to list |
+### **Error Handling**
+- Graceful failure if recipe has no ingredients
+- Handle nil safely throughout
+- User-friendly error messages
 
 ---
 
 ## 🚀 READY TO START?
 
-### **Session Startup Checklist:**
+**Session Startup Checklist:**
 1. ✅ Read this next-prompt.md
-2. ✅ Review M3 Phase 4 (RecipeScalingService)
-3. ✅ Review M4.3.1 (Recipe relationships)
+2. ✅ Review M4.3.2 (scaling logic to reuse)
+3. ✅ Review M4.3.1 (recipe relationships)
 4. ✅ Check current-story.md for any updates
-5. ✅ Open RecipeDetailView.swift and AddIngredientsToListView.swift
+5. ✅ Open MealPlanDetailView.swift
 
-### **First Steps:**
-1. Add `@State private var selectedServings` to RecipeDetailView
-2. Pass `targetServings` parameter to AddIngredientsToListView
-3. Add servings picker UI section
-4. Test UI before moving to Phase 2
+**First Steps:**
+1. Add "Add All to Shopping List" button to MealPlanDetailView
+2. Add confirmation dialog with counts
+3. Implement Phase 1 (UI), test, then proceed to Phase 2
 
 ---
 
-**Good luck! You've got proven foundations (M3 + M4.3.1) to build on. This should be straightforward! 🚀**
+**Good luck! This completes the meal planning to grocery workflow! 🎉**
 
 ---
 
 **Document Version**: 1.0  
 **Created**: November 22, 2025  
 **Status**: 🚀 READY  
-**Estimated Time**: 1.5-2 hours  
-**Prerequisite Reading**: M3 Phase 4, M4.3.1 learning notes
+**Estimated Time**: 2 hours  
+**Prerequisites**: M4.2 ✅, M4.3.1 ✅, M4.3.2 ✅

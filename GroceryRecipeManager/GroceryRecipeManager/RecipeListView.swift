@@ -724,7 +724,7 @@ struct RecipeDetailView: View {
         }
         .sheet(isPresented: $showingAddToListSheet) {
             if hasIngredients {
-                AddIngredientsToListView(recipe: recipe)
+                AddIngredientsToListView(recipe: recipe, context: viewContext)
             }
         }
         .sheet(isPresented: $showingEditSheet) {
