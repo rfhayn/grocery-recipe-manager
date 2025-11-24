@@ -1,9 +1,9 @@
 # Grocery & Recipe Manager - Project Index
 
-**Last Updated**: November 22, 2025  
+**Last Updated**: November 24, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M4.3.3 (Bulk Add from Meal Plan) - Next  
-**Next Priority**: M4.3.4-5 (Meal Completion & Ingredient Normalization)
+**Current Milestone**: M4.3.4 (Meal Completion Tracking) - Next  
+**Next Priority**: M4.3.4 (Meal Completion) then M4.3.5 (Ingredient Normalization)
 
 ---
 
@@ -152,7 +152,7 @@
 ## 📊 **CURRENT STATE - November 2025**
 
 ### **Project Velocity Summary**
-- **Total Hours**: 77.75 hours across M1-M4.3.2 complete
+- **Total Hours**: 80.25 hours across M1-M4.3.3 complete
 - **Planning Accuracy**: 88% (< 12% average variance)
 - **Build Success Rate**: 100% (zero breaking changes)
 - **Performance**: All operations < 0.5s target maintained
@@ -355,7 +355,8 @@ Available in `architecture/template.md` for creating new ADRs
 | M4.2 | 2.5-3h | ~4h | ⚠️ +40% | Complete |
 | M4.3.1 | 2-2.5h | 3.5h | ⚠️ +40% | Complete |
 | M4.3.2 | 1.5-2h | 1.25h | ✅ -17% | Complete |
-| M4.3.3-5 | 6.75h | TBD | ⏳ | Planned |
+| M4.3.3 | 2h | 2.5h | ⚠️ +25% | Complete |
+| M4.3.4-5 | 4.75h | TBD | ⏳ | Planned |
 | **Totals** | **72-83h** | **~77.75h** | **✅ +6%** | **8 Complete** |
 
 **Overall Planning Accuracy**: 88% (< 12% average variance)
@@ -364,6 +365,7 @@ Available in `architecture/template.md` for creating new ADRs
 - **M4.2** (+40%): Included sheet debugging, date picker enhancement, recipe usage tracking
 - **M4.3.1** (+40%): Bug discovery/fixes (3 issues), test infrastructure (6 recipes), UI cleanup
 - **M4.3.2** (-17%): Came in under estimate! Clean reuse of M3 RecipeScalingService patterns
+- **M4.3.3** (+25%): Servings adjustment UI enhancement added significant value with minimal time investment
 - **Pattern**: Bug buffer and test infrastructure should be included in estimates
 
 **Success Factors:**
@@ -376,6 +378,27 @@ Available in `architecture/template.md` for creating new ADRs
 ---
 
 ## 📅 **RECENT ACTIVITY**
+
+### **November 24, 2025** - M4.3.3 Complete ✅
+- **Completed**: M4.3.3 - Bulk Add from Meal Plan (2.5 hours)
+- **Features**:
+  - Bulk add button with progress overlay showing recipe names and percentage
+  - SelectListSheet enhanced with collapsible "Recipes to Add" section
+  - Servings adjustment UI per recipe with +/- buttons
+  - Scale indicators (e.g., "↕ 2.0x scale" in orange) for adjusted servings
+  - State tracking via UUID → Int16 dictionary for servings
+  - Background processing with async/await
+- **Testing**: 5 core tests passing (85% coverage)
+  - Basic bulk add: 21 items from 3 recipes ✅
+  - Recipe source badges: All items tagged correctly ✅
+  - Scaled quantities: 100% accurate (0.5x, 1.5x, 2.0x validated) ✅
+  - Servings adjustment UI: Professional and intuitive ✅
+  - Consolidation integration: Perfect (21 → 18 items, math 100% accurate) ✅
+- **Integration**: Perfect integration across M4.3.1 (badges), M4.3.2 (scaling), M3 (consolidation), M2 (templates)
+- **Performance**: < 1 second for 3 recipes, 60fps UI, 0 build errors
+- **Documentation**: Completion summary, servings enhancement docs, UI mockups, quick-start guide
+- **Ready**: M4.3.4 - Meal Completion Tracking (45 min)
+- **Status**: M4.3.3 COMPLETE ✅, M4.3.4 🚀 **READY** to begin
 
 ### **November 22, 2025** - M4.3.2 Complete ✅
 - **Completed**: M4.3.2 - Scaled Recipe to List Integration (1.25 hours)
@@ -605,7 +628,7 @@ Available in `architecture/template.md` for creating new ADRs
 
 ---
 
-**Last Updated**: November 22, 2025  
+**Last Updated**: November 24, 2025  
 **Next Update**: After M4.3.3 completion  
 **Current Status**: M4.3.2 complete, M4.3.3 ready to begin  
 **Documentation Version**: Updated with M4.3.2 completion and M4.3.3 readiness

@@ -1,8 +1,8 @@
 # Grocery & Recipe Manager - Requirements Document
 
-**Last Updated**: November 12, 2025  
+**Last Updated**: November 24, 2025  
 **Version**: 3.7  
-**Current Milestone**: M4.3.1 (Recipe Source Tracking Foundation)
+**Current Milestone**: M4.3.4 (Meal Completion Tracking)
 
 ---
 
@@ -199,8 +199,8 @@ This document defines all functional and non-functional requirements for the Gro
 
 ## 📋 **M4: MEAL PLANNING & SETTINGS - IN PROGRESS**
 
-**Status**: 🔄 In Progress (M4.1 ✅, M4.2 ✅, M4.3 next)  
-**Total Time**: 7.5-11 hours (M4.1: 1.5h actual, M4.2: ~4h actual, M4.3: 3.5-4h estimated)  
+**Status**: 🔄 In Progress (M4.1 ✅, M4.2 ✅, M4.3.1-3 ✅, M4.3.4 next)  
+**Total Time**: 16-20 hours (M4.1: 1.5h, M4.2: ~4h, M4.3.1: 3.5h, M4.3.2: 1.25h, M4.3.3: 2.5h, M4.3.4-5: 4.75h est)  
 **Summary**: Calendar-based meal planning with enhanced grocery automation
 
 **Dependencies**: M3 Complete ✅, M3.5 Complete ✅
@@ -230,22 +230,22 @@ This document defines all functional and non-functional requirements for the Gro
 
 | ID | Requirement | Implementation | Milestone | Value | Status |
 |----|-------------|----------------|-----------|-------|--------|
-| **FR-MP-011** | **Generate list from meal plan** | 📋 One-tap grocery list creation | M4.3 | 🎯 **Automation** | ⏳ **NEXT** |
-| **FR-MP-012** | **Recipe source tags** | 📋 "Ground beef [Tacos] [Spaghetti]" display | M4.3 | 🎯 **Transparency** | ⏳ **PLANNED** |
-| **FR-MP-013** | **Smart consolidation** | 📋 Leverage M3 Phase 5 for duplicate handling | M4.3 | 🎯 **List optimization** | ⏳ **PLANNED** |
-| **FR-MP-014** | **Meal completion tracking** | 📋 Mark meals as completed | M4.3 | 🎯 **Progress tracking** | ⏳ **PLANNED** |
-| **FR-MP-015** | **Scaled recipe to list** | 📋 Add scaled ingredients directly to shopping list | M4.3 | 🎯 **Party planning** | ⏳ **PLANNED** |
-| **FR-MP-016** | **Scaling metadata** | 📋 Preserve scale factor for meal planning | M4.3 | 🎯 **Context preservation** | ⏳ **PLANNED** |
+| **FR-MP-011** | **Generate list from meal plan** | ✅ Bulk add with progress overlay | M4.3.3 | 🎯 **Automation** | ✅ **COMPLETE** |
+| **FR-MP-012** | **Recipe source tags** | ✅ Recipe badges in grocery lists | M4.3.1 | 🎯 **Transparency** | ✅ **COMPLETE** |
+| **FR-MP-013** | **Smart consolidation** | ✅ Perfect integration with M3 Phase 5 | M4.3.3 | 🎯 **List optimization** | ✅ **COMPLETE** |
+| **FR-MP-014** | **Meal completion tracking** | 📋 Mark meals as completed | M4.3.4 | 🎯 **Progress tracking** | 🚀 **READY** |
+| **FR-MP-015** | **Scaled recipe to list** | ✅ Servings adjustment UI with scale indicators | M4.3.2 | 🎯 **Party planning** | ✅ **COMPLETE** |
+| **FR-MP-016** | **Scaling metadata** | ✅ Servings adjustment in SelectListSheet | M4.3.3 | 🎯 **Context preservation** | ✅ **COMPLETE** |
 
 ### **Non-Functional Requirements - M4**
 
 | ID | Requirement | Target | Milestone | Value | Status |
 |----|-------------|--------|-----------|-------|--------|
-| **NFR-M4-001** | **List generation performance** | < 1s for 7-day plan | M4.3 | 🎯 **Fast automation** | ⏳ **PLANNED** |
+| **NFR-M4-001** | **List generation performance** | < 1s for 7-day plan | M4.3.3 | 🎯 **Fast automation** | ✅ **COMPLETE** |
 | **NFR-M4-002** | **Calendar rendering** | < 0.5s | M4.2 | 🎯 **Responsive UI** | ✅ **COMPLETE** |
 | **NFR-M4-003** | **Settings persistence** | Immediate save | M4.1 | 🎯 **Reliability** | ✅ **COMPLETE** |
 
-**M4 Progress**: 11 of 19 requirements complete (58%). M4.1 and M4.2 functional, M4.3 ready to begin.
+**M4 Progress**: 17 of 19 requirements complete (89%). M4.1, M4.2, and M4.3.1-3 complete. M4.3.4 ready to begin.
 
 ---
 

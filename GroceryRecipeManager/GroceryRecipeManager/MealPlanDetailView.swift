@@ -29,6 +29,22 @@ struct MealPlanDetailView: View {
     // M4.2.1-3 Enhancement: All recipes loaded for autocomplete
     @State private var allRecipes: [Recipe] = []
     
+    // M4.3.3: Bulk add to shopping list
+    @State private var showingBulkAddSheet = false
+    @State private var isBulkAdding = false
+    @State private var bulkAddProgress: Double = 0.0
+    @State private var bulkAddMessage = "Processing recipes..."
+    @State private var bulkAddResults: BulkAddResults?
+    
+    // MARK: - Supporting Types
+    
+    // M4.3.3: Results from bulk add operation
+    struct BulkAddResults {
+        let totalRecipes: Int
+        let totalIngredients: Int
+        let listName: String
+    }
+    
     // MARK: - Initialization
     
     init(mealPlan: MealPlan) {
@@ -96,12 +112,65 @@ struct MealPlanDetailView: View {
         .onAppear {
             loadAllRecipes()
         }
+        // M4.3.3: Progress overlay during bulk add
+        .overlay {
+            if isBulkAdding {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                    
+                    VStack(spacing: 20) {
+                        ProgressView(value: bulkAddProgress) {
+                            Text(bulkAddMessage)
+                                .font(.headline)
+                        }
+                        .progressViewStyle(.linear)
+                        .frame(width: 250)
+                        .tint(.blue)
+                        
+                        Text("\(Int(bulkAddProgress * 100))% complete")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(30)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(radius: 20)
+                    )
+                }
+            }
+        }
+        // M4.3.3: Bulk add to shopping list with servings adjustment
+        .sheet(isPresented: $showingBulkAddSheet) {
+            SelectListSheet(
+                onSelect: { selectedList, adjustedServings in
+                    Task {
+                        await performBulkAdd(to: selectedList, adjustedServings: adjustedServings)
+                    }
+                },
+                recipes: plannedMeals.compactMap { meal in
+                    guard let recipe = meal.recipe else { return nil }
+                    return (recipe: recipe, currentServings: meal.servings)
+                }
+            )
+            .environment(\.managedObjectContext, viewContext)
+        }
+        .alert("Success!", isPresented: .constant(bulkAddResults != nil)) {
+            Button("OK") {
+                bulkAddResults = nil
+            }
+        } message: {
+            if let results = bulkAddResults {
+                Text("Added \(results.totalIngredients) ingredients from \(results.totalRecipes) recipes to \(results.listName)")
+            }
+        }
     }
     
     // MARK: - Plan Header
     
     private var planHeaderView: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             // Date range
             if let startDate = mealPlan.startDate {
                 Text(formatDateRange(startDate: startDate, duration: Int(mealPlan.duration)))
@@ -116,6 +185,31 @@ struct MealPlanDetailView: View {
             }
             .font(.caption)
             .foregroundColor(.secondary)
+            
+            // M4.3.3: Add All to Shopping List button
+            if !plannedMeals.isEmpty {
+                Button {
+                    showingBulkAddSheet = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "cart.fill.badge.plus")
+                            .font(.body)
+                        Text("Add All to Shopping List")
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .shadow(color: Color.green.opacity(0.3), radius: 4, y: 2)
+                }
+                .disabled(isBulkAdding)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
@@ -184,6 +278,185 @@ struct MealPlanDetailView: View {
         let year = yearFormatter.string(from: startDate)
         
         return "\(startString) - \(endString), \(year)"
+    }
+    
+    // MARK: - M4.3.3: Bulk Add Operations
+    
+    // M4.3.3: Process all recipes in meal plan and add to shopping list
+    // M4.3.3: Perform bulk add with optional adjusted servings
+    private func performBulkAdd(to weeklyList: WeeklyList, adjustedServings: [UUID: Int16] = [:]) async {
+        // Count recipes that actually have ingredients
+        let recipesWithIngredients = plannedMeals.filter { meal in
+            guard let recipe = meal.recipe else { return false }
+            guard let ingredients = recipe.ingredients else { return false }
+            return ingredients.count > 0
+        }
+        
+        guard !recipesWithIngredients.isEmpty else {
+            // Show alert for empty meal plan
+            await MainActor.run {
+                showingBulkAddSheet = false
+            }
+            return
+        }
+        
+        await MainActor.run {
+            isBulkAdding = true
+            bulkAddProgress = 0.0
+        }
+        
+        // Services we'll need
+        let templateService = IngredientTemplateService(context: viewContext)
+        let scalingService = RecipeScalingService(context: viewContext)
+        
+        var totalIngredientsAdded = 0
+        let totalMeals = recipesWithIngredients.count
+        
+        // Process each planned meal
+        for (index, plannedMeal) in recipesWithIngredients.enumerated() {
+            guard let recipe = plannedMeal.recipe else { continue }
+            
+            // Update progress
+            await MainActor.run {
+                bulkAddProgress = Double(index) / Double(totalMeals)
+                bulkAddMessage = "Processing \(recipe.title ?? "recipe")..."
+            }
+            
+            // M4.3.3: Get servings - use adjusted if available, otherwise use meal servings
+            let targetServings: Int
+            if let recipeID = recipe.id, let adjusted = adjustedServings[recipeID] {
+                targetServings = Int(adjusted)
+            } else {
+                targetServings = Int(plannedMeal.servings)
+            }
+            let scaleFactor = recipe.servings > 0 ? Double(targetServings) / Double(recipe.servings) : 1.0
+            
+            // Get ingredients
+            guard let ingredientsSet = recipe.ingredients else { continue }
+            let ingredients = Array(ingredientsSet) as! [Ingredient]
+            
+            // Add each ingredient to the list
+            for ingredient in ingredients {
+                // Skip if no name
+                guard let ingredientName = ingredient.name, !ingredientName.isEmpty else { continue }
+                
+                // Ensure template exists (for future normalization)
+                let cleanName = extractCleanIngredientName(from: ingredientName)
+                _ = templateService.findOrCreateTemplate(name: cleanName)
+                
+                // Create list item
+                let listItem = GroceryListItem(context: viewContext)
+                listItem.id = UUID()
+                listItem.name = ingredientName
+                listItem.isCompleted = false
+                listItem.sortOrder = Int16(weeklyList.items?.count ?? 0)
+                listItem.weeklyList = weeklyList
+                
+                // M4.3.2: Apply scaling to quantities
+                if scaleFactor != 1.0 && ingredient.isParseable && ingredient.numericValue > 0 {
+                    let scaledValue = ingredient.numericValue * scaleFactor
+                    listItem.displayText = formatScaledQuantity(value: scaledValue, unit: ingredient.standardUnit)
+                    listItem.numericValue = scaledValue
+                    listItem.standardUnit = ingredient.standardUnit
+                    listItem.isParseable = true
+                    listItem.parseConfidence = ingredient.parseConfidence
+                } else {
+                    listItem.displayText = ingredient.displayText ?? ""
+                    listItem.numericValue = ingredient.numericValue
+                    listItem.standardUnit = ingredient.standardUnit
+                    listItem.isParseable = ingredient.isParseable
+                    listItem.parseConfidence = ingredient.parseConfidence
+                }
+                
+                // M4.3.1: Establish recipe relationship
+                listItem.addToSourceRecipes(recipe)
+                
+                totalIngredientsAdded += 1
+            }
+            
+            // Small delay to show progress
+            try? await Task.sleep(nanoseconds: 50_000_000) // 0.05 seconds
+        }
+        
+        // Save context
+        do {
+            try viewContext.save()
+            
+            // Show success
+            await MainActor.run {
+                isBulkAdding = false
+                showingBulkAddSheet = false
+                bulkAddResults = BulkAddResults(
+                    totalRecipes: totalMeals,
+                    totalIngredients: totalIngredientsAdded,
+                    listName: weeklyList.name ?? "shopping list"
+                )
+            }
+        } catch {
+            print("Error saving bulk add: \(error)")
+            await MainActor.run {
+                isBulkAdding = false
+            }
+        }
+    }
+    
+    // M4.3.3: Format scaled quantity for display
+    private func formatScaledQuantity(value: Double, unit: String?) -> String {
+        let fractionString = formatToFraction(value)
+        
+        if let unit = unit, !unit.isEmpty {
+            return "\(fractionString) \(unit)"
+        } else {
+            return fractionString
+        }
+    }
+    
+    // M4.3.3: Convert decimal to fraction
+    private func formatToFraction(_ value: Double) -> String {
+        // Whole number check
+        if value.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(Int(value))
+        }
+        
+        // Common fractions
+        let fractions: [(Double, String)] = [
+            (0.125, "⅛"), (0.25, "¼"), (0.333, "⅓"), (0.375, "⅜"),
+            (0.5, "½"), (0.625, "⅝"), (0.666, "⅔"), (0.75, "¾"), (0.875, "⅞")
+        ]
+        
+        let wholePart = Int(value)
+        let fractionalPart = value - Double(wholePart)
+        
+        // Find closest fraction
+        for (decimal, fraction) in fractions {
+            if abs(fractionalPart - decimal) < 0.01 {
+                if wholePart > 0 {
+                    return "\(wholePart) \(fraction)"
+                } else {
+                    return fraction
+                }
+            }
+        }
+        
+        // Default to decimal
+        return String(format: "%.2f", value)
+    }
+    
+    // M4.3.3: Extract clean ingredient name
+    private func extractCleanIngredientName(from fullText: String) -> String {
+        var cleaned = fullText
+        
+        // Remove quantities and measurements
+        let measurementPattern = "\\b\\d+(?:\\.\\d+)?\\s*(?:cups?|tbsp|tsp|oz|lbs?|g|kg|ml|l)?\\b"
+        if let regex = try? NSRegularExpression(pattern: measurementPattern, options: .caseInsensitive) {
+            cleaned = regex.stringByReplacingMatches(
+                in: cleaned,
+                range: NSRange(cleaned.startIndex..., in: cleaned),
+                withTemplate: ""
+            )
+        }
+        
+        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines).capitalized
     }
 }
 

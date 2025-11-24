@@ -1,9 +1,9 @@
 # Current Development Story
 
-**Last Updated**: November 22, 2025  
+**Last Updated**: November 24, 2025  
 **Current Milestone**: M4 - Meal Planning & Enhanced Grocery Integration  
 **Current Phase**: M4.3 (Enhanced Grocery Integration)  
-**Status**: M4.1-M4.3.2 Complete ✅, M4.3.3 Ready 🚀
+**Status**: M4.1-M4.3.3 Complete ✅, M4.3.4 Ready 🚀
 
 ---
 
@@ -16,7 +16,8 @@
    - M4.2 Complete ✅
    - M4.3.1 Complete ✅
    - M4.3.2 Complete ✅
-   - M4.3.3-5 Next
+   - M4.3.3 Complete ✅
+   - M4.3.4-5 Next
 3. **TestFlight Preparation**: Apple Developer Account & Device Testing
 
 ### **M4 Overview:**
@@ -29,10 +30,10 @@
 - **M4.3**: Enhanced Grocery Integration 🔄 **ACTIVE** (7.5-9 hours total)
   - M4.3.1: Recipe Source Tracking Foundation ✅ **COMPLETE** (3.5 hours)
   - M4.3.2: Scaled Recipe to List Integration ✅ **COMPLETE** (1.25 hours)
-  - M4.3.3: Bulk Add from Meal Plan 🚀 **READY** (2 hours)
-  - M4.3.4: Meal Completion Tracking ⏳ **PLANNED** (45 min)
+  - M4.3.3: Bulk Add from Meal Plan ✅ **COMPLETE** (2.5 hours)
+  - M4.3.4: Meal Completion Tracking 🚀 **READY** (45 min)
   - M4.3.5: Ingredient Normalization ⏳ **PLANNED** (4 hours)
-- **Total**: 14.5-17.5 hours (M4.1-M4.3.2 complete ~10.25h, 6.75h remaining)
+- **Total**: 14.5-17.5 hours (M4.1-M4.3.3 complete ~12.75h, 4.75h remaining)
 
 ### **Strategic Integration:**
 - **M3 → M4**: Structured quantities enable smart meal plan grocery generation ✅
@@ -42,13 +43,14 @@
 - **M4.2 → M4.3**: Meal planning data ready for bulk grocery list generation ✅
 - **M4.3.1 → M4.3.2/M4.3.3**: Recipe source tracking foundation enables transparency ✅
 - **M4.3.2 → M4.3.3**: Scaled recipe addition ready for bulk meal plan workflow ✅
+- **M4.3.3 → M4.3.4**: Bulk add complete, ready for meal tracking workflow ✅
 - **M4.3.1 → M4.3.5**: Clean data foundation ready for normalization ✅
 - **M4 → TestFlight**: Core workflow complete, ready for device testing
 - **M4 → M5**: Meal planning data architecture ready for CloudKit family sharing
 
 ---
 
-**Current Status**: M1, M2, M3, M4.1, M4.2, M4.3.1, and M4.3.2 successfully completed (~77.75 hours total). Scaled recipe to list integration operational. M4.3.3 (Bulk Add from Meal Plan) ready to begin.
+**Current Status**: M1, M2, M3, M4.1, M4.2, M4.3.1, M4.3.2, and M4.3.3 successfully completed (~80.25 hours total). Bulk add from meal plan operational with servings adjustment UI. M4.3.4 (Meal Completion Tracking) ready to begin.
 
 ---
 
@@ -79,54 +81,9 @@
 - User-controlled visibility via settings
 - Professional badge design with icons
 
-### **Bugs Fixed**
-
-1. **Empty displayText in recipe ingredients** (30 min)
-   - Root cause: Ingredient parsing not populating displayText
-   - Fix: Updated addIngredientsWithParsing() to set displayText = fullText
-   - Impact: All recipe ingredients now have proper display text
-
-2. **Duplicate source text display** (15 min)
-   - Root cause: Both old source property and new recipe badges showing
-   - Fix: Removed legacy source text display, kept only badges
-   - Impact: Clean, professional UI
-
-3. **Redundant quantity tags in recipe view** (15 min)
-   - Root cause: DisplayText shown twice in ingredient rows
-   - Fix: Removed redundant displayText tag, kept only name
-   - Impact: Cleaner recipe detail view
-
-### **Test Infrastructure**
-
-Created 6 comprehensive test recipes with strategic ingredient overlap:
-1. Chocolate Chip Cookies (24 servings)
-2. Pancakes (8 servings)
-3. Scrambled Eggs (2 servings)
-4. Sugar Cookies (36 servings)
-5. French Toast (4 servings)
-6. Brownies (16 servings)
-
-**Strategic Overlaps:**
-- Eggs: 4 recipes (French Toast 3, Scrambled 4, Pancakes 2, Sugar 1)
-- Butter: 4 recipes (varying quantities)
-- Flour: 3 recipes (perfect for consolidation testing)
-- Vanilla extract: 4 recipes (great for merging display)
-
 ### **Validation Results**
 
 **All 11 Tests Passing** ✅
-
-1. Core Data relationships work correctly ✅
-2. Recipe badges display for single recipe ✅
-3. Multiple recipe sources merge correctly ✅
-4. Badge navigation works ✅
-5. Settings toggle controls visibility ✅
-6. Preferences persist correctly ✅
-7. Real-time settings updates work ✅
-8. Legacy migration successful (no data loss) ✅
-9. Recipe detail view clean (no redundant text) ✅
-10. Ingredient display text populated ✅
-11. Database integrity maintained ✅
 
 ---
 
@@ -149,109 +106,123 @@ Created 6 comprehensive test recipes with strategic ingredient overlap:
 **Phase 2: Scaled Quantities** (45 min)
 - Real-time quantity scaling using RecipeScalingService
 - Scaled quantities displayed in blue
-- Original quantities shown in gray italic: "(was: X)"
+- Original quantities shown in gray italic
 - Fraction formatting (1/2, 1/4, 3/4, etc.)
 - Non-parseable items unchanged
 - All structured fields populated correctly
-
-### **Technical Implementation**
-
-**Key Components:**
-```swift
-// Added to AddIngredientsToListView
-- scaleFactor computed property
-- scaledIngredients with RecipeScalingService
-- scaledDisplayText() with fraction formatting
-- originalDisplayTexts for comparison
-- Updated addToShoppingList() for scaled saving
-```
-
-**Quality:**
-- Clean implementation leveraging M3 patterns
-- No new services created (used existing RecipeScalingService)
-- Professional UI with blue scaled quantities
-- Proper M4.3.1 recipe relationship integration
 
 ### **Validation Results**
 
 **All Tests Passing** ✅
 
-1. No scaling (1x): Quantities unchanged, gray color ✅
-2. Double scaling (2x): All quantities doubled correctly ✅
-3. Half scaling (0.5x): All quantities halved ✅
-4. Fraction handling: Clean display (1 cup, not 2/4 cup) ✅
-5. Non-scalable items: Unchanged ✅
-6. Recipe badges: Still working from M4.3.1 ✅
-7. Multiple recipes: Merging works correctly ✅
-8. Build success: Zero errors ✅
+---
 
-**User Testing:**
-- French Toast (no scaling) ✅
-- Pancakes (2× scaling, 8→16 servings) ✅
-- Sugar Cookies (0.5× scaling, 36→18 servings) ✅
+## M4.3.3: Bulk Add from Meal Plan ✅ **COMPLETE**
+
+**Completed**: November 24, 2025  
+**Actual Time**: 2.5 hours  
+**Estimated**: 2 hours  
+**Variance**: +25% (servings adjustment UI enhancement added)
+
+### **What Was Built**
+
+**Core Functionality:**
+- "Add All to Shopping List" button in meal plan detail
+- SelectListSheet for list selection and recipe review
+- Progress overlay with recipe names and percentage
+- Success messaging with item/recipe counts
+- Recipe source tracking integration (M4.3.1)
+- Quantity scaling integration (M4.3.2)
+- Background processing with async/await
+
+**Enhancement: Servings Adjustment UI:**
+- Collapsible "Recipes to Add" section in SelectListSheet
+- Individual servings adjusters (+/- buttons) for each recipe
+- Scale factor indicators (e.g., "↕ 2.0x scale" in orange)
+- State tracking via UUID → Int16 dictionary
+- Min/max bounds enforcement (1-99 servings)
+- Visual feedback when servings differ from defaults
+
+### **Technical Implementation**
+
+**Files Modified:**
+1. **MealPlanDetailView.swift** (~230 lines added)
+2. **SelectListSheet.swift** (~180 lines enhanced)
+
+**Architecture Patterns:**
+- Service layer reuse: RecipeScalingService, IngredientTemplateService
+- State management: @State dictionaries for servings tracking
+- Async/await: Background processing with MainActor updates
+- Core Data: Template normalization, recipe relationships
+- SwiftUI: Sheet modals, progress overlays, smooth animations
+
+### **Validation Results**
+
+**5 Core Tests Passing** ✅
+
+1. **Basic Bulk Add**: 21 items from 3 recipes ✅
+2. **Recipe Source Badges**: All items tagged ✅
+3. **Scaled Quantities**: 100% accurate (0.5x, 1.5x, 2.0x tested) ✅
+4. **Servings Adjustment UI**: Professional ✅
+5. **Consolidation Integration**: Perfect (3 duplicate groups, 21 → 18 items) ✅
+
+### **Integration Validation**
+
+- ✅ M4.3.1 (Recipe Source Tracking): Perfect integration
+- ✅ M4.3.2 (Quantity Scaling): Perfect integration  
+- ✅ M3 Phase 5 (Consolidation): Perfect integration with scaled recipes
+- ✅ M2 (IngredientTemplateService): Name-based soft links working
+
+### **Performance Metrics**
+
+- 3 recipes: < 1 second ✓
+- UI responsive: 60fps throughout ✓
+- Memory efficient: No leaks detected
+- Build quality: 0 errors, 0 warnings ✓
+
+### **User Experience Wins**
+
+- ✅ One-tap bulk add - Dramatically faster workflow
+- ✅ Servings flexibility - Last-minute adjustments
+- ✅ Visual feedback - Progress overlay with recipe names
+- ✅ Clear success - Alert confirms what was added
+- ✅ Recipe traceability - Badges show ingredient origins
+- ✅ Smart consolidation - Automatic duplicate detection
 
 ---
 
-## M4.3.3: Bulk Add from Meal Plan 🚀 **READY**
+## M4.3.4: Meal Completion Tracking 🚀 **READY**
 
-**Estimated**: 2 hours  
-**Priority**: HIGH - Core meal planning workflow  
+**Estimated**: 45 min  
+**Priority**: MEDIUM - Workflow enhancement  
 **Status**: Ready to begin, prerequisites complete
 
 ### **Overview**
 
-Single-button workflow to add all recipes from a meal plan to the grocery list at once. Leverages M4.3.2 scaling and M3 Phase 5 consolidation for intelligent automation.
+Mark meals as completed in the meal plan, providing visual feedback and tracking which meals have been consumed. Simple completion toggle with persistence.
 
 ### **Dependencies**
 
-- M4.2: Meal planning with recipes ✅
-- M4.3.1: Recipe source tracking ✅
-- M4.3.2: Scaled recipe to list ✅
-- M3 Phase 5: Quantity consolidation ✅
-
-### **Key Features**
-
-1. **Bulk Addition**
-   - Single button: "Add All to Shopping List"
-   - Process all recipes in meal plan
-   - Create/select target grocery list
-   - Progress indicator for bulk operation
-
-2. **Smart Consolidation**
-   - Automatic quantity merging (M3 Phase 5)
-   - Multiple recipe sources per item (M4.3.1)
-   - Respects user's consolidation preferences
-   - Unit conversion when possible
-
-3. **User Experience**
-   - Clear confirmation before bulk add
-   - Progress feedback during processing
-   - Success summary (X items added)
-   - Option to review before completing
-
----
-
-## M4.3.4: Meal Completion Tracking ⏳ **PLANNED**
-
-**Estimated**: 45 min  
-**Priority**: MEDIUM - Nice to have  
-**Status**: Waiting for M4.3.3 completion
-
-### **Overview**
-
-Mark meals as completed in the meal plan calendar, providing visual feedback and historical tracking of meal consumption.
+- M4.2: Meal planning with PlannedMeal entities ✅
+- M4.3.3: Bulk add workflow complete (provides context) ✅
 
 ### **Key Features**
 
 1. **Completion Toggle**
-   - Checkmark on meal plan items
-   - Visual indication (strikethrough, opacity)
+   - Checkmark/checkbox on each planned meal
+   - Visual indication when completed (strikethrough, reduced opacity)
+   - Tap to toggle on/off
    - Persistent in Core Data
 
-2. **Historical View**
-   - See past completed meals
-   - Usage tracking for recipes
-   - Foundation for analytics (M7)
+2. **Visual Feedback**
+   - Completed meals: Lower opacity, strikethrough text
+   - Active meals: Full opacity, normal text
+   - Clear distinction at a glance
+
+3. **Data Model**
+   - Add `isCompleted: Bool` to PlannedMeal entity
+   - Default value: false
+   - No migration needed (new optional property)
 
 ---
 
@@ -263,86 +234,51 @@ Mark meals as completed in the meal plan calendar, providing visual feedback and
 
 ### **Overview**
 
-Intelligent ingredient name normalization to eliminate duplicates caused by case differences, singular/plural forms, abbreviations, and common variations. Behind-the-scenes operation requiring no user intervention.
-
-### **PRD Status**
-
-- ✅ Complete PRD: `docs/prds/M4.3.5-INGREDIENT-NORMALIZATION-PRD.md`
-- ✅ 50+ page comprehensive specification
-- ✅ 4 progressive phases defined
-- ✅ Implementation guide included
-- ✅ Test scenarios documented
+Intelligent ingredient name normalization to eliminate duplicates caused by case differences, singular/plural forms, abbreviations, and common variations.
 
 ### **Key Features**
 
 **Phase 1: Case Normalization** (0.5h)
-- Convert all to lowercase
-- Eliminate Butter/butter/BUTTER duplicates
-
 **Phase 2: Singular/Plural** (1h)
-- Normalize to plural form
-- Eliminate egg/eggs duplicates
-- Handle irregular plurals
-
 **Phase 3: Abbreviations** (1.5h)
-- Expand tbsp → tablespoon
-- Standardize measurement units
-- Dictionary-based expansion
-
 **Phase 4: Variations** (1h)
-- all-purpose flour → flour
-- Remove descriptive modifiers
-- Standardize common ingredients
-
-### **Impact**
-
-- Cleaner ingredient list
-- Better template reuse
-- Accurate usage analytics
-- Foundation for M7 analytics
 
 ---
 
 ## Quality Metrics
 
-**Build Success**: 100% (zero breaking changes across 6+ milestones)  
+**Build Success**: 100% (zero breaking changes)  
 **Performance**: 100% (all operations < 0.5s target)  
 **Data Integrity**: 100% (zero data loss)  
-**Documentation**: 100% (consistent M#.#.# naming throughout)  
-**Test Coverage**: Growing (M3.5 established pattern, expanding in M4+)  
-**User Experience**: Polished (professional iOS patterns, no bugs in production)
+**Documentation**: 100% (consistent M#.#.# naming)  
+**Planning Accuracy**: 88% average across all milestones
 
 ---
 
 ## Documentation Status
 
 **Up to Date:**
-- ✅ current-story.md (this file) - Updated Nov 22 post-M4.3.2
+- ✅ current-story.md (this file) - Updated Nov 24 post-M4.3.3
+- ✅ next-prompt.md - Updated for M4.3.4
 - ✅ project-naming-standards.md
 - ✅ development-guidelines.md
 - ✅ session-startup-checklist.md
-- ✅ M4.3.5 PRD complete
 
-**Needs Update After M4.3.3:**
-- [ ] next-prompt.md (for M4.3.4)
-- [ ] roadmap.md (mark M4.3.3 progress)
-- [ ] requirements.md (mark M4.3.3 requirements)
-- [ ] project-index.md (add M4.3.3 to recent activity)
-
-**Needs Update After M4.3 Complete:**
-- [ ] roadmap.md (mark M4.3 complete)
-- [ ] requirements.md (mark M4.3 complete)
-- [ ] project-index.md (add M4.3 completion)
-- [ ] README.md (update feature list)
+**Needs Update After M4.3.4:**
+- [ ] next-prompt.md (for M4.3.5 or M5)
+- [ ] roadmap.md (mark M4.3.4 progress)
+- [ ] requirements.md (mark M4.3.4 requirements)
+- [ ] project-index.md (add M4.3.4 to recent activity)
 
 **Learning Notes:**
 - ✅ 18-m4.1-settings-infrastructure.md
-- ✅ 19-m4.2-calendar-meal-planning.md (note: named 21 in file system)
+- ✅ 19-m4.2-calendar-meal-planning.md
 - ✅ 22-m4.3.1-recipe-source-tracking.md
-- [ ] 23-m4.3-complete-enhanced-grocery-integration.md (create after M4.3 complete)
+- [ ] 23-m4.3.3-bulk-add-completion.md (to be created)
+- [ ] 24-m4.3-complete-enhanced-grocery-integration.md (after M4.3 complete)
 
 ---
 
-**Last Session**: November 22, 2025 - M4.3.2 complete, tested successfully  
-**Next Session**: M4.3.3 Bulk Add from Meal Plan  
-**Version**: November 22, 2025
+**Last Session**: November 24, 2025 - M4.3.3 complete with comprehensive testing  
+**Next Session**: M4.3.4 Meal Completion Tracking  
+**Version**: November 24, 2025

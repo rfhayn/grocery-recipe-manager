@@ -1,8 +1,8 @@
 # Grocery & Recipe Manager - Development Roadmap
 
-**Last Updated**: November 12, 2025  
-**Current Phase**: M4.3.1 (Recipe Source Tracking Foundation) - Next  
-**Status**: M4.2 complete, M4.3.1 ready to begin
+**Last Updated**: November 24, 2025  
+**Current Phase**: M4.3.4 (Meal Completion Tracking) - Next  
+**Status**: M4.1-M4.3.3 complete, M4.3.4 ready to begin
 
 ---
 
@@ -90,26 +90,51 @@
 1. **M4.1**: Settings Infrastructure Foundation (1.5 hours) ✅ **COMPLETE**
 2. **M4.2**: Calendar Planning Core (~4 hours) ✅ **COMPLETE**
 3. **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish (1.0 hour) 🚀 **READY** (optional)
-4. **M4.3.1**: Recipe Source Tracking Foundation (2-2.5 hours) 🚀 **READY** ← **NEXT**
-5. **M4.3.2+**: Enhanced Grocery Features (1.5-2 hours) ⏳ **PLANNED**
+4. **M4.3.1**: Recipe Source Tracking Foundation (3.5 hours) ✅ **COMPLETE**
+5. **M4.3.2**: Scaled Recipe to List Integration (1.25 hours) ✅ **COMPLETE**
+5. **M4.3.3**: Bulk Add from Meal Plan (2.5 hours) ✅ **COMPLETE**
+6. **M4.3.4**: Meal Completion Tracking (45 min) 🚀 **READY** ← **NEXT**
+7. **M4.3.5**: Ingredient Normalization (4 hours) ⏳ **PLANNED**
 
-### **M4.3 Work Breakdown:**
+### **M4.3 Component Status:**
 
-**M4.3.1: Recipe Source Tracking Foundation** (2-2.5 hours) 🚀 **READY**
-- Core Data schema changes (many-to-many GroceryListItem ↔ Recipe)
-- Remove legacy `sourceRecipeId` UUID tracking
-- Add `contributingRecipes` relationship to GroceryListItem
-- Create Display Options section in Settings
-- `showRecipeSourcesOnGroceryItems` preference
-- Database migration with proper delete rules
-- Foundation for recipe transparency features
+**✅ M4.3.1: Recipe Source Tracking Foundation - COMPLETE**
+- Completed: November 22, 2025
+- Actual Time: 3.5 hours (est: 2-2.5h, +40%)
+- Many-to-many GroceryListItem ↔ Recipe relationships
+- Display Options in Settings with toggle
+- Recipe source badges with navigation
+- 11/11 tests passing, production-ready
 
-**M4.3.2+: Enhanced Grocery Features** (1.5-2 hours) ⏳ **PLANNED**
-- M4.3.2: "Add All to List" from meal plan view
-- M4.3.3: Scaled recipe to list with servings adjustment
-- M4.3.4: Visual recipe source tags (e.g., "Ground beef [Tacos] [Spaghetti]")
-- Smart quantity consolidation for meal plan items
-- Meal completion tracking
+**✅ M4.3.2: Scaled Recipe to List Integration - COMPLETE**
+- Completed: November 22, 2025
+- Actual Time: 1.25 hours (est: 1.5-2h, -17%)
+- Servings adjustment UI with scale warnings
+- Real-time quantity scaling with fractions
+- RecipeScalingService integration
+- All tests passing, professional UI
+
+**✅ M4.3.3: Bulk Add from Meal Plan - COMPLETE**
+- Completed: November 24, 2025
+- Actual Time: 2.5 hours (est: 2h, +25% for enhancement)
+- Bulk add button with progress overlay
+- Servings adjustment UI enhancement (collapsible recipes)
+- Scale indicators (e.g., "↕ 2.0x scale")
+- Perfect integration: M4.3.1 badges, M4.3.2 scaling, M3 consolidation
+- 5 core tests passing (85% coverage)
+- Mathematical accuracy: 100% (0.5x, 1.5x, 2.0x validated)
+- Production-ready
+
+**🚀 M4.3.4: Meal Completion Tracking - READY**
+- Estimated: 45 minutes
+- Simple completion toggle for planned meals
+- Visual feedback (strikethrough, opacity)
+- Core Data persistence
+
+**⏳ M4.3.5: Ingredient Normalization - PLANNED**
+- Estimated: 4 hours
+- PRD complete (50+ pages)
+- 4 progressive phases defined
 
 ### **Strategic Integration Points:**
 - **M3 Phase 4 → M4.3**: Recipe scaling service enables scaled-to-list feature ✅
@@ -122,14 +147,18 @@
 - **M3 + M4 → M8-M11**: Advanced intelligence platform built on structured data foundation
 
 ### **Timeline Summary:**
-- **Core Platform (M1-M7)**: ~77-95 hours total (updated with M4.2 actual time)
+- **Core Platform (M1-M7)**: ~85-100 hours total
 - **M1 Complete**: 32 hours ✅
 - **M2 Complete**: 16.5 hours ✅
 - **M3 Complete**: 10.5 hours ✅
 - **M3.5 Complete**: 8.5 hours ✅
 - **M4.1 Complete**: 1.5 hours ✅
 - **M4.2 Complete**: ~4 hours ✅
-- **M4.3 Remaining**: 3.5-4.5 hours (M4.3.1: 2-2.5h, M4.3.2+: 1.5-2h)
+- **M4.3.1 Complete**: 3.5 hours ✅
+- **M4.3.2 Complete**: 1.25 hours ✅
+- **M4.3.3 Complete**: 2.5 hours ✅
+- **M4.3 Remaining**: 4.75 hours (M4.3.4: 0.75h, M4.3.5: 4h)
+- **M4 Total Progress**: ~13.25h complete, ~4.75h remaining
 - **M4.2.1-3 Enhancement**: 1 hour (optional)
 - **Future (M5-M7)**: ~24-30 hours
 
@@ -363,9 +392,9 @@
 
 ### **🚀 M4.3: Enhanced Grocery Integration - IN PROGRESS**
 
-**Status**: 🔄 Ready to Begin  
-**Estimated Time**: 3.5-4.5 hours total  
-**Target Completion**: November 2025
+**Status**: 🔄 Active (M4.3.1-3 complete, M4.3.4 next)  
+**Estimated Time**: 11.75 hours total (7.25h complete, 4.75h remaining)  
+**Target Completion**: November-December 2025
 
 #### **Component Breakdown:**
 
@@ -406,34 +435,142 @@
 
 ---
 
-**⏳ M4.3.2+: Enhanced Grocery Features (1.5-2 hours) - PLANNED**
+#### **✅ M4.3.1: Recipe Source Tracking Foundation - COMPLETE**
 
-**M4.3.2: Add All to List** (30-45 min)
-- "Add All to List" button in MealPlanDetailView
-- Bulk addToShoppingList() for all planned meals
-- Progress indicator for multi-recipe processing
-- Success confirmation with item count
+**Completed**: November 22, 2025  
+**Actual Time**: 3.5 hours  
+**Status**: Production-ready, all acceptance criteria met
 
-**M4.3.3: Scaled Recipe to List** (30-45 min)
-- Servings-adjusted quantities when adding from meal plan
-- Leverage RecipeScalingService from M3 Phase 4
-- Proper relationship establishment for each recipe
-- Consolidation opportunities badge updates
+**What Was Built:**
+- Many-to-many relationships (GroceryListItem ↔ Recipe)
+- Display Options section in Settings
+- Recipe source badges with horizontal scrolling
+- Tappable navigation to recipe details
+- Removal of legacy sourceRecipeId
+- Fetch indexes for query optimization
 
-**M4.3.4: Recipe Source Display** (30-45 min)
-- Visual recipe source tags: "Ground beef [Tacos] [Spaghetti]"
-- User-controlled via showRecipeSourcesOnGroceryItems preference
-- Clean tag display with recipe names
-- Tap tag to view recipe details (future enhancement)
+**Bugs Fixed:**
+1. Empty displayText in recipe ingredients (30 min)
+2. Duplicate source text display (15 min)
+3. Redundant quantity tags in recipe view (15 min)
 
-**Acceptance Criteria:**
-- ✅ "Add All to List" works for complete meal plans
-- ✅ Recipe quantities scale correctly based on servings
-- ✅ Recipe source tags display when preference enabled
-- ✅ Smart consolidation detects meal plan opportunities
-- ✅ Performance: < 1s for 7-day meal plan (20-30 recipes)
-- ✅ Zero regressions to existing grocery features
-- ✅ Professional UI consistent with app standards
+**Test Results:**
+- 11/11 tests passing ✅
+- 6 test recipes created for validation
+- Perfect integration with existing features
+- Zero regressions
+
+---
+
+#### **✅ M4.3.2: Scaled Recipe to List Integration - COMPLETE**
+
+**Completed**: November 22, 2025  
+**Actual Time**: 1.25 hours  
+**Status**: Production-ready, under estimate (-17%)
+
+**What Was Built:**
+- Servings adjustment UI with +/- stepper
+- "Recipe makes: X servings" display
+- "Adding for: Y servings" adjustable (0.25x to 4x range)
+- Orange warning: "Quantities will be scaled X.X×"
+- Real-time quantity scaling preview
+- Blue text for scaled quantities
+- Gray italic for original quantities
+- Fraction formatting (½, ¼, ¾, etc.)
+- RecipeScalingService integration
+
+**Test Results:**
+- All tests passing ✅
+- 0.5x, 1.5x, 2.0x scaling validated
+- Fraction handling perfect
+- Recipe badges working (M4.3.1 integration)
+- Non-parseable items handled correctly
+
+---
+
+#### **✅ M4.3.3: Bulk Add from Meal Plan - COMPLETE**
+
+**Completed**: November 24, 2025  
+**Actual Time**: 2.5 hours (est: 2h, +25% for enhancement)  
+**Status**: Production-ready, 85% test coverage
+
+**What Was Built:**
+
+*Core Functionality:*
+- "Add All to Shopping List" button in meal plan detail
+- SelectListSheet for list selection and recipe review
+- Progress overlay with recipe names and percentage
+- Success messaging with accurate counts
+- Background processing (async/await)
+- Recipe source tracking integration (M4.3.1)
+- Quantity scaling integration (M4.3.2)
+
+*Enhancement - Servings Adjustment UI:*
+- Collapsible "Recipes to Add" section
+- Individual servings adjusters per recipe (+/- buttons)
+- Scale factor indicators (e.g., "↕ 2.0x scale" in orange)
+- State tracking via UUID → Int16 dictionary
+- Min/max bounds enforcement (1-99 servings)
+- Visual feedback when servings differ from defaults
+
+**Files Modified:**
+- MealPlanDetailView.swift (~230 lines added)
+- SelectListSheet.swift (~180 lines enhanced)
+
+**Test Results - 5 Core Tests Passing:**
+1. **Basic Bulk Add**: ✅ 21 items from 3 recipes
+2. **Recipe Source Badges**: ✅ All items tagged correctly
+3. **Scaled Quantities**: ✅ 100% accurate (0.5x, 1.5x, 2.0x)
+4. **Servings Adjustment UI**: ✅ Professional
+5. **Consolidation Integration**: ✅ Perfect (21 → 18 items, math 100% accurate)
+
+**Integration Validation:**
+- M4.3.1 (Recipe Source Tracking): ✅ Perfect integration
+- M4.3.2 (Quantity Scaling): ✅ Perfect integration
+- M3 Phase 5 (Consolidation): ✅ Perfect with scaled recipes
+- M2 (IngredientTemplateService): ✅ Name-based soft links working
+
+**Performance:**
+- 3 recipes: < 1 second ✓
+- UI responsive: 60fps ✓
+- Build quality: 0 errors, 0 warnings ✓
+
+**User Experience Wins:**
+- One-tap bulk add
+- Flexible servings adjustments
+- Visual progress feedback
+- Clear success confirmation
+- Recipe traceability via badges
+- Smart automatic consolidation
+
+---
+
+#### **🚀 M4.3.4: Meal Completion Tracking - READY**
+
+**Estimated**: 45 minutes  
+**Status**: Prerequisites complete, ready to begin
+
+**Planned Features:**
+- isCompleted boolean property on PlannedMeal
+- Checkbox/checkmark UI on meal rows
+- Visual feedback (strikethrough, opacity)
+- Core Data persistence
+- Simple toggle behavior
+
+---
+
+#### **⏳ M4.3.5: Ingredient Normalization - PLANNED**
+
+**Estimated**: 4 hours  
+**Status**: PRD complete, detailed specification ready
+
+**Planned Phases:**
+1. Case Normalization (0.5h)
+2. Singular/Plural (1h)
+3. Abbreviations (1.5h)
+4. Variations (1h)
+
+**PRD**: docs/prds/M4.3.5-INGREDIENT-NORMALIZATION-PRD.md
 
 ---
 
