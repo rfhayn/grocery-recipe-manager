@@ -287,12 +287,19 @@ func callOpenAI(userContent: String) throws -> String {
 @main
 struct AITestReviewCLI {
     static func main() {
+        // Feature flag: disable AI test review by default.
+        let enabled = ProcessInfo.processInfo.environment["ENABLE_AI_TEST_REVIEW"] == "true"
+        if !enabled {
+            print("AI Test Review is disabled. Set ENABLE_AI_TEST_REVIEW=true to enable.")
+            return
+        }
+
         do {
             let ctx = try collectRepoContext()
             let userContent = buildUserContent(from: ctx)
             let aiOutput = try callOpenAI(userContent: userContent)
 
-            // This is the Markdown comment you’ll later post in GitHub Actions.
+            // This is the Markdown comment you’ll later post as a PR comment.
             print(aiOutput)
         } catch {
             fputs("Error: \(error)\n", stderr)

@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:grocery-recipe-manager}/Tools/AITestReview",
+            "name": "Debug AITestReview (Tools/AITestReview)",
+            "target": "AITestReview",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug AITestReview (Tools/AITestReview)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:grocery-recipe-manager}/Tools/AITestReview",
+            "name": "Release AITestReview (Tools/AITestReview)",
+            "target": "AITestReview",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release AITestReview (Tools/AITestReview)"
+        }
+    ]
+}
