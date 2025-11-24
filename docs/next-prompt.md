@@ -1,10 +1,10 @@
-# Next Prompt: M4.3.4 - Meal Completion Tracking
+# Next Prompt: M4.3.5 - Ingredient Normalization
 
-**Milestone**: M4.3.4 - Meal Completion Tracking  
+**Milestone**: M4.3.5 - Ingredient Normalization  
 **Status**: 🚀 READY  
-**Estimated Time**: 45 minutes  
-**Priority**: MEDIUM - Workflow enhancement  
-**Prerequisites**: M4.2 (Meal Planning) ✅, M4.3.3 (Bulk Add) ✅
+**Estimated Time**: 4 hours  
+**Priority**: MEDIUM - Data quality enhancement  
+**Prerequisites**: M4.3.1 (Recipe Source Tracking) ✅, M4.3.4 (Meal Completion) ✅
 
 ---
 
@@ -12,322 +12,463 @@
 
 ### **What We're Building**
 
-Simple completion toggle for meals in the meal plan. Mark meals as "completed" to track which have been consumed, with visual feedback (strikethrough, reduced opacity). Persistence in Core Data.
+Behind-the-scenes ingredient name normalization to eliminate duplicates caused by case differences, singular/plural forms, abbreviations, and common variations. Zero user intervention required - just improved data quality.
 
-### **User Flow**
+### **User Impact**
 
+**Before Normalization:**
 ```
-1. User viewing meal plan
-2. Each meal row shows checkbox (circle when uncompleted, checkmark when completed)
-3. User taps checkbox to mark meal as completed
-4. Visual feedback: Meal text gets strikethrough, reduced opacity
-5. User taps again to un-complete (toggle behavior)
-6. Status persists across app restarts
+Shopping List:
+- Butter (Recipe A)
+- butter (Recipe B)
+- Eggs (Recipe C)
+- egg (Recipe D)
+- Tbsp olive oil (Recipe E)
+- tablespoon olive oil (Recipe F)
+```
+
+**After Normalization:**
+```
+Shopping List:
+- butter (2 sources)
+- eggs (2 sources)
+- tablespoon olive oil (2 sources)
 ```
 
 ### **Key Technical Points**
 
-- **Core Data**: Add `isCompleted: Bool` property to PlannedMeal
-- **UI**: Checkbox/checkmark icon, strikethrough text, opacity changes
-- **Persistence**: Automatic Core Data save on toggle
-- **Simple**: No complex logic, just toggle + visual feedback
+- **Four Progressive Phases**: Case → Plural → Abbreviations → Variations
+- **Behind-the-scenes**: Runs during ingredient parsing/template creation
+- **No UI changes**: Users see cleaner lists automatically
+- **Complete PRD available**: `prds/milestone-4.3.5-ingredient-normalization.md`
 
 ---
 
-## 📋 IMPLEMENTATION GUIDE
+## 📋 FOUR PHASES OVERVIEW
 
-### **Phase 1: Core Data Model Update** (10-15 min)
+### **Phase 1: Case Normalization** (30 min)
+**Goal**: "Butter" → "butter", "EGGS" → "eggs"
+- Lowercase all ingredient names at template creation
+- Update existing templates in migration
+- Simple, foundational change
 
-**Objective**: Add isCompleted property to PlannedMeal entity
+### **Phase 2: Singular/Plural Handling** (1 hour)
+**Goal**: "eggs" and "egg" → both map to "egg" template
+- Smart plural detection (eggs→egg, tomatoes→tomato)
+- Irregular plurals (children→child, feet→foot)
+- Preserve original display text while normalizing template
 
-**Files to Modify**:
-- `GroceryRecipeManager.xcdatamodeld` - Add property to PlannedMeal entity
+### **Phase 3: Abbreviation Expansion** (1.5 hours)
+**Goal**: "tbsp", "Tbsp", "tablespoon" → all map to "tablespoon"
+- Common cooking abbreviations (tsp, tbsp, oz, lb, etc.)
+- Regional variations (litre/liter, colour/color)
+- Measurement unit normalization
 
-**What to Do:**
+### **Phase 4: Common Variations** (1 hour)
+**Goal**: "all-purpose flour" and "flour" → same template
+- Qualifier removal (fresh basil → basil, unsalted butter → butter)
+- Brand name removal (Kerrygold butter → butter)
+- Preparation methods (diced tomatoes → tomatoes)
 
-**1. Open Core Data Model:**
+---
+
+## 📝 IMPLEMENTATION STRATEGY
+
+### **Where Normalization Happens**
+
+**Primary Location**: `IngredientTemplateService`
+```swift
+// When creating templates from ingredients
+func findOrCreateTemplate(name: String) -> IngredientTemplate {
+    let normalizedName = normalizeName(name)  // ← Apply all phases here
+    // ... rest of template lookup/creation
+}
 ```
-1. Open GroceryRecipeManager.xcdatamodeld in Xcode
-2. Select PlannedMeal entity
-3. Click "+" under Attributes section
+
+**Secondary Location**: Data migration for existing templates
+
+### **Recommended Approach**
+
+**1. Build Incrementally** (Phase by Phase)
+- Complete Phase 1 fully → Test → Commit
+- Complete Phase 2 fully → Test → Commit
+- Complete Phase 3 fully → Test → Commit
+- Complete Phase 4 fully → Test → Commit
+
+**2. Create Comprehensive Tests**
+```swift
+// Example test structure
+func testCaseNormalization() {
+    XCTAssertEqual(normalize("Butter"), "butter")
+    XCTAssertEqual(normalize("EGGS"), "eggs")
+    XCTAssertEqual(normalize("All-Purpose Flour"), "all-purpose flour")
+}
+
+func testPluralNormalization() {
+    XCTAssertEqual(normalizePlural("eggs"), "egg")
+    XCTAssertEqual(normalizePlural("tomatoes"), "tomato")
+    XCTAssertEqual(normalizePlural("children"), "child")
+}
 ```
 
-**2. Add isCompleted Property:**
-```
-Attribute Name: isCompleted
-Type: Boolean
-Default Value: NO (false)
-Optional: Unchecked (make it required with default)
+**3. Preserve Display Text**
+```swift
+// Recipe ingredient: "2 Tbsp Butter"
+ingredient.name = "2 Tbsp Butter"           // Original for display
+ingredient.template = findTemplate("butter") // Normalized for grouping
 ```
 
-**3. Verify Settings:**
-```
-- Codegen: Manual/None (since PlannedMeal likely uses manual extensions)
-- Indexed: Not needed for boolean flags
-- Transient: No
+---
+
+## 🎯 PHASE-BY-PHASE GUIDE
+
+### **Phase 1: Case Normalization** (30 min)
+
+**Files to Modify:**
+- `IngredientTemplateService.swift` - Add lowercase normalization
+- Migration script (optional) - Update existing templates
+
+**Implementation:**
+```swift
+// In IngredientTemplateService
+private func normalizeCase(_ name: String) -> String {
+    return name.lowercased()
+}
+
+func findOrCreateTemplate(name: String) -> IngredientTemplate {
+    let normalized = normalizeCase(name)
+    
+    // Check if template exists with normalized name
+    let fetchRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+    fetchRequest.predicate = NSPredicate(format: "name ==[c] %@", normalized)
+    
+    if let existing = try? context.fetch(fetchRequest).first {
+        return existing
+    }
+    
+    // Create new template with normalized name
+    let template = IngredientTemplate(context: context)
+    template.name = normalized
+    return template
+}
 ```
 
 **Testing:**
-- [ ] Build succeeds after adding property
-- [ ] No migration required (new property with default value)
-- [ ] Can access plannedMeal.isCompleted in code
+- [ ] "Butter" creates template named "butter"
+- [ ] "EGGS" creates template named "eggs"
+- [ ] Existing templates migrated to lowercase
+- [ ] Display text preserved in ingredients
 
 ---
 
-### **Phase 2: UI Implementation** (25-30 min)
+### **Phase 2: Singular/Plural** (1 hour)
 
-**Objective**: Add completion checkbox and visual feedback
-
-**Files to Modify**:
-- `MealPlanDetailView.swift` - Add checkbox to meal rows
-
-**What to Build:**
-
-**1. Update Meal Row UI:**
+**Core Logic:**
 ```swift
-// In MealPlanDetailView.swift, find the meal row component
-// Add checkbox before the meal details
-
-HStack(spacing: 12) {
-    // MARK: M4.3.4 - Completion Checkbox
-    Button(action: {
-        toggleCompletion(for: plannedMeal)
-    }) {
-        Image(systemName: plannedMeal.isCompleted ? "checkmark.circle.fill" : "circle")
-            .font(.title3)
-            .foregroundColor(plannedMeal.isCompleted ? .green : .gray)
-    }
-    .buttonStyle(.plain)  // Prevent entire row from being tappable
+private func normalizePlural(_ name: String) -> String {
+    let lowercased = name.lowercased()
     
-    VStack(alignment: .leading, spacing: 4) {
-        Text(plannedMeal.recipe?.name ?? "No Recipe")
-            .font(.headline)
-            .strikethrough(plannedMeal.isCompleted)
-        
-        Text("\(plannedMeal.servings) servings")
-            .font(.subheadline)
-            .foregroundColor(.secondary)
+    // Irregular plurals first
+    let irregulars: [String: String] = [
+        "children": "child",
+        "feet": "foot",
+        "teeth": "tooth",
+        "geese": "goose",
+        "mice": "mouse"
+    ]
+    
+    if let singular = irregulars[lowercased] {
+        return singular
     }
     
-    Spacer()
+    // Regular patterns
+    if lowercased.hasSuffix("ies") {
+        // berries → berry, cherries → cherry
+        return String(lowercased.dropLast(3)) + "y"
+    }
     
-    // Badge for day name, if applicable
-    Text(dayName(for: plannedMeal))
-        .font(.caption)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Color.blue.opacity(0.2))
-        .cornerRadius(8)
+    if lowercased.hasSuffix("oes") {
+        // tomatoes → tomato, potatoes → potato
+        return String(lowercased.dropLast(2))
+    }
+    
+    if lowercased.hasSuffix("ses") {
+        // glasses → glass, buses → bus
+        return String(lowercased.dropLast(2))
+    }
+    
+    if lowercased.hasSuffix("s") && !lowercased.hasSuffix("ss") {
+        // eggs → egg, apples → apple
+        // but NOT: grass → gras
+        return String(lowercased.dropLast())
+    }
+    
+    return lowercased
 }
-.opacity(plannedMeal.isCompleted ? 0.6 : 1.0)
-.padding(.vertical, 8)
 ```
 
-**2. Add Toggle Function:**
-```swift
-// MARK: M4.3.4 - Completion Tracking
+**Testing:**
+- [ ] eggs → egg
+- [ ] tomatoes → tomato
+- [ ] berries → berry
+- [ ] children → child
+- [ ] grass → grass (no change)
 
-/// Toggles the completion status of a planned meal
-/// Updates Core Data and saves immediately for persistence
-private func toggleCompletion(for plannedMeal: PlannedMeal) {
-    withAnimation {
-        plannedMeal.isCompleted.toggle()
-        
-        do {
-            try viewContext.save()
-            print("✅ M4.3.4: Toggled completion for \(plannedMeal.recipe?.name ?? "Unknown") to \(plannedMeal.isCompleted)")
-        } catch {
-            print("❌ M4.3.4: Failed to save completion status: \(error)")
-            // Revert on error
-            plannedMeal.isCompleted.toggle()
+---
+
+### **Phase 3: Abbreviations** (1.5 hours)
+
+**Abbreviation Dictionary:**
+```swift
+private let abbreviationMap: [String: String] = [
+    // Volume
+    "tsp": "teaspoon",
+    "tbsp": "tablespoon",
+    "oz": "ounce",
+    "fl oz": "fluid ounce",
+    "c": "cup",
+    "pt": "pint",
+    "qt": "quart",
+    "gal": "gallon",
+    
+    // Weight
+    "lb": "pound",
+    "lbs": "pound",
+    "g": "gram",
+    "kg": "kilogram",
+    
+    // Other
+    "temp": "temperature",
+    "approx": "approximately"
+]
+
+private func expandAbbreviations(_ text: String) -> String {
+    var result = text.lowercased()
+    
+    // Sort by length (longest first) to avoid partial replacements
+    let sorted = abbreviationMap.sorted { $0.key.count > $1.key.count }
+    
+    for (abbrev, full) in sorted {
+        // Use word boundaries to avoid partial matches
+        let pattern = "\\b\(abbrev)\\b"
+        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+            result = regex.stringByReplacingMatches(
+                in: result,
+                range: NSRange(result.startIndex..., in: result),
+                withTemplate: full
+            )
         }
     }
-}
-```
-
-**3. Optional Helper Function:**
-```swift
-/// Returns day name for a planned meal (e.g., "Mon", "Tue")
-/// Useful for displaying in meal row
-private func dayName(for plannedMeal: PlannedMeal) -> String {
-    guard let date = plannedMeal.date else { return "" }
-    let formatter = DateFormatter()
-    formatter.dateFormat = "EEE"  // Mon, Tue, Wed, etc.
-    return formatter.string(from: date)
+    
+    return result
 }
 ```
 
 **Testing:**
-- [ ] Checkbox appears before meal name
-- [ ] Empty circle when not completed
-- [ ] Filled green checkmark when completed
-- [ ] Tap toggles state correctly
-- [ ] Strikethrough appears/disappears
-- [ ] Opacity changes (100% → 60%)
-- [ ] Status persists after app restart
-- [ ] Animation smooth
+- [ ] "2 tbsp butter" → template "tablespoon butter"
+- [ ] "1 Tbsp oil" → template "tablespoon oil"
+- [ ] "3 tsp vanilla" → template "teaspoon vanilla"
+- [ ] "buttercup" unchanged (no word boundary match)
+
+---
+
+### **Phase 4: Variations** (1 hour)
+
+**Qualifier Removal:**
+```swift
+private let qualifiersToRemove = [
+    "fresh", "dried", "frozen", "canned",
+    "organic", "raw", "cooked",
+    "unsalted", "salted", "sweetened", "unsweetened",
+    "all-purpose", "whole", "ground",
+    "large", "medium", "small",
+    "chopped", "diced", "sliced", "minced",
+    "extra virgin", "virgin"
+]
+
+private func removeQualifiers(_ text: String) -> String {
+    var result = text.lowercased()
+    
+    for qualifier in qualifiersToRemove {
+        // Remove qualifier + optional separator
+        let patterns = [
+            "\\b\(qualifier)\\s+",      // "fresh basil" → "basil"
+            "\\s+\(qualifier)\\b",      // "basil fresh" → "basil"
+            "\\b\(qualifier)-",         // "all-purpose flour" → "flour"
+            "-\(qualifier)\\b"          // "flour-purpose" → "flour"
+        ]
+        
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                result = regex.stringByReplacingMatches(
+                    in: result,
+                    range: NSRange(result.startIndex..., in: result),
+                    withTemplate: " "
+                )
+            }
+        }
+    }
+    
+    // Clean up extra whitespace
+    result = result.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+    return result.trimmingCharacters(in: .whitespaces)
+}
+```
+
+**Testing:**
+- [ ] "fresh basil" → template "basil"
+- [ ] "unsalted butter" → template "butter"
+- [ ] "all-purpose flour" → template "flour"
+- [ ] "extra virgin olive oil" → template "olive oil"
 
 ---
 
 ## ✅ ACCEPTANCE CRITERIA
 
-**Core Functionality:**
-- [ ] PlannedMeal.isCompleted property exists in Core Data
-- [ ] Checkbox appears on each meal row
-- [ ] Empty circle icon when meal not completed
-- [ ] Filled checkmark icon (green) when completed
-- [ ] Tap checkbox toggles completion state
-- [ ] Visual feedback applied immediately:
-  - [ ] Strikethrough on meal name
-  - [ ] Reduced opacity (60%)
-  - [ ] Green checkmark color
-- [ ] Status persists in Core Data
-- [ ] Can toggle back (un-complete a meal)
+**Phase 1: Case**
+- [ ] All new templates created in lowercase
+- [ ] Existing templates migrated to lowercase
+- [ ] Case-insensitive template lookup works
+- [ ] Display text preserves original case
 
-**Edge Cases:**
-- [ ] Empty meal plan: No crashes
-- [ ] Meal with no recipe: Checkbox still works
-- [ ] Multiple toggles: No state confusion
-- [ ] App restart: Completion status preserved
+**Phase 2: Plural**
+- [ ] Regular plurals normalized (eggs → egg)
+- [ ] Irregular plurals handled (children → child)
+- [ ] "ies" suffix handled (berries → berry)
+- [ ] "oes" suffix handled (tomatoes → tomato)
+- [ ] False positives avoided (grass ≠ gras)
 
-**Polish:**
-- [ ] Animation smooth (withAnimation)
-- [ ] No impact on existing meal plan functionality
-- [ ] Checkbox doesn't interfere with recipe navigation
-- [ ] Professional iOS appearance
+**Phase 3: Abbreviations**
+- [ ] Common abbreviations expanded
+- [ ] Word boundaries respected
+- [ ] No partial replacements
+- [ ] Case-insensitive matching
 
----
+**Phase 4: Variations**
+- [ ] Common qualifiers removed
+- [ ] Multiple qualifiers handled
+- [ ] Hyphenated qualifiers handled
+- [ ] Core ingredient names preserved
 
-## 🎯 TESTING SCENARIOS
-
-### **Test 1: Basic Completion**
-1. Open meal plan with 3 meals
-2. Tap checkbox on first meal
-3. Verify:
-   - Checkmark appears (green)
-   - Text has strikethrough
-   - Opacity reduced
-   - Can still navigate to recipe
-
-### **Test 2: Toggle Back**
-1. Mark meal as completed (test 1)
-2. Tap checkbox again
-3. Verify:
-   - Checkmark → empty circle
-   - Strikethrough removed
-   - Full opacity restored
-
-### **Test 3: Persistence**
-1. Mark 2 meals as completed
-2. Close app completely (force quit)
-3. Reopen app
-4. Navigate to meal plan
-5. Verify: 2 meals still marked completed
-
-### **Test 4: Multiple Meals**
-1. Mark all meals in plan as completed
-2. Verify each updates independently
-3. Unmark first meal
-4. Verify others remain completed
-
-### **Test 5: Integration with Bulk Add**
-1. Mark some meals as completed
-2. Tap "Add All to Shopping List"
-3. Verify: Both completed and uncompleted meals included
-4. Completion status unaffected by bulk add
+**Overall:**
+- [ ] Duplicate ingredient count reduced
+- [ ] Shopping list consolidation improved
+- [ ] Recipe ingredient matching enhanced
+- [ ] No user-visible breaking changes
+- [ ] Performance maintained (<0.5s operations)
 
 ---
 
-## 📝 FILES TO MODIFY
+## 🧪 TESTING STRATEGY
 
-**Primary Files:**
-1. **GroceryRecipeManager.xcdatamodeld** - Add isCompleted to PlannedMeal (~2 min)
-2. **MealPlanDetailView.swift** - Add checkbox UI and toggle logic (~30 lines)
-
-**No New Files Needed**
-
----
-
-## 💡 TIPS & REMINDERS
-
-### **Core Data Best Practices**
+### **Unit Tests**
+Create `IngredientNormalizationTests.swift`:
 ```swift
-// Always wrap Core Data changes in do-catch
-do {
-    try viewContext.save()
-} catch {
-    // Handle error, possibly revert changes
+class IngredientNormalizationTests: XCTestCase {
+    func testPhase1_CaseNormalization() {
+        // Test all case combinations
+    }
+    
+    func testPhase2_PluralNormalization() {
+        // Test regular and irregular plurals
+    }
+    
+    func testPhase3_AbbreviationExpansion() {
+        // Test all common abbreviations
+    }
+    
+    func testPhase4_VariationHandling() {
+        // Test qualifier removal
+    }
+    
+    func testIntegration_CompleteNormalization() {
+        // Test full pipeline
+        // "2 Tbsp Fresh Unsalted Butter" → "butter"
+    }
 }
 ```
 
-### **Animation**
+### **Integration Tests**
+1. Create recipes with intentional variations
+2. Add to shopping list
+3. Verify consolidation works correctly
+4. Check recipe source tracking intact
+
+### **Performance Tests**
+- [ ] Normalization <0.05s per ingredient
+- [ ] Template lookup <0.1s
+- [ ] Batch processing <1s for 100 ingredients
+
+---
+
+## 📚 REFERENCE: COMPLETE PRD
+
+**Full documentation available at:**
+`docs/prds/milestone-4.3.5-ingredient-normalization.md`
+
+**Contents:**
+- Detailed algorithm descriptions
+- Comprehensive test cases
+- Edge case handling
+- Performance considerations
+- Future enhancement ideas
+
+---
+
+## 💡 TIPS & BEST PRACTICES
+
+### **Order Matters**
+Apply normalization in this order:
+1. Case (lowercase everything first)
+2. Abbreviations (expand before plural check)
+3. Plural (singularize after expansion)
+4. Qualifiers (remove modifiers last)
+
+### **Preserve Original**
 ```swift
-// Use withAnimation for smooth state transitions
-withAnimation {
-    plannedMeal.isCompleted.toggle()
+// ALWAYS keep original for display
+ingredient.name = originalText
+ingredient.template = findTemplate(normalizedName)
+```
+
+### **Test Edge Cases**
+- Empty strings
+- Single characters
+- Numbers only
+- Special characters
+- Unicode characters
+
+### **Performance**
+```swift
+// Cache normalized results
+private var normalizationCache: [String: String] = [:]
+
+func normalize(_ name: String) -> String {
+    if let cached = normalizationCache[name] {
+        return cached
+    }
+    
+    let result = applyAllPhases(name)
+    normalizationCache[name] = result
+    return result
 }
 ```
 
-### **Button Style**
-```swift
-// Prevent entire row from being tappable, only checkbox
-.buttonStyle(.plain)
-```
-
-### **Strikethrough Modifier**
-```swift
-// SwiftUI built-in modifier
-Text("Meal Name")
-    .strikethrough(isCompleted)
-```
-
-### **Opacity Modifier**
-```swift
-// Reduce visibility for completed items
-.opacity(isCompleted ? 0.6 : 1.0)
-```
-
 ---
 
-## 🎨 DESIGN NOTES
+## 🎯 SUCCESS METRICS
 
-### **Visual States**
+**Before M4.3.5:**
+- 100 ingredients might create 85 templates (15% duplicates)
 
-**Uncompleted (Default):**
-- Empty circle icon (gray)
-- Full opacity (1.0)
-- No strikethrough
-- Normal text color
+**After M4.3.5:**
+- Same 100 ingredients create 65 templates (35% duplicates eliminated)
 
-**Completed:**
-- Filled checkmark icon (green)
-- Reduced opacity (0.6)
-- Strikethrough text
-- Dimmed appearance
-
-### **Icon System Names**
-```swift
-"circle"                    // Uncompleted
-"checkmark.circle.fill"     // Completed
-```
-
-### **Color Scheme**
-```swift
-.foregroundColor(isCompleted ? .green : .gray)
-```
-
----
-
-## 🔍 FUTURE ENHANCEMENTS (Not in Scope)
-
-- [ ] Filter to show only active/completed meals
-- [ ] Completion date tracking (when meal was completed)
-- [ ] Undo completion with confirmation
-- [ ] Completion statistics (X of Y meals completed)
-- [ ] Auto-mark as completed when ingredients added to list
-- [ ] Swipe to complete gesture
-
-**These are NOT part of M4.3.4** - Keep it simple for now!
+**Target Improvements:**
+- 30-50% reduction in duplicate templates
+- Improved shopping list consolidation
+- Better recipe ingredient matching
+- Maintained performance (<0.5s all operations)
 
 ---
 
@@ -335,26 +476,32 @@ Text("Meal Name")
 
 **Session Startup Checklist:**
 1. ✅ Read this next-prompt.md
-2. ✅ Review current-story.md for M4.3.3 completion status
+2. ✅ Review M4.3.5 PRD (optional but helpful)
 3. ✅ Check session-startup-checklist.md
-4. ✅ Open GroceryRecipeManager.xcdatamodeld
-5. ✅ Open MealPlanDetailView.swift
+4. ✅ Open IngredientTemplateService.swift
+5. ✅ Create test file: IngredientNormalizationTests.swift
 
-**First Steps:**
-1. Add `isCompleted: Bool` to PlannedMeal in Core Data model
-2. Build to verify schema change successful
-3. Add checkbox UI to meal rows
-4. Implement toggle function
-5. Test thoroughly
+**Recommended Order:**
+1. Phase 1: Case (30 min) → Test → Commit
+2. Phase 2: Plural (1 hr) → Test → Commit
+3. Phase 3: Abbreviations (1.5 hr) → Test → Commit
+4. Phase 4: Variations (1 hr) → Test → Commit
+
+**Total Time**: ~4 hours
 
 ---
 
-**This is a quick win - should take ~45 minutes! 🎉**
+## 🎉 THIS COMPLETES M4!
+
+After M4.3.5:
+- Core grocery-recipe workflow complete
+- Ready for TestFlight deployment
+- Foundation set for M5 (CloudKit sync)
 
 ---
 
 **Document Version**: 1.0  
 **Created**: November 24, 2025  
 **Status**: 🚀 READY  
-**Estimated Time**: 45 minutes  
-**Prerequisites**: M4.2 ✅, M4.3.3 ✅
+**Estimated Time**: 4 hours  
+**Prerequisites**: M4.3.1 ✅, M4.3.4 ✅

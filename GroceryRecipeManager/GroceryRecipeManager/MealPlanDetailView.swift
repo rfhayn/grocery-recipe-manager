@@ -29,6 +29,9 @@ struct MealPlanDetailView: View {
     // M4.2.1-3 Enhancement: All recipes loaded for autocomplete
     @State private var allRecipes: [Recipe] = []
     
+    // M4.3.4: Force UI refresh when meals change
+    @State private var refreshID = UUID()
+    
     // M4.3.3: Bulk add to shopping list
     @State private var showingBulkAddSheet = false
     @State private var isBulkAdding = false
@@ -100,11 +103,15 @@ struct MealPlanDetailView: View {
                             },
                             onRecipeRemoved: { meal in
                                 removePlannedMeal(meal)
+                            },
+                            onMealToggled: { meal in
+                                toggleCompletion(for: meal)
                             }
                         )
                     }
                 }
                 .padding(.horizontal)
+                .id(refreshID)  // M4.3.4: Force entire list to refresh when completion changes
             }
         }
         .navigationTitle(mealPlan.name ?? "Meal Plan")
@@ -442,6 +449,36 @@ struct MealPlanDetailView: View {
         return String(format: "%.2f", value)
     }
     
+    // MARK: - M4.3.4: Meal Completion
+    
+    // M4.3.4: Toggle completion status for a planned meal
+    // Updates Core Data and persists automatically via context save
+    // No date restrictions - users can mark any meal complete regardless of date
+    private func toggleCompletion(for meal: PlannedMeal) {
+        meal.isCompleted.toggle()
+        
+        // Update completed date when marking complete
+        if meal.isCompleted {
+            meal.completedDate = Date()
+        } else {
+            meal.completedDate = nil
+        }
+        
+        // Save changes to Core Data
+        do {
+            try viewContext.save()
+            print("M4.3.4: Meal completion toggled to: \(meal.isCompleted)")  // Debug logging
+            
+            // M4.3.4: Force UI refresh
+            refreshID = UUID()
+        } catch {
+            print("M4.3.4: Error toggling meal completion: \(error)")
+            // Revert the toggle on error
+            meal.isCompleted.toggle()
+            meal.completedDate = nil
+        }
+    }
+    
     // M4.3.3: Extract clean ingredient name
     private func extractCleanIngredientName(from fullText: String) -> String {
         var cleaned = fullText
@@ -471,6 +508,7 @@ struct DayRowView: View {
     let mealPlan: MealPlan
     let onRecipeAdded: (Recipe, Int) -> Void
     let onRecipeRemoved: (PlannedMeal) -> Void
+    let onMealToggled: (PlannedMeal) -> Void  // M4.3.4: Toggle completion callback
     
     // M4.2.1-3 Enhancement: Search text for this day's autocomplete
     @State private var searchText = ""
@@ -589,8 +627,21 @@ struct DayRowView: View {
     }
     
     // M4.2.1-3 Enhancement: Assigned recipe display
+    // M4.3.4: Added completion checkbox and visual feedback
     private func assignedRecipeView(meal: PlannedMeal) -> some View {
         HStack(spacing: 12) {
+            // M4.3.4: Completion checkbox - works for any date
+            Button {
+                onMealToggled(meal)
+            } label: {
+                Image(systemName: meal.isCompleted ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundColor(meal.isCompleted ? .green : .gray)
+                    .frame(width: 44, height: 44)  // M4.3.4: Standard tap target size
+                    .contentShape(Rectangle())  // M4.3.4: Entire frame is tappable
+            }
+            .buttonStyle(.borderless)  // M4.3.4: Prevents row tap interference
+            
             Image(systemName: "fork.knife.circle.fill")
                 .foregroundColor(.blue)
                 .font(.title3)
@@ -599,11 +650,14 @@ struct DayRowView: View {
                 Text(meal.recipe?.title ?? "Untitled Recipe")
                     .font(.body)
                     .fontWeight(.medium)
+                    .strikethrough(meal.isCompleted, color: .secondary)  // M4.3.4: Strikethrough when completed
                 
                 Text("\(Int(meal.servings)) servings")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .strikethrough(meal.isCompleted, color: .secondary)  // M4.3.4: Strikethrough when completed
             }
+            .opacity(meal.isCompleted ? 0.5 : 1.0)  // M4.3.4: Reduced opacity when completed
             
             Spacer()
             

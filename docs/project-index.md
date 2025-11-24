@@ -2,8 +2,8 @@
 
 **Last Updated**: November 24, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M4.3.4 (Meal Completion Tracking) - Next  
-**Next Priority**: M4.3.4 (Meal Completion) then M4.3.5 (Ingredient Normalization)
+**Current Milestone**: M4.3 (Enhanced Grocery Integration)  
+**Next Priority**: M4.3.5 (Ingredient Normalization) or M4 wrap-up
 
 ---
 
@@ -379,6 +379,18 @@ Available in `architecture/template.md` for creating new ADRs
 
 ## 📅 **RECENT ACTIVITY**
 
+### **November 24, 2025** - M4.3.4 Complete ✅
+- **Completed**: M4.3.4 - Meal Completion Tracking (1.0 hour)
+  - Checkbox toggle for meal completion (any date)
+  - Visual feedback: green checkmark, strikethrough, reduced opacity
+  - Core Data persistence with isCompleted and completedDate
+  - SwiftUI reactivity fix with explicit refresh trigger
+  - Flexible UX: no date restrictions for change of plans
+- **Challenge**: SwiftUI not detecting Core Data changes
+  - Solution: `refreshID` state variable triggers VStack rebuild
+  - Callback pattern: `onMealToggled` closure parameter
+- **Status**: M4.3.4 COMPLETE, M4.3.5 ready
+
 ### **November 24, 2025** - M4.3.3 Complete ✅
 - **Completed**: M4.3.3 - Bulk Add from Meal Plan (2.5 hours)
 - **Features**:
@@ -504,10 +516,10 @@ Available in `architecture/template.md` for creating new ADRs
 
 ### **Current State**
 - **Active Milestone**: M4 (Meal Planning & Enhanced Grocery Integration)
-- **Completed**: M4.1 (Settings), M4.2 (Calendar Planning), M4.3.1 (Recipe Source Tracking), M4.3.2 (Scaled Recipe to List) ✅
-- **Current Phase**: M4.3.3 (Bulk Add from Meal Plan) 🚀 **READY** ← **NEXT**
-- **Next After**: M4.3.4-5 (Meal Completion & Ingredient Normalization) ⏳ **PLANNED**
-- **Progress**: M1-M4.3.2 complete (77.75 hours), M4.3.3-5 remaining (~6.75h estimated)
+- **Completed**: M4.1 (Settings), M4.2 (Calendar Planning), M4.3.1 (Recipe Source Tracking), M4.3.2 (Scaled Recipe to List), M4.3.3 (Bulk Add), M4.3.4 (Meal Completion) ✅
+- **Current Phase**: M4.3.5 (Ingredient Normalization) 🚀 **READY** ← **NEXT**
+- **Next After**: M4 wrap-up or M5 (CloudKit Sync)
+- **Progress**: M1-M4.3.4 complete (81.25 hours), M4.3.5 remaining (~4h estimated)
 - **Status**: On track with excellent planning accuracy (88%)
 
 ### **M4.3 Work Breakdown**
@@ -528,19 +540,22 @@ Available in `architecture/template.md` for creating new ADRs
 - Updated addToShoppingList() for scaled saving
 - Under estimate by 17%! Clean M3 pattern reuse
 
-**M4.3.3: Bulk Add from Meal Plan** 🚀 **READY** (2 hours) ← **NEXT**
+**M4.3.3: Bulk Add from Meal Plan** ✅ **COMPLETE** (2.5 hours)
 - "Add All to Shopping List" button
-- Process all meal plan recipes
-- Smart quantity consolidation
-- Progress feedback
-- Complete next-prompt.md ready
+- Process all meal plan recipes with progress overlay
+- Servings adjustment UI with scale factor indicators
+- Recipe source tracking integration (M4.3.1)
+- Quantity scaling integration (M4.3.2)
+- Smart consolidation with M3 Phase 5
 
-**M4.3.4: Meal Completion Tracking** ⏳ **PLANNED** (45 min)
-- Mark meals as completed
-- Visual feedback
-- Historical tracking
+**M4.3.4: Meal Completion Tracking** ✅ **COMPLETE** (1.0 hour)
+- Checkbox toggle for meal completion (circle → checkmark)
+- Visual feedback: green checkmark, strikethrough, 50% opacity
+- No date restrictions (flexible for change of plans)
+- Core Data persistence with isCompleted and completedDate
+- SwiftUI reactivity fix with refreshID state trigger
 
-**M4.3.5: Ingredient Normalization** ⏳ **PLANNED** (4 hours)
+**M4.3.5: Ingredient Normalization** 🚀 **READY** (4 hours) ← **NEXT**
 - Case normalization (Butter → butter)
 - Singular/plural handling (egg → eggs)
 - Abbreviation expansion (tbsp → tablespoon)
@@ -629,6 +644,6 @@ Available in `architecture/template.md` for creating new ADRs
 ---
 
 **Last Updated**: November 24, 2025  
-**Next Update**: After M4.3.3 completion  
-**Current Status**: M4.3.2 complete, M4.3.3 ready to begin  
-**Documentation Version**: Updated with M4.3.2 completion and M4.3.3 readiness
+**Next Update**: After M4.3.5 completion or M4 wrap-up  
+**Current Status**: M4.3.4 complete, M4.3.5 ready to begin  
+**Documentation Version**: Updated with M4.3.4 completion

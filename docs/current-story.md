@@ -3,7 +3,7 @@
 **Last Updated**: November 24, 2025  
 **Current Milestone**: M4 - Meal Planning & Enhanced Grocery Integration  
 **Current Phase**: M4.3 (Enhanced Grocery Integration)  
-**Status**: M4.1-M4.3.3 Complete ✅, M4.3.4 Ready 🚀
+**Status**: M4.1-M4.3.4 Complete ✅, M4.3.5 Ready 🚀
 
 ---
 
@@ -17,7 +17,8 @@
    - M4.3.1 Complete ✅
    - M4.3.2 Complete ✅
    - M4.3.3 Complete ✅
-   - M4.3.4-5 Next
+   - M4.3.4 Complete ✅
+   - M4.3.5 Next
 3. **TestFlight Preparation**: Apple Developer Account & Device Testing
 
 ### **M4 Overview:**
@@ -31,9 +32,9 @@
   - M4.3.1: Recipe Source Tracking Foundation ✅ **COMPLETE** (3.5 hours)
   - M4.3.2: Scaled Recipe to List Integration ✅ **COMPLETE** (1.25 hours)
   - M4.3.3: Bulk Add from Meal Plan ✅ **COMPLETE** (2.5 hours)
-  - M4.3.4: Meal Completion Tracking 🚀 **READY** (45 min)
+  - M4.3.4: Meal Completion Tracking ✅ **COMPLETE** (1.0 hour)
   - M4.3.5: Ingredient Normalization ⏳ **PLANNED** (4 hours)
-- **Total**: 14.5-17.5 hours (M4.1-M4.3.3 complete ~12.75h, 4.75h remaining)
+- **Total**: 14.5-17.5 hours (M4.1-M4.3.4 complete ~13.75h, 4h remaining)
 
 ### **Strategic Integration:**
 - **M3 → M4**: Structured quantities enable smart meal plan grocery generation ✅
@@ -44,13 +45,14 @@
 - **M4.3.1 → M4.3.2/M4.3.3**: Recipe source tracking foundation enables transparency ✅
 - **M4.3.2 → M4.3.3**: Scaled recipe addition ready for bulk meal plan workflow ✅
 - **M4.3.3 → M4.3.4**: Bulk add complete, ready for meal tracking workflow ✅
+- **M4.3.4 → M4.3.5**: Meal completion tracking ready, can track normalization impact ✅
 - **M4.3.1 → M4.3.5**: Clean data foundation ready for normalization ✅
 - **M4 → TestFlight**: Core workflow complete, ready for device testing
 - **M4 → M5**: Meal planning data architecture ready for CloudKit family sharing
 
 ---
 
-**Current Status**: M1, M2, M3, M4.1, M4.2, M4.3.1, M4.3.2, and M4.3.3 successfully completed (~80.25 hours total). Bulk add from meal plan operational with servings adjustment UI. M4.3.4 (Meal Completion Tracking) ready to begin.
+**Current Status**: M1, M2, M3, M4.1, M4.2, M4.3.1, M4.3.2, M4.3.3, and M4.3.4 successfully completed (~81.25 hours total). Meal completion tracking operational with flexible UX (any date can be marked complete). M4.3.5 (Ingredient Normalization) ready to begin.
 
 ---
 
@@ -191,38 +193,74 @@
 
 ---
 
-## M4.3.4: Meal Completion Tracking 🚀 **READY**
+## M4.3.4: Meal Completion Tracking ✅ **COMPLETE**
 
+**Completed**: November 24, 2025  
+**Actual Time**: 1.0 hour  
 **Estimated**: 45 min  
-**Priority**: MEDIUM - Workflow enhancement  
-**Status**: Ready to begin, prerequisites complete
+**Variance**: +33% (SwiftUI reactivity debugging)
 
-### **Overview**
+### **What Was Built**
 
-Mark meals as completed in the meal plan, providing visual feedback and tracking which meals have been consumed. Simple completion toggle with persistence.
+**Completion Toggle:**
+- Checkbox button on each planned meal (circle → checkmark)
+- Works for any date (no restrictions for flexibility)
+- Green checkmark when complete, gray circle when not
+- Toggle behavior: tap to complete, tap again to uncomplete
+- Core Data persistence with `isCompleted` and `completedDate`
 
-### **Dependencies**
+**Visual Feedback:**
+- Completed meals: Strikethrough text, 50% opacity, green checkmark
+- Active meals: Normal text, full opacity, gray circle
+- Clear distinction at a glance
 
-- M4.2: Meal planning with PlannedMeal entities ✅
-- M4.3.3: Bulk add workflow complete (provides context) ✅
+**Technical Implementation:**
+- Callback pattern: `onMealToggled` closure parameter
+- Error handling with automatic rollback on save failure
+- 44x44pt tap target for accessibility
+- Explicit UI refresh with `refreshID` state trigger
+- `.buttonStyle(.borderless)` prevents row tap interference
 
-### **Key Features**
+### **Key Design Decision**
 
-1. **Completion Toggle**
-   - Checkmark/checkbox on each planned meal
-   - Visual indication when completed (strikethrough, reduced opacity)
-   - Tap to toggle on/off
-   - Persistent in Core Data
+**No Date Restrictions:** Users can mark any meal complete regardless of scheduled date. This provides flexibility when:
+- Cooking tomorrow's meal today
+- Change of plans without adjusting meal plan dates
+- Simply checking off meals as consumed
 
-2. **Visual Feedback**
-   - Completed meals: Lower opacity, strikethrough text
-   - Active meals: Full opacity, normal text
-   - Clear distinction at a glance
+### **Technical Challenges**
 
-3. **Data Model**
-   - Add `isCompleted: Bool` to PlannedMeal entity
-   - Default value: false
-   - No migration needed (new optional property)
+**Challenge:** SwiftUI not detecting Core Data changes
+- `DayRowView` receives `plannedMeal` as plain parameter (not `@ObservedObject`)
+- Core Data saves worked (confirmed via logs)
+- UI wasn't refreshing after first toggle
+
+**Solution:** Explicit refresh trigger
+```swift
+@State private var refreshID = UUID()
+
+// After Core Data save:
+refreshID = UUID()  // Triggers VStack.id() change
+
+// Applied to list:
+VStack { ... }.id(refreshID)
+```
+
+### **Validation Results**
+
+**All Tests Passing** ✅
+- Toggle works on all meals (today, past, future)
+- Visual feedback updates immediately
+- Multiple toggles work reliably
+- Persistence across app restarts
+- Console logging confirms Core Data saves
+
+### **Files Modified**
+- **MealPlanDetailView.swift**: ~50 lines added
+  - `toggleCompletion()` function
+  - `refreshID` state variable
+  - Button with 44x44pt tap target
+  - Visual feedback modifiers
 
 ---
 
@@ -258,15 +296,14 @@ Intelligent ingredient name normalization to eliminate duplicates caused by case
 ## Documentation Status
 
 **Up to Date:**
-- ✅ current-story.md (this file) - Updated Nov 24 post-M4.3.3
-- ✅ next-prompt.md - Updated for M4.3.4
+- ✅ current-story.md (this file) - Updated Nov 24 post-M4.3.4
 - ✅ project-naming-standards.md
 - ✅ development-guidelines.md
 - ✅ session-startup-checklist.md
 
-**Needs Update After M4.3.4:**
-- [ ] next-prompt.md (for M4.3.5 or M5)
-- [ ] roadmap.md (mark M4.3.4 progress)
+**Needs Update After This Session:**
+- [ ] next-prompt.md (for M4.3.5 or wrap-up)
+- [ ] roadmap.md (mark M4.3.4 complete)
 - [ ] requirements.md (mark M4.3.4 requirements)
 - [ ] project-index.md (add M4.3.4 to recent activity)
 
@@ -279,6 +316,6 @@ Intelligent ingredient name normalization to eliminate duplicates caused by case
 
 ---
 
-**Last Session**: November 24, 2025 - M4.3.3 complete with comprehensive testing  
-**Next Session**: M4.3.4 Meal Completion Tracking  
+**Last Session**: November 24, 2025 - M4.3.4 complete with SwiftUI reactivity fix  
+**Next Session**: M4.3.5 Ingredient Normalization or wrap-up M4  
 **Version**: November 24, 2025

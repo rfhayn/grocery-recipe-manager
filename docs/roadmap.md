@@ -1,8 +1,8 @@
 # Grocery & Recipe Manager - Development Roadmap
 
 **Last Updated**: November 24, 2025  
-**Current Phase**: M4.3.4 (Meal Completion Tracking) - Next  
-**Status**: M4.1-M4.3.3 complete, M4.3.4 ready to begin
+**Current Phase**: M4.3.5 (Ingredient Normalization) - Ready  
+**Status**: M4.1-M4.3.4 complete, M4.3.5 ready to begin
 
 ---
 
@@ -92,9 +92,9 @@
 3. **M4.2.1-3 Enhancement**: RecipePickerSheet UI Polish (1.0 hour) 🚀 **READY** (optional)
 4. **M4.3.1**: Recipe Source Tracking Foundation (3.5 hours) ✅ **COMPLETE**
 5. **M4.3.2**: Scaled Recipe to List Integration (1.25 hours) ✅ **COMPLETE**
-5. **M4.3.3**: Bulk Add from Meal Plan (2.5 hours) ✅ **COMPLETE**
-6. **M4.3.4**: Meal Completion Tracking (45 min) 🚀 **READY** ← **NEXT**
-7. **M4.3.5**: Ingredient Normalization (4 hours) ⏳ **PLANNED**
+6. **M4.3.3**: Bulk Add from Meal Plan (2.5 hours) ✅ **COMPLETE**
+7. **M4.3.4**: Meal Completion Tracking (1.0 hour) ✅ **COMPLETE**
+8. **M4.3.5**: Ingredient Normalization (4 hours) 🚀 **READY** ← **NEXT**
 
 ### **M4.3 Component Status:**
 
@@ -125,13 +125,18 @@
 - Mathematical accuracy: 100% (0.5x, 1.5x, 2.0x validated)
 - Production-ready
 
-**🚀 M4.3.4: Meal Completion Tracking - READY**
-- Estimated: 45 minutes
-- Simple completion toggle for planned meals
-- Visual feedback (strikethrough, opacity)
-- Core Data persistence
+**✅ M4.3.4: Meal Completion Tracking - COMPLETE**
+- Completed: November 24, 2025
+- Actual Time: 1.0 hour (est: 45 min, +33% for SwiftUI debugging)
+- Checkbox toggle for meal completion (any date)
+- Visual feedback: green checkmark, strikethrough, 50% opacity
+- No date restrictions (flexible for change of plans)
+- Core Data persistence with isCompleted and completedDate
+- SwiftUI reactivity fix with refreshID state trigger
+- Callback pattern: onMealToggled closure parameter
+- Production-ready
 
-**⏳ M4.3.5: Ingredient Normalization - PLANNED**
+**🚀 M4.3.5: Ingredient Normalization - READY**
 - Estimated: 4 hours
 - PRD complete (50+ pages)
 - 4 progressive phases defined
@@ -157,8 +162,9 @@
 - **M4.3.1 Complete**: 3.5 hours ✅
 - **M4.3.2 Complete**: 1.25 hours ✅
 - **M4.3.3 Complete**: 2.5 hours ✅
-- **M4.3 Remaining**: 4.75 hours (M4.3.4: 0.75h, M4.3.5: 4h)
-- **M4 Total Progress**: ~13.25h complete, ~4.75h remaining
+- **M4.3.4 Complete**: 1.0 hour ✅
+- **M4.3 Remaining**: 4 hours (M4.3.5 only)
+- **M4 Total Progress**: ~14.25h complete, ~4h remaining
 - **M4.2.1-3 Enhancement**: 1 hour (optional)
 - **Future (M5-M7)**: ~24-30 hours
 
@@ -853,7 +859,7 @@ All identified risks from M1-M3 have been successfully mitigated through:
 
 ### **Technical Debt: NONE**
 
-Clean architecture maintained throughout M1-M4.2 with:
+Clean architecture maintained throughout M1-M4.3.4 with:
 - Service layer separation
 - Clear data models
 - Performance optimization
@@ -866,9 +872,9 @@ Clean architecture maintained throughout M1-M4.2 with:
 
 ### **Current Milestone:**
 - [M4 PRD](prds/milestone-4-meal-planning-and-settings-integration.md) - Complete requirements
-- [M4.3.1 PRD](prds/milestone-4.3.1-recipe-source-tracking-foundation.md) - Recipe source foundation
+- [M4.3.5 PRD](prds/milestone-4.3.5-ingredient-normalization.md) - Ingredient normalization (50+ pages)
 - [M4 Current Story](current-story.md) - Current development state
-- [M4.3.1 Next Prompt](next-prompt.md) - Ready for M4.3.1 implementation
+- [M4.3.5 Next Prompt](next-prompt.md) - Ready for M4.3.5 implementation
 
 ### **Completed Milestones:**
 - [M1 Learning Notes](learning-notes/01-10-milestone-1-phases.md)
@@ -881,6 +887,8 @@ Clean architecture maintained throughout M1-M4.2 with:
 - [M3.5 Learning Notes](learning-notes/17-m3.5-foundation-validation.md)
 - [M4.1 Learning Notes](learning-notes/18-m4.1-settings-infrastructure.md)
 - [M4.2 Learning Notes](learning-notes/19-m4.2-calendar-meal-planning.md)
+- [M4.3.1 Learning Notes](learning-notes/22-m4.3.1-recipe-source-tracking.md)
+- M4.3.3-4 Learning Notes - To be created
 
 ### **Architecture & Requirements:**
 - [Requirements Document](requirements.md)
@@ -926,13 +934,19 @@ Clean architecture maintained throughout M1-M4.2 with:
 - Calendar-based meal planning with date pickers ✅
 - MealPlan and PlannedMeal entities operational ✅
 - Recipe usage tracking (usageCount, lastUsed) ✅
+- Recipe source tracking with many-to-many relationships ✅
+- Scaled recipe to shopping list with servings adjustment ✅
+- Bulk add from meal plan with progress overlay ✅
+- Meal completion tracking with flexible UX ✅
 - Sheet pattern discovery and fix ✅
-- Ready for recipe source tracking foundation 🚀
+- Ingredient normalization ready to implement 🚀
 
 ### **Platform Readiness:**
 - Meal planning foundation complete ✅
-- Recipe source tracking ready to implement 🚀
-- Scaled recipe to list ready (M3 Phase 4) ✅
+- Recipe source tracking complete ✅
+- Scaled recipe to list operational ✅
+- Bulk add from meal plan operational ✅
+- Meal completion tracking operational ✅
 - Smart consolidation ready (M3 Phase 5) ✅
 - Analytics-ready data structures ✅
 - CloudKit-ready architecture ✅
@@ -943,6 +957,6 @@ Clean architecture maintained throughout M1-M4.2 with:
 
 ---
 
-**Next Action**: Begin M4.3.1 Recipe Source Tracking Foundation (2-2.5 hours)
+**Next Action**: Begin M4.3.5 Ingredient Normalization (4 hours) or wrap up M4 for TestFlight
 
-**Status**: M1-M4.2 complete with ~73 hours total. M4.3.1 ready to begin with all dependencies satisfied, comprehensive PRD and implementation guidance prepared, and strong technical foundation in place. Core Data relationship changes will establish the foundation for recipe transparency features in M4.3.2+.
+**Status**: M1-M4.3.4 complete with ~81.25 hours total. M4.3.5 ready to begin with complete 50+ page PRD, 4-phase implementation plan, and strong technical foundation. Normalization will improve data quality by eliminating 30-50% of duplicate ingredient templates through intelligent name standardization. Optional - can defer to post-TestFlight if desired.
