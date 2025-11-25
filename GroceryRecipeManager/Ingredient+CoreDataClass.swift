@@ -104,12 +104,13 @@ public class Ingredient: NSManagedObject {
             )
         }
         
-        // Validate consistency: isParseable implies data present
-        if isParseable && (numericValue <= 0 || standardUnit == nil || standardUnit?.isEmpty == true) {
+        // Validate consistency: isParseable implies numericValue present
+        // M4.3.5 FIX: standardUnit is optional - ingredients like "2 eggs" are parseable without a unit
+        if isParseable && numericValue <= 0 {
             throw NSError(
                 domain: "IngredientValidation",
                 code: 2009,
-                userInfo: [NSLocalizedDescriptionKey: "Parseable ingredients must have numericValue > 0 and standardUnit"]
+                userInfo: [NSLocalizedDescriptionKey: "Parseable ingredients must have numericValue > 0"]
             )
         }
     }

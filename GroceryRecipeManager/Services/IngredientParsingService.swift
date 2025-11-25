@@ -284,13 +284,46 @@ class IngredientParsingService: ObservableObject {
     
     // MARK: - Pattern-Based Parsing (Existing - Unchanged)
     
+    // M4.3.5: Helper to check if a string is a known measurement unit
+    private func isKnownUnit(_ unit: String) -> Bool {
+        let lowercased = unit.lowercased()
+        
+        // Volume units
+        let volumeUnits = ["cup", "cups", "c", "tablespoon", "tablespoons", "tbsp", "tbs", "t",
+                          "teaspoon", "teaspoons", "tsp", "ts", "ml", "milliliter", "milliliters",
+                          "l", "liter", "liters", "oz", "fl oz", "fluid ounce", "fluid ounces",
+                          "pint", "pints", "pt", "quart", "quarts", "qt", "gallon", "gallons", "gal"]
+        
+        // Weight units
+        let weightUnits = ["lb", "lbs", "pound", "pounds", "oz", "ounce", "ounces",
+                          "g", "gram", "grams", "kg", "kilogram", "kilograms"]
+        
+        // Count/other units
+        let countUnits = ["piece", "pieces", "pc", "clove", "cloves", "slice", "slices",
+                         "can", "cans", "package", "packages", "pkg", "bunch", "bunches",
+                         "head", "heads"]
+        
+        return volumeUnits.contains(lowercased) || 
+               weightUnits.contains(lowercased) || 
+               countUnits.contains(lowercased)
+    }
+    
     private func parseWithPatterns(text: String) -> ParsedIngredient {
         // Pattern 1: "2 cups flour" or "1 1/2 tbsp olive oil"
         let pattern1 = #"^([0-9]+(?:\s+[0-9]+/[0-9]+|[/.][0-9]+)?)\s+([a-zA-Z]+)?\s*(.+)$"#
         if let match = matchPattern(pattern1, in: text) {
             let quantity = match[1]
-            let unit = match[2].isEmpty ? nil : match[2]
-            let name = match[3].trimmingCharacters(in: .whitespacesAndNewlines)
+            var unit = match[2].isEmpty ? nil : match[2]
+            var name = match[3].trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            // M4.3.5 BUG FIX: Validate that captured "unit" is actually a known unit
+            // If not (like "egg" from "2 eggs"), combine it with the name
+            if let capturedUnit = unit, !isKnownUnit(capturedUnit) {
+                // Combine unit and name, handling cases where name might be empty or just whitespace
+                let combinedName = "\(capturedUnit)\(name)".trimmingCharacters(in: .whitespacesAndNewlines)
+                name = combinedName
+                unit = nil
+            }
             
             return ParsedIngredient(
                 originalText: text,

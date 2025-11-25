@@ -291,9 +291,11 @@ struct RecipeListView: View {
     }
     
     private func createAllTestRecipes() {
-        withAnimation {
-            // Recipe 1: Chocolate Chip Cookies
-            createRecipe(
+        // M4.3.5 FIX: Create recipes sequentially to avoid Core Data race conditions
+        // Don't wrap in withAnimation - causes context save conflicts
+        
+        // Recipe 1: Chocolate Chip Cookies
+        createRecipe(
                 title: "Chocolate Chip Cookies",
                 instructions: """
                 1. Preheat oven to 375°F
@@ -442,9 +444,8 @@ struct RecipeListView: View {
                     "1/4 tsp salt"
                 ]
             )
-            
-            print("✅ Created 6 test recipes with overlapping ingredients")
-        }
+        
+        print("✅ Created 6 test recipes with overlapping ingredients")
     }
     
     // Helper function to create a recipe with ingredients
@@ -462,11 +463,17 @@ struct RecipeListView: View {
         
         do {
             try viewContext.save()
+            print("✅ Saved recipe: '\(title)'")
+            
             addIngredientsWithParsing(to: newRecipe, ingredients: ingredients, in: viewContext)
+            print("   - Created \(ingredients.count) ingredients for '\(title)'")
+            
             try viewContext.save()
-            print("✅ Created recipe: '\(title)'")
+            print("✅ Saved ingredients for: '\(title)'")
         } catch {
             print("❌ Error creating recipe '\(title)': \(error)")
+            print("   Error details: \(error.localizedDescription)")
+            viewContext.rollback()
         }
     }
     
@@ -475,6 +482,7 @@ struct RecipeListView: View {
         let parsingService = IngredientParsingService(context: context, templateService: templateService)
         
         for (index, text) in ingredients.enumerated() {
+            let parsed = parsingService.parseIngredient(text: text)
             let structured = parsingService.parseToStructured(text: text)
             
             let ingredient = Ingredient(context: context)
@@ -482,6 +490,17 @@ struct RecipeListView: View {
             ingredient.name = text
             ingredient.sortOrder = Int16(index)
             ingredient.recipe = recipe
+            
+            // M4.3.5 FIX: Create/link ingredient template (was missing!)
+            // Extract ingredient name from parsed result and create template
+            let ingredientName = parsed.displayName
+            print("      Parsing '\(text)' -> template name: '\(ingredientName)'")
+            
+            if !ingredientName.isEmpty && ingredientName.lowercased() != "unknown ingredient" {
+                ingredient.ingredientTemplate = templateService.findOrCreateTemplate(name: ingredientName)
+            } else {
+                print("      ⚠️ WARNING: Skipping template creation for empty/unknown ingredient")
+            }
             
             // M4.3.1 FIX: Populate all structured quantity fields
             ingredient.displayText = structured.displayText

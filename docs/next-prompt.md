@@ -1,456 +1,273 @@
-# Next Prompt: M4.3.5 - Ingredient Normalization
+# Next Prompt: M4.3.5 Phase 2 - Singular/Plural Normalization
 
 **Milestone**: M4.3.5 - Ingredient Normalization  
+**Current Phase**: Phase 2 - Singular/Plural Handling  
 **Status**: 🚀 READY  
-**Estimated Time**: 4 hours  
-**Priority**: MEDIUM - Data quality enhancement  
-**Prerequisites**: M4.3.1 (Recipe Source Tracking) ✅, M4.3.4 (Meal Completion) ✅
+**Estimated Time**: 1.0 hour  
+**Prerequisites**: Phase 1 (Case Normalization) ✅ COMPLETE
 
 ---
 
-## 🚀 QUICK START
+## 🎯 PHASE 1 RECAP
 
-### **What We're Building**
+### **What We Accomplished**
 
-Behind-the-scenes ingredient name normalization to eliminate duplicates caused by case differences, singular/plural forms, abbreviations, and common variations. Zero user intervention required - just improved data quality.
+✅ **Case Normalization Working**
+- All ingredient templates stored in lowercase
+- "Butter" → "butter", "EGGS" → "eggs"
+- Implemented in `IngredientTemplateService.swift`
 
-### **User Impact**
+✅ **Four Critical Bugs Fixed**
+1. **Missing Template Creation**: Sample recipes weren't creating templates
+2. **Core Data Race Condition**: `withAnimation` wrapper causing conflicts  
+3. **Regex Parsing Bug**: Greedy unit capture creating "egg s" instead of "eggs"
+4. **Validation Bug**: `isParseable` required `standardUnit` unnecessarily
 
-**Before Normalization:**
-```
-Shopping List:
-- Butter (Recipe A)
-- butter (Recipe B)
-- Eggs (Recipe C)
-- egg (Recipe D)
-- Tbsp olive oil (Recipe E)
-- tablespoon olive oil (Recipe F)
-```
+✅ **Validation Complete**
+- All 6 test recipes created successfully
+- 14 unique templates in Ingredients tab (all lowercase)
+- No duplicate or malformed templates
+- Clean console logs (zero errors)
 
-**After Normalization:**
-```
-Shopping List:
-- butter (2 sources)
-- eggs (2 sources)
-- tablespoon olive oil (2 sources)
-```
+### **Current State**
+Templates: baking powder, bread, butter, chocolate chips, cinnamon, cocoa powder, **egg**, **eggs**, flour, milk, pepper, salt, sugar, vanilla extract
 
-### **Key Technical Points**
-
-- **Four Progressive Phases**: Case → Plural → Abbreviations → Variations
-- **Behind-the-scenes**: Runs during ingredient parsing/template creation
-- **No UI changes**: Users see cleaner lists automatically
-- **Complete PRD available**: `prds/milestone-4.3.5-ingredient-normalization.md`
+Notice: "egg" (singular) and "eggs" (plural) are separate templates ← **Phase 2 will fix this**
 
 ---
 
-## 📋 FOUR PHASES OVERVIEW
+## 🚀 PHASE 2: SINGULAR/PLURAL HANDLING
 
-### **Phase 1: Case Normalization** (30 min)
-**Goal**: "Butter" → "butter", "EGGS" → "eggs"
-- Lowercase all ingredient names at template creation
-- Update existing templates in migration
-- Simple, foundational change
+### **Goal**
 
-### **Phase 2: Singular/Plural Handling** (1 hour)
-**Goal**: "eggs" and "egg" → both map to "egg" template
-- Smart plural detection (eggs→egg, tomatoes→tomato)
-- Irregular plurals (children→child, feet→foot)
-- Preserve original display text while normalizing template
+Consolidate singular and plural forms into single templates:
+- "egg" + "eggs" → "egg"
+- "tomato" + "tomatoes" → "tomato"
+- "berry" + "berries" → "berry"
 
-### **Phase 3: Abbreviation Expansion** (1.5 hours)
-**Goal**: "tbsp", "Tbsp", "tablespoon" → all map to "tablespoon"
-- Common cooking abbreviations (tsp, tbsp, oz, lb, etc.)
-- Regional variations (litre/liter, colour/color)
-- Measurement unit normalization
+### **Expected Result**
 
-### **Phase 4: Common Variations** (1 hour)
-**Goal**: "all-purpose flour" and "flour" → same template
-- Qualifier removal (fresh basil → basil, unsalted butter → butter)
-- Brand name removal (Kerrygold butter → butter)
-- Preparation methods (diced tomatoes → tomatoes)
+**Before**: 14 templates, "egg" and "eggs" separate  
+**After**: 13 templates, only "egg" (6 recipes consolidated)
 
 ---
 
-## 📝 IMPLEMENTATION STRATEGY
+## 📋 IMPLEMENTATION (1 hour)
 
-### **Where Normalization Happens**
+### **Step 1: Add normalizePlural() Function** (20 min)
 
-**Primary Location**: `IngredientTemplateService`
+**Location**: `IngredientTemplateService.swift`
+
+**Add this function:**
 ```swift
-// When creating templates from ingredients
-func findOrCreateTemplate(name: String) -> IngredientTemplate {
-    let normalizedName = normalizeName(name)  // ← Apply all phases here
-    // ... rest of template lookup/creation
-}
-```
+// MARK: - M4.3.5 Phase 2: Singular/Plural Normalization
 
-**Secondary Location**: Data migration for existing templates
-
-### **Recommended Approach**
-
-**1. Build Incrementally** (Phase by Phase)
-- Complete Phase 1 fully → Test → Commit
-- Complete Phase 2 fully → Test → Commit
-- Complete Phase 3 fully → Test → Commit
-- Complete Phase 4 fully → Test → Commit
-
-**2. Create Comprehensive Tests**
-```swift
-// Example test structure
-func testCaseNormalization() {
-    XCTAssertEqual(normalize("Butter"), "butter")
-    XCTAssertEqual(normalize("EGGS"), "eggs")
-    XCTAssertEqual(normalize("All-Purpose Flour"), "all-purpose flour")
-}
-
-func testPluralNormalization() {
-    XCTAssertEqual(normalizePlural("eggs"), "egg")
-    XCTAssertEqual(normalizePlural("tomatoes"), "tomato")
-    XCTAssertEqual(normalizePlural("children"), "child")
-}
-```
-
-**3. Preserve Display Text**
-```swift
-// Recipe ingredient: "2 Tbsp Butter"
-ingredient.name = "2 Tbsp Butter"           // Original for display
-ingredient.template = findTemplate("butter") // Normalized for grouping
-```
-
----
-
-## 🎯 PHASE-BY-PHASE GUIDE
-
-### **Phase 1: Case Normalization** (30 min)
-
-**Files to Modify:**
-- `IngredientTemplateService.swift` - Add lowercase normalization
-- Migration script (optional) - Update existing templates
-
-**Implementation:**
-```swift
-// In IngredientTemplateService
-private func normalizeCase(_ name: String) -> String {
-    return name.lowercased()
-}
-
-func findOrCreateTemplate(name: String) -> IngredientTemplate {
-    let normalized = normalizeCase(name)
-    
-    // Check if template exists with normalized name
-    let fetchRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
-    fetchRequest.predicate = NSPredicate(format: "name ==[c] %@", normalized)
-    
-    if let existing = try? context.fetch(fetchRequest).first {
-        return existing
-    }
-    
-    // Create new template with normalized name
-    let template = IngredientTemplate(context: context)
-    template.name = normalized
-    return template
-}
-```
-
-**Testing:**
-- [ ] "Butter" creates template named "butter"
-- [ ] "EGGS" creates template named "eggs"
-- [ ] Existing templates migrated to lowercase
-- [ ] Display text preserved in ingredients
-
----
-
-### **Phase 2: Singular/Plural** (1 hour)
-
-**Core Logic:**
-```swift
+/// Converts plural ingredient names to singular form
+/// Handles regular plurals (eggs → egg) and irregular plurals (children → child)
 private func normalizePlural(_ name: String) -> String {
     let lowercased = name.lowercased()
     
-    // Irregular plurals first
-    let irregulars: [String: String] = [
+    // Irregular plurals mapping (check these first)
+    let irregularPlurals: [String: String] = [
         "children": "child",
         "feet": "foot",
         "teeth": "tooth",
         "geese": "goose",
-        "mice": "mouse"
+        "mice": "mouse",
+        "people": "person",
+        "men": "man",
+        "women": "woman",
+        "oxen": "ox"
     ]
     
-    if let singular = irregulars[lowercased] {
+    if let singular = irregularPlurals[lowercased] {
         return singular
     }
     
-    // Regular patterns
-    if lowercased.hasSuffix("ies") {
-        // berries → berry, cherries → cherry
-        return String(lowercased.dropLast(3)) + "y"
+    // Regular plural patterns
+    
+    // Pattern 1: -ies → -y (berries → berry, cherries → cherry)
+    if lowercased.hasSuffix("ies") && lowercased.count > 3 {
+        let base = String(lowercased.dropLast(3))
+        return base + "y"
     }
     
-    if lowercased.hasSuffix("oes") {
-        // tomatoes → tomato, potatoes → potato
+    // Pattern 2: -oes → -o (tomatoes → tomato, potatoes → potato)
+    if lowercased.hasSuffix("oes") && lowercased.count > 3 {
         return String(lowercased.dropLast(2))
     }
     
-    if lowercased.hasSuffix("ses") {
-        // glasses → glass, buses → bus
+    // Pattern 3: -ses → -s (glasses → glass)
+    if lowercased.hasSuffix("ses") && lowercased.count > 3 {
         return String(lowercased.dropLast(2))
     }
     
-    if lowercased.hasSuffix("s") && !lowercased.hasSuffix("ss") {
-        // eggs → egg, apples → apple
-        // but NOT: grass → gras
+    // Pattern 4: -ves → -f (knives → knife, loaves → loaf)
+    if lowercased.hasSuffix("ves") && lowercased.count > 3 {
+        let base = String(lowercased.dropLast(3))
+        return base + "f"
+    }
+    
+    // Pattern 5: -s → remove (eggs → egg, apples → apple)
+    // BUT NOT: -ss words (grass, glass, etc.)
+    if lowercased.hasSuffix("s") && 
+       !lowercased.hasSuffix("ss") && 
+       !lowercased.hasSuffix("us") &&  // Don't touch: asparagus, hummus
+       lowercased.count > 1 {
         return String(lowercased.dropLast())
     }
     
+    // No plural pattern matched, return as-is
     return lowercased
 }
 ```
 
-**Testing:**
-- [ ] eggs → egg
-- [ ] tomatoes → tomato
-- [ ] berries → berry
-- [ ] children → child
-- [ ] grass → grass (no change)
+### **Step 2: Update normalize() Function** (10 min)
 
----
-
-### **Phase 3: Abbreviations** (1.5 hours)
-
-**Abbreviation Dictionary:**
+**Modify your existing `normalize()` function** to add the plural normalization step:
 ```swift
-private let abbreviationMap: [String: String] = [
-    // Volume
-    "tsp": "teaspoon",
-    "tbsp": "tablespoon",
-    "oz": "ounce",
-    "fl oz": "fluid ounce",
-    "c": "cup",
-    "pt": "pint",
-    "qt": "quart",
-    "gal": "gallon",
-    
-    // Weight
-    "lb": "pound",
-    "lbs": "pound",
-    "g": "gram",
-    "kg": "kilogram",
-    
-    // Other
-    "temp": "temperature",
-    "approx": "approximately"
-]
+// MARK: - M4.3.5: Complete Normalization Pipeline
 
-private func expandAbbreviations(_ text: String) -> String {
-    var result = text.lowercased()
+/// Applies all normalization phases to an ingredient name
+/// Phase 1: Case normalization (lowercase)
+/// Phase 2: Singular/plural normalization
+/// Phase 3: Abbreviation expansion (future)
+/// Phase 4: Variation handling (future)
+private func normalize(_ name: String) -> String {
+    var normalized = name
     
-    // Sort by length (longest first) to avoid partial replacements
-    let sorted = abbreviationMap.sorted { $0.key.count > $1.key.count }
+    // Phase 1: Case normalization
+    normalized = normalizeCase(normalized)
     
-    for (abbrev, full) in sorted {
-        // Use word boundaries to avoid partial matches
-        let pattern = "\\b\(abbrev)\\b"
-        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-            result = regex.stringByReplacingMatches(
-                in: result,
-                range: NSRange(result.startIndex..., in: result),
-                withTemplate: full
-            )
-        }
-    }
+    // Phase 2: Singular/plural normalization
+    normalized = normalizePlural(normalized)
     
-    return result
+    // Future phases will be added here
+    
+    return normalized
 }
 ```
 
-**Testing:**
-- [ ] "2 tbsp butter" → template "tablespoon butter"
-- [ ] "1 Tbsp oil" → template "tablespoon oil"
-- [ ] "3 tsp vanilla" → template "teaspoon vanilla"
-- [ ] "buttercup" unchanged (no word boundary match)
+### **Step 3: Testing** (30 min)
 
----
+**Testing Procedure:**
 
-### **Phase 4: Variations** (1 hour)
+1. **Clean Build**: ⌘⇧K
+2. **Reset simulator**: Device → Erase All Content and Settings
+3. **Build & Run**: ⌘R
+4. **Generate 6 test recipes**
+5. **Verify in Ingredients Tab**:
+   - Should see only "egg" (not both "egg" and "eggs")
+   - Count should be 13 templates (down from 14)
+   - "egg" should show it's used in 6 recipes
+6. **Check console logs**:
+   - Should see: "Parsing '2 eggs' -> template name: 'egg'"
+   - Should see: "Parsing '1 egg' -> template name: 'egg'"
 
-**Qualifier Removal:**
-```swift
-private let qualifiersToRemove = [
-    "fresh", "dried", "frozen", "canned",
-    "organic", "raw", "cooked",
-    "unsalted", "salted", "sweetened", "unsweetened",
-    "all-purpose", "whole", "ground",
-    "large", "medium", "small",
-    "chopped", "diced", "sliced", "minced",
-    "extra virgin", "virgin"
-]
+**Test Cases to Verify:**
 
-private func removeQualifiers(_ text: String) -> String {
-    var result = text.lowercased()
-    
-    for qualifier in qualifiersToRemove {
-        // Remove qualifier + optional separator
-        let patterns = [
-            "\\b\(qualifier)\\s+",      // "fresh basil" → "basil"
-            "\\s+\(qualifier)\\b",      // "basil fresh" → "basil"
-            "\\b\(qualifier)-",         // "all-purpose flour" → "flour"
-            "-\(qualifier)\\b"          // "flour-purpose" → "flour"
-        ]
-        
-        for pattern in patterns {
-            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-                result = regex.stringByReplacingMatches(
-                    in: result,
-                    range: NSRange(result.startIndex..., in: result),
-                    withTemplate: " "
-                )
-            }
-        }
-    }
-    
-    // Clean up extra whitespace
-    result = result.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
-    return result.trimmingCharacters(in: .whitespaces)
-}
-```
+✅ Regular Plurals (Simple -s)
+- "eggs" → "egg"
+- "apples" → "apple"
+- "carrots" → "carrot"
 
-**Testing:**
-- [ ] "fresh basil" → template "basil"
-- [ ] "unsalted butter" → template "butter"
-- [ ] "all-purpose flour" → template "flour"
-- [ ] "extra virgin olive oil" → template "olive oil"
+✅ Irregular Plurals
+- "children" → "child"
+- "feet" → "foot"
+- "mice" → "mouse"
+
+✅ -ies Pattern
+- "berries" → "berry"
+- "cherries" → "cherry"
+
+✅ -oes Pattern
+- "tomatoes" → "tomato"
+- "potatoes" → "potato"
+
+✅ -ses Pattern
+- "glasses" → "glass"
+
+✅ -ves Pattern
+- "knives" → "knife"
+- "loaves" → "loaf"
+
+✅ False Positives (Should NOT Change)
+- "grass" → "grass" (not "gras")
+- "glass" → "glass" (not "glas")
+- "asparagus" → "asparagus"
+- "hummus" → "hummus"
 
 ---
 
 ## ✅ ACCEPTANCE CRITERIA
 
-**Phase 1: Case**
-- [ ] All new templates created in lowercase
-- [ ] Existing templates migrated to lowercase
-- [ ] Case-insensitive template lookup works
-- [ ] Display text preserves original case
+### **Functional Requirements**
 
-**Phase 2: Plural**
-- [ ] Regular plurals normalized (eggs → egg)
-- [ ] Irregular plurals handled (children → child)
-- [ ] "ies" suffix handled (berries → berry)
-- [ ] "oes" suffix handled (tomatoes → tomato)
-- [ ] False positives avoided (grass ≠ gras)
+- [ ] `normalizePlural()` function implemented
+- [ ] `normalize()` function updated to call `normalizePlural()`
+- [ ] All regular plurals handled (-s, -ies, -oes, -ses, -ves)
+- [ ] All common irregular plurals handled
+- [ ] False positives avoided (grass, glass, asparagus, hummus)
 
-**Phase 3: Abbreviations**
-- [ ] Common abbreviations expanded
-- [ ] Word boundaries respected
-- [ ] No partial replacements
-- [ ] Case-insensitive matching
+### **Validation Tests**
 
-**Phase 4: Variations**
-- [ ] Common qualifiers removed
-- [ ] Multiple qualifiers handled
-- [ ] Hyphenated qualifiers handled
-- [ ] Core ingredient names preserved
+- [ ] Test recipes regenerated with Phase 2 active
+- [ ] "egg" and "eggs" consolidated to "egg" template
+- [ ] Total template count reduced (14 → 13)
+- [ ] All recipes still display correct ingredient lists
+- [ ] Console shows normalized template names
 
-**Overall:**
-- [ ] Duplicate ingredient count reduced
-- [ ] Shopping list consolidation improved
-- [ ] Recipe ingredient matching enhanced
-- [ ] No user-visible breaking changes
-- [ ] Performance maintained (<0.5s operations)
+### **Integration Checks**
+
+- [ ] Case normalization (Phase 1) still working
+- [ ] Recipe source tracking intact
+- [ ] Quantity scaling intact
+- [ ] Shopping list consolidation working
+- [ ] No performance degradation (<0.5s operations)
 
 ---
 
-## 🧪 TESTING STRATEGY
+## 📚 FILES TO MODIFY
 
-### **Unit Tests**
-Create `IngredientNormalizationTests.swift`:
+### **Primary File**
+
+**`GroceryRecipeManager/Services/IngredientTemplateService.swift`**
+- Add `normalizePlural()` function (~45 lines)
+- Update `normalize()` function (~8 lines)
+
+### **No Other Files Need Changes**
+
+Phase 2 is entirely within the service layer. No UI changes, no Core Data schema changes, no other services affected.
+
+---
+
+## 💡 IMPLEMENTATION TIPS
+
+### **Order of Pattern Checks Matters**
+
+Check patterns from most specific to most general:
+1. Irregular plurals first (exact matches)
+2. -ies, -oes, -ses, -ves patterns (specific suffixes)
+3. Simple -s removal last (most general)
+
+### **Avoid Over-Normalization**
 ```swift
-class IngredientNormalizationTests: XCTestCase {
-    func testPhase1_CaseNormalization() {
-        // Test all case combinations
-    }
-    
-    func testPhase2_PluralNormalization() {
-        // Test regular and irregular plurals
-    }
-    
-    func testPhase3_AbbreviationExpansion() {
-        // Test all common abbreviations
-    }
-    
-    func testPhase4_VariationHandling() {
-        // Test qualifier removal
-    }
-    
-    func testIntegration_CompleteNormalization() {
-        // Test full pipeline
-        // "2 Tbsp Fresh Unsalted Butter" → "butter"
-    }
+// ❌ BAD: This would break "grass"
+if lowercased.hasSuffix("s") {
+    return String(lowercased.dropLast())
+}
+
+// ✅ GOOD: Check for -ss first
+if lowercased.hasSuffix("s") && !lowercased.hasSuffix("ss") {
+    return String(lowercased.dropLast())
 }
 ```
 
-### **Integration Tests**
-1. Create recipes with intentional variations
-2. Add to shopping list
-3. Verify consolidation works correctly
-4. Check recipe source tracking intact
-
-### **Performance Tests**
-- [ ] Normalization <0.05s per ingredient
-- [ ] Template lookup <0.1s
-- [ ] Batch processing <1s for 100 ingredients
-
----
-
-## 📚 REFERENCE: COMPLETE PRD
-
-**Full documentation available at:**
-`docs/prds/milestone-4.3.5-ingredient-normalization.md`
-
-**Contents:**
-- Detailed algorithm descriptions
-- Comprehensive test cases
-- Edge case handling
-- Performance considerations
-- Future enhancement ideas
-
----
-
-## 💡 TIPS & BEST PRACTICES
-
-### **Order Matters**
-Apply normalization in this order:
-1. Case (lowercase everything first)
-2. Abbreviations (expand before plural check)
-3. Plural (singularize after expansion)
-4. Qualifiers (remove modifiers last)
-
-### **Preserve Original**
+### **Length Checks Prevent Crashes**
 ```swift
-// ALWAYS keep original for display
-ingredient.name = originalText
-ingredient.template = findTemplate(normalizedName)
-```
-
-### **Test Edge Cases**
-- Empty strings
-- Single characters
-- Numbers only
-- Special characters
-- Unicode characters
-
-### **Performance**
-```swift
-// Cache normalized results
-private var normalizationCache: [String: String] = [:]
-
-func normalize(_ name: String) -> String {
-    if let cached = normalizationCache[name] {
-        return cached
-    }
-    
-    let result = applyAllPhases(name)
-    normalizationCache[name] = result
-    return result
+// ✅ GOOD: Ensure enough characters exist
+if lowercased.hasSuffix("ies") && lowercased.count > 3 {
+    return String(lowercased.dropLast(3)) + "y"
 }
 ```
 
@@ -458,50 +275,65 @@ func normalize(_ name: String) -> String {
 
 ## 🎯 SUCCESS METRICS
 
-**Before M4.3.5:**
-- 100 ingredients might create 85 templates (15% duplicates)
+**Before Phase 2:**
+- 14 templates in test data
+- "egg" and "eggs" separate
 
-**After M4.3.5:**
-- Same 100 ingredients create 65 templates (35% duplicates eliminated)
-
-**Target Improvements:**
-- 30-50% reduction in duplicate templates
-- Improved shopping list consolidation
-- Better recipe ingredient matching
-- Maintained performance (<0.5s all operations)
+**After Phase 2:**
+- 13 templates in test data (1 consolidated)
+- Only "egg" exists (consolidates 6 recipes)
+- All recipe displays unchanged
+- Shopping list consolidation improved
 
 ---
 
 ## 🚀 READY TO START?
 
-**Session Startup Checklist:**
-1. ✅ Read this next-prompt.md
-2. ✅ Review M4.3.5 PRD (optional but helpful)
-3. ✅ Check session-startup-checklist.md
-4. ✅ Open IngredientTemplateService.swift
-5. ✅ Create test file: IngredientNormalizationTests.swift
+### **Quick Checklist**
 
-**Recommended Order:**
-1. Phase 1: Case (30 min) → Test → Commit
-2. Phase 2: Plural (1 hr) → Test → Commit
-3. Phase 3: Abbreviations (1.5 hr) → Test → Commit
-4. Phase 4: Variations (1 hr) → Test → Commit
+- [ ] Read this next-prompt.md
+- [ ] Open `IngredientTemplateService.swift`
+- [ ] Add `normalizePlural()` function
+- [ ] Update `normalize()` function
+- [ ] Clean build + reset simulator
+- [ ] Generate test recipes
+- [ ] Verify in Ingredients tab
 
-**Total Time**: ~4 hours
+### **Expected Session Flow**
 
----
+1. **Implementation** (20 min): Add functions
+2. **Testing** (30 min): Generate recipes + verify
+3. **Documentation** (10 min): Update current-story.md
 
-## 🎉 THIS COMPLETES M4!
-
-After M4.3.5:
-- Core grocery-recipe workflow complete
-- Ready for TestFlight deployment
-- Foundation set for M5 (CloudKit sync)
+**Total Time**: ~1 hour
 
 ---
 
-**Document Version**: 1.0  
-**Created**: November 24, 2025  
-**Status**: 🚀 READY  
-**Estimated Time**: 4 hours  
-**Prerequisites**: M4.3.1 ✅, M4.3.4 ✅
+## 📈 PROGRESS TRACKING
+
+**M4.3.5 Phases:**
+- ✅ Phase 1: Case Normalization (2.5h actual vs 0.5h est - bugs discovered)
+- 🔄 Phase 2: Singular/Plural (1h estimated) ← **CURRENT**
+- ⏳ Phase 3: Abbreviations (1.5h estimated)
+- ⏳ Phase 4: Variations (1h estimated)
+
+**Total M4.3.5 Progress**: 1/4 phases complete (25%)
+
+---
+
+## 🎉 AFTER PHASE 2
+
+Once Phase 2 is complete:
+- Update `current-story.md` with Phase 2 results
+- Update `next-prompt.md` for Phase 3 (Abbreviations)
+- Consider whether Phase 3-4 are needed based on your usage patterns
+
+**Phase 3 Preview**: Abbreviations (tbsp → tablespoon, tsp → teaspoon, etc.)
+
+---
+
+**Document Version**: 2.0  
+**Created**: November 25, 2025  
+**Status**: 🚀 READY for Phase 2  
+**Estimated Time**: 1 hour  
+**Prerequisites**: Phase 1 ✅ COMPLETE

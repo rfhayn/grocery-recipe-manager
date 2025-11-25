@@ -11,6 +11,25 @@ class IngredientTemplateService: ObservableObject {
         self.context = context
     }
     
+    // MARK: - M4.3.5: Ingredient Normalization
+    
+    // Phase 1: Case Normalization
+    // Normalizes ingredient names to lowercase for consistent template matching
+    // This eliminates duplicates like "Butter", "butter", "BUTTER"
+    private func normalizeCase(_ name: String) -> String {
+        return name.lowercased()
+    }
+    
+    // Main normalization entry point
+    // Currently only Phase 1 (case), will be extended with additional phases
+    private func normalize(name: String) -> String {
+        var normalized = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        normalized = normalizeCase(normalized)
+        return normalized
+    }
+    
+    // MARK: - Template Operations
+    
     func searchTemplates(query: String, limit: Int = 10) -> [IngredientTemplate] {
         let startTime = CFAbsoluteTimeGetCurrent()
         
@@ -62,8 +81,11 @@ class IngredientTemplateService: ObservableObject {
     }
     
     func findOrCreateTemplate(name: String, category: String? = nil) -> IngredientTemplate {
+        // M4.3.5: Normalize ingredient name before lookup/creation
+        let normalizedName = normalize(name: name)
+        
         let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
-        request.predicate = NSPredicate(format: "name ==[cd] %@", name)
+        request.predicate = NSPredicate(format: "name ==[cd] %@", normalizedName)
         
         do {
             if let existingTemplate = try context.fetch(request).first {
@@ -73,9 +95,10 @@ class IngredientTemplateService: ObservableObject {
             print("Error searching for existing template: \(error)")
         }
         
+        // M4.3.5: Store normalized name in template
         let newTemplate = IngredientTemplate(context: context)
         newTemplate.id = UUID()
-        newTemplate.name = name
+        newTemplate.name = normalizedName
         newTemplate.category = category  // String assignment
         newTemplate.usageCount = 1
         newTemplate.dateCreated = Date()
@@ -102,5 +125,35 @@ class IngredientTemplateService: ObservableObject {
     func validateSearchPerformance() -> Bool {
         let _ = searchTemplates(query: "a", limit: 5)
         return lastSearchDuration < 0.1
+    }
+    
+    // MARK: - M4.3.5: Data Migration
+    
+    // Migrates existing templates to normalized names
+    // Should be called once after Phase 1 deployment
+    func migrateExistingTemplates() {
+        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+        
+        do {
+            let templates = try context.fetch(request)
+            var migratedCount = 0
+            
+            for template in templates {
+                let normalizedName = normalize(name: template.name ?? "")
+                if template.name != normalizedName {
+                    template.name = normalizedName
+                    migratedCount += 1
+                }
+            }
+            
+            if migratedCount > 0 {
+                try context.save()
+                print("M4.3.5 Phase 1: Migrated \(migratedCount) templates to normalized case")
+            } else {
+                print("M4.3.5 Phase 1: No templates needed migration")
+            }
+        } catch {
+            print("Error migrating templates: \(error)")
+        }
     }
 }
