@@ -1,6 +1,6 @@
 # Grocery & Recipe Manager - Development Roadmap
 
-**Last Updated**: November 24, 2025  
+**Last Updated**: November 26, 2025  
 **Current Phase**: M4.3.5 (Ingredient Normalization) - Ready  
 **Status**: M4.1-M4.3.4 complete, M4.3.5 ready to begin
 
@@ -152,7 +152,7 @@
 - **M3 + M4 → M8-M11**: Advanced intelligence platform built on structured data foundation
 
 ### **Timeline Summary:**
-- **Core Platform (M1-M7)**: ~85-100 hours total
+- **Core Platform (M1-M7)**: ~103-136 hours total
 - **M1 Complete**: 32 hours ✅
 - **M2 Complete**: 16.5 hours ✅
 - **M3 Complete**: 10.5 hours ✅
@@ -163,10 +163,10 @@
 - **M4.3.2 Complete**: 1.25 hours ✅
 - **M4.3.3 Complete**: 2.5 hours ✅
 - **M4.3.4 Complete**: 1.0 hour ✅
-- **M4.3 Remaining**: 4 hours (M4.3.5 only)
+- **M4.3.5 Remaining**: 4 hours (ready to begin)
 - **M4 Total Progress**: ~14.25h complete, ~4h remaining
 - **M4.2.1-3 Enhancement**: 1 hour (optional)
-- **Future (M5-M7)**: ~24-30 hours
+- **Future (M5-M7)**: ~32-47 hours
 
 ---
 
@@ -580,76 +580,130 @@
 
 ---
 
-### **⏳ M5: CloudKit Family Collaboration - PLANNED**
+### **⏳ M5: Production Infrastructure & CloudKit - PLANNED**
 
 **Status**: ⏳ Planned  
-**Estimated Time**: 12-18 hours  
+**Estimated Time**: 12-17 hours  
 **Dependencies**: M4 complete
 
-**Phase 1: CloudKit Schema Design** (3-4 hours)
-- Design CloudKit record types for all entities
-- Plan sync strategy and conflict resolution
-- Define share permissions and access control
-- Schema migration path from local Core Data
+**Phase 1: Apple Developer Account & App Store Setup** (2-3 hours)
+- Apple Developer Program enrollment ($99/year)
+- App Store Connect configuration
+- Bundle identifier and certificates setup
+- App icon and metadata preparation
+- Privacy policy and terms of service
 
-**Phase 2: Sync Engine Implementation** (4-6 hours)
-- CloudKit integration with Core Data
-- Bidirectional sync logic
-- Conflict resolution mechanisms
+**Phase 2: TestFlight Deployment & Device Testing** (3-4 hours)
+- TestFlight build configuration
+- Internal testing group setup
+- Real device testing and validation (3+ devices)
+- Performance profiling on actual hardware
+- User feedback collection and iteration
+
+**Phase 3: CloudKit Schema Design & Integration** (4-6 hours)
+- CloudKit record types for all entities
+- Sync strategy and conflict resolution design
+- Share permissions and access control
+- Schema migration from local Core Data
+- Bidirectional sync logic implementation
 - Offline support with sync queue
 
-**Phase 3: Family Sharing UI** (3-4 hours)
-- Family account management interface
+**Phase 4: Family Sharing Features** (3-4 hours)
+- Family account management UI
 - Share invitation and acceptance flows
-- Shared list and recipe indicators
 - Real-time collaboration notifications
-
-**Phase 4: Testing & Refinement** (2-4 hours)
+- Shared list and recipe indicators
 - Multi-device testing
 - Conflict scenario validation
-- Performance optimization
-- Error handling and recovery
 
 **Success Criteria:**
+- [ ] Apple Developer Account activated
+- [ ] TestFlight build deployed successfully
+- [ ] Real device testing complete on 3+ devices
 - [ ] CloudKit schema operational
 - [ ] Real-time multi-user sync working
 - [ ] Conflict resolution tested and reliable
-- [ ] Offline mode with proper queue
 - [ ] Family sharing flows intuitive
-- [ ] Privacy and security maintained
 - [ ] Performance: < 2s sync for typical changes
 
 ---
 
-### **⏳ M6: Testing Foundation - PLANNED**
+### **⏳ M6: Testing Foundation & AI Augmentation - PLANNED**
 
 **Status**: ⏳ Planned  
-**Estimated Time**: 8-12 hours  
-**Dependencies**: M5 complete (family sharing tested)
+**Estimated Time**: 12-18 hours  
+**Dependencies**: M5 complete (TestFlight validated, CloudKit tested)
 
-**Phase 1: Unit Test Suite** (3-4 hours)
-- Core Data service tests
-- Business logic validation
-- Parsing and conversion tests
-- Mock data infrastructure
+**Phase 1: Human Test Baseline** (5-7 hours)
+- **M6.1.1: Core Data & Model Tests** (2-3h)
+  - Entity relationship validation
+  - Data integrity tests
+  - Migration and persistence tests
+- **M6.1.2: Service Layer Tests** (2-3h)
+  - IngredientParsingService tests
+  - RecipeScalingService tests
+  - QuantityMergeService tests
+  - IngredientTemplateService tests
+- **M6.1.3: Critical Workflow Tests** (1-2h)
+  - Recipe-to-grocery flow
+  - Meal plan to list generation
+  - Category assignment workflows
+- **Target**: 50%+ coverage on critical services
 
-**Phase 2: Integration Tests** (3-4 hours)
-- Multi-service workflows
-- Recipe-to-grocery flows
-- Meal planning scenarios
-- Sync and conflict tests
+**Phase 2: AI Test Review Setup** (3-4 hours)
+- **M6.2.1: CLI Refinement** (1-1.5h)
+  - Enhance diff parsing for iOS project structure
+  - Add context gathering (recent commits, PR description)
+  - Improve prompt engineering for Given/When/Then format
+- **M6.2.2: GitHub Actions Workflow** (1.5-2h)
+  - Configure PR trigger workflow
+  - Set up API key management via secrets
+  - Add comment posting to PRs
+  - Test on sample PRs
+- **M6.2.3: Documentation & Integration** (0.5-1h)
+  - Document usage and capabilities
+  - Update development guidelines
+  - Team onboarding materials
+- **Target**: ≥90% PRs receive suggestions, ≥75% found useful
 
-**Phase 3: UI Tests** (2-4 hours)
-- Critical user flows automated
-- Navigation and data entry
-- Sheet and modal behaviors
-- Error state handling
+**Phase 3: Testing Standards & Infrastructure** (2-3 hours)
+- **M6.3.1: Test Architecture Standards** (1-1.5h)
+  - Document test organization patterns
+  - XCTest best practices guide
+  - Mock and fixture guidelines
+- **M6.3.2: Coverage Monitoring** (0.5-1h)
+  - Set up Xcode coverage reporting
+  - Define coverage targets per layer
+  - Create coverage dashboard
+- **M6.3.3: CI/CD Test Foundation** (0.5-1h)
+  - Configure automated test runs
+  - Set up test result reporting
+  - Define passing criteria
+
+**Phase 4: Phase 3 Prep (Optional)** (2-4 hours)
+- **M6.4.1: Domain Model Documentation** (1-1.5h)
+  - Document business rules explicitly
+  - Entity relationship diagrams with rules
+  - Validation logic specifications
+- **M6.4.2: Architecture Diagrams** (1-1.5h)
+  - Service layer architecture
+  - Data flow diagrams
+  - Component interaction maps
+- **M6.4.3: Gap Detection Experiments** (1-2h)
+  - Prototype semantic gap detector
+  - Test on historical PRs
+  - Refine detection heuristics
+- **Note**: Can be deferred to M6.5 or M7 if needed
 
 **Success Criteria:**
-- [ ] 80%+ code coverage achieved
-- [ ] Critical paths fully tested
-- [ ] CI/CD pipeline ready
-- [ ] Regression prevention automated
+- [ ] 50%+ service layer coverage achieved
+- [ ] All Core Data entities have basic tests
+- [ ] 5+ critical workflows validated
+- [ ] AI reviewer operational (≥90% PR activation)
+- [ ] ≥75% of AI suggestions found useful
+- [ ] Testing standards documented
+- [ ] CI/CD running tests on every commit
+- [ ] Zero flaky tests, < 30s test suite
 - [ ] Documentation through tests
 
 ---
@@ -800,24 +854,25 @@
 - [ ] Smart quantity consolidation for meal plans (M4.3)
 - [ ] Sub-0.5s performance maintained
 
-### **M5: CloudKit Family Collaboration**
-- [ ] CloudKit schema and sync engine
-- [ ] Family account management
-- [ ] Shared grocery lists and recipes
-- [ ] Real-time multi-user updates
-- [ ] Conflict resolution working
-- [ ] Offline support with sync
-- [ ] Robust error handling
-- [ ] Privacy and security maintained
+### **M5: Production Infrastructure & CloudKit**
+- [ ] Apple Developer Account activated
+- [ ] TestFlight build deployed successfully
+- [ ] Real device testing complete on 3+ devices
+- [ ] CloudKit schema operational
+- [ ] Real-time multi-user sync working
+- [ ] Conflict resolution tested and reliable
+- [ ] Family sharing flows intuitive
+- [ ] Performance: < 2s sync for typical changes
 
-### **M6: Testing Foundation**
-- [ ] Comprehensive unit test suite
-- [ ] Integration test coverage
-- [ ] UI test for critical flows
-- [ ] 80%+ code coverage
-- [ ] CI/CD pipeline ready
-- [ ] Automated regression prevention
-- [ ] Documentation through tests
+### **M6: Testing Foundation & AI Augmentation**
+- [ ] 50%+ service layer coverage achieved
+- [ ] All Core Data entities have basic tests
+- [ ] 5+ critical workflows validated
+- [ ] AI reviewer operational (≥90% PR activation)
+- [ ] ≥75% of AI suggestions found useful
+- [ ] Testing standards documented
+- [ ] CI/CD running tests on every commit
+- [ ] Zero flaky tests, < 30s test suite
 
 ### **M7: Analytics & Insights**
 - [ ] Usage analytics tracking

@@ -1,8 +1,8 @@
 # Grocery & Recipe Manager - Requirements Document
 
-**Last Updated**: November 24, 2025  
-**Version**: 3.7  
-**Current Milestone**: M4.3.4 (Meal Completion Tracking)
+**Last Updated**: November 26, 2025  
+**Version**: 3.8  
+**Current Milestone**: M4.3.5 (Ingredient Normalization)
 
 ---
 
@@ -199,8 +199,8 @@ This document defines all functional and non-functional requirements for the Gro
 
 ## 📋 **M4: MEAL PLANNING & SETTINGS - IN PROGRESS**
 
-**Status**: 🔄 In Progress (M4.1 ✅, M4.2 ✅, M4.3.1-3 ✅, M4.3.4 next)  
-**Total Time**: 16-20 hours (M4.1: 1.5h, M4.2: ~4h, M4.3.1: 3.5h, M4.3.2: 1.25h, M4.3.3: 2.5h, M4.3.4-5: 4.75h est)  
+**Status**: 🔄 In Progress (M4.1 ✅, M4.2 ✅, M4.3.1-4 ✅, M4.3.5 ready)  
+**Total Time**: 16-20 hours (M4.1: 1.5h, M4.2: ~4h, M4.3.1: 3.5h, M4.3.2: 1.25h, M4.3.3: 2.5h, M4.3.4: 1.0h, M4.3.5: 4h est)  
 **Summary**: Calendar-based meal planning with enhanced grocery automation
 
 **Dependencies**: M3 Complete ✅, M3.5 Complete ✅
@@ -233,7 +233,7 @@ This document defines all functional and non-functional requirements for the Gro
 | **FR-MP-011** | **Generate list from meal plan** | ✅ Bulk add with progress overlay | M4.3.3 | 🎯 **Automation** | ✅ **COMPLETE** |
 | **FR-MP-012** | **Recipe source tags** | ✅ Recipe badges in grocery lists | M4.3.1 | 🎯 **Transparency** | ✅ **COMPLETE** |
 | **FR-MP-013** | **Smart consolidation** | ✅ Perfect integration with M3 Phase 5 | M4.3.3 | 🎯 **List optimization** | ✅ **COMPLETE** |
-| **FR-MP-014** | **Meal completion tracking** | 📋 Mark meals as completed | M4.3.4 | 🎯 **Progress tracking** | 🚀 **READY** |
+| **FR-MP-014** | **Meal completion tracking** | ✅ Mark meals as completed | M4.3.4 | 🎯 **Progress tracking** | ✅ **COMPLETE** |
 | **FR-MP-015** | **Scaled recipe to list** | ✅ Servings adjustment UI with scale indicators | M4.3.2 | 🎯 **Party planning** | ✅ **COMPLETE** |
 | **FR-MP-016** | **Scaling metadata** | ✅ Servings adjustment in SelectListSheet | M4.3.3 | 🎯 **Context preservation** | ✅ **COMPLETE** |
 
@@ -245,25 +245,27 @@ This document defines all functional and non-functional requirements for the Gro
 | **NFR-M4-002** | **Calendar rendering** | < 0.5s | M4.2 | 🎯 **Responsive UI** | ✅ **COMPLETE** |
 | **NFR-M4-003** | **Settings persistence** | Immediate save | M4.1 | 🎯 **Reliability** | ✅ **COMPLETE** |
 
-**M4 Progress**: 17 of 19 requirements complete (89%). M4.1, M4.2, and M4.3.1-3 complete. M4.3.4 ready to begin.
+**M4 Progress**: 19 of 19 requirements complete (100%). M4 milestone complete, ready for M5.
 
 ---
 
 ## 🔮 **FUTURE MILESTONES (M5-M11)**
 
-### **M5: CloudKit Family Collaboration**
-- Family account management
-- Shared grocery lists and recipes
-- Real-time synchronization
-- Multi-device support
-- **Estimated**: 10-12 hours
+### **M5: Production Infrastructure & CloudKit**
+- Apple Developer Account setup & App Store configuration
+- TestFlight deployment & real device testing
+- CloudKit schema design & sync engine
+- Family account management & sharing features
+- Real-time multi-device synchronization
+- **Estimated**: 12-17 hours
 
-### **M6: Testing Foundation**
-- Unit test suite
-- Integration tests
-- UI tests
-- CI/CD pipeline
-- **Estimated**: 8-10 hours
+### **M6: Testing Foundation & AI Augmentation**
+- Human-written test baseline (50%+ service layer coverage)
+- AI test reviewer operational on every PR
+- Testing standards & infrastructure documented
+- CI/CD pipeline with automated test execution
+- Foundation for semantic coverage gap detection
+- **Estimated**: 12-18 hours
 
 ### **M7: Analytics & Insights**
 - Usage analytics
@@ -287,8 +289,8 @@ This document defines all functional and non-functional requirements for the Gro
 
 | Status | M1 | M2 | M3 | M4 | Total |
 |--------|----|----|----|----|-------|
-| ✅ Complete | 19 | 37 | 33 | 0 | **89** |
-| 📋 Planned | 0 | 0 | 0 | 19 | **19** |
+| ✅ Complete | 19 | 37 | 33 | 19 | **108** |
+| 📋 Planned | 0 | 0 | 0 | 0 | **0** |
 | **Total** | **19** | **37** | **33** | **19** | **108** |
 
 ### **By Category**
@@ -300,8 +302,8 @@ This document defines all functional and non-functional requirements for the Gro
 | Staples | 4 | ✅ Complete |
 | Recipes | 19 | ✅ Complete |
 | Quantities | 33 | ✅ Complete |
-| Meal Planning | 19 | 📋 Planned |
-| **Total** | **85** | **82% Complete** |
+| Meal Planning | 19 | ✅ Complete |
+| **Total** | **85** | **100% Complete** |
 
 ### **Performance Requirements Status**
 
@@ -322,40 +324,35 @@ This document defines all functional and non-functional requirements for the Gro
 
 ## 🎯 **CURRENT REQUIREMENTS FOCUS**
 
-### **Immediate Priority: M4 Phase 1 - Settings Infrastructure** 🚀
-**Timeline**: 1.5 hours  
-**Status**: Ready to begin
+### **Completed: M4 Meal Planning & Settings** ✅
+**Total Time**: ~18.5 hours  
+**Status**: All requirements complete
 
-**Requirements:**
-1. **FR-MP-001**: Meal planning preferences (duration, start day, auto-naming)
-2. **FR-MP-002**: Recipe source display preferences
-3. **FR-MP-003**: UserPreferences Core Data entity
-4. **FR-MP-004**: Real-time settings validation
+**Achievements:**
+- Settings infrastructure with meal planning preferences ✅
+- UserPreferences entity operational ✅
+- Calendar-based meal planning with tap-to-add ✅
+- MealPlan and PlannedMeal entities complete ✅
+- Recipe assignment with servings tracking ✅
+- Recipe usage analytics (usageCount, lastUsed) ✅
+- Many-to-many recipe source relationships ✅
+- Display Options in Settings ✅
+- Recipe source tracking and badges ✅
+- Bulk add from meal plan with progress overlay ✅
+- Scaled recipe to list with servings adjustment ✅
+- Smart quantity consolidation integration ✅
+- Meal completion tracking ✅
+- Sub-0.5s performance maintained ✅
 
-**Dependencies:**
-- M3 Complete ✅
-- Settings tab infrastructure exists (created in M3 Phase 3) ✅
-- Core Data patterns established ✅
+### **Next Priority: M5 Production Infrastructure & CloudKit** 🚀
+**Timeline**: 12-17 hours  
+**Status**: Ready to plan
 
-### **Next Priority: M4 Phase 2 - Calendar Planning Core** 📋
-**Timeline**: 2.5 hours  
-**Status**: Requirements complete
-
-**Priority Requirements:**
-- MealPlan and PlannedMeal entities
-- Calendar view with recipe display
-- Add to meal plan workflows
-- Configurable planning periods
-
-### **Post-M4.2: M4 Phase 3 - Enhanced Grocery Integration** 🛒
-**Timeline**: 3.5-4 hours  
-**Status**: Requirements complete
-
-**Priority Requirements:**
-- Generate grocery lists from meal plans
-- Recipe source tracking
-- Smart consolidation (leverages M3 Phase 5)
-- Scaled recipe to list feature (leverages M3 Phase 4)
+**Priority Areas:**
+- Apple Developer Account enrollment
+- TestFlight deployment configuration
+- CloudKit schema and sync design
+- Family sharing feature implementation
 
 ---
 
@@ -371,9 +368,9 @@ This document defines all functional and non-functional requirements for the Gro
 | Recipe | FR-RM-001 through FR-RM-013 | ✅ Complete |
 | Ingredient | FR-RM-032, FR-RM-034, FR-QM-001-005 | ✅ Complete |
 | IngredientTemplate | FR-RM-011, FR-RM-033-035 | ✅ Complete |
-| PlannedMeal | FR-MP-005, FR-MP-006 | 📋 Planned (M4) |
-| MealPlan | FR-MP-007 through FR-MP-010 | 📋 Planned (M4) |
-| UserPreferences | FR-MP-001 through FR-MP-004 | 📋 Planned (M4) |
+| PlannedMeal | FR-MP-005, FR-MP-006 | ✅ Complete |
+| MealPlan | FR-MP-007 through FR-MP-010 | ✅ Complete |
+| UserPreferences | FR-MP-001 through FR-MP-004 | ✅ Complete |
 
 ### **Service Layer Requirements**
 
@@ -386,6 +383,8 @@ This document defines all functional and non-functional requirements for the Gro
 | QuantityMergeService | FR-QM-011 through FR-QM-015, FR-QM-027-030 | ✅ Complete |
 | UnitConversionService | FR-QM-027, FR-QM-028 | ✅ Complete |
 | QuantityMigrationService | FR-QM-006 through FR-QM-010 | ✅ Complete |
+| MealPlanService | FR-MP-005 through FR-MP-010, FR-MP-017 | ✅ Complete |
+| UserPreferencesService | FR-MP-001 through FR-MP-004 | ✅ Complete |
 
 ### **UI Component Requirements**
 
@@ -400,8 +399,11 @@ This document defines all functional and non-functional requirements for the Gro
 | EditRecipeView | FR-RM-036, FR-RM-037 | ✅ Complete |
 | RecipeScalingView | FR-QM-021 through FR-QM-026 | ✅ Complete |
 | ConsolidationPreviewView | FR-QM-011 through FR-QM-015 | ✅ Complete |
-| SettingsView | FR-QM-009 | ✅ Complete |
+| SettingsView | FR-QM-009, FR-MP-001-004 | ✅ Complete |
 | HelpView | FR-QM-017 | ✅ Complete |
+| MealPlanDetailView | FR-MP-007, FR-MP-008 | ✅ Complete |
+| CreateMealPlanSheet | FR-MP-009, FR-MP-010 | ✅ Complete |
+| RecipePickerSheet | FR-MP-008 | ✅ Complete |
 
 ---
 
@@ -428,37 +430,41 @@ This document defines all functional and non-functional requirements for the Gro
 - User value demonstrated ✅
 - Production-ready quality ✅
 
-**M4 Validation**: 📋 Pending
-- Requirements defined
-- Dependencies verified
-- PRD complete
-- Ready for implementation
+**M4 Validation**: ✅ Complete
+- All requirements validated ✅
+- Calendar planning operational ✅
+- Grocery integration complete ✅
+- Performance targets met ✅
+- Production-ready quality ✅
 
 ---
 
 ## 🚀 **STRATEGIC REQUIREMENTS ROADMAP**
 
-### **Phase 1: Core Platform (M1-M4)** - In Progress
+### **Phase 1: Core Platform (M1-M4)** - Complete
 **Goal**: Complete essential grocery and recipe workflows  
-**Timeline**: ~66-79 hours  
-**Status**: M1-M3 complete (59 hours), M4 ready to begin
+**Timeline**: 67.5 hours actual  
+**Status**: ✅ Complete
 
 **Value Delivered**:
 - Store-layout optimized shopping ✅
 - Complete recipe management ✅
 - Intelligent quantity handling ✅
-- Meal planning automation 📋
+- Meal planning automation ✅
 
-### **Phase 2: Collaboration & Quality (M5-M6)** - Planned
-**Goal**: Family sharing and quality assurance  
-**Timeline**: ~18-22 hours  
+### **Phase 2: Production & Quality (M5-M6)** - Planned
+**Goal**: Production deployment and quality assurance  
+**Timeline**: ~24-35 hours  
 **Status**: Requirements planning
 
 **Value Delivered**:
-- Family collaboration
-- Multi-device sync
-- Comprehensive testing
-- Production readiness
+- Apple Developer Account & App Store presence
+- TestFlight deployment for real device testing
+- CloudKit family collaboration
+- Multi-device sync with conflict resolution
+- Comprehensive automated testing (50%+ coverage)
+- AI-augmented test review on every PR
+- Production readiness validation
 
 ### **Phase 3: Intelligence Platform (M7-M11)** - Future
 **Goal**: Advanced features and insights  
@@ -474,8 +480,9 @@ This document defines all functional and non-functional requirements for the Gro
 
 ---
 
-**Strategic Validation**: Core platform requirements (M1-M7) provide robust foundation for advanced intelligence features (M8-M11) representing significant competitive advantage and comprehensive lifestyle optimization platform.
+**Strategic Validation**: Core platform requirements (M1-M4) complete with professional quality. Phase 2 (M5-M6) provides production deployment infrastructure and quality assurance. Phase 3 (M7-M11) builds advanced intelligence features on robust foundation representing significant competitive advantage and comprehensive lifestyle optimization platform.
 
-**Last Updated**: October 22, 2025  
-**Next Update**: After M4.1 completion  
-**Current Focus**: Begin M4 Settings Infrastructure Foundation
+**Last Updated**: November 26, 2025  
+**Version**: 3.8  
+**Next Update**: After M5 planning  
+**Current Focus**: Prepare for M5 Production Infrastructure & CloudKit

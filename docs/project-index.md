@@ -1,6 +1,6 @@
 # Grocery & Recipe Manager - Project Index
 
-**Last Updated**: November 25, 2025  
+**Last Updated**: November 26, 2025  
 **Purpose**: Central navigation hub for all project documentation  
 **Current Milestone**: M4.3 (Enhanced Grocery Integration)  
 **Next Priority**: M4.3.5 Phase 4 (Variation Handling)
@@ -309,7 +309,7 @@
 - **Active Milestone**: M4 (Meal Planning & Enhanced Grocery Integration)
 - **Completed**: M4.1 (Settings), M4.2 (Calendar Planning), M4.3.1 (Recipe Source Tracking), M4.3.2 (Scaled Recipe to List), M4.3.3 (Bulk Add), M4.3.4 (Meal Completion), M4.3.5 Phases 1-3 (Ingredient Normalization) ✅
 - **Current Phase**: M4.3.5 Phase 4 (Variation Handling) 🚀 **READY** ← **NEXT**
-- **Next After**: M4 wrap-up or M5 (CloudKit Sync)
+- **Next After**: M4 wrap-up or M5 (Production Infrastructure & CloudKit)
 - **Progress**: M1-M4.3.5 Phases 1-3 complete (85.75 hours), M4.3.5 Phase 4 remaining (~1h estimated)
 - **Status**: On track with excellent planning accuracy (88%)
 
@@ -436,7 +436,7 @@
 
 ---
 
-**Last Updated**: November 25, 2025  
+**Last Updated**: November 26, 2025  
 **Next Update**: After M4.3.5 Phase 4 completion or M4 wrap-up  
 **Current Status**: M4.3.5 Phases 1-3 complete, Phase 4 ready to begin  
 **Documentation Version**: Updated with M4.3.5 Phases 2-3 completion
