@@ -325,29 +325,14 @@ struct IngredientsView: View {
     
     // MARK: - Empty State View
     private var emptyStateView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "leaf.circle")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
-            
-            Text("No Ingredients Found")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .foregroundColor(.secondary)
-            
-            Text("Add ingredients to get started with your grocery management.")
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-            
-            Button("Add First Ingredient") {
-                showingAddForm = true
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground))
+        StandardEmptyStateView(
+            iconName: "leaf.circle",
+            title: "No Ingredients Found",
+            subtitle: "Start adding ingredients to your collection!",
+            buttonIcon: "plus.circle.fill",
+            buttonText: "Add First Ingredient",
+            buttonAction: { showingAddForm = true }
+        )
     }
     
     // MARK: - Computed Properties

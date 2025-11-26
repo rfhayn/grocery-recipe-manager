@@ -60,41 +60,15 @@ struct WeeklyListsView: View {
     }
     
     private var emptyStateView: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "list.clipboard")
-                .font(.system(size: 60))
-                .foregroundColor(.blue)
-            
-            VStack(spacing: 12) {
-                Text("No Grocery Lists")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                Text("Generate your first list from staples to get started!")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-            }
-            
-            Button(action: generateListFromStaples) {
-                HStack {
-                    Image(systemName: "cart.badge.plus")
-                    Text("Generate from Staples")
-                }
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(Color.blue)
-                .cornerRadius(12)
-            }
-            .disabled(isGeneratingList)
-            
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground))
+        StandardEmptyStateView(
+            iconName: "list.clipboard",
+            title: "No Grocery Lists",
+            subtitle: "Generate your first list to get started!",
+            buttonIcon: "cart.badge.plus",
+            buttonText: "Generate from Staples",
+            isButtonDisabled: isGeneratingList,
+            buttonAction: generateListFromStaples
+        )
     }
     
     private var listsView: some View {

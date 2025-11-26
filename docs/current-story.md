@@ -3,7 +3,7 @@
 **Last Updated**: November 25, 2025  
 **Current Milestone**: M4 - Meal Planning & Enhanced Grocery Integration  
 **Current Phase**: M4.3.5 (Ingredient Normalization)  
-**Status**: M4.1-M4.3.4 Complete ✅, M4.3.5 Phase 1 Complete ✅, Phase 2 Ready 🚀
+**Status**: M4.1-M4.3.4 Complete ✅, M4.3.5 Phases 1-3 Complete ✅, Phase 4 Ready 🚀
 
 ---
 
@@ -33,12 +33,12 @@
   - M4.3.2: Scaled Recipe to List Integration ✅ **COMPLETE** (1.25 hours)
   - M4.3.3: Bulk Add from Meal Plan ✅ **COMPLETE** (2.5 hours)
   - M4.3.4: Meal Completion Tracking ✅ **COMPLETE** (1.0 hour)
-  - M4.3.5: Ingredient Normalization 🔄 **ACTIVE** (2.5h Phase 1 complete, ~3.5h remaining)
+  - M4.3.5: Ingredient Normalization 🔄 **ACTIVE** (4.5h Phases 1-3 complete, ~1h remaining)
     - Phase 1: Case Normalization ✅ **COMPLETE** (2.5h)
-    - Phase 2: Singular/Plural 🚀 **READY** (1h)
-    - Phase 3: Abbreviations ⏳ **PLANNED** (1.5h)
-    - Phase 4: Variations ⏳ **PLANNED** (1h)
-- **Total**: 14.5-17.5 hours (M4.1-M4.3.4 + M4.3.5 Phase 1 complete ~16.25h, ~3.5h remaining)
+    - Phase 2: Singular/Plural ✅ **COMPLETE** (1h + chocolate chips fix)
+    - Phase 3: Abbreviations ✅ **COMPLETE** (0.5h + UI consistency bonus)
+    - Phase 4: Variations 🚀 **READY** (1h)
+- **Total**: 14.5-17.5 hours (M4.1-M4.3.4 + M4.3.5 Phases 1-3 complete ~18.25h, ~1h remaining)
 
 ### **Strategic Integration:**
 - **M3 → M4**: Structured quantities enable smart meal plan grocery generation ✅
@@ -51,12 +51,14 @@
 - **M4.3.3 → M4.3.4**: Bulk add complete, ready for meal tracking workflow ✅
 - **M4.3.4 → M4.3.5**: Meal completion tracking ready, can track normalization impact ✅
 - **M4.3.5 Phase 1 → Phase 2**: Case normalization complete, ready for plural handling ✅
+- **M4.3.5 Phase 2 → Phase 3**: Plural consolidation complete (with preserve-plural list), ready for abbreviations ✅
+- **M4.3.5 Phase 3 → Phase 4**: Abbreviation expansion complete, ready for variation handling ✅
 - **M4 → TestFlight**: Core workflow complete, ready for device testing
 - **M4 → M5**: Meal planning data architecture ready for CloudKit family sharing
 
 ---
 
-**Current Status**: M1, M2, M3, M4.1, M4.2, M4.3.1, M4.3.2, M4.3.3, M4.3.4, and M4.3.5 Phase 1 successfully completed (~83.75 hours total). Case normalization operational with all templates in lowercase. Ready for Phase 2 (Singular/Plural handling).
+**Current Status**: M1, M2, M3, M4.1, M4.2, M4.3.1, M4.3.2, M4.3.3, M4.3.4, and M4.3.5 Phases 1-3 successfully completed (~85.75 hours total). Ingredient normalization system operational with case/plural/abbreviation consolidation. 18 templates with smart "preserve-plural" list for items like "chocolate chips". UI consistency improved with StandardEmptyStateView component. Ready for Phase 4 (Variation handling).
 
 ---
 
@@ -272,6 +274,88 @@ Behind-the-scenes ingredient name normalization to eliminate duplicates caused b
 **Key Learning:**
 Systematic debugging approach uncovered three interconnected bugs creating confusing symptoms. User persistence in investigating the mysterious "s" template led to comprehensive fixes that improved core data quality infrastructure beyond the original Phase 1 scope.
 
+### **Phases 2-3 Implementation Details**
+
+**Completed**: November 25, 2025  
+**Actual Time**: 2 hours (Phase 2: 1h, Phase 3: 0.5h, UI Polish: 0.5h)  
+**Estimated**: 2.5 hours  
+**Variance**: -20% (under estimate!)
+
+**Phase 2: Singular/Plural Normalization** ✅
+
+**What Was Built:**
+- `normalizePlural()` function with comprehensive pattern matching
+- Irregular plurals mapping (children→child, feet→foot, teeth→tooth, geese→goose, mice→mouse, people→person, men→man, women→woman, oxen→ox)
+- Regular plural patterns:
+  - Pattern 1: -ies → -y (berries→berry, cherries→cherry)
+  - Pattern 2: -oes → -o (tomatoes→tomato, potatoes→potato)
+  - Pattern 3: -ses → -s (glasses→glass)
+  - Pattern 4: -ves → -f (knives→knife, loaves→loaf)
+  - Pattern 5: -s removal (eggs→egg, apples→apple)
+- Edge case protections: -ss words (grass, glass), -us words (asparagus, hummus)
+- **"Preserve-Plural" List**: Items that should always stay plural
+  - chocolate chips, sprinkles, croutons, noodles, tortilla chips, potato chips, corn chips
+  - User insight: "You don't buy just one chocolate chip, you buy a bag of chocolate chips"
+
+**Results:**
+- Template count: 18 (down from 14 with new recipes added)
+- "egg" properly consolidated (no "eggs") ✅
+- "chocolate chips" stays plural (preserve-plural list working) ✅
+- All other templates intact ✅
+
+**Phase 3: Abbreviation Expansion** ✅
+
+**What Was Built:**
+- `expandAbbreviations()` function with word-boundary matching
+- Comprehensive abbreviation dictionary:
+  - Volume: tbsp→tablespoon, tbs→tablespoon, tsp→teaspoon, c→cup, pt→pint, qt→quart, gal→gallon, fl oz→fluid ounce, ml→milliliter, l→liter
+  - Weight: oz→ounce, lb→pound, lbs→pound, g→gram, kg→kilogram
+  - Other: pkg→package, env→envelope
+- Split/join approach to preserve non-abbreviation words
+- Integrated into normalize() pipeline
+
+**Test Recipes Added:**
+- Recipe 7: Guacamole (tests abbreviations - 3 avocados, 2 tbsp lime juice, 1 tsp salt, 1/2 tsp pepper, 1 c diced tomatoes, 1/4 c diced onions)
+- Recipe 8: Chocolate Milk (tests abbreviations - 1 c milk, 2 tbsp chocolate syrup)
+
+**Results:**
+- No abbreviation templates visible ✅
+- Phase 3 working as "safety net" (parser already removes most abbreviations) ✅
+- Infrastructure ready for edge cases if abbreviations slip through ✅
+
+**UI Consistency Bonus** ✅
+
+**What Was Built:**
+- `StandardEmptyStateView.swift` - Reusable empty state component
+- Applied to all 4 main tabs: Grocery Lists, Ingredients, Recipes, Meal Plans
+- Standardized pattern:
+  - Icon: Size 60, Blue color
+  - Spacing: 24pt between major elements, 12pt within sections
+  - Title: .title2, .semibold
+  - Subtitle: .body, .secondary, ~40-50 characters
+  - Button: Icon + Text, .headline, white/blue, 12pt corners
+  - Background: .systemGroupedBackground
+
+**Results:**
+- Perfect visual consistency across all empty states ✅
+- Reusable component prevents future inconsistencies ✅
+- Professional iOS design standards maintained ✅
+
+**Files Modified:**
+1. IngredientTemplateService.swift - Added normalizePlural(), expandAbbreviations(), preserve-plural list
+2. RecipeListView.swift - Added test recipes 7-8, updated button text
+3. WeeklyListsView.swift - Updated to use StandardEmptyStateView
+4. IngredientsView.swift - Updated to use StandardEmptyStateView
+5. RecipeListView.swift - Updated to use StandardEmptyStateView (with @ViewBuilder for search fallback)
+6. MealPlanListView.swift - Updated to use StandardEmptyStateView
+7. StandardEmptyStateView.swift - New reusable component created
+
+**Key Learning:**
+- User-driven insights ("chocolate chips") improve real-world usability
+- Safety-net patterns (Phase 3 abbreviations) provide future-proofing without complexity
+- Reusable UI components (StandardEmptyStateView) enforce consistency at scale
+- Small UX polish work compounds into professional app feel
+
 ---
 
 ## Quality Metrics
@@ -306,6 +390,6 @@ Systematic debugging approach uncovered three interconnected bugs creating confu
 
 ---
 
-**Last Session**: November 25, 2025 - M4.3.5 Phase 1 complete with four bug fixes  
-**Next Session**: M4.3.5 Phase 2 - Singular/Plural Normalization  
+**Last Session**: November 25, 2025 - M4.3.5 Phases 2-3 complete with preserve-plural list and UI consistency bonus  
+**Next Session**: M4.3.5 Phase 4 - Variation Handling ("diced tomato" → "tomato", "fresh basil" → "basil")  
 **Version**: November 25, 2025

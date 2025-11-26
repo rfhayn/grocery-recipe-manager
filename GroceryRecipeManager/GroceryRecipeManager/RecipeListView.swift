@@ -158,23 +158,30 @@ struct RecipeListView: View {
     }
     
     // ENHANCED: Improved empty state with search awareness
+    @ViewBuilder
     private var enhancedEmptyStateView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: searchText.isEmpty ? "book.closed" : "magnifyingglass")
-                .font(.system(size: 60))
-                .foregroundColor(.secondary)
-            
-            VStack(spacing: 8) {
-                Text(searchText.isEmpty ? "No Recipes Yet" : "No Matches Found")
-                    .font(.title2)
-                    .fontWeight(.semibold)
+        if searchText.isEmpty {
+            // Standard empty state when no search
+            StandardEmptyStateView(
+                iconName: "book.closed",
+                title: "No Recipes Yet",
+                subtitle: "Start building your recipe collection!",
+                buttonIcon: "plus.circle.fill",
+                buttonText: "Generate 8 Test Recipes",
+                buttonAction: createSampleRecipe
+            )
+        } else {
+            // Search-specific empty state
+            VStack(spacing: 20) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 60))
+                    .foregroundColor(.blue)
                 
-                if searchText.isEmpty {
-                    Text("Start building your recipe collection")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                } else {
+                VStack(spacing: 8) {
+                    Text("No Matches Found")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
                     VStack(spacing: 4) {
                         Text("No recipes found for \"\(searchText)\"")
                             .font(.body)
@@ -187,30 +194,14 @@ struct RecipeListView: View {
                             .multilineTextAlignment(.center)
                     }
                 }
-            }
-            
-            if searchText.isEmpty {
-                Button(action: {
-                    createSampleRecipe()
-                }) {
-                    HStack {
-                        Image(systemName: "plus.circle.fill")
-                        Text("Generate 6 Test Recipes")
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(12)
-                }
-            } else {
+                
                 Button("Clear Search") {
                     searchText = ""
                 }
                 .buttonStyle(.bordered)
             }
+            .padding()
         }
-        .padding()
     }
     
     private var recipeListContent: some View {
@@ -444,8 +435,49 @@ struct RecipeListView: View {
                     "1/4 tsp salt"
                 ]
             )
+            
+            // M4.3.5 PHASE 3: Recipe 7 - Tests abbreviation expansion
+            createRecipe(
+                title: "Guacamole",
+                instructions: """
+                1. Mash avocados in bowl
+                2. Mix in lime juice, salt, pepper
+                3. Add diced tomatoes and onions
+                4. Stir in cilantro
+                5. Serve with chips
+                """,
+                servings: 4,
+                prepTime: 10,
+                cookTime: 0,
+                ingredients: [
+                    "3 avocados",
+                    "2 tbsp lime juice",
+                    "1 tsp salt",
+                    "1/2 tsp pepper",
+                    "1 c diced tomatoes",
+                    "1/4 c diced onions"
+                ]
+            )
+            
+            // M4.3.5 PHASE 3: Recipe 8 - Tests more abbreviations
+            createRecipe(
+                title: "Chocolate Milk",
+                instructions: """
+                1. Pour milk into glass
+                2. Add chocolate syrup
+                3. Stir well
+                4. Add ice if desired
+                """,
+                servings: 1,
+                prepTime: 2,
+                cookTime: 0,
+                ingredients: [
+                    "1 c milk",
+                    "2 tbsp chocolate syrup"
+                ]
+            )
         
-        print("✅ Created 6 test recipes with overlapping ingredients")
+        print("✅ Created 8 test recipes with overlapping ingredients and abbreviations (M4.3.5 Phase 3)")
     }
     
     // Helper function to create a recipe with ingredients

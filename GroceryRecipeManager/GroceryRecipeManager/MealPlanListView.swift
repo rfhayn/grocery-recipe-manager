@@ -72,42 +72,16 @@ struct MealPlansListView: View {
     
     // M4.2.4: Empty state when no meal plans exist
     // Encourages user to create first plan
-    // Pattern: Matches WeeklyListsView empty state
+    // Pattern: Uses StandardEmptyStateView for consistency
     private var emptyStateView: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "calendar.badge.plus")
-                .font(.system(size: 60))
-                .foregroundColor(.blue)
-            
-            VStack(spacing: 12) {
-                Text("No Meal Plans Yet")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                Text("Create your first meal plan to start organizing your weekly meals!")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-            }
-            
-            Button(action: { showingCreateSheet = true }) {
-                HStack {
-                    Image(systemName: "calendar.badge.plus")
-                    Text("Create Meal Plan")
-                }
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(Color.blue)
-                .cornerRadius(12)
-            }
-            
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground))
+        StandardEmptyStateView(
+            iconName: "calendar.badge.plus",
+            title: "No Meal Plans Yet",
+            subtitle: "Start organizing your weekly meals!",
+            buttonIcon: "calendar.badge.plus",
+            buttonText: "Create Meal Plan",
+            buttonAction: { showingCreateSheet = true }
+        )
     }
     
     // MARK: - Plans List
