@@ -167,7 +167,7 @@ struct RecipeListView: View {
                 title: "No Recipes Yet",
                 subtitle: "Start building your recipe collection!",
                 buttonIcon: "plus.circle.fill",
-                buttonText: "Generate 8 Test Recipes",
+                buttonText: "Generate 11 Test Recipes",
                 buttonAction: createSampleRecipe
             )
         } else {
@@ -476,8 +476,87 @@ struct RecipeListView: View {
                     "2 tbsp chocolate syrup"
                 ]
             )
+            
+            // M4.3.5 PHASE 4: Recipe 9 - Tests preparation & freshness descriptors
+            createRecipe(
+                title: "Pasta Primavera",
+                instructions: """
+                1. Cook pasta according to package directions
+                2. Sauté garlic in olive oil
+                3. Add vegetables and cook until tender
+                4. Toss with pasta and cheese
+                5. Season with salt and pepper
+                """,
+                servings: 4,
+                prepTime: 15,
+                cookTime: 20,
+                ingredients: [
+                    "8 oz pasta",
+                    "2 cloves minced garlic",
+                    "1 cup sliced mushrooms",
+                    "1/4 cup fresh basil",
+                    "1/2 cup grated parmesan cheese",
+                    "2 tbsp extra-virgin olive oil",
+                    "1 cup chopped tomatoes",
+                    "1/2 tsp salt",
+                    "1/4 tsp pepper"
+                ]
+            )
+            
+            // M4.3.5 PHASE 4: Recipe 10 - Tests type/variety & size descriptors
+            createRecipe(
+                title: "Chicken Pot Pie",
+                instructions: """
+                1. Preheat oven to 375°F
+                2. Cook chicken and vegetables
+                3. Make cream sauce with butter and flour
+                4. Combine filling in pie dish
+                5. Top with pie crust
+                6. Bake 35-40 minutes until golden
+                """,
+                servings: 6,
+                prepTime: 25,
+                cookTime: 40,
+                ingredients: [
+                    "2 cups diced chicken",
+                    "1 cup frozen peas",
+                    "1 cup frozen carrots",
+                    "3 large eggs",
+                    "1/4 cup unsalted butter",
+                    "1/3 cup all-purpose flour",
+                    "2 cups chicken broth",
+                    "1 cup heavy cream",
+                    "1 tsp salt",
+                    "1/2 tsp pepper"
+                ]
+            )
+            
+            // M4.3.5 PHASE 4: Recipe 11 - Tests quality & additional descriptors
+            createRecipe(
+                title: "Garden Salad",
+                instructions: """
+                1. Wash and dry lettuce
+                2. Chop vegetables
+                3. Combine in large bowl
+                4. Toss with dressing
+                5. Top with cheese and croutons
+                """,
+                servings: 4,
+                prepTime: 15,
+                cookTime: 0,
+                ingredients: [
+                    "4 cups fresh lettuce",
+                    "1 cup baby carrots",
+                    "1/2 cup sliced cucumber",
+                    "1/4 cup diced red onion",
+                    "2 organic tomatoes",
+                    "1/4 cup shredded cheddar cheese",
+                    "1/4 cup croutons",
+                    "2 tbsp salad dressing"
+                ]
+            )
         
-        print("✅ Created 8 test recipes with overlapping ingredients and abbreviations (M4.3.5 Phase 3)")
+        print("✅ Created 11 test recipes with comprehensive variation coverage (M4.3.5 Phase 4)")
     }
     
     // Helper function to create a recipe with ingredients

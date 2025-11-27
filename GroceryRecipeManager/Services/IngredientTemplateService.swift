@@ -23,23 +23,55 @@ class IngredientTemplateService: ObservableObject {
     // Phase 2: Singular/Plural Normalization
     // Converts plural ingredient names to singular form
     // Handles regular plurals (eggs → egg) and irregular plurals (children → child)
-    // EXCEPTION: Preserves ingredients that are inherently plural (chocolate chips, sprinkles)
+    // EXCEPTION: Preserves ingredients that are inherently plural (chocolate chips, sprinkles, peas, beans)
     private func normalizePlural(_ name: String) -> String {
         let lowercased = name.lowercased()
         
         // Preserve-plural list: ingredients that should always stay plural
         // These are items typically bought/used in plural form
         let alwaysPlural = [
+            "beans",
+            "chickpeas",
             "chocolate chips",
-            "sprinkles",
+            "corn chips",
             "croutons",
+            "greens",
+            "lentils",
             "noodles",
-            "tortilla chips",
+            "oats",
+            "peas",
             "potato chips",
-            "corn chips"
+            "sprinkles",
+            "tortilla chips"
         ]
         
-        // Check if this ingredient should stay plural
+        // M4.3.5 PHASE 4 FIX: Strip qualifiers BEFORE checking preserve-plural list
+        // This ensures "frozen peas" matches "peas" in the list
+        // We'll apply a simplified version of removeVariations just for this check
+        let qualifierPrefixes = [
+            "diced ", "chopped ", "sliced ", "minced ", "crushed ", "grated ",
+            "shredded ", "ground ", "whole ", "halved ", "quartered ",
+            "fresh ", "frozen ", "canned ", "dried ", "raw ",
+            "organic ", "free-range ", "grass-fed ", "wild-caught ",
+            "all-purpose ", "self-rising ", "unsalted ", "salted ",
+            "extra-virgin ", "light ", "dark ", "heavy ", "lite ",
+            "large ", "medium ", "small ", "baby ", "jumbo "
+        ]
+        
+        var checkName = lowercased
+        // Remove qualifiers for preserve-plural check
+        for prefix in qualifierPrefixes {
+            if checkName.hasPrefix(prefix) {
+                checkName = String(checkName.dropFirst(prefix.count)).trimmingCharacters(in: .whitespaces)
+            }
+        }
+        
+        // Check if this ingredient (after stripping qualifiers) should stay plural
+        if alwaysPlural.contains(checkName) {
+            return checkName  // Return the stripped version in plural form
+        }
+        
+        // If the original (with qualifiers) is in the list, use that
         if alwaysPlural.contains(lowercased) {
             return lowercased
         }
@@ -146,12 +178,67 @@ class IngredientTemplateService: ObservableObject {
         return replacedWords.joined(separator: " ")
     }
     
+    // Phase 4: Variation Handling
+    // Removes qualifiers and descriptors to consolidate ingredient variations
+    // Handles: "diced tomato" → "tomato", "fresh basil" → "basil", "all-purpose flour" → "flour"
+    // ENHANCED: Also handles compound words without spaces like "largeegg" → "egg", "organictomato" → "tomato"
+    // This phase reduces template fragmentation by normalizing ingredient variants
+    private func removeVariations(_ name: String) -> String {
+        let lowercased = name.lowercased()
+        
+        // Common qualifiers to remove (WITHOUT trailing space for matching)
+        let qualifierWords = [
+            // Preparation descriptors
+            "diced", "chopped", "sliced", "minced", "crushed", "grated",
+            "shredded", "ground", "whole", "halved", "quartered",
+            
+            // Freshness descriptors
+            "fresh", "frozen", "canned", "dried", "raw",
+            
+            // Quality descriptors
+            "organic", "free-range", "grass-fed", "wild-caught",
+            
+            // Type/variety descriptors (common ones)
+            "all-purpose", "self-rising", "unsalted", "salted",
+            "extra-virgin", "light", "dark", "heavy", "lite",
+            
+            // Size descriptors
+            "large", "medium", "small", "baby", "jumbo"
+        ]
+        
+        var result = lowercased
+        
+        // Remove qualifiers from start of name
+        // Loop to handle multiple qualifiers (e.g., "fresh diced tomato" or "freshdicedt omato")
+        var changed = true
+        while changed {
+            changed = false
+            for qualifier in qualifierWords {
+                // Try matching with space first (e.g., "large egg")
+                if result.hasPrefix(qualifier + " ") {
+                    result = String(result.dropFirst((qualifier + " ").count))
+                    changed = true
+                    break
+                }
+                // Try matching without space (e.g., "largeegg")
+                // Only if there's more content after the qualifier
+                else if result.hasPrefix(qualifier) && result.count > qualifier.count {
+                    result = String(result.dropFirst(qualifier.count))
+                    changed = true
+                    break
+                }
+            }
+        }
+        
+        return result.trimmingCharacters(in: .whitespaces)
+    }
+    
     // Main normalization entry point
     // Applies all normalization phases to an ingredient name
     // Phase 1: Case normalization (lowercase)
     // Phase 2: Singular/plural normalization
     // Phase 3: Abbreviation expansion
-    // Phase 4: Variation handling (future)
+    // Phase 4: Variation handling (qualifiers and descriptors)
     private func normalize(name: String) -> String {
         var normalized = name.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -164,7 +251,8 @@ class IngredientTemplateService: ObservableObject {
         // Phase 3: Abbreviation expansion
         normalized = expandAbbreviations(normalized)
         
-        // Phase 4 will be added here
+        // Phase 4: Variation handling
+        normalized = removeVariations(normalized)
         
         return normalized
     }
@@ -271,7 +359,7 @@ class IngredientTemplateService: ObservableObject {
     // MARK: - M4.3.5: Data Migration
     
     // Migrates existing templates to normalized names
-    // Should be called once after Phase 1 deployment
+    // Should be called once after Phase 4 deployment
     func migrateExistingTemplates() {
         let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
         
@@ -289,9 +377,9 @@ class IngredientTemplateService: ObservableObject {
             
             if migratedCount > 0 {
                 try context.save()
-                print("M4.3.5 Phase 1: Migrated \(migratedCount) templates to normalized case")
+                print("M4.3.5: Migrated \(migratedCount) templates to normalized names")
             } else {
-                print("M4.3.5 Phase 1: No templates needed migration")
+                print("M4.3.5: No templates needed migration")
             }
         } catch {
             print("Error migrating templates: \(error)")
