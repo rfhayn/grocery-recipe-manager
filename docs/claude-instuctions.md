@@ -1,8 +1,21 @@
 # CLAUDE PROJECT INSTRUCTIONS - GROCERY & RECIPE MANAGER
 
-**Project**: iOS Grocery & Recipe Manager  
-**Version**: 3.0 - Optimized Session Startup & Naming Enforcement  
-**Last Updated**: October 23, 2025
+> **🚀 ACTIVE WORK: M5.0 - Complete App Renaming & TestFlight Deployment**
+> 
+> **Current Phase**: M5.0.1 Name Selection (update as you progress)
+> **Status**: Systematically renaming from "GroceryRecipeManager" to "Forager"
+> 
+> **Key M5.0 Documentation**:
+> - [M5.0 PRD](docs/prds/M5.0-APP-RENAMING-TESTFLIGHT-PRD.md) - Complete plan
+> - [M5.0 Next-Prompt](docs/M5.0-NEXT-PROMPT.md) - Step-by-step execution
+> - [Current Story](docs/current-story.md) - Current progress
+> 
+> **⚠️ IMPORTANT**: References to "GroceryRecipeManager" below are actively being updated.
+> Follow M5.0 documentation for current execution. Full instruction update at M5.0.4 completion.
+
+**Project**: Grocery & Recipe Manager ⚠️ *Being renamed to "Forager"*  
+**Version**: 3.0 - M5.0 Transition  
+**Last Updated**: November 28, 2025
 
 ---
 

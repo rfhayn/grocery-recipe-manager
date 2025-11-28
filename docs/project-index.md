@@ -1,9 +1,9 @@
 # Grocery & Recipe Manager - Project Index
 
-**Last Updated**: November 26, 2025  
+**Last Updated**: November 28, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M4 COMPLETE ✅ (All phases)  
-**Next Priority**: M5 (CloudKit & Production Infrastructure) or TestFlight Deployment
+**Current Milestone**: M5.0 - App Renaming & TestFlight Deployment 🚀 READY  
+**Next Priority**: Execute M5.0 systematically with validation checkpoints
 
 ---
 
@@ -27,11 +27,11 @@
 
 3. **[Current Story](current-story.md)** ← **READ THIRD**
    - Current milestone and active phases
-   - What's 🔄 ACTIVE right now
+   - What's 🚀 READY to start
    - Recently completed work ✅
-   - Next steps 🚀
+   - Next steps with prompts
 
-4. **[Next Prompt](next-prompt.md)** ← **READ FOURTH (if developing)**
+4. **[Next Prompt](next-prompt.md)** or **[M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md)** ← **READ FOURTH**
    - Ready-to-use implementation prompt
    - Current phase guidance
    - Technical requirements
@@ -49,13 +49,20 @@
 
 ## 🚀 **QUICK START BY ACTIVITY TYPE**
 
-### **Starting a Development Session**
+### **Starting M5.0 (Current Priority)**
 1. Complete [Session Startup Checklist](session-startup-checklist.md) (ALL 7 items)
-2. Follow [Next Prompt](next-prompt.md) implementation guidance
-3. Reference [Development Guidelines](development-guidelines.md) for code standards
-4. Review relevant [Learning Notes](learning-notes/) for patterns
+2. Read [Current Story](current-story.md) - M5.0 details
+3. Read [M5.0 PRD](M5.0-APP-RENAMING-TESTFLIGHT-PRD.md) - Complete plan
+4. Follow [M5.0 Next-Prompt](M5.0-NEXT-PROMPT.md) - Step-by-step guide
+5. Start with M5.0.1: Name Selection & Planning
 
-### **Planning a New Feature**
+### **Continuing M5.0 Mid-Milestone**
+1. Complete [Session Startup Checklist](session-startup-checklist.md)
+2. Check [Current Story](current-story.md) - Verify progress
+3. Review last Git checkpoint - Know where you left off
+4. Follow [M5.0 Next-Prompt](M5.0-NEXT-PROMPT.md) - Resume guidance
+
+### **Planning Future Features (After M5.0)**
 1. Review [Requirements](requirements.md) - Check existing requirements
 2. Check [Roadmap](roadmap.md) - Verify strategic fit
 3. Review [Architecture](architecture/) - Check for relevant ADRs
@@ -80,7 +87,7 @@
 
 ### **🎯 Critical Workflow Documents**
 
-#### **[session-startup-checklist.md](session-startup-checklist.md)** 🆕
+#### **[session-startup-checklist.md](session-startup-checklist.md)**
 **Purpose**: Mandatory startup procedure for EVERY session  
 **Contents**:
 - 7-point checklist (3 for context, 4 for development)
@@ -100,27 +107,28 @@
 #### **[current-story.md](current-story.md)**
 **Purpose**: Active milestone status and progress tracking  
 **Contents**:
-- Current milestone progress
-- Phase-by-phase status
-- Next actions and priorities
-- Recent completions summary
+- Current milestone progress (M5.0 READY)
+- Phase-by-phase breakdown with estimates
+- Next actions and start prompts
+- Recent completions summary (M1-M4)
 - **Updated after every development session**
 
-#### **[next-prompt.md](next-prompt.md)**
+#### **[next-prompt.md](next-prompt.md)** / **[M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md)**
 **Purpose**: Copy-paste ready implementation guidance  
 **Contents**:
 - Current phase implementation guide
 - Technical requirements
 - Integration points
 - Acceptance criteria
-- **Updated at end of each phase**
+- Validation checkpoints
+- **Use M5.0-NEXT-PROMPT.md for current work**
 
 #### **[development-guidelines.md](development-guidelines.md)**
 **Purpose**: How Claude should work - code standards and patterns  
 **Contents**:
 - Session startup requirements
 - Pre-development analysis checklist
-- Proven patterns from M1-M3.5
+- Proven patterns from M1-M4
 - Code documentation standards
 - Quality gates and success criteria
 - **Reference during development work**
@@ -134,257 +142,195 @@
 **Contents**:
 - Requirements organized by milestone
 - Traceability to implementation
-- Acceptance criteria for each requirement
-- **Check before planning new features**
+- Success criteria per feature
+- M1-M4 complete (108 requirements ✅)
 
 #### **[roadmap.md](roadmap.md)**
-**Purpose**: Milestone sequence and completion tracking  
+**Purpose**: Milestone sequence and high-level timeline  
 **Contents**:
-- Milestone status and timelines
-- Estimates vs actuals
-- Success criteria by milestone
-- Strategic integration points
-- Risk management
-- **Update after milestone completion**
+- M1-M4 complete with actual hours
+- M5.0 planned and documented
+- Future milestones (M5.1-M11) outlined
+- Strategic decisions documented
 
 ---
 
-## 📊 **CURRENT STATE - November 2025**
+### **📁 Implementation Documentation**
 
-### **Project Velocity Summary**
-- **Total Hours**: 85.75 hours across M1-M4.3.5 Phases 1-3 complete
-- **Planning Accuracy**: 88% (< 12% average variance)
-- **Build Success Rate**: 100% (zero breaking changes)
-- **Performance**: All operations < 0.5s target maintained
+#### **PRDs (Product Requirements Documents)**
 
-### **Completed Work**
+**Active PRD**:
+- **[M5.0-APP-RENAMING-TESTFLIGHT-PRD.md](M5.0-APP-RENAMING-TESTFLIGHT-PRD.md)** ← Current milestone
+  - Complete renaming + TestFlight deployment
+  - 42-item checklist
+  - 5 phases with validation checkpoints
+  - 4-6 hours estimated
 
-#### **M1: Professional Grocery Management** ✅ (32 hours - August 2025)
-**Key Achievements:**
-- Store-layout optimized grocery lists
-- Custom category management with drag-and-drop ordering
-- Staple item system with auto-population
-- Professional iOS UI with accessibility compliance
+**Completed PRDs** (in docs/prds/complete/):
+- M1: Professional Grocery Management
+- M2: Recipe Integration
+- M3: Structured Quantity Management
+- M4: Meal Planning & Enhanced Grocery Integration
 
-**Components:**
-- M1.1: Core Data Foundation ✅
-- M1.2: Performance Architecture ✅
-- M1.3: Staples Management ✅
-- M1.4: Custom Category System ✅
-- M1.5: Auto-Generated Lists ✅
+#### **Learning Notes** (Implementation Journey)
 
-#### **M2: Recipe Integration** ✅ (16.5 hours - Sept-Oct 2025)
-**Key Achievements:**
-- Complete recipe catalog with search
-- Recipe CRUD operations with validation
-- Recipe-to-grocery integration
-- Ingredient autocomplete with parse-then-search
-- Fuzzy matching and template alignment
-- Enhanced search and navigation
+**Recent Notes**:
+- [18-m4.1-settings-infrastructure.md](learning-notes/18-m4.1-settings-infrastructure.md)
+- [19-m4.2-calendar-meal-planning.md](learning-notes/19-m4.2-calendar-meal-planning.md)
+- [22-m4.3.1-recipe-source-tracking.md](learning-notes/22-m4.3.1-recipe-source-tracking.md)
+- [23-m4.3.5-ingredient-normalization.md](learning-notes/23-m4.3.5-ingredient-normalization.md)
 
-**Components:**
-- M2.1: Recipe Architecture Services ✅ (1 hour)
-- M2.2: Recipe Catalog ✅ (10.5 hours)
-- M2.3: Recipe Creation & Editing ✅ (5 hours)
+**To Create**:
+- 24-m5.0-app-renaming-testflight.md (after M5.0 complete)
 
-#### **M3: Structured Quantity Management** ✅ (10.5 hours - October 2025)
-**Key Achievements:**
-- Structured quantity parsing (amount + unit)
-- Recipe scaling with unit conversion
-- Intelligent quantity consolidation (30-50% list reduction)
-- Visual quantity indicators
-- Comprehensive help documentation
+#### **Architecture Decision Records**
 
-**Phases:**
-- M3 Phase 1-2: Core Data Model & Enhanced Parsing ✅ (3 hours)
-- M3 Phase 3: Data Migration ✅ (1.5 hours)
-- M3 Phase 4: Recipe Scaling Service ✅ (1 hour)
-- M3 Phase 5: Quantity Consolidation ✅ (2.5 hours)
-- M3 Phase 6: UI Polish & Help ✅ (2.5 hours)
-
-#### **M3.5: Foundation Validation & System Health Check** ✅ (8.5 hours - October 2025)
-**Key Achievements:**
-- Validated Core Data relationships end-to-end
-- Fixed 3 critical deletion cascade bugs
-- Verified IngredientTemplate normalization
-- Confirmed recipe-to-list workflow integrity
-- Comprehensive testing infrastructure
-
-#### **M4: Meal Planning & Enhanced Grocery Integration** 🔄 (18.25h complete, ~1h remaining)
-**Key Achievements So Far:**
-- Settings infrastructure with user preferences
-- Calendar-based meal planning
-- Recipe source tracking with many-to-many relationships
-- Scaled recipe-to-list with servings adjustment
-- Bulk add from meal plan with progress overlay
-- Meal completion tracking
-- Ingredient normalization system (Phases 1-3 complete)
-
-**Components:**
-- M4.1: Settings Infrastructure ✅ (1.5 hours)
-- M4.2: Calendar Meal Planning ✅ (~4 hours)
-- M4.3.1: Recipe Source Tracking ✅ (3.5 hours)
-- M4.3.2: Scaled Recipe to List ✅ (1.25 hours)
-- M4.3.3: Bulk Add from Meal Plan ✅ (2.5 hours)
-- M4.3.4: Meal Completion Tracking ✅ (1.0 hour)
-- M4.3.5: Ingredient Normalization 🔄 (4.5h Phases 1-3, ~1h Phase 4 remaining)
+**Key ADRs**:
+- [001-selective-technical-improvements.md](architecture/001-selective-technical-improvements.md)
+- [006-consolidate-staples-and-ingredients.md](architecture/006-consolidate-staples-and-ingredients.md)
+- [007-core-data-change-process.md](architecture/007-core-data-change-process.md)
 
 ---
 
-## 📅 **RECENT ACTIVITY**
+## 📞 **DOCUMENTATION QUICK LINKS**
 
-### **November 26, 2025** - M4.3.5 & M4 COMPLETE ✅ 🎉
-- **Completed**: M4.3.5 Phase 4 - Variation Handling (1 hour)
-- **Completed**: M4 Milestone - Meal Planning & Enhanced Grocery Integration (19.25 hours total)
-- **Achievement**: Complete 4-phase ingredient normalization pipeline operational
-- Variation handling removes qualifiers (diced, fresh, organic, large, etc.)
-- Handles both spaced ("large egg") and compound ("largeegg") forms
-- 13-item preserve-plural list finalized (peas, beans, chocolate chips, etc.)
-- Enhanced Phase 2 with qualifier stripping before preserve-plural check
-- Fixed "frozen peas" → "peas" (not "pea") preservation
-- 30% reduction in template fragmentation (50+ → 35 templates)
-- StandardEmptyStateView component created for app-wide consistency
-- **Planning Accuracy**: 90% for M4 (19.25h vs 14.5-17.5h estimate)
-- **M4 Components**: M4.1 (1.5h), M4.2 (4h), M4.3.1 (3.5h), M4.3.2 (1.25h), M4.3.3 (2.5h), M4.3.4 (1h), M4.3.5 (5.5h)
-- Revolutionary grocery-recipe workflow complete
-- Ready for M5 (CloudKit) or TestFlight deployment
+**When you need to know...**
 
-### **November 25, 2025** - M4.3.5 Phases 2-3 Complete ✅
-- **Completed**: M4.3.5 Phases 2-3 - Ingredient Normalization (2 hours)
-- **Phase 2**: Singular/plural consolidation with "preserve-plural" list (eggs→egg, but "chocolate chips" stays plural)
-- **Phase 3**: Abbreviation expansion safety net (tbsp→tablespoon)
-- **Bonus**: StandardEmptyStateView component for UI consistency across all 4 tabs
-- 18 ingredient templates with intelligent normalization
-- Template count down from initial duplicates
-- Professional iOS design standards maintained
+| What | Check This Document |
+|------|-------------------|
+| How to start a session | [session-startup-checklist.md](session-startup-checklist.md) |
+| Correct M#.#.# naming | [project-naming-standards.md](project-naming-standards.md) |
+| What's active now | [current-story.md](current-story.md) |
+| How to implement M5.0 | [M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md) |
+| Complete M5.0 plan | [M5.0-APP-RENAMING-TESTFLIGHT-PRD.md](M5.0-APP-RENAMING-TESTFLIGHT-PRD.md) |
+| Code standards | [development-guidelines.md](development-guidelines.md) |
+| What features are needed | [requirements.md](requirements.md) |
+| Milestone timeline | [roadmap.md](roadmap.md) |
+| Architecture decisions | [architecture/](architecture/) |
+| Feature details | [prds/](prds/) |
+| How something was built | [learning-notes/](learning-notes/) |
 
-### **November 24, 2025** - M4.3.4 Complete ✅
-- **Completed**: M4.3.4 - Meal Completion Tracking (1.0 hour)
-- **Achievement**: On-target estimate (0% variance)
-- Tappable completion checkbox with visual feedback
-- Clean state management with refreshID pattern
-- No date restrictions for plan flexibility
+---
 
-### **November 24, 2025** - M4.3.3 Complete ✅
-- **Completed**: M4.3.3 - Bulk Add from Meal Plan (2.5 hours)
-- **Achievement**: Added servings adjustment UI enhancement
-- "Add All to Shopping List" with progress overlay
-- Individual recipe servings adjusters
-- Recipe source tracking integration (M4.3.1)
-- Quantity scaling integration (M4.3.2)
+## 🔥 **RECENT ACTIVITY**
 
-### **November 22, 2025** - M4.3.2 Complete ✅
-- **Completed**: M4.3.2 - Scaled Recipe to List Integration (1.25 hours)
-- **Achievement**: Under estimate by 17%!
+### **November 28, 2025** - M5.0 Documentation Complete + Instruction Transition ✅
+- **Created**: M5.0 PRD - Complete app renaming & TestFlight plan
+- **Created**: M5.0 Next-Prompt - Implementation guide with validation checkpoints
+- **Updated**: current-story.md for M5.0 start
+- **Updated**: project-index.md (this file)
+- **Updated**: claude-instructions.md with transition note
+- **Status**: Ready to execute M5.0.1 - Name Selection & Planning
+- **Decision**: Chose TestFlight validation before CloudKit investment
+
+### **November 26, 2025** - M4 COMPLETE ✅
+- **Completed**: M4 Milestone (19.25 hours vs 14.5-17.5h estimate)
+- **Achievement**: 90% planning accuracy maintained
+- **Components**: All 7 sub-components complete
+  - M4.1: Settings Infrastructure (1.5h)
+  - M4.2: Calendar Meal Planning (4h)
+  - M4.3.1: Recipe Source Tracking (3.5h)
+  - M4.3.2: Scaled Recipe to List (1.25h)
+  - M4.3.3: Bulk Add from Meal Plan (2.5h)
+  - M4.3.4: Meal Completion Tracking (1h)
+  - M4.3.5: Ingredient Normalization - All 4 phases (5.5h)
+- Revolutionary meal planning to grocery automation complete
+- 30% reduction in ingredient template fragmentation achieved
+
+### **November 25, 2025** - M4.3.5 Phases 2-4 Complete ✅
+- **Completed**: M4.3.5 Ingredient Normalization system (5.5h total)
+- **Phase 2**: Singular/plural with 13-item preserve-plural list
+- **Phase 3**: Abbreviation expansion safety net
+- **Phase 4**: Variation handling (descriptive qualifiers removal)
+- **Bonus**: StandardEmptyStateView component for UI consistency
+- 30% template consolidation achieved (50+ → 35 templates)
+
+### **November 24, 2025** - M4.3.4 & M4.3.3 Complete ✅
+- **M4.3.4**: Meal Completion Tracking (1.0 hour) - On-target estimate
+- **M4.3.3**: Bulk Add from Meal Plan (2.5 hours) with servings UI enhancement
+- Clean state management patterns established
+- Progress overlay implementation successful
+
+### **November 22, 2025** - M4.3.2 & M4.3.1 Complete ✅
+- **M4.3.2**: Scaled Recipe to List Integration (1.25 hours) - 17% under estimate
+- **M4.3.1**: Recipe Source Tracking Foundation (3.5 hours)
+- Many-to-many relationships with professional UI
 - Servings picker with real-time scaling
-- Scaled quantities in blue, original in gray
-- Fraction formatting for kitchen-friendly display
-
-### **November 22, 2025** - M4.3.1 Complete ✅
-- **Completed**: M4.3.1 - Recipe Source Tracking Foundation (3.5 hours)
-- **Achievement**: Many-to-many relationships with professional UI
-- GroceryListItem ↔ Recipe relationships
-- Display Options in Settings
 - Recipe source badges with user control
-- Fixed 3 critical bugs
 
-### **November 3, 2025** - M4.2.1-3 Complete ✅
+### **November 3, 2025** - M4.2 Complete ✅
 - **Completed**: M4.2 Calendar-Based Meal Planning (~4 hours)
-- **Components**: M4.2.1 (Calendar UI), M4.2.2 (Recipe Assignment), M4.2.3 (Meal Plan Management)
 - Multi-week calendar view with meal assignments
 - Professional iOS calendar patterns
 - Recipe picker with search and filtering
 
 ### **October 26, 2025** - M3.5 Complete ✅
 - **Completed**: M3.5 - Foundation Validation (8.5 hours)
-- **Achievement**: Validated entire M1-M3 architecture
+- Validated entire M1-M3 architecture
 - Fixed 3 deletion cascade bugs
-- Verified 75+ computed properties
 - Comprehensive testing infrastructure
 - System health confirmed for M4
 
 ### **October 14, 2025** - M3 Complete ✅
 - **Status**: M3 MILESTONE COMPLETE (10.5 hours total)
-- Validated recipe ingredient autocomplete with M3 features
-- Added consolidation button with opportunity badge
-- Implemented visual indicators for quantity types
-- Created comprehensive user help documentation
-- Finalized all M3 documentation
-
-### **October 14, 2025** - M3 Phase 5 Complete ✅
-- **Completed**: M3 Phase 5 - Quantity Consolidation (2.5 hours)
-- **Achievement**: Intelligent consolidation reduces list redundancy by 30-50%
-- Created QuantityMergeService and UnitConversionService
-- Implemented preview-before-merge workflow
+- Intelligent quantity consolidation (30-50% list reduction)
+- Recipe scaling with kitchen-friendly fractions
+- Unit conversion system operational
 
 ---
 
 ## 🚦 **QUICK REFERENCE: PROJECT STATUS**
 
 ### **Current State**
-- **Completed Milestone**: M4 (Meal Planning & Enhanced Grocery Integration) ✅
-- **All M4 Components Complete**: M4.1 (Settings), M4.2 (Calendar Planning), M4.3.1 (Recipe Source Tracking), M4.3.2 (Scaled Recipe to List), M4.3.3 (Bulk Add), M4.3.4 (Meal Completion), M4.3.5 (Ingredient Normalization - All 4 Phases) ✅
-- **Next Priority**: M5 (CloudKit & Production Infrastructure) or TestFlight Deployment
-- **Progress**: M1-M4 complete (86.5 hours total across 4 major milestones)
-- **Status**: Revolutionary grocery-recipe workflow complete with 89% planning accuracy
+- **Current Milestone**: M5.0 - App Renaming & TestFlight Deployment 🚀 READY
+- **Next Component**: M5.0.1 - Name Selection & Planning (30 min)
+- **Completed Milestones**: M1-M4 (86.5 hours, 89% planning accuracy)
+- **Status**: Ready to begin systematic rename + TestFlight
 
-### **M4.3 Work Breakdown**
+### **M5.0 Component Status**
+- 🚀 **M5.0.1**: Name Selection & Planning (30 min) - READY
+- 🚀 **M5.0.2**: Xcode Project Renaming (1-1.5h) - READY after M5.0.1
+- 🚀 **M5.0.3**: File Structure Renaming (1-1.5h) - READY after M5.0.2
+- 🚀 **M5.0.4**: Documentation & GitHub (45-60 min) - READY after M5.0.3
+- 🚀 **M5.0.5**: TestFlight Deployment (45-90 min + wait) - READY after M5.0.4
 
-**M4.3.1: Recipe Source Tracking Foundation** ✅ **COMPLETE** (3.5 hours)
-- Many-to-many GroceryListItem ↔ Recipe relationships
-- Display Options section in Settings
-- Professional recipe source badges with user control
-- Fixed 3 critical bugs (displayText, duplicate text, redundant tags)
-- 6 comprehensive test recipes with strategic overlap
-- Complete testing validation (11/11 tests passing)
+### **Strategic Decision After M5.0**
+- **Option A**: M5.1 - CloudKit Sync (20-25h)
+- **Option B**: M6 - Testing Foundation (12-18h)
+- **Option C**: M7 - Analytics Dashboard (6-8h)
+- **Decision Based On**: TestFlight feedback + user priorities
 
-**M4.3.2: Scaled Recipe to List Integration** ✅ **COMPLETE** (1.25 hours)
-- Servings picker with +/- stepper
-- Real-time quantity scaling with RecipeScalingService
-- Scaled quantities in blue, original in gray
-- Fraction formatting for kitchen-friendly display
-- Updated addToShoppingList() for scaled saving
-- Under estimate by 17%! Clean M3 pattern reuse
+### **Foundation Achievements (M1-M4)**
+- ✅ Store-layout optimized shopping
+- ✅ Complete recipe management with autocomplete
+- ✅ Intelligent quantity handling & consolidation
+- ✅ Meal planning with calendar interface
+- ✅ Recipe source tracking & scaled integration
+- ✅ Ingredient normalization (30% template reduction)
 
-**M4.3.3: Bulk Add from Meal Plan** ✅ **COMPLETE** (2.5 hours)
-- "Add All to Shopping List" button
-- Process all meal plan recipes with progress overlay
-- Servings adjustment UI with scale factor indicators
-- Recipe source tracking integration (M4.3.1)
-- Quantity scaling integration (M4.3.2)
-- Smart consolidation with M3 Phase 5
+---
 
-**M4.3.4: Meal Completion Tracking** ✅ **COMPLETE** (1.0 hour)
-- Checkbox toggle for meal completion (circle → checkmark)
-- Visual feedback: green checkmark, strikethrough, 50% opacity
-- No date restrictions (flexible for change of plans)
-- Core Data persistence with isCompleted and completedDate
-- SwiftUI reactivity fix with refreshID state trigger
+## 🎯 **SUCCESS METRICS**
 
-**M4.3.5: Ingredient Normalization** ✅ **COMPLETE** (5.5 hours - all 4 phases)
-- **Phase 1**: Case normalization (Butter → butter) ✅ COMPLETE (2.5h)
-- **Phase 2**: Singular/plural with 13-item preserve-plural list (eggs → egg, "chocolate chips" stays plural) ✅ COMPLETE (1.5h)
-- **Phase 3**: Abbreviation expansion safety net (tbsp → tablespoon) ✅ COMPLETE (0.5h)
-- **Phase 4**: Variation handling (diced tomato → tomato, fresh basil → basil) ✅ COMPLETE (1h)
-- 30% reduction in template fragmentation (50+ → 35 templates)
-- Handles both spaced and compound qualifier forms
-- Intelligent plural preservation for items bought in bulk
-- StandardEmptyStateView component for UI consistency
-- Complete 4-phase normalization pipeline operational
+**This project maintains excellence through:**
 
-### **Performance Metrics**
-- **All Operations**: < 0.5s target maintained ✅
-- **Parse Accuracy**: 95%+ ✅
-- **Unit Conversion**: 100% accurate ✅
-- **Data Integrity**: Zero data loss across migrations ✅
-- **Build Success**: 100% (zero breaking changes) ✅
+1. **Consistent Naming**: M#.#.# format everywhere (zero variance)
+2. **Session Discipline**: Startup checklist followed every session
+3. **Documentation Currency**: All docs updated after every session
+4. **Planning Accuracy**: 89% accuracy across M1-M4 (< 12% variance)
+5. **Code Quality**: Zero regressions, 100% build success
+6. **Performance**: All operations < 0.5s target maintained
+7. **Knowledge Preservation**: Comprehensive learning notes for all work
 
-### **Technical Debt**
-- **Status**: NONE ✅
-- Clean architecture maintained throughout M1-M4.3.5
-- No shortcuts or workarounds
-- Comprehensive documentation at all levels
-- All code follows established patterns from development-guidelines.md
+**M1-M4 Track Record:**
+- **M1**: 32h (estimated 30-35h) - 91% accuracy ✅
+- **M2**: 16.5h (estimated 15-18h) - 92% accuracy ✅
+- **M3**: 10.5h (estimated 8-12h) - 88% accuracy ✅
+- **M4**: 19.25h (estimated 14.5-17.5h) - 90% accuracy ✅
+- **Average**: 89% planning accuracy
+
+**M5.0 Estimate**: 4-6 hours  
+**Confidence**: High (systematic process with validation checkpoints)
 
 ---
 
@@ -393,9 +339,9 @@
 ### **Every Session Start**
 1. Complete [session-startup-checklist.md](session-startup-checklist.md) (mandatory)
 2. Verify current M#.#.# identifier in [current-story.md](current-story.md)
-3. Follow [next-prompt.md](next-prompt.md) for implementation
+3. For M5.0: Follow [M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md) for implementation
 
-### **Planning New Features**
+### **Planning New Features (After M5.0)**
 1. Check [requirements.md](requirements.md) for existing requirements
 2. Review [roadmap.md](roadmap.md) for strategic fit and dependencies
 3. Search [architecture/](architecture/) for relevant ADRs
@@ -409,8 +355,9 @@
 4. If milestone complete, update [roadmap.md](roadmap.md) with completion summary
 
 ### **Finding Information**
-- **Current work**: [current-story.md](current-story.md)
-- **How to implement**: [next-prompt.md](next-prompt.md)
+- **Current work**: [current-story.md](current-story.md) → M5.0 details
+- **How to implement**: [M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md) → Step-by-step
+- **Complete plan**: [M5.0-APP-RENAMING-TESTFLIGHT-PRD.md](M5.0-APP-RENAMING-TESTFLIGHT-PRD.md) → Full PRD
 - **Naming rules**: [project-naming-standards.md](project-naming-standards.md)
 - **Code patterns**: [development-guidelines.md](development-guidelines.md)
 - **Architecture**: [architecture/](architecture/) ADRs
@@ -418,42 +365,43 @@
 
 ---
 
-## 📞 **DOCUMENTATION QUICK LINKS**
+## 🚀 **READY TO START M5.0?**
 
-**When you need to know...**
+### **First Session Start Prompt**:
+```
+I'm ready to start M5.0.1 - Name Selection & Planning.
 
-| What | Check This Document |
-|------|-------------------|
-| How to start a session | [session-startup-checklist.md](session-startup-checklist.md) |
-| Correct M#.#.# naming | [project-naming-standards.md](project-naming-standards.md) |
-| What's active now | [current-story.md](current-story.md) |
-| How to implement current work | [next-prompt.md](next-prompt.md) |
-| Code standards | [development-guidelines.md](development-guidelines.md) |
-| What features are needed | [requirements.md](requirements.md) |
-| Milestone timeline | [roadmap.md](roadmap.md) |
-| Architecture decisions | [architecture/](architecture/) |
-| Feature details | [prds/](prds/) |
-| How something was built | [learning-notes/](learning-notes/) |
+I've completed:
+✅ session-startup-checklist.md
+✅ project-naming-standards.md
+✅ current-story.md
+✅ M5.0 PRD review
+
+I'm considering these names:
+- Display Name: [YOUR IDEA]
+- Bundle ID: com.richhayn.[YOUR IDEA]
+- Marketing Name: [YOUR IDEA]
+
+Help me finalize and create the 42-item checklist.
+```
+
+### **Continuing Session Start Prompt**:
+```
+Continuing M5.0 - App Renaming & TestFlight.
+
+Completed so far:
+✅ M5.0.1: Name selection (if done)
+✅ M5.0.2: Xcode renaming (if done)
+[list completed phases]
+
+Current checkpoint: M5.0.[X] Phase [Y]
+
+Ready to proceed with next phase.
+```
 
 ---
 
-## 🎯 **SUCCESS METRICS**
-
-**This project maintains excellence through:**
-
-1. **Consistent Naming**: M#.#.# format everywhere (zero variance)
-2. **Session Discipline**: Startup checklist followed every session
-3. **Documentation Currency**: All docs updated after every session
-4. **Planning Accuracy**: 88% accuracy (< 12% variance)
-5. **Code Quality**: Zero regressions, 100% build success
-6. **Performance**: All operations < 0.5s target
-7. **Knowledge Preservation**: Comprehensive learning notes for all work
-
-**These metrics are maintained through disciplined adherence to the documentation structure and session startup procedures.**
-
----
-
-**Last Updated**: November 26, 2025  
-**Next Update**: After M5 planning or TestFlight preparation  
-**Current Status**: M4 COMPLETE ✅ - All 4 milestones complete, ready for M5 or TestFlight  
-**Documentation Version**: Updated with M4.3.5 Phase 4 and M4 milestone completion
+**Last Updated**: November 28, 2025  
+**Next Update**: After M5.0.1 completion or phase milestones  
+**Current Status**: M5.0 READY - Documentation complete, ready for systematic execution  
+**Documentation Version**: Updated with M5.0 planning and implementation guides
