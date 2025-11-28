@@ -1,9 +1,10 @@
 # Current Development Story
 
 **Last Updated**: November 28, 2025  
-**Status**: M5.0 - App Renaming & TestFlight Deployment 🚀 READY  
+**Status**: M5.0 - App Renaming & TestFlight Deployment 🔄 ACTIVE (M5.0.1)  
 **Total Progress**: M1-M4 Complete (86.5 hours) | 89% planning accuracy  
-**Next Priority**: Rename to "Forager" + TestFlight Deployment
+**Current Phase**: M5.0.1 Name Selection - Nearly Complete  
+**Next Priority**: Complete M5.0.1 checkpoint, then begin M5.0.2 Xcode renaming
 
 ---
 
@@ -13,19 +14,21 @@
 
 **✅ Foundation Complete (M1-M4)**: 86.5 hours total, 89% planning accuracy
 
-**🚀 M5.0 Ready to Start**: App Renaming & TestFlight Deployment (4-6 hours estimated)
+**🔄 M5.0 ACTIVE**: App Renaming & TestFlight Deployment (4-6 hours estimated)  
+**Progress**: 6 of 42 items complete (14%)
 
 **⏳ Future**: M5.1 (CloudKit) or M6 (Testing) - Decision after M5.0 + TestFlight feedback
 
 ---
 
-## 🚀 **M5.0: APP RENAMING & TESTFLIGHT DEPLOYMENT** 🚀 READY
+## 🚀 **M5.0: APP RENAMING & TESTFLIGHT DEPLOYMENT** 🔄 ACTIVE
 
-**Status**: Ready to begin  
+**Status**: Phase 1 (M5.0.1) nearly complete  
 **Estimated Time**: 4-6 hours across 5 phases  
 **Dependencies**: M4 Complete ✅, Apple Developer Account enrollment required  
 **PRD**: `M5.0-APP-RENAMING-TESTFLIGHT-PRD.md`  
-**Implementation Guide**: `M5.0-NEXT-PROMPT.md`
+**Implementation Guide**: `M5.0-NEXT-PROMPT.md`  
+**Naming Strategy**: `milestone5.0.1-name-decision-record.md` ✅
 
 ### **Purpose**
 Systematically rename entire project from "GroceryRecipeManager" to "Forager", updating all technical identifiers, file structures, documentation, and GitHub repository. Follow with TestFlight deployment for real-device validation before CloudKit investment.
@@ -45,249 +48,224 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 
 ---
 
-## 📋 **M5.0 COMPONENT BREAKDOWN**
+## 📋 **M5.0 COMPLETE RENAME CHECKLIST - "FORAGER"**
 
-### **M5.0.1: Name Selection & Planning** 🚀 READY
-**Estimated**: 30 minutes  
-**Status**: Ready to start
-
-**Objectives**:
-- ✅ Display name chosen: **Forager** (8 chars - perfect!)
-- ✅ Bundle identifier chosen: **com.richhayn.forager**
-- ✅ Marketing name chosen: **Forager**
-- ✅ GitHub repository name chosen: **forager-ios**
-- Create complete 42-item rename checklist
-- Document naming strategy
-
-**Deliverables**:
-- [x] Display name finalized: **Forager**
-- [x] Bundle ID finalized: **com.richhayn.forager**
-- [x] Marketing name finalized: **Forager**
-- [x] GitHub repo name finalized: **forager-ios**
-- [ ] 42-item checklist created with actual names
-- [ ] Naming strategy documented
-
-**Start Prompt**:
-```
-I'm ready to complete M5.0.1 - Name Selection & Planning.
-
-My chosen names:
-- Display Name: Forager
-- Bundle ID: com.richhayn.forager
-- Marketing Name: Forager
-- GitHub Repo: forager-ios
-
-Please create the complete 42-item rename checklist with these actual names 
-(no placeholders) so I can track progress through M5.0.
-```
+**Project**: Forager (formerly GroceryRecipeManager)  
+**Started**: November 28, 2025  
+**Progress**: 6 of 42 items complete (14%)
 
 ---
 
-### **M5.0.2: Xcode Project Renaming** 🚀 READY (After M5.0.1)
-**Estimated**: 1-1.5 hours  
-**Status**: Waiting for M5.0.1 completion
+### ✅ **PHASE 1: M5.0.1 - NAME SELECTION & PLANNING** (30 min)
 
-**Objectives**:
-- Update bundle identifiers (3 targets)
-- Update display name
-- Rename Xcode scheme
-- Rename project file (⚠️ HIGH RISK)
-- Update target/product names
-- **5 validation checkpoints throughout**
+- [x] **1.1** Display name chosen: Forager
+- [x] **1.2** Bundle ID chosen: com.richhayn.forager
+- [x] **1.3** Marketing name chosen: Forager
+- [x] **1.4** GitHub repo chosen: forager-ios
+- [x] **1.5** 42-item checklist created
+- [x] **1.6** Naming strategy documented (milestone5.0.1-name-decision-record.md)
+- [ ] **1.7** Git checkpoint: "M5.0.1 COMPLETE: Forager name finalized" ← **NEXT ACTION**
 
-**Critical Phases**:
-- **Phase 2A**: Bundle IDs (20 min) → Checkpoint: Clean build succeeds
-- **Phase 2B**: Display Name (10 min) → Checkpoint: Name shows on simulator
-- **Phase 2C**: Scheme Rename (15 min) → Checkpoint: Build with new scheme
-- **Phase 2D**: Project File Rename (20 min) ⚠️ → Checkpoint: All files green, builds
-- **Phase 2E**: Target/Product Names (15 min) → Checkpoint: Archive succeeds
-
-**Validation Checklist**:
-- [ ] Clean build succeeds
-- [ ] App runs on simulator with new name
-- [ ] No red files in navigator
-- [ ] Scheme renamed and functional
-- [ ] Archive build succeeds
-- [ ] Git checkpoint commit created
-
-**Git Checkpoint**:
-```bash
-git commit -m "M5.0.2 COMPLETE: Xcode project renamed, all builds pass"
-```
+**Status**: 6/7 complete - Ready for final checkpoint
 
 ---
 
-### **M5.0.3: File & Folder Structure Renaming** 🚀 READY (After M5.0.2)
-**Estimated**: 1-1.5 hours  
-**Status**: Waiting for M5.0.2 completion
+### 🔧 **PHASE 2: M5.0.2 - XCODE PROJECT RENAMING** (80 min) 🚀 READY
 
-**Objectives**:
-- Rename source folders (3 folders)
-- Rename Core Data model file + container (⚠️ HIGH RISK)
-- Rename entitlements file + CloudKit container ID
-- Rename main app file + struct
-- Update all file header comments
-- **5 validation checkpoints throughout**
+**Phase 2A: Bundle Identifiers (20 min)**
+- [ ] **2.1** Main target → com.richhayn.forager
+- [ ] **2.2** Tests target → com.richhayn.foragerTests
+- [ ] **2.3** UI Tests target → com.richhayn.foragerUITests
+- [ ] **2.4** ✓ Clean build succeeds
+- [ ] **2.5** Git: "M5.0.2A: Bundle IDs updated"
 
-**Critical Phases**:
-- **Phase 3A**: Source Folders (25 min) → Checkpoint: Build succeeds
-- **Phase 3B**: Core Data Model (20 min) ⚠️ → Checkpoint: Data loads correctly
-- **Phase 3C**: Entitlements (15 min) → Checkpoint: No signing errors
-- **Phase 3D**: App File (10 min) → Checkpoint: Build succeeds
-- **Phase 3E**: File Headers (20 min) → Checkpoint: No unwanted changes
+**Phase 2B: Display Name (10 min)**
+- [ ] **2.6** Set display name: Forager
+- [ ] **2.7** ✓ Simulator shows "Forager"
+- [ ] **2.8** Git: "M5.0.2B: Display name set"
 
-**Validation Checklist**:
-- [ ] All folders renamed
-- [ ] Core Data model renamed
-- [ ] NSPersistentCloudKitContainer name updated
-- [ ] Existing data loads correctly
-- [ ] Entitlements file renamed
-- [ ] CloudKit container ID updated
-- [ ] Main app file renamed
-- [ ] All file headers updated
-- [ ] Clean build succeeds
-- [ ] All features work (Categories, Recipes, Lists, Meal Planning)
-- [ ] Archive succeeds
-- [ ] Git checkpoint commit created
+**Phase 2C: Scheme Renaming (15 min)**
+- [ ] **2.9** Rename scheme: GroceryRecipeManager → Forager
+- [ ] **2.10** ✓ Build succeeds with new scheme
+- [ ] **2.11** Git: "M5.0.2C: Scheme renamed"
 
-**Git Checkpoint**:
-```bash
-git commit -m "M5.0.3 COMPLETE: File structure renamed, all tests pass"
-```
+**Phase 2D: Project File Rename (20 min) ⚠️ HIGH RISK**
+- [ ] **2.12** Close Xcode completely
+- [ ] **2.13** Finder: .xcodeproj → Forager.xcodeproj
+- [ ] **2.14** Reopen, fix broken references
+- [ ] **2.15** ✓ All files green, builds
+- [ ] **2.16** Git: "M5.0.2D: Project file renamed"
+
+**Phase 2E: Target & Product Names (15 min)**
+- [ ] **2.17** Rename target to Forager
+- [ ] **2.18** Set product name: Forager
+- [ ] **2.19** ✓ Archive succeeds
+- [ ] **2.20** Git: "M5.0.2E COMPLETE: Xcode done"
 
 ---
 
-### **M5.0.4: Documentation & GitHub Renaming** 🚀 READY (After M5.0.3)
-**Estimated**: 45-60 minutes  
-**Status**: Waiting for M5.0.3 completion
+### 📁 **PHASE 3: M5.0.3 - FILE & FOLDER STRUCTURE** (90 min) ⏳ PLANNED
 
-**Objectives**:
-- Update all core documentation (10 files)
-- Preserve historical context in learning notes
-- Rename GitHub repository
-- Update README and repository metadata
-- **4 validation checkpoints throughout**
+**Phase 3A: Source Folders (25 min)**
+- [ ] **3.1** Close Xcode
+- [ ] **3.2** Folder: GroceryRecipeManager/ → Forager/
+- [ ] **3.3** Folder: GroceryRecipeManagerTests/ → ForagerTests/
+- [ ] **3.4** Folder: GroceryRecipeManagerUITests/ → ForagerUITests/
+- [ ] **3.5** Reopen, fix references
+- [ ] **3.6** ✓ Build succeeds
+- [ ] **3.7** Git: "M5.0.3A: Folders renamed"
 
-**Critical Phases**:
-- **Phase 4A**: Core Docs (20 min) → Checkpoint: Key docs consistent
-- **Phase 4B**: Learning Notes (15 min) → Checkpoint: Historical accuracy preserved
-- **Phase 4C**: GitHub Repo (15 min) → Checkpoint: Push/pull works
-- **Phase 4D**: README (10 min) → Checkpoint: Professional appearance
+**Phase 3B: Core Data Model (20 min) ⚠️ HIGH RISK**
+- [ ] **3.8** Rename: GroceryRecipeManager.xcdatamodeld → Forager.xcdatamodeld
+- [ ] **3.9** Update ForagerApp.swift container name
+- [ ] **3.10** ✓ App launches, data loads
+- [ ] **3.11** Git: "M5.0.3B: Core Data renamed"
 
-**Documentation Files to Update**:
-- [ ] docs/project-index.md
-- [ ] docs/current-story.md (this file)
-- [ ] docs/roadmap.md
-- [ ] docs/requirements.md
-- [ ] docs/next-prompt.md
-- [ ] docs/development-guidelines.md
-- [ ] docs/session-startup-checklist.md
-- [ ] docs/project-naming-standards.md
-- [ ] claude-instructions.md (remove transition note, update all name references)
-- [ ] Learning notes (add context, preserve history)
-- [ ] README.md
+**Phase 3C: Entitlements Files (15 min)**
+- [ ] **3.12** Rename: GroceryRecipeManager.entitlements → Forager.entitlements
+- [ ] **3.13** Update CloudKit: iCloud.com.richhayn.forager
+- [ ] **3.14** ✓ No signing errors
+- [ ] **3.15** Git: "M5.0.3C: Entitlements renamed"
 
-**Validation Checklist**:
-- [ ] All core docs updated with new name
-- [ ] Historical references preserved with context
-- [ ] GitHub repository renamed
-- [ ] Git push/pull works
-- [ ] README displays correctly
-- [ ] Repository metadata updated
-- [ ] Consistency check passes (grep for old name)
-- [ ] Git checkpoint commit created
+**Phase 3D: App File (10 min)**
+- [ ] **3.16** Rename: GroceryRecipeManagerApp.swift → ForagerApp.swift
+- [ ] **3.17** Update struct: ForagerApp
+- [ ] **3.18** ✓ Build succeeds
+- [ ] **3.19** Git: "M5.0.3D: App file renamed"
 
-**Git Checkpoint**:
-```bash
-git commit -m "M5.0.4 COMPLETE: Documentation and GitHub renamed"
-```
+**Phase 3E: File Headers (20 min)**
+- [ ] **3.20** Update all file headers
+- [ ] **3.21** ✓ No unintended changes
+- [ ] **3.22** Git: "M5.0.3E COMPLETE: Files done"
 
 ---
 
-### **M5.0.5: TestFlight Deployment** 🚀 READY (After M5.0.4)
-**Estimated**: 45-90 minutes + wait time  
-**Status**: Waiting for M5.0.4 completion
+### 📚 **PHASE 4: M5.0.4 - DOCUMENTATION & GITHUB** (60 min) ⏳ PLANNED
 
-**Objectives**:
-- Enroll in Apple Developer Program ($99/year)
-- Set up App Store Connect
-- Create app record with new bundle ID
-- Create app icon (1024x1024 PNG)
-- Archive and upload build
-- Configure TestFlight
-- Install on real device and test
-- **6 validation checkpoints throughout**
+**Phase 4A: Core Documentation (20 min)**
+- [ ] **4.1** project-index.md updated
+- [ ] **4.2** current-story.md updated
+- [ ] **4.3** roadmap.md updated
+- [ ] **4.4** requirements.md updated
+- [ ] **4.5** All PRDs updated
+- [ ] **4.6** Git: "M5.0.4A: Core docs"
 
-**Critical Phases**:
-- **Phase 5A**: Apple Developer Enrollment (15 min + 24-48h wait)
-- **Phase 5B**: App Icon Creation (30 min if needed)
-- **Phase 5C**: App Store Connect Setup (20 min)
-- **Phase 5D**: Build Archive & Upload (30 min)
-- **Phase 5E**: TestFlight Configuration (15 min)
-- **Phase 5F**: Device Installation & Testing (15 min)
+**Phase 4B: Learning Notes (15 min)**
+- [ ] **4.7** Historical notes contextualized
+- [ ] **4.8** Future content updated
+- [ ] **4.9** Git: "M5.0.4B: Learning notes"
 
-**Validation Checklist**:
-- [ ] Apple Developer account enrolled and active
-- [ ] App icon created (1024x1024 PNG, no transparency)
-- [ ] App icon added to Assets.xcassets
-- [ ] App Store Connect app record created
-- [ ] Build archived successfully
-- [ ] Build validated
-- [ ] Build uploaded to App Store Connect
-- [ ] Build processing complete (wait 5-15 min)
-- [ ] TestFlight configured
-- [ ] Internal testing group created
-- [ ] Testers invited
-- [ ] App installed on physical iPhone via TestFlight
-- [ ] All features work on real device
-- [ ] No crashes during device testing
-- [ ] Git checkpoint commit created
+**Phase 4C: GitHub Repository (15 min)**
+- [ ] **4.10** Rename repo: forager-ios
+- [ ] **4.11** Update remote URL
+- [ ] **4.12** ✓ Push/pull works
+- [ ] **4.13** Git: "M5.0.4C: GitHub renamed"
 
-**Git Checkpoint**:
-```bash
-git commit -m "M5.0.5 COMPLETE: TestFlight deployment successful"
-```
+**Phase 4D: README & Metadata (10 min)**
+- [ ] **4.14** README.md updated
+- [ ] **4.15** Repo description updated
+- [ ] **4.16** Git: "M5.0.4D COMPLETE: Docs done"
 
 ---
 
-## ✅ **M5.0 COMPLETION CRITERIA**
+### 🚀 **PHASE 5: M5.0.5 - TESTFLIGHT DEPLOYMENT** (90-120 min + wait) ⏳ PLANNED
 
-**Before marking M5.0 complete, verify**:
+**Phase 5A: Apple Developer Enrollment (15 min + 24-48h)**
+- [ ] **5.1** Enroll ($99/year)
+- [ ] **5.2** Wait for confirmation
+- [ ] **5.3** ✓ Account active
+
+**Phase 5B: App Icon Creation (30 min)**
+- [ ] **5.4** Create 1024x1024 PNG
+- [ ] **5.5** Add to Assets.xcassets
+- [ ] **5.6** ✓ Icon displays
+
+**Phase 5C: App Store Connect Setup (20 min)**
+- [ ] **5.7** Create app record
+- [ ] **5.8** Set bundle: com.richhayn.forager
+- [ ] **5.9** Set name: Forager
+- [ ] **5.10** ✓ Record created
+
+**Phase 5D: Archive & Upload (30 min)**
+- [ ] **5.11** Product → Archive
+- [ ] **5.12** ✓ Archive succeeds
+- [ ] **5.13** Validate archive
+- [ ] **5.14** Upload to ASC
+- [ ] **5.15** Wait for processing
+- [ ] **5.16** ✓ Build appears
+
+**Phase 5E: TestFlight Configuration (15 min)**
+- [ ] **5.17** Configure TestFlight
+- [ ] **5.18** Create test group
+- [ ] **5.19** Add testers
+- [ ] **5.20** ✓ Invites sent
+
+**Phase 5F: Device Testing (15 min)**
+- [ ] **5.21** Install TestFlight app
+- [ ] **5.22** Install Forager
+- [ ] **5.23** Test all features
+- [ ] **5.24** ✓ No crashes
+- [ ] **5.25** Git: "M5.0.5 COMPLETE: TestFlight live"
+
+---
+
+## ✅ **M5.0 FINAL VALIDATION CRITERIA**
+
+**Before marking M5.0 complete, verify ALL of these:**
 
 ### **Functional Success**
-- [ ] App runs with new name
-- [ ] All M1-M4 features work post-rename
-- [ ] Data loads and saves correctly
+- [ ] App runs with name "Forager"
+- [ ] All M1-M4 features work identically post-rename
+- [ ] Data persists correctly (Core Data operational)
 - [ ] App installs via TestFlight
-- [ ] Runs on physical device
+- [ ] Runs successfully on physical iPhone
 
 ### **Technical Success**
-- [ ] Zero build errors
-- [ ] Zero red files in Xcode
-- [ ] Archive succeeds
-- [ ] All 3 bundle IDs consistent
-- [ ] Core Data operational
-- [ ] 42-item checklist 100% complete
+- [ ] Zero build errors in Xcode
+- [ ] Zero red files in project navigator
+- [ ] Archive builds successfully
+- [ ] All 3 bundle IDs are consistent
+- [ ] All 42 checklist items complete
 
 ### **Documentation Success**
-- [ ] All docs use new name consistently
+- [ ] All docs reference "Forager" consistently
 - [ ] GitHub renamed and operational
-- [ ] README updated
-- [ ] Learning note created
-- [ ] current-story.md updated
-- [ ] roadmap.md updated
-- [ ] project-index.md updated
+- [ ] README.md updated professionally
+- [ ] Learning note created (24-m5.0-forager-renaming.md)
+- [ ] current-story.md updated with completion
+- [ ] roadmap.md updated with M5.0 complete
+- [ ] project-index.md updated with recent activity
 
-### **Quality Success**
-- [ ] No regressions to M1-M4 features
-- [ ] Performance maintained (<0.5s targets)
-- [ ] Zero data loss
-- [ ] Professional appearance
+---
 
-### **Time Tracking**
-- [ ] Actual hours recorded for each phase
-- [ ] Planning accuracy calculated
-- [ ] Documented in learning note
+## 💡 **NEXT IMMEDIATE ACTIONS**
+
+### **Action 1: Complete M5.0.1** (2 minutes)
+
+Move naming strategy doc to permanent location:
+```bash
+mv milestone5.0.1-name-decision-record.md docs/
+```
+
+Create M5.0.1 checkpoint:
+```bash
+git add .
+git commit -m "M5.0.1 COMPLETE: Forager name finalized with strategy doc and checklist"
+git push origin main
+```
+
+### **Action 2: Start M5.0.2 Xcode Renaming**
+
+Use this prompt when ready:
+```
+M5.0.1 complete ✅
+
+Ready to start M5.0.2 - Xcode Project Renaming.
+Xcode is currently [OPEN/CLOSED].
+
+Let's begin with Phase 2A: Bundle Identifier Updates.
+Walk me through each step with validation checkpoints.
+```
 
 ---
 
@@ -374,7 +352,7 @@ git commit -m "M5.0.5 COMPLETE: TestFlight deployment successful"
 ## 📚 **DOCUMENTATION STATUS**
 
 **All Core Documentation Current** ✅
-- ✅ current-story.md (this file) - Updated for M5.0 start
+- ✅ current-story.md (this file) - Updated with M5.0 checklist
 - ✅ project-index.md - Updated with M5.0 Quick Reference
 - ✅ next-prompt.md - M5.0-NEXT-PROMPT.md created
 - ✅ claude-instructions.md - Transition note added for M5.0
@@ -384,8 +362,10 @@ git commit -m "M5.0.5 COMPLETE: TestFlight deployment successful"
 - ✅ session-startup-checklist.md - Current
 - ✅ project-naming-standards.md - Current
 
-**M5.0 PRD Created** ✅
+**M5.0 Documentation** ✅
 - ✅ M5.0-APP-RENAMING-TESTFLIGHT-PRD.md (comprehensive)
+- ✅ M5.0-NEXT-PROMPT.md (step-by-step guide)
+- ✅ milestone5.0.1-name-decision-record.md (naming strategy)
 
 **Learning Notes Complete for M1-M4** ✅
 - ✅ 18-m4.1-settings-infrastructure.md
@@ -394,7 +374,7 @@ git commit -m "M5.0.5 COMPLETE: TestFlight deployment successful"
 - ✅ 23-m4.3.5-ingredient-normalization.md
 
 **To Create After M5.0**:
-- [ ] 24-m5.0-app-renaming-testflight.md
+- [ ] 24-m5.0-forager-renaming-testflight.md
 
 ---
 
@@ -411,42 +391,6 @@ git commit -m "M5.0.5 COMPLETE: TestFlight deployment successful"
 
 ---
 
-## 💡 **READY TO START M5.0?**
-
-**First Session - Name Selection**:
-```
-I'm ready to start M5.0.1 - Name Selection & Planning.
-
-I've completed:
-✅ session-startup-checklist.md
-✅ project-naming-standards.md
-✅ current-story.md
-✅ M5.0 PRD review
-
-I'm considering these names:
-- Display Name: [YOUR IDEA]
-- Bundle ID: com.richhayn.[YOUR IDEA]
-- Marketing Name: [YOUR IDEA]
-
-Help me finalize and create the 42-item checklist.
-```
-
-**Continuing Session - Resume Where Left Off**:
-```
-Continuing M5.0 - App Renaming & TestFlight.
-
-Completed so far:
-✅ M5.0.1: Name selection (if done)
-✅ M5.0.2: Xcode renaming (if done)
-[list what's complete]
-
-Current checkpoint: M5.0.[X] Phase [Y]
-
-Ready to proceed with next phase.
-```
-
----
-
-**Last Session**: November 28, 2025 - M5.0 documentation created  
-**Next Session**: M5.0.1 Name Selection & Planning  
-**Version**: November 28, 2025 - Ready for M5.0 execution
+**Last Session**: November 28, 2025 - M5.0.1 nearly complete  
+**Next Action**: Git checkpoint for M5.0.1, then begin M5.0.2  
+**Version**: November 28, 2025 - M5.0 Active, Checklist Integrated
