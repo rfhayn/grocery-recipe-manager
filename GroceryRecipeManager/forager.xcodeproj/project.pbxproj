@@ -56,9 +56,9 @@
 		85ADBDC72EA97DE600E3B1B5 /* M3ValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M3ValidationTests.swift; sourceTree = "<group>"; };
 		9B31714B2E6E2AA80004CD70 /* Recipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Recipe+CoreDataClass.swift"; sourceTree = "<group>"; };
 		9B3DB86D2ECD52DE00395BD7 /* GroceryListItem+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroceryListItem+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		9B731C292E535C3100CE26F0 /* GroceryRecipeManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroceryRecipeManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B731C3D2E535C3300CE26F0 /* GroceryRecipeManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GroceryRecipeManagerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B731C472E535C3300CE26F0 /* GroceryRecipeManagerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GroceryRecipeManagerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B731C292E535C3100CE26F0 /* forager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = forager.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B731C3D2E535C3300CE26F0 /* foragerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = foragerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B731C472E535C3300CE26F0 /* foragerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = foragerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B731C732E5364A300CE26F0 /* GroceryItem+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroceryItem+CoreDataClass.swift"; sourceTree = "<group>"; };
 		9B731C752E5364A300CE26F0 /* GroceryListItem+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GroceryListItem+CoreDataClass.swift"; sourceTree = "<group>"; };
 		9B731C772E5364A300CE26F0 /* Ingredient+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Ingredient+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -75,12 +75,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		9B731C4F2E535C3300CE26F0 /* Exceptions for "GroceryRecipeManager" folder in "GroceryRecipeManager" target */ = {
+		9B731C4F2E535C3300CE26F0 /* Exceptions for "GroceryRecipeManager" folder in "forager" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 9B731C282E535C3100CE26F0 /* GroceryRecipeManager */;
+			target = 9B731C282E535C3100CE26F0 /* forager */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -88,7 +88,7 @@
 		9B731C2B2E535C3100CE26F0 /* GroceryRecipeManager */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				9B731C4F2E535C3300CE26F0 /* Exceptions for "GroceryRecipeManager" folder in "GroceryRecipeManager" target */,
+				9B731C4F2E535C3300CE26F0 /* Exceptions for "GroceryRecipeManager" folder in "forager" target */,
 			);
 			path = GroceryRecipeManager;
 			sourceTree = "<group>";
@@ -170,9 +170,9 @@
 		9B731C2A2E535C3100CE26F0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9B731C292E535C3100CE26F0 /* GroceryRecipeManager.app */,
-				9B731C3D2E535C3300CE26F0 /* GroceryRecipeManagerTests.xctest */,
-				9B731C472E535C3300CE26F0 /* GroceryRecipeManagerUITests.xctest */,
+				9B731C292E535C3100CE26F0 /* forager.app */,
+				9B731C3D2E535C3300CE26F0 /* foragerTests.xctest */,
+				9B731C472E535C3300CE26F0 /* foragerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -180,9 +180,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9B731C282E535C3100CE26F0 /* GroceryRecipeManager */ = {
+		9B731C282E535C3100CE26F0 /* forager */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9B731C502E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "GroceryRecipeManager" */;
+			buildConfigurationList = 9B731C502E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "forager" */;
 			buildPhases = (
 				9B731C252E535C3100CE26F0 /* Sources */,
 				9B731C262E535C3100CE26F0 /* Frameworks */,
@@ -196,16 +196,16 @@
 				9B731C2B2E535C3100CE26F0 /* GroceryRecipeManager */,
 				9BADD71F2E64E79A00D677DC /* Services */,
 			);
-			name = GroceryRecipeManager;
+			name = forager;
 			packageProductDependencies = (
 			);
 			productName = GroceryRecipeManager;
-			productReference = 9B731C292E535C3100CE26F0 /* GroceryRecipeManager.app */;
+			productReference = 9B731C292E535C3100CE26F0 /* forager.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9B731C3C2E535C3300CE26F0 /* GroceryRecipeManagerTests */ = {
+		9B731C3C2E535C3300CE26F0 /* foragerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9B731C552E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "GroceryRecipeManagerTests" */;
+			buildConfigurationList = 9B731C552E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "foragerTests" */;
 			buildPhases = (
 				9B731C392E535C3300CE26F0 /* Sources */,
 				9B731C3A2E535C3300CE26F0 /* Frameworks */,
@@ -219,16 +219,16 @@
 			fileSystemSynchronizedGroups = (
 				9B731C402E535C3300CE26F0 /* GroceryRecipeManagerTests */,
 			);
-			name = GroceryRecipeManagerTests;
+			name = foragerTests;
 			packageProductDependencies = (
 			);
 			productName = GroceryRecipeManagerTests;
-			productReference = 9B731C3D2E535C3300CE26F0 /* GroceryRecipeManagerTests.xctest */;
+			productReference = 9B731C3D2E535C3300CE26F0 /* foragerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		9B731C462E535C3300CE26F0 /* GroceryRecipeManagerUITests */ = {
+		9B731C462E535C3300CE26F0 /* foragerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9B731C582E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "GroceryRecipeManagerUITests" */;
+			buildConfigurationList = 9B731C582E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "foragerUITests" */;
 			buildPhases = (
 				9B731C432E535C3300CE26F0 /* Sources */,
 				9B731C442E535C3300CE26F0 /* Frameworks */,
@@ -242,11 +242,11 @@
 			fileSystemSynchronizedGroups = (
 				9B731C4A2E535C3300CE26F0 /* GroceryRecipeManagerUITests */,
 			);
-			name = GroceryRecipeManagerUITests;
+			name = foragerUITests;
 			packageProductDependencies = (
 			);
 			productName = GroceryRecipeManagerUITests;
-			productReference = 9B731C472E535C3300CE26F0 /* GroceryRecipeManagerUITests.xctest */;
+			productReference = 9B731C472E535C3300CE26F0 /* foragerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -272,7 +272,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 9B731C242E535C3100CE26F0 /* Build configuration list for PBXProject "GroceryRecipeManager" */;
+			buildConfigurationList = 9B731C242E535C3100CE26F0 /* Build configuration list for PBXProject "forager" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -286,9 +286,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9B731C282E535C3100CE26F0 /* GroceryRecipeManager */,
-				9B731C3C2E535C3300CE26F0 /* GroceryRecipeManagerTests */,
-				9B731C462E535C3300CE26F0 /* GroceryRecipeManagerUITests */,
+				9B731C282E535C3100CE26F0 /* forager */,
+				9B731C3C2E535C3300CE26F0 /* foragerTests */,
+				9B731C462E535C3300CE26F0 /* foragerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -365,12 +365,12 @@
 /* Begin PBXTargetDependency section */
 		9B731C3F2E535C3300CE26F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9B731C282E535C3100CE26F0 /* GroceryRecipeManager */;
+			target = 9B731C282E535C3100CE26F0 /* forager */;
 			targetProxy = 9B731C3E2E535C3300CE26F0 /* PBXContainerItemProxy */;
 		};
 		9B731C492E535C3300CE26F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9B731C282E535C3100CE26F0 /* GroceryRecipeManager */;
+			target = 9B731C282E535C3100CE26F0 /* forager */;
 			targetProxy = 9B731C482E535C3300CE26F0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -391,6 +391,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GroceryRecipeManager/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = forager;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -424,6 +425,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GroceryRecipeManager/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = forager;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -640,7 +642,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9B731C242E535C3100CE26F0 /* Build configuration list for PBXProject "GroceryRecipeManager" */ = {
+		9B731C242E535C3100CE26F0 /* Build configuration list for PBXProject "forager" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9B731C532E535C3300CE26F0 /* Debug */,
@@ -649,7 +651,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9B731C502E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "GroceryRecipeManager" */ = {
+		9B731C502E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "forager" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9B731C512E535C3300CE26F0 /* Debug */,
@@ -658,7 +660,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9B731C552E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "GroceryRecipeManagerTests" */ = {
+		9B731C552E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "foragerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9B731C562E535C3300CE26F0 /* Debug */,
@@ -667,7 +669,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9B731C582E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "GroceryRecipeManagerUITests" */ = {
+		9B731C582E535C3300CE26F0 /* Build configuration list for PBXNativeTarget "foragerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9B731C592E535C3300CE26F0 /* Debug */,

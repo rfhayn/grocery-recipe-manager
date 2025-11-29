@@ -64,8 +64,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9B731C282E535C3100CE26F0"
-            BuildableName = "GroceryRecipeManager.app"
-            BlueprintName = "GroceryRecipeManager"
+            BuildableName = "forager.app"
+            BlueprintName = "forager"
             ReferencedContainer = "container:forager.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
