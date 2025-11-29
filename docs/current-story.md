@@ -107,13 +107,13 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 ### 📁 **PHASE 3: M5.0.3 - FILE & FOLDER STRUCTURE** (90 min) ⏳ PLANNED
 
 **Phase 3A: Source Folders (25 min)**
-- [ ] **3.1** Close Xcode
-- [ ] **3.2** Folder: GroceryRecipeManager/ → Forager/
-- [ ] **3.3** Folder: GroceryRecipeManagerTests/ → ForagerTests/
-- [ ] **3.4** Folder: GroceryRecipeManagerUITests/ → ForagerUITests/
-- [ ] **3.5** Reopen, fix references
-- [ ] **3.6** ✓ Build succeeds
-- [ ] **3.7** Git: "M5.0.3A: Folders renamed"
+- [x] **3.1** Close Xcode
+- [x] **3.2** Folder: GroceryRecipeManager/ → Forager/
+- [x] **3.3** Folder: GroceryRecipeManagerTests/ → ForagerTests/
+- [x] **3.4** Folder: GroceryRecipeManagerUITests/ → ForagerUITests/
+- [x] **3.5** Reopen, fix references
+- [x] **3.6** ✓ Build succeeds
+- [x] **3.7** Git: "M5.0.3A: Folders renamed"
 
 **Phase 3B: Core Data Model (20 min) ⚠️ HIGH RISK**
 - [ ] **3.8** Rename: GroceryRecipeManager.xcdatamodeld → Forager.xcdatamodeld
