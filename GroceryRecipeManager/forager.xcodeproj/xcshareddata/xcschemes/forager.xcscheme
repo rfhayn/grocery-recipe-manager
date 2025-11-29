@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "2600"
-   version = "1.7">
+   version = "2.2">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
@@ -13,13 +13,8 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES"
             buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9B731C282E535C3100CE26F0"
-               BuildableName = "GroceryRecipeManager.app"
-               BlueprintName = "GroceryRecipeManager"
-               ReferencedContainer = "container:GroceryRecipeManager.xcodeproj">
-            </BuildableReference>
+            <AutocreatedTestPlanReference>
+            </AutocreatedTestPlanReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
@@ -71,7 +66,7 @@
             BlueprintIdentifier = "9B731C282E535C3100CE26F0"
             BuildableName = "GroceryRecipeManager.app"
             BlueprintName = "GroceryRecipeManager"
-            ReferencedContainer = "container:GroceryRecipeManager.xcodeproj">
+            ReferencedContainer = "container:forager.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -81,16 +76,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9B731C282E535C3100CE26F0"
-            BuildableName = "GroceryRecipeManager.app"
-            BlueprintName = "GroceryRecipeManager"
+            BlueprintIdentifier = "9B731C3C2E535C3300CE26F0"
+            BuildableName = "GroceryRecipeManagerTests.xctest"
+            BlueprintName = "GroceryRecipeManagerTests"
             ReferencedContainer = "container:GroceryRecipeManager.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

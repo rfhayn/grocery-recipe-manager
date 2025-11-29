@@ -90,11 +90,11 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 - [x] **2.11** Git: "M5.0.2C: Scheme renamed"
 
 **Phase 2D: Project File Rename (20 min) ⚠️ HIGH RISK**
-- [ ] **2.12** Close Xcode completely
-- [ ] **2.13** Finder: .xcodeproj → Forager.xcodeproj
-- [ ] **2.14** Reopen, fix broken references
-- [ ] **2.15** ✓ All files green, builds
-- [ ] **2.16** Git: "M5.0.2D: Project file renamed"
+- [x] **2.12** Close Xcode completely
+- [x] **2.13** Finder: .xcodeproj → Forager.xcodeproj
+- [x] **2.14** Reopen, fix broken references
+- [x] **2.15** ✓ All files green, builds
+- [x] **2.16** Git: "M5.0.2D: Project file renamed"
 
 **Phase 2E: Target & Product Names (15 min)**
 - [ ] **2.17** Rename target to Forager
