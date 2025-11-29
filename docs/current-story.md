@@ -97,10 +97,10 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 - [x] **2.16** Git: "M5.0.2D: Project file renamed"
 
 **Phase 2E: Target & Product Names (15 min)**
-- [ ] **2.17** Rename target to Forager
-- [ ] **2.18** Set product name: Forager
-- [ ] **2.19** ✓ Archive succeeds
-- [ ] **2.20** Git: "M5.0.2E COMPLETE: Xcode done"
+- [x] **2.17** Rename target to Forager
+- [x] **2.18** Set product name: Forager
+- [x] **2.19** ✓ Build succeeds
+- [x] **2.20** Git: "M5.0.2E COMPLETE: Xcode done"
 
 ---
 
