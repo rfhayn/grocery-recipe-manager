@@ -64,7 +64,7 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 - [x] **1.4** GitHub repo chosen: forager-ios
 - [x] **1.5** 42-item checklist created
 - [x] **1.6** Naming strategy documented (milestone5.0.1-name-decision-record.md)
-- [ ] **1.7** Git checkpoint: "M5.0.1 COMPLETE: Forager name finalized" ← **NEXT ACTION**
+- [x] **1.7** Git checkpoint: "M5.0.1 COMPLETE: Forager name finalized" ← **NEXT ACTION**
 
 **Status**: 6/7 complete - Ready for final checkpoint
 
@@ -73,16 +73,16 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 ### 🔧 **PHASE 2: M5.0.2 - XCODE PROJECT RENAMING** (80 min) 🚀 READY
 
 **Phase 2A: Bundle Identifiers (20 min)**
-- [ ] **2.1** Main target → com.richhayn.forager
-- [ ] **2.2** Tests target → com.richhayn.foragerTests
-- [ ] **2.3** UI Tests target → com.richhayn.foragerUITests
-- [ ] **2.4** ✓ Clean build succeeds
-- [ ] **2.5** Git: "M5.0.2A: Bundle IDs updated"
+- [x] **2.1** Main target → com.richhayn.forager
+- [x] **2.2** Tests target → com.richhayn.foragerTests
+- [x] **2.3** UI Tests target → com.richhayn.foragerUITests
+- [x] **2.4** ✓ Clean build succeeds
+- [x] **2.5** Git: "M5.0.2A: Bundle IDs updated"
 
 **Phase 2B: Display Name (10 min)**
-- [ ] **2.6** Set display name: Forager
-- [ ] **2.7** ✓ Simulator shows "Forager"
-- [ ] **2.8** Git: "M5.0.2B: Display name set"
+- [x] **2.6** Set display name: Forager
+- [x] **2.7** ✓ Simulator shows "Forager"
+- [x] **2.8** Git: "M5.0.2B: Display name set"
 
 **Phase 2C: Scheme Renaming (15 min)**
 - [ ] **2.9** Rename scheme: GroceryRecipeManager → Forager
