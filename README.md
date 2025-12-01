@@ -1,4 +1,4 @@
-# Grocery & Recipe Manager
+# Forager
 
 An iOS app that transforms grocery shopping from a time-consuming chore into an efficient, personalized experience through smart automation, custom store layouts, and intelligent meal planning.
 
@@ -43,13 +43,13 @@ An iOS app that transforms grocery shopping from a time-consuming chore into an 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/rfhayn/grocery-recipe-manager.git
-cd grocery-recipe-manager
+git clone https://github.com/rfhayn/forager.git
+cd forager
 ```
 
 2. Open the project in Xcode:
 ```bash
-open forager/forager.xcodeproj
+open forager.xcodeproj
 ```
 
 3. Build and run:
@@ -71,7 +71,7 @@ The app consists of four main tabs:
 ### Technology Stack
 - **SwiftUI** for modern, declarative UI
 - **Core Data** for local data persistence with performance optimization
-- **CloudKit** ready for family sharing (planned for M5)
+- **CloudKit** ready for family sharing (planned for M5.1)
 
 ### Data Model
 - 9-entity Core Data model supporting recipes, ingredients, meal planning, and custom categories
@@ -128,19 +128,20 @@ The app consists of four main tabs:
 - **M4.3.3**: Bulk add from meal plan with progress tracking (2.5h)
 - **M4.3.4**: Meal completion tracking with visual feedback (1h)
 
-### In Progress
-
-**M4.3.5: Ingredient Normalization** 🔄 (3.5/4 hours complete)
-- ✅ Phase 1: Case normalization (Butter → butter)
-- ✅ Phase 2: Singular/plural consolidation with preserve-plural list
-- ✅ Phase 3: Abbreviation expansion (tbsp → tablespoon)
-- 🚀 Phase 4: Variation handling (diced tomato → tomato) - Ready to begin
+**M5.0: App Renaming & Directory Restructure** ✅ (November 2025)
+- Complete app rename from "GroceryRecipeManager" to "Forager"
+- Directory structure flattened and optimized
+- All documentation and references updated
+- 164 references updated across 74 files
 
 ### Planned Features
 
-**M5: Production Infrastructure & CloudKit** (12-17 hours)
+**M5.1: TestFlight & Production Infrastructure** (8-12 hours)
 - Apple Developer Account setup & App Store Connect configuration
 - TestFlight deployment & real device testing (3+ devices)
+- Production build preparation
+
+**M5.2: CloudKit Sync** (12-15 hours)
 - CloudKit schema design & sync engine implementation
 - Family sharing features with real-time collaboration
 - Multi-device support with conflict resolution
@@ -161,21 +162,24 @@ The app consists of four main tabs:
 ## Project Structure
 
 ```
-grocery-recipe-manager/
-├── forager/           # iOS Xcode project
-│   ├── Views/                      # SwiftUI views
-│   ├── Services/                   # Data services
-│   └── Core Data/                  # Data model
-├── docs/                           # Comprehensive documentation
-│   ├── requirements.md             # All functional requirements
-│   ├── roadmap.md                  # Milestone timeline & tracking
-│   ├── current-story.md            # Active development status
-│   ├── project-index.md            # Documentation navigation hub
-│   ├── learning-notes/             # Implementation journey
-│   ├── architecture/               # Architecture Decision Records
-│   └── prds/                       # Product Requirements Documents
-└── Tools/                          # Development tools
-    └── AITestReview/               # AI test review CLI (M6)
+forager/
+├── forager.xcodeproj          # Xcode project
+├── forager/                    # Main source code
+│   ├── Views/                  # SwiftUI views
+│   ├── Services/               # Data services
+│   └── forager.xcdatamodeld/   # Core Data model
+├── foragerTests/               # Unit tests
+├── foragerUITests/             # UI tests
+├── docs/                       # Comprehensive documentation
+│   ├── requirements.md         # All functional requirements
+│   ├── roadmap.md              # Milestone timeline & tracking
+│   ├── current-story.md        # Active development status
+│   ├── project-index.md        # Documentation navigation hub
+│   ├── learning-notes/         # Implementation journey
+│   ├── architecture/           # Architecture Decision Records
+│   └── prds/                   # Product Requirements Documents
+└── Tools/                      # Development tools
+    └── AITestReview/           # AI test review CLI (M6)
 ```
 
 ## Documentation
@@ -275,7 +279,7 @@ For questions about the project or iOS development approaches used, please open 
 ---
 
 **Project Stats:**
-- 🕐 85.75 hours of development across 4 major milestones
+- 🕐 85.75+ hours of development across 5 major milestones
 - 📊 88% planning accuracy with phase-based approach
 - ✅ 100% build success rate (zero breaking changes)
 - 🚀 100% performance targets met or exceeded
