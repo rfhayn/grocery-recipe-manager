@@ -1,4 +1,4 @@
-// GroceryRecipeManagerApp.swift
+// foragerApp.swift
 // Updated with Settings Tab - M3 Phase 3
 // Updated with Meal Planning Tab - M4.2
 // CORRECTED: Tap-to-Pop-to-Root with NavigationStack and path arrays
@@ -6,7 +6,7 @@
 import SwiftUI
 
 @main
-struct GroceryRecipeManagerApp: App {
+struct foragerApp: App {
     let persistenceController = PersistenceController.shared
     
     // Tab selection tracking
