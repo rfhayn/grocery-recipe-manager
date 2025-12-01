@@ -136,12 +136,12 @@ Keywords: grocery, recipes, meal planning, shopping list, forager
 ## 🔄 **WHAT CHANGES IN M5.0**
 
 ### **From (Current)**
-- Project: GroceryRecipeManager
+- Project: forager
 - Bundle: com.richhayn.groceryrecipemanager  
 - GitHub: grocery-recipe-manager
-- Folders: GroceryRecipeManager/
-- Files: GroceryRecipeManagerApp.swift
-- Core Data: GroceryRecipeManager.xcdatamodeld
+- Folders: forager/
+- Files: foragerApp.swift
+- Core Data: forager.xcdatamodeld
 
 ### **To (Target)**
 - Project: Forager

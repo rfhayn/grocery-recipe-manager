@@ -1,4 +1,4 @@
-# Grocery & Recipe Manager - Requirements Document
+# forager - Requirements Document
 
 **Last Updated**: November 26, 2025  
 **Version**: 3.8  
@@ -8,7 +8,7 @@
 
 ## 📋 **OVERVIEW**
 
-This document defines all functional and non-functional requirements for the Grocery & Recipe Manager iOS application. Requirements are organized by milestone with traceability to implementation status.
+This document defines all functional and non-functional requirements for the forager iOS application. Requirements are organized by milestone with traceability to implementation status.
 
 ---
 

@@ -1,4 +1,4 @@
-# Grocery & Recipe Manager - Project Index
+# forager - Project Index
 
 **Last Updated**: November 28, 2025  
 **Purpose**: Central navigation hub for all project documentation  

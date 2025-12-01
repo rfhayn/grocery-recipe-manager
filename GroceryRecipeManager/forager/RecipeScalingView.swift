@@ -1,6 +1,6 @@
 //
 //  RecipeScalingView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M3 Phase 4: Recipe Scaling Service
 //  WITH TICK MARKS - No quick buttons

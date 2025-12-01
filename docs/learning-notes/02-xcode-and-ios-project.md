@@ -38,15 +38,15 @@
 
 ### Project Structure Created
 ```
-GroceryRecipeManager/
-├── GroceryRecipeManager.xcodeproj/     # Xcode project file
-├── GroceryRecipeManager/               # Main app source
-│   ├── GroceryRecipeManagerApp.swift   # App entry point
+forager/
+├── forager.xcodeproj/     # Xcode project file
+├── forager/               # Main app source
+│   ├── foragerApp.swift   # App entry point
 │   ├── ContentView.swift               # Main UI view
 │   ├── Persistence.swift               # Core Data stack
-│   └── GroceryRecipeManager.xcdatamodeld # Core Data model
-├── GroceryRecipeManagerTests/          # Unit tests
-└── GroceryRecipeManagerUITests/        # UI tests
+│   └── forager.xcdatamodeld # Core Data model
+├── foragerTests/          # Unit tests
+└── foragerUITests/        # UI tests
 ```
 
 ### Core Data Template Analysis

@@ -1,6 +1,6 @@
 //
 //  IngredientTemplate+Validation.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M3.5 Phase 1 Task 3: Template Validation
 //  Date: October 22, 2025

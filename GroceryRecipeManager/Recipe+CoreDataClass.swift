@@ -1,6 +1,6 @@
 //
 //  Recipe+CoreDataClass.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Richard Hayn on 9/7/25.
 //  Updated by Richard Hayn on 10/21/35 as part of M 3.5

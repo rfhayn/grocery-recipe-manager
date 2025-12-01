@@ -1,6 +1,6 @@
 //
 //  Tag+CoreDataProperties.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Rich Hayn on 8/18/25.
 //

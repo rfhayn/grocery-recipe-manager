@@ -1,13 +1,13 @@
 //
-//  GroceryRecipeManagerUITestsLaunchTests.swift
-//  GroceryRecipeManagerUITests
+//  foragerUITestsLaunchTests.swift
+//  foragerUITests
 //
 //  Created by Rich Hayn on 8/18/25.
 //
 
 import XCTest
 
-final class GroceryRecipeManagerUITestsLaunchTests: XCTestCase {
+final class foragerUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

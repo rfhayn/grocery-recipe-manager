@@ -1,6 +1,6 @@
 //
 //  HelpView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Rich Hayn on 10/20/25.
 //
@@ -8,7 +8,7 @@
 
 //
 //  HelpView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  M3 Phase 6: User-facing help documentation for quantity management features
 //

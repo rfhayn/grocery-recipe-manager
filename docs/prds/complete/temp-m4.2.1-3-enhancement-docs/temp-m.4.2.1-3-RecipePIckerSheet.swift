@@ -1,6 +1,6 @@
 //
 //  RecipePickerSheet.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.2.1-3: Calendar Recipe Assignment Enhancement
 //  Modal sheet for selecting a recipe to add to a specific date in meal plan

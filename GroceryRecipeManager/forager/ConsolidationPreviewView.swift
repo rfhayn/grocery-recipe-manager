@@ -1,6 +1,6 @@
 //
 //  ConsolidationPreviewView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  M3 Phase 5: Consolidation Preview with Unit Conversion Support
 //

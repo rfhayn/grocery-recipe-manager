@@ -1,6 +1,6 @@
 //
 //  RecipePickerSheet.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.2.1-3: Calendar Recipe Assignment Enhancement
 //  Autocomplete-style recipe picker with search-as-you-type

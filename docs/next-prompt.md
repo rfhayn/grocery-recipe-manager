@@ -382,7 +382,7 @@ Let's start with Phase 4A: Core Documentation Updates.
 ✓ README displays correctly
 
 # 3. Consistency check
-grep -r "GroceryRecipeManager" docs/ | grep -v ".git"
+grep -r "forager" docs/ | grep -v ".git"
 ✓ Only historical references with context
 
 # If ALL pass:

@@ -508,7 +508,7 @@ func addRecipeToMealPlan(recipe: Recipe, date: Date, mealPlan: MealPlan) {
 4. Build and verify schema
 
 **Files Modified**:
-- `GroceryRecipeManager.xcdatamodeld`
+- `forager.xcdatamodeld`
 
 ### Phase 2: Service Layer Enhancements (25 min)
 
@@ -583,14 +583,14 @@ MealPlanService {
 ### Phase 7: Update Tab Structure & Integration (10 min)
 
 **Tasks**:
-1. Update GroceryRecipeManagerApp.swift
+1. Update foragerApp.swift
 2. Change tab to MealPlansListView
 3. Update RecipeListView "Add to Meal Plan" button
 4. Update RecipeDetailView "Add to Meal Plan" section
 5. Test navigation flows
 
 **Files Modified**:
-- `GroceryRecipeManagerApp.swift`
+- `foragerApp.swift`
 - `Views/RecipeListView.swift`
 - `Views/RecipeDetailView.swift`
 

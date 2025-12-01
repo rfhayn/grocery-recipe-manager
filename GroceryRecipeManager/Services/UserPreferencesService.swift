@@ -1,6 +1,6 @@
 //
 //  UserPreferencesService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Rich Hayn on 10/23/25.
 //
@@ -8,7 +8,7 @@
 
 //
 //  UserPreferencesService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.1: Settings Infrastructure Foundation
 //  Manages meal planning and app-wide user preferences

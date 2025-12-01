@@ -1,6 +1,6 @@
 //
 //  QuantityMigrationService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M3 Phase 3: Data Migration
 //  Converts existing string-based quantities to structured format

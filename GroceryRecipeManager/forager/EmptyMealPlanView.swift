@@ -1,6 +1,6 @@
 //
 //  EmptyMealPlanView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.2: Calendar-Based Meal Planning Core
 //  Empty state view shown when no active meal plan exists

@@ -1,5 +1,5 @@
 # Project Naming Standards
-**Project**: Grocery & Recipe Manager iOS App  
+**Project**: forager iOS App  
 **Version**: 3.0 - Enhanced with Quick Reference & Enforcement  
 **Last Updated**: October 23, 2025  
 

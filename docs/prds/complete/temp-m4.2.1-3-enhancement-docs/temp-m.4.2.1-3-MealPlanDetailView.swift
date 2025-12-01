@@ -1,6 +1,6 @@
 //
 //  MealPlanDetailView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Enhanced for M4.2.1-3: Calendar Recipe Assignment with Tap-to-Add
 //  Displays calendar view for a specific meal plan with recipe assignment

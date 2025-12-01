@@ -1,6 +1,6 @@
 //
 //  IngredientParsingService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Updated for M3 Phase 2: Structured Quantity Management
 //  Enhanced with numeric conversion and unit standardization

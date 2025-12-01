@@ -1,6 +1,6 @@
 //
 //  ComputedPropertiesTests.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M3.5 Phase 1 Task 4: Computed Properties Testing
 //  Date: October 22, 2025

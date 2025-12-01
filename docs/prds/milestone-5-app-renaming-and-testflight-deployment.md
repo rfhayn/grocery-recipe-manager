@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-Systematically rename the entire project from "GroceryRecipeManager" to a new app name, updating all technical identifiers, file structures, documentation, and GitHub repository while maintaining zero code breakage. Follow with TestFlight deployment to enable real-device testing. This milestone establishes production-ready branding and infrastructure before CloudKit implementation.
+Systematically rename the entire project from "forager" to a new app name, updating all technical identifiers, file structures, documentation, and GitHub repository while maintaining zero code breakage. Follow with TestFlight deployment to enable real-device testing. This milestone establishes production-ready branding and infrastructure before CloudKit implementation.
 
 **Critical Success Factors**:
 - Zero build breaks at any checkpoint
@@ -24,7 +24,7 @@ Systematically rename the entire project from "GroceryRecipeManager" to a new ap
 ## Problem Statement
 
 ### Current State Issues
-1. **Generic naming**: "GroceryRecipeManager" lacks brand identity and market appeal
+1. **Generic naming**: "forager" lacks brand identity and market appeal
 2. **Inconsistent references**: Project name appears in 50+ locations across code, docs, GitHub
 3. **Bundle ID locked**: Once App Store Connect record created, bundle ID is permanent
 4. **No validation path**: Can't test on real devices before CloudKit investment
@@ -108,7 +108,7 @@ Systematically rename the entire project from "GroceryRecipeManager" to a new ap
 
 **Xcode Project Name** (Developer-facing):
 - Recommendation: Match app name for consistency
-- Current: "GroceryRecipeManager"
+- Current: "forager"
 - New: `[TO BE DECIDED]`
 
 **GitHub Repository Name**:
@@ -204,7 +204,7 @@ Systematically rename the entire project from "GroceryRecipeManager" to a new ap
    Steps:
    1. Open Xcode
    2. Select project in navigator
-   3. Select "GroceryRecipeManager" target
+   3. Select "forager" target
    4. General tab → Bundle Identifier
    5. Change from: com.richhayn.groceryrecipemanager
    6. Change to: [NEW_BUNDLE_ID]
@@ -214,7 +214,7 @@ Systematically rename the entire project from "GroceryRecipeManager" to a new ap
 2. **Test Target Bundle ID**:
    ```
    Steps:
-   1. Select "GroceryRecipeManagerTests" target
+   1. Select "foragerTests" target
    2. General tab → Bundle Identifier
    3. Change to: [NEW_BUNDLE_ID]Tests
    4. Must match main target + "Tests" suffix
@@ -223,7 +223,7 @@ Systematically rename the entire project from "GroceryRecipeManager" to a new ap
 3. **UI Test Target Bundle ID**:
    ```
    Steps:
-   1. Select "GroceryRecipeManagerUITests" target
+   1. Select "foragerUITests" target
    2. General tab → Bundle Identifier
    3. Change to: [NEW_BUNDLE_ID]UITests
    4. Must match main target + "UITests" suffix
@@ -282,7 +282,7 @@ Systematically rename the entire project from "GroceryRecipeManager" to a new ap
 
 **Steps**:
 1. Product → Scheme → Manage Schemes
-2. Double-click "GroceryRecipeManager" scheme
+2. Double-click "forager" scheme
 3. Rename to: `[NEW_APP_NAME]`
 4. Click "Close"
 5. Xcode may prompt to save - click "Save"
@@ -321,10 +321,10 @@ git commit -m "M5.0.2: Before project file rename checkpoint"
 1. **Close Xcode completely** (Cmd+Q)
 2. **In Finder**:
    - Navigate to project folder
-   - Right-click "GroceryRecipeManager.xcodeproj"
+   - Right-click "forager.xcodeproj"
    - Rename to: `[NEW_APP_NAME].xcodeproj`
 3. **Rename containing folder** (optional but recommended):
-   - Rename "GroceryRecipeManager" folder to `[NEW_APP_NAME]`
+   - Rename "forager" folder to `[NEW_APP_NAME]`
 4. **Open renamed project file**:
    - Double-click `[NEW_APP_NAME].xcodeproj`
    - Xcode should open (may take a moment)
@@ -375,13 +375,13 @@ git commit -m "M5.0.2: Before project file rename checkpoint"
 1. **Update target names** (cosmetic, optional):
    - Select project → Select target
    - Single-click target name in sidebar
-   - Rename from "GroceryRecipeManager" to `[NEW_APP_NAME]`
+   - Rename from "forager" to `[NEW_APP_NAME]`
    - Repeat for test targets
 
 2. **Update product name** (build settings):
    - Select target → Build Settings tab
    - Search for: "Product Name"
-   - Change from: $(TARGET_NAME) or "GroceryRecipeManager"
+   - Change from: $(TARGET_NAME) or "forager"
    - Change to: `[NEW_APP_NAME]`
    - Do this for all 3 targets
 
@@ -467,32 +467,32 @@ git commit -m "M5.0.2 COMPLETE: Xcode project renamed, all builds pass"
 
 **Current structure**:
 ```
-GroceryRecipeManager/
-├── GroceryRecipeManager/          # Main source folder
+forager/
+├── forager/          # Main source folder
 │   ├── Models/
 │   ├── Views/
 │   ├── Services/
-│   ├── GroceryRecipeManagerApp.swift
-│   ├── GroceryRecipeManager.xcdatamodeld/
+│   ├── foragerApp.swift
+│   ├── forager.xcdatamodeld/
 │   ├── Assets.xcassets
-│   └── GroceryRecipeManager.entitlements
-├── GroceryRecipeManagerTests/
-└── GroceryRecipeManagerUITests/
+│   └── forager.entitlements
+├── foragerTests/
+└── foragerUITests/
 ```
 
 **Steps**:
 
 1. **In Xcode** (not Finder):
-   - Select "GroceryRecipeManager" folder (blue folder in navigator)
+   - Select "forager" folder (blue folder in navigator)
    - File → Show in Finder
    - Note the location
 
 2. **Close Xcode completely**
 
 3. **In Finder**:
-   - Rename "GroceryRecipeManager" folder to `[NEW_APP_NAME]`
-   - Rename "GroceryRecipeManagerTests" to `[NEW_APP_NAME]Tests`
-   - Rename "GroceryRecipeManagerUITests" to `[NEW_APP_NAME]UITests`
+   - Rename "forager" folder to `[NEW_APP_NAME]`
+   - Rename "foragerTests" to `[NEW_APP_NAME]Tests`
+   - Rename "foragerUITests" to `[NEW_APP_NAME]UITests`
 
 4. **Open Xcode project**:
    - Double-click `[NEW_APP_NAME].xcodeproj`
@@ -521,20 +521,20 @@ Right-click any file → Show in Finder
 
 #### Phase 3B: Core Data Model Renaming (20 minutes)
 
-**Current**: `GroceryRecipeManager.xcdatamodeld`  
+**Current**: `forager.xcdatamodeld`  
 **New**: `[NEW_APP_NAME].xcdatamodeld`
 
 **Steps**:
 
 1. **In Xcode**:
-   - Select `GroceryRecipeManager.xcdatamodeld` in navigator
+   - Select `forager.xcdatamodeld` in navigator
    - File → Show in Finder
    - Note exact location
 
 2. **Close Xcode**
 
 3. **In Finder**:
-   - Rename `GroceryRecipeManager.xcdatamodeld` to `[NEW_APP_NAME].xcdatamodeld`
+   - Rename `forager.xcdatamodeld` to `[NEW_APP_NAME].xcdatamodeld`
    - This is a package - make sure to rename the whole thing
 
 4. **Open Xcode**
@@ -542,7 +542,7 @@ Right-click any file → Show in Finder
 5. **Update Persistence.swift** (or wherever NSPersistentContainer is initialized):
    ```swift
    // OLD:
-   let container = NSPersistentCloudKitContainer(name: "GroceryRecipeManager")
+   let container = NSPersistentCloudKitContainer(name: "forager")
    
    // NEW:
    let container = NSPersistentCloudKitContainer(name: "[NEW_APP_NAME]")
@@ -550,7 +550,7 @@ Right-click any file → Show in Finder
 
 6. **Search for model references**:
    - Xcode → Find in Project (Cmd+Shift+F)
-   - Search: "GroceryRecipeManager.xcdatamodeld"
+   - Search: "forager.xcdatamodeld"
    - Replace with: "[NEW_APP_NAME].xcdatamodeld"
 
 **Validation Checkpoint 3B**:
@@ -583,13 +583,13 @@ Product → Run
 
 #### Phase 3C: Entitlements File Renaming (15 minutes)
 
-**Current**: `GroceryRecipeManager.entitlements`  
+**Current**: `forager.entitlements`  
 **New**: `[NEW_APP_NAME].entitlements`
 
 **Steps**:
 
 1. **In Xcode navigator**:
-   - Locate `GroceryRecipeManager.entitlements`
+   - Locate `forager.entitlements`
    - Right-click → Rename
    - Rename to: `[NEW_APP_NAME].entitlements`
 
@@ -597,7 +597,7 @@ Product → Run
    - Select project → Select target
    - Build Settings tab
    - Search: "Code Signing Entitlements"
-   - Update path from: `GroceryRecipeManager/GroceryRecipeManager.entitlements`
+   - Update path from: `forager/forager.entitlements`
    - Update path to: `[NEW_APP_NAME]/[NEW_APP_NAME].entitlements`
 
 3. **Update CloudKit container identifier**:
@@ -628,13 +628,13 @@ Open entitlements file in editor
 
 #### Phase 3D: Main App File Renaming (10 minutes)
 
-**Current**: `GroceryRecipeManagerApp.swift`  
+**Current**: `foragerApp.swift`  
 **New**: `[NEW_APP_NAME]App.swift`
 
 **Steps**:
 
 1. **In Xcode navigator**:
-   - Locate `GroceryRecipeManagerApp.swift`
+   - Locate `foragerApp.swift`
    - Right-click → Rename
    - Rename to: `[NEW_APP_NAME]App.swift`
 
@@ -642,7 +642,7 @@ Open entitlements file in editor
    ```swift
    // OLD:
    @main
-   struct GroceryRecipeManagerApp: App {
+   struct foragerApp: App {
    
    // NEW:
    @main
@@ -650,7 +650,7 @@ Open entitlements file in editor
    ```
 
 3. **Search for app struct references**:
-   - Cmd+Shift+F → Search: "GroceryRecipeManagerApp"
+   - Cmd+Shift+F → Search: "foragerApp"
    - Replace with: "[NEW_APP_NAME]App"
    - Check each occurrence (may be in previews)
 
@@ -678,10 +678,10 @@ Product → Run
 
 # 1. Update project name in all Swift files
 find . -name "*.swift" -type f -exec sed -i '' \
-  's/GroceryRecipeManager/[NEW_APP_NAME]/g' {} +
+  's/forager/[NEW_APP_NAME]/g' {} +
 
 # 2. Verify changes
-git diff | grep "GroceryRecipeManager"
+git diff | grep "forager"
 # Should show old name being replaced
 
 # 3. Check for unwanted replacements
@@ -695,7 +695,7 @@ git diff
 # For each file with header comment:
 //
 //  [FileName].swift
-//  GroceryRecipeManager    ← Update this line
+//  forager    ← Update this line
 //
 //  Created by Rich Hayn on [date]
 //
@@ -712,7 +712,7 @@ git diff
 **Validation Checkpoint 3E**:
 ```bash
 # Test 1: Search for old name
-Cmd+Shift+F → Search: "GroceryRecipeManager"
+Cmd+Shift+F → Search: "forager"
 ✓ Should only appear in:
   - Git commit messages
   - Learning notes documenting rename
@@ -845,14 +845,14 @@ git push origin main
    **GitHub**: https://github.com/rfhayn/[new-repo-name]
    **Bundle ID**: com.richhayn.[new-bundle-id]
    
-   [Update all "GroceryRecipeManager" references]
+   [Update all "forager" references]
    [Update current status to M5.0 COMPLETE]
    ```
 
 **Search-and-replace strategy**:
 ```bash
 # In Terminal at docs/ directory:
-grep -r "GroceryRecipeManager" . | grep -v ".git"
+grep -r "forager" . | grep -v ".git"
 # Review all occurrences
 # Manually update each file (safer than bulk replace)
 ```
@@ -861,7 +861,7 @@ grep -r "GroceryRecipeManager" . | grep -v ".git"
 ```bash
 # Test 1: Grep for old name
 cd docs/
-grep -r "GroceryRecipeManager" . | grep -v ".git"
+grep -r "forager" . | grep -v ".git"
 ✓ Expected: Only in learning notes documenting history
 
 # Test 2: Check key files
@@ -885,7 +885,7 @@ grep -r "GroceryRecipeManager" . | grep -v ".git"
 1. **Keep old references in historical notes** - they document what was true at the time
 2. **Add context note at top of recent notes**:
    ```markdown
-   > **Note**: This project was renamed from "GroceryRecipeManager" 
+   > **Note**: This project was renamed from "forager" 
    > to "[NEW_APP_NAME]" in M5.0 (November 2025). Historical 
    > references to the old name are preserved for accuracy.
    ```
@@ -903,7 +903,7 @@ grep -r "GroceryRecipeManager" . | grep -v ".git"
 **Validation Checkpoint 4B**:
 ```bash
 # Test 1: Historical accuracy preserved
-✓ Old learning notes keep "GroceryRecipeManager"
+✓ Old learning notes keep "forager"
 ✓ Context notes added to recent documents
 
 # Test 2: Future content updated
@@ -1048,7 +1048,7 @@ Private - All Rights Reserved
 ✓ Git push/pull working
 
 # 4. Consistency check
-grep -r "GroceryRecipeManager" docs/ | grep -v ".git"
+grep -r "forager" docs/ | grep -v ".git"
 ✓ Only appears with historical context
 
 # 5. Git checkpoint

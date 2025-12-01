@@ -1,6 +1,6 @@
 //
 //  UnitConversionService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Rich Hayn on 10/14/25.
 //
@@ -8,7 +8,7 @@
 
 //
 //  UnitConversionService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  M3 Phase 5 Enhancement: Kitchen unit conversions
 //  Based on standard kitchen measurement conversions

@@ -59,7 +59,7 @@ Successfully implemented intelligent shopping list consolidation with advanced u
 
 **3. ConsolidationPreviewView**
 - **Purpose**: Professional UI for merge preview and execution
-- **Location**: `GroceryRecipeManager/ConsolidationPreviewView.swift`
+- **Location**: `forager/ConsolidationPreviewView.swift`
 - **Key Features**:
   - Summary statistics (items before/after merge)
   - Grouped preview by ingredient
@@ -70,7 +70,7 @@ Successfully implemented intelligent shopping list consolidation with advanced u
 
 **4. GroceryListDetailView Integration**
 - **Purpose**: Entry point for consolidation workflow
-- **Location**: `GroceryRecipeManager/GroceryListDetailView.swift`
+- **Location**: `forager/GroceryListDetailView.swift`
 - **Enhancement**: Added "Consolidate" toolbar button with intelligent enabling
 
 ### Data Models
@@ -464,11 +464,11 @@ Group: flour
 ### Created
 - `Services/QuantityMergeService.swift` - Core consolidation logic (350 lines)
 - `Services/UnitConversionService.swift` - Unit conversion system (280 lines)
-- `GroceryRecipeManager/ConsolidationPreviewView.swift` - Preview UI (220 lines)
+- `forager/ConsolidationPreviewView.swift` - Preview UI (220 lines)
 - `docs/learning-notes/15-m3-phase5-quantity-consolidation.md` - This document
 
 ### Updated
-- `GroceryRecipeManager/GroceryListDetailView.swift` - Added consolidation integration
+- `forager/GroceryListDetailView.swift` - Added consolidation integration
 - `docs/current-story.md` - Phase 5 marked complete, Phase 6 setup
 - `docs/roadmap.md` - Progress tracking updated
 - `docs/project-index.md` - Learning note reference added

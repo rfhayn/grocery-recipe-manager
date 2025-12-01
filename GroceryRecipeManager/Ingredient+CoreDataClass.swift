@@ -1,6 +1,6 @@
 //
 //  Ingredient+CoreDataClass.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Rich Hayn on 10/10/25.
 //  Enhanced for M3.5: Foundation Hardening - Ingredient Validation

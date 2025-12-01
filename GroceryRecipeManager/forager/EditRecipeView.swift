@@ -1,6 +1,6 @@
 //
 //  EditRecipeView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M2.3: Recipe Creation & Editing
 //  Edit existing recipes while maintaining data integrity

@@ -1,6 +1,6 @@
 //
 //  SelectListSheet.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.3.3: Bulk Add from Meal Plan
 //  Sheet for selecting grocery list and adjusting recipe servings

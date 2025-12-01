@@ -1,6 +1,6 @@
 //
 //  MigrationDebugView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M3 Phase 3: Migration UI
 //  Debug view to trigger and monitor quantity migration

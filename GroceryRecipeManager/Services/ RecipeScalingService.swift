@@ -1,6 +1,6 @@
 //
 //  RecipeScalingService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M3 Phase 4: Recipe Scaling Service
 //  Mathematical recipe scaling with graceful handling of parseable and unparseable quantities

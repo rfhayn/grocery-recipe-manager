@@ -1,6 +1,6 @@
 //
 //  MealPlanDetailView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Enhanced for M4.2.1-3 Enhancement: Inline Autocomplete Meal Planning
 //  Each day has its own search field for quick recipe assignment

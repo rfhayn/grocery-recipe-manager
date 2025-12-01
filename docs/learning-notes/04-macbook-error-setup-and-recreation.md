@@ -51,12 +51,12 @@
 4. Update code files to match documented functionality
 
 ### Git Submodule Resolution
-**Problem Identified**: `fatal: Pathspec 'GroceryRecipeManager/...' is in submodule 'GroceryRecipeManager'`
+**Problem Identified**: `fatal: Pathspec 'forager/...' is in submodule 'forager'`
 **Root Cause**: Xcode project initialized with its own Git repository
 **Solution Process**:
 ```bash
-git rm --cached GroceryRecipeManager  # Remove submodule reference
-git add GroceryRecipeManager/          # Add as regular directory
+git rm --cached forager  # Remove submodule reference
+git add forager/          # Add as regular directory
 git status                             # Verify all files now tracked
 ```
 

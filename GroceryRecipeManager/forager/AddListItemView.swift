@@ -1,6 +1,6 @@
 //
 //  AddListItemView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  PHASE 3 UPDATE: Added new ingredient to template system with category assignment
 //

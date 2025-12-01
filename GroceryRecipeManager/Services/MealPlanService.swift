@@ -1,6 +1,6 @@
 //
 //  MealPlanService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.2: Calendar-Based Meal Planning Core
 //  Manages meal plans and recipe assignments to dates

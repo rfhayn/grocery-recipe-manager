@@ -1,6 +1,6 @@
 //
 //  SelectMealPlanSheet.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.2.4: Multiple Meal Plans List View
 //  Modal sheet for selecting which meal plan to add a recipe to

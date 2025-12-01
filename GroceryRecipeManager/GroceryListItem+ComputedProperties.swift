@@ -1,6 +1,6 @@
 //
 //  GroceryListItem+ComputedProperties.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.3.1 Phase 4: Recipe Source Display Logic
 //  Date: November 13, 2025

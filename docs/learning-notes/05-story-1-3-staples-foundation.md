@@ -126,7 +126,7 @@ private func deleteStaples(offsets: IndexSet) {
 **Diagnosis**: NavigationView nesting causing layout conflicts
 **Solution Process**:
 1. Identified double NavigationView wrapping
-2. Moved NavigationView to app level (GroceryRecipeManagerApp.swift)
+2. Moved NavigationView to app level (foragerApp.swift)
 3. Removed NavigationView from StaplesView itself
 4. Kept navigation features (toolbar, title) at view level
 **Result**: Proper scrolling with maintained navigation functionality

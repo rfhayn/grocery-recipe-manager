@@ -1,6 +1,6 @@
 # DEVELOPMENT GUIDELINES FOR CLAUDE ASSISTANCE - V3.0
 
-**Project**: Grocery & Recipe Manager iOS App  
+**Project**: forager iOS App  
 **Last Updated**: October 23, 2025 (Enhanced with Session Startup Checklist & Naming Enforcement)  
 **GitHub Repository**: https://github.com/rfhayn/grocery-recipe-manager.git
 

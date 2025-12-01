@@ -49,7 +49,7 @@ cd grocery-recipe-manager
 
 2. Open the project in Xcode:
 ```bash
-open GroceryRecipeManager/GroceryRecipeManager.xcodeproj
+open forager/forager.xcodeproj
 ```
 
 3. Build and run:
@@ -162,7 +162,7 @@ The app consists of four main tabs:
 
 ```
 grocery-recipe-manager/
-├── GroceryRecipeManager/           # iOS Xcode project
+├── forager/           # iOS Xcode project
 │   ├── Views/                      # SwiftUI views
 │   ├── Services/                   # Data services
 │   └── Core Data/                  # Data model

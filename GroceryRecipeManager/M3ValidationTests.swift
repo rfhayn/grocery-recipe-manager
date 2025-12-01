@@ -1,6 +1,6 @@
 //
 //  M3ValidationTests.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  M3.5 Phase 1 Task 5: Automated Validation Testing
 //  Tests all M3 functionality that doesn't require UI interaction

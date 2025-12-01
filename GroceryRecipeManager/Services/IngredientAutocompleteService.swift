@@ -1,6 +1,6 @@
 //
 //  IngredientAutocompleteService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M2.3: Recipe Creation & Editing
 //  Parse-then-autocomplete pattern for intelligent ingredient matching
@@ -178,7 +178,7 @@ class IngredientAutocompleteService: ObservableObject {
     }
 }//
 //  IngredientAutocompleteService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Richard Hayn on 10/3/25.
 //

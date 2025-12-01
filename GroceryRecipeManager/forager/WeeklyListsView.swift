@@ -1,6 +1,6 @@
 //
 //  WeeklyListsView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  PHASE 1 UPDATE: Generate from IngredientTemplate.isStaple instead of GroceryItem.isStaple
 //  FIX: Added @FetchRequest to WeeklyListRowView for live progress updates

@@ -1,6 +1,6 @@
 //
 //  StandardEmptyStateView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for UI consistency - M4.3.5
 //  Provides a standardized empty state pattern used across all main tabs

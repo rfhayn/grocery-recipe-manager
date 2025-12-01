@@ -589,9 +589,9 @@ AddIngredientsToListView completes
 - **M2 Phase 2 Story 3a**: `docs/prds/complete/milestone-2-phase-2-story-3a-enhanced-add-to-ingredient-list.md`
 
 ### Integration Points
-- **RecipeScalingView**: `GroceryRecipeManager/RecipeScalingView.swift` (M3 Phase 4)
+- **RecipeScalingView**: `forager/RecipeScalingView.swift` (M3 Phase 4)
 - **RecipeScalingService**: `Services/RecipeScalingService.swift` (M3 Phase 4)
-- **AddIngredientsToListView**: `GroceryRecipeManager/AddIngredientsToListView.swift` (M2)
+- **AddIngredientsToListView**: `forager/AddIngredientsToListView.swift` (M2)
 
 ### Future Enhancements
 - **M4.2 Meal Planning**: Will leverage scaled recipe metadata

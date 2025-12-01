@@ -1,6 +1,6 @@
 //
 //  RecipeFormModels.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M2.3: Recipe Creation & Editing
 //  Data models for recipe creation and editing forms

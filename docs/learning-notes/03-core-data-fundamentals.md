@@ -153,7 +153,7 @@ WeeklyList ←→ GroceryListItem ←→ GroceryItem
 ### Core Data Stack Setup
 ```swift
 // CloudKit-enabled container
-let container = NSPersistentCloudKitContainer(name: "GroceryRecipeManager")
+let container = NSPersistentCloudKitContainer(name: "forager")
 
 // Sample data conditional loading
 private func addSampleDataIfNeeded() {

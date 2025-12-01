@@ -1,6 +1,6 @@
 //
 //  MealPlansListView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.2.4: Multiple Meal Plans List View
 //  Main entry point for meal planning, displays all meal plans organized by status

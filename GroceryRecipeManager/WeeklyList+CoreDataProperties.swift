@@ -1,6 +1,6 @@
 //
 //  WeeklyList+CoreDataProperties.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created by Richard Hayn on 8/27/25.
 //

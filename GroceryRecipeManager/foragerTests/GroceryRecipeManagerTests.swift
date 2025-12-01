@@ -1,15 +1,15 @@
 //
-//  GroceryRecipeManagerTests.swift
-//  GroceryRecipeManagerTests
+//  foragerTests.swift
+//  foragerTests
 //
 //  Created by Rich Hayn on 8/18/25.
 //
 
 import XCTest
 import CoreData
-@testable import GroceryRecipeManager
+@testable import forager
 
-final class GroceryRecipeManagerTests: XCTestCase {
+final class foragerTests: XCTestCase {
     
     // Test-specific Core Data setup
     var testPersistenceController: PersistenceController!

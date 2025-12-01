@@ -1,13 +1,13 @@
 //
-//  GroceryRecipeManagerUITests.swift
-//  GroceryRecipeManagerUITests
+//  foragerUITests.swift
+//  foragerUITests
 //
 //  Created by Rich Hayn on 8/18/25.
 //
 
 import XCTest
 
-final class GroceryRecipeManagerUITests: XCTestCase {
+final class foragerUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

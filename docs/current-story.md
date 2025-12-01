@@ -31,7 +31,7 @@
 **Naming Strategy**: `milestone5.0.1-name-decision-record.md` ✅
 
 ### **Purpose**
-Systematically rename entire project from "GroceryRecipeManager" to "Forager", updating all technical identifiers, file structures, documentation, and GitHub repository. Follow with TestFlight deployment for real-device validation before CloudKit investment.
+Systematically rename entire project from "forager" to "Forager", updating all technical identifiers, file structures, documentation, and GitHub repository. Follow with TestFlight deployment for real-device validation before CloudKit investment.
 
 **Final Names**:
 - **Display Name**: Forager
@@ -50,7 +50,7 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 
 ## 📋 **M5.0 COMPLETE RENAME CHECKLIST - "FORAGER"**
 
-**Project**: Forager (formerly GroceryRecipeManager)  
+**Project**: Forager (formerly forager)  
 **Started**: November 28, 2025  
 **Progress**: 6 of 42 items complete (14%)
 
@@ -85,7 +85,7 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 - [x] **2.8** Git: "M5.0.2B: Display name set"
 
 **Phase 2C: Scheme Renaming (15 min)**
-- [x] **2.9** Rename scheme: GroceryRecipeManager → Forager
+- [x] **2.9** Rename scheme: forager → Forager
 - [x] **2.10** ✓ Build succeeds with new scheme
 - [x] **2.11** Git: "M5.0.2C: Scheme renamed"
 
@@ -108,30 +108,30 @@ Systematically rename entire project from "GroceryRecipeManager" to "Forager", u
 
 **Phase 3A: Source Folders (25 min)**
 - [x] **3.1** Close Xcode
-- [x] **3.2** Folder: GroceryRecipeManager/ → Forager/
-- [x] **3.3** Folder: GroceryRecipeManagerTests/ → ForagerTests/
-- [x] **3.4** Folder: GroceryRecipeManagerUITests/ → ForagerUITests/
+- [x] **3.2** Folder: forager/ → Forager/
+- [x] **3.3** Folder: foragerTests/ → ForagerTests/
+- [x] **3.4** Folder: foragerUITests/ → ForagerUITests/
 - [x] **3.5** Reopen, fix references
 - [x] **3.6** ✓ Build succeeds
 - [x] **3.7** Git: "M5.0.3A: Folders renamed"
 
 **Phase 3B: Core Data Model (20 min) ⚠️ HIGH RISK**
-- [ ] **3.8** Rename: GroceryRecipeManager.xcdatamodeld → Forager.xcdatamodeld
-- [ ] **3.9** Update ForagerApp.swift container name
-- [ ] **3.10** ✓ App launches, data loads
-- [ ] **3.11** Git: "M5.0.3B: Core Data renamed"
+- [x] **3.8** Rename: forager.xcdatamodeld → Forager.xcdatamodeld
+- [x] **3.9** Update ForagerApp.swift container name
+- [x] **3.10** ✓ App launches, data loads
+- [x] **3.11** Git: "M5.0.3B: Core Data renamed"
 
 **Phase 3C: Entitlements Files (15 min)**
-- [ ] **3.12** Rename: GroceryRecipeManager.entitlements → Forager.entitlements
-- [ ] **3.13** Update CloudKit: iCloud.com.richhayn.forager
-- [ ] **3.14** ✓ No signing errors
-- [ ] **3.15** Git: "M5.0.3C: Entitlements renamed"
+- [x] **3.12** Rename: forager.entitlements → Forager.entitlements
+- [x] **3.13** Update CloudKit: iCloud.com.richhayn.forager
+- [x] **3.14** ✓ No signing errors
+- [x] **3.15** Git: "M5.0.3C: Entitlements renamed"
 
 **Phase 3D: App File (10 min)**
-- [ ] **3.16** Rename: GroceryRecipeManagerApp.swift → ForagerApp.swift
-- [ ] **3.17** Update struct: ForagerApp
-- [ ] **3.18** ✓ Build succeeds
-- [ ] **3.19** Git: "M5.0.3D: App file renamed"
+- [x] **3.16** Rename: foragerApp.swift → ForagerApp.swift
+- [x] **3.17** Update struct: ForagerApp
+- [x] **3.18** ✓ Build succeeds
+- [x] **3.19** Git: "M5.0.3D: App file renamed"
 
 **Phase 3E: File Headers (20 min)**
 - [ ] **3.20** Update all file headers

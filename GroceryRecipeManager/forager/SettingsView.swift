@@ -1,6 +1,6 @@
 //
 //  SettingsView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Enhanced for M4.1: Added Meal Planning Preferences Section
 //  Enhanced for M4.3.1: Added Display Options Section

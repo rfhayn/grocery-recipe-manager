@@ -1,4 +1,4 @@
-# Grocery & Recipe Manager - Development Roadmap
+# forager - Development Roadmap
 
 **Last Updated**: November 26, 2025  
 **Current Phase**: M4 COMPLETE ✅  

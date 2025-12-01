@@ -94,7 +94,7 @@ parseConfidence: Float      // Parse confidence score (0.0-1.0)
 ### Files That Were Affected (Found Through Build Errors)
 
 **Core Data Layer:**
-1. ✅ GroceryRecipeManager.xcdatamodeld
+1. ✅ forager.xcdatamodeld
 2. ✅ Ingredient+CoreDataProperties.swift
 3. ✅ GroceryListItem+CoreDataProperties.swift
 

@@ -1,6 +1,6 @@
 //
 //  GroceryListDetailView.swift - INLINE ADD (SIMPLIFIED) + PROGRESS BAR FIX + M3 PHASE 6
-//  GroceryRecipeManager
+//  forager
 //
 //  Added inline TextField for quick item entry without modal
 //  PHASE 3: New ingredient tracking with template creation

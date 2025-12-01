@@ -1,6 +1,6 @@
 //
 //  CreateRecipeView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M2.3: Recipe Creation & Editing
 //  Professional recipe creation with parse-then-autocomplete ingredient management

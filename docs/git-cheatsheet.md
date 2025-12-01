@@ -1,4 +1,4 @@
-# Git & GitHub CLI Cheat Sheet for Grocery & Recipe Manager
+# Git & GitHub CLI Cheat Sheet for forager
 
 This cheat sheet provides the essential commands for creating feature
 branches, pushing changes, and opening PRs for the AI Test Review

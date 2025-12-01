@@ -1,6 +1,6 @@
 //
 //  MealPlanRowView.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  Created for M4.2.4: Multiple Meal Plans List View
 //  Row component for displaying meal plan summary in list

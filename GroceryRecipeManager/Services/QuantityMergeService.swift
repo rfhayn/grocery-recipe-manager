@@ -1,6 +1,6 @@
 //
 //  QuantityMergeService.swift
-//  GroceryRecipeManager
+//  forager
 //
 //  M3 Phase 5: Intelligent Shopping List Consolidation with Unit Conversion
 //  Combines duplicate ingredients with compatible quantities
