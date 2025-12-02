@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "forager-icon-light.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -12,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "forager-icon-dark.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -23,6 +25,7 @@
           "value" : "tinted"
         }
       ],
+      "filename" : "forager-icon-tinted.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
