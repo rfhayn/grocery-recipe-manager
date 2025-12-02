@@ -104,108 +104,129 @@ Systematically rename entire project from "forager" to "Forager", updating all t
 
 ---
 
-### 📁 **PHASE 3: M5.0.3 - FILE & FOLDER STRUCTURE** (90 min) ⏳ PLANNED
+### 📚 **PHASE 3: M5.0.3 - FILE & FOLDER STRUCTURE** (90 min) ✅ COMPLETE
 
-**Phase 3A: Source Folders (25 min)**
-- [x] **3.1** Close Xcode
-- [x] **3.2** Folder: forager/ → Forager/
-- [x] **3.3** Folder: foragerTests/ → ForagerTests/
-- [x] **3.4** Folder: foragerUITests/ → ForagerUITests/
-- [x] **3.5** Reopen, fix references
-- [x] **3.6** ✓ Build succeeds
+**Phase 3A: Source Folder Renaming (25 min)** ✅ COMPLETE
+- [x] **3.1** Renamed forager/ → forager/
+- [x] **3.2** Renamed foragerTests/
+- [x] **3.3** Renamed foragerUITests/
+- [x] **3.4** Fixed Xcode references
+- [x] **3.5** ✓ Build succeeds
+- [x] **3.6** ✓ All files green
 - [x] **3.7** Git: "M5.0.3A: Folders renamed"
 
-**Phase 3B: Core Data Model (20 min) ⚠️ HIGH RISK**
-- [x] **3.8** Rename: forager.xcdatamodeld → Forager.xcdatamodeld
-- [x] **3.9** Update ForagerApp.swift container name
-- [x] **3.10** ✓ App launches, data loads
+**Phase 3B: Core Data Model Renaming (20 min)** ✅ COMPLETE
+- [x] **3.8** Renamed .xcdatamodeld file
+- [x] **3.9** Updated Persistence.swift container
+- [x] **3.10** Fixed .xccurrentversion file
 - [x] **3.11** Git: "M5.0.3B: Core Data renamed"
 
-**Phase 3C: Entitlements Files (15 min)**
-- [x] **3.12** Rename: forager.entitlements → Forager.entitlements
-- [x] **3.13** Update CloudKit: iCloud.com.richhayn.forager
+**Phase 3C: Entitlements Renaming (15 min)** ✅ COMPLETE
+- [x] **3.12** Renamed entitlements file
+- [x] **3.13** Updated CloudKit container ID
 - [x] **3.14** ✓ No signing errors
 - [x] **3.15** Git: "M5.0.3C: Entitlements renamed"
 
-**Phase 3D: App File (10 min)**
-- [x] **3.16** Rename: foragerApp.swift → ForagerApp.swift
-- [x] **3.17** Update struct: ForagerApp
+**Phase 3D: App File Renaming (10 min)** ✅ COMPLETE
+- [x] **3.16** Renamed foragerApp.swift
+- [x] **3.17** Updated @main struct name
 - [x] **3.18** ✓ Build succeeds
 - [x] **3.19** Git: "M5.0.3D: App file renamed"
 
-**Phase 3E: File Headers (20 min)**
-- [ ] **3.20** Update all file headers
-- [ ] **3.21** ✓ No unintended changes
-- [ ] **3.22** Git: "M5.0.3E COMPLETE: Files done"
+**Phase 3E: File Headers Update (20 min)** ✅ COMPLETE
+- [x] **3.20** Python script updated 164 refs in 74 files
+- [x] **3.21** ✓ Build succeeds
+- [x] **3.22** ✓ App functions normally
+- [x] **3.23** Git: "M5.0.3E: File headers updated"
 
 ---
 
-### 📚 **PHASE 4: M5.0.4 - DOCUMENTATION & GITHUB** (60 min) ⏳ PLANNED
+### 📁 **PHASE 4A: DIRECTORY RESTRUCTURE** (30 min) ✅ COMPLETE (BONUS PHASE)
 
-**Phase 4A: Core Documentation (20 min)**
-- [ ] **4.1** project-index.md updated
-- [ ] **4.2** current-story.md updated
-- [ ] **4.3** roadmap.md updated
-- [ ] **4.4** requirements.md updated
-- [ ] **4.5** All PRDs updated
-- [ ] **4.6** Git: "M5.0.4A: Core docs"
+**Complete Directory Flattening**
+- [x] **4A.1** Flattened: /grocery-recipe-manager/GroceryRecipeManager/ → /forager/
+- [x] **4A.2** Moved all Xcode files up one level
+- [x] **4A.3** Fixed Xcode project references
+- [x] **4A.4** ✓ Build succeeds
+- [x] **4A.5** ✓ App runs normally
+- [x] **4A.6** Git: "M5.0.4A: Directory flattened to /forager"
 
-**Phase 4B: Learning Notes (15 min)**
-- [ ] **4.7** Historical notes contextualized
-- [ ] **4.8** Future content updated
-- [ ] **4.9** Git: "M5.0.4B: Learning notes"
-
-**Phase 4C: GitHub Repository (15 min)**
-- [ ] **4.10** Rename repo: forager-ios
-- [ ] **4.11** Update remote URL
-- [ ] **4.12** ✓ Push/pull works
-- [ ] **4.13** Git: "M5.0.4C: GitHub renamed"
-
-**Phase 4D: README & Metadata (10 min)**
-- [ ] **4.14** README.md updated
-- [ ] **4.15** Repo description updated
-- [ ] **4.16** Git: "M5.0.4D COMPLETE: Docs done"
+**New Structure:**
+```
+/Users/rich/Development/forager/
+├── forager.xcodeproj
+├── forager/
+├── foragerTests/
+├── foragerUITests/
+├── docs/
+├── Tools/
+└── README.md
+```
 
 ---
 
-### 🚀 **PHASE 5: M5.0.5 - TESTFLIGHT DEPLOYMENT** (90-120 min + wait) ⏳ PLANNED
+### 📚 **PHASE 4B: DOCUMENTATION & GITHUB** (60 min) 🔄 IN PROGRESS
 
-**Phase 5A: Apple Developer Enrollment (15 min + 24-48h)**
-- [ ] **5.1** Enroll ($99/year)
-- [ ] **5.2** Wait for confirmation
+**Phase 4B.1: Core Documentation (20 min)** ✅ COMPLETE
+- [x] **4B.1** Python script updated all docs
+- [x] **4B.2** README.md updated with new paths
+- [x] **4B.3** All 74 files updated (164 references)
+- [x] **4B.4** ✓ Documentation consistent
+- [x] **4B.5** Git: "M5.0.4B: Update README for forager rename"
+
+**Phase 4B.2: Learning Notes (10 min)** ⏳ REMAINING
+- [x] **4B.6** Add context notes to recent learning notes
+- [x] **4B.7** Preserve historical accuracy
+- [x] **4B.8** Git: "M5.0.4B: Learning notes contextualized"
+
+**Phase 4B.3: GitHub Repository (15 min)** ✅ COMPLETE
+- [x] **4B.9** Renamed repo: forager
+- [x] **4B.10** Updated remote URL
+- [x] **4B.11** Set up Personal Access Token
+- [x] **4B.12** ✓ Push/pull works
+- [x] **4B.13** Git: "M5.0.4B: GitHub repository renamed to forager"
+
+**Phase 4B.4: Repository Metadata (2 min)** ⏳ REMAINING
+- [x] **4B.14** Update GitHub About section
+- [x] **4B.15** Git: "M5.0.4B COMPLETE: Documentation phase done"
+
+---
+
+### 🚀 **PHASE 5: M5.0.5 - TESTFLIGHT DEPLOYMENT** (90 min + wait) ⏳ PLANNED
+
+**Phase 5A: Apple Developer Enrollment (15 min + 24-48h wait)**
+- [ ] **5.1** Enroll in Apple Developer Program ($99)
+- [ ] **5.2** Wait for approval (24-48 hours)
 - [ ] **5.3** ✓ Account active
 
 **Phase 5B: App Icon Creation (30 min)**
-- [ ] **5.4** Create 1024x1024 PNG
+- [ ] **5.4** Create 1024x1024 app icon
 - [ ] **5.5** Add to Assets.xcassets
-- [ ] **5.6** ✓ Icon displays
+- [ ] **5.6** ✓ Icon appears in simulator
 
 **Phase 5C: App Store Connect Setup (20 min)**
-- [ ] **5.7** Create app record
-- [ ] **5.8** Set bundle: com.richhayn.forager
-- [ ] **5.9** Set name: Forager
-- [ ] **5.10** ✓ Record created
+- [ ] **5.7** Create app in App Store Connect
+- [ ] **5.8** Configure bundle ID and metadata
+- [ ] **5.9** ✓ App record created
 
-**Phase 5D: Archive & Upload (30 min)**
-- [ ] **5.11** Product → Archive
-- [ ] **5.12** ✓ Archive succeeds
-- [ ] **5.13** Validate archive
-- [ ] **5.14** Upload to ASC
-- [ ] **5.15** Wait for processing
-- [ ] **5.16** ✓ Build appears
+**Phase 5D: Build Archive & Upload (30 min)**
+- [ ] **5.10** Archive build in Xcode
+- [ ] **5.11** Validate archive
+- [ ] **5.12** Upload to App Store Connect
+- [ ] **5.13** ✓ Build processing complete
 
 **Phase 5E: TestFlight Configuration (15 min)**
-- [ ] **5.17** Configure TestFlight
-- [ ] **5.18** Create test group
-- [ ] **5.19** Add testers
-- [ ] **5.20** ✓ Invites sent
+- [ ] **5.14** Add build to TestFlight
+- [ ] **5.15** Create internal testing group
+- [ ] **5.16** Invite testers
+- [ ] **5.17** ✓ Invitations sent
 
 **Phase 5F: Device Testing (15 min)**
-- [ ] **5.21** Install TestFlight app
-- [ ] **5.22** Install Forager
-- [ ] **5.23** Test all features
-- [ ] **5.24** ✓ No crashes
-- [ ] **5.25** Git: "M5.0.5 COMPLETE: TestFlight live"
+- [ ] **5.18** Install TestFlight app
+- [ ] **5.19** Accept invitation
+- [ ] **5.20** Install and test app
+- [ ] **5.21** ✓ All features work on device
+- [ ] **5.22** Git: "M5.0.5 COMPLETE: TestFlight deployed"
 
 ---
 
