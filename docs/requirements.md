@@ -1,14 +1,14 @@
-# forager - Requirements Document
+# Forager - Requirements Document
 
-**Last Updated**: November 26, 2025  
-**Version**: 3.8  
-**Current Milestone**: M4.3.5 (Ingredient Normalization)
+**Last Updated**: December 3, 2025  
+**Version**: 4.0  
+**Current Milestone**: M5.0 Complete ✅ | M7.0 Ready 🚀
 
 ---
 
 ## 📋 **OVERVIEW**
 
-This document defines all functional and non-functional requirements for the forager iOS application. Requirements are organized by milestone with traceability to implementation status.
+This document defines all functional and non-functional requirements for the Forager iOS application. Requirements are organized by milestone with traceability to implementation status.
 
 ---
 
@@ -195,91 +195,205 @@ This document defines all functional and non-functional requirements for the for
 **M3 Summary**: All 33 requirements successfully completed. Structured quantity system operational with recipe scaling, intelligent consolidation, unit conversion, visual enhancements, and comprehensive help documentation. All performance targets met or exceeded. Production-ready quality achieved.
 
 **M3.5 Validation**: Comprehensive validation completed with automated test suite. 75+ computed properties added, 100% test pass rate achieved, test automation pattern established for future milestones.
+
 ---
 
-## 📋 **M4: MEAL PLANNING & SETTINGS - IN PROGRESS**
+## ✅ **M4: MEAL PLANNING & SETTINGS - COMPLETE**
 
-**Status**: 🔄 In Progress (M4.1 ✅, M4.2 ✅, M4.3.1-4 ✅, M4.3.5 ready)  
-**Total Time**: 16-20 hours (M4.1: 1.5h, M4.2: ~4h, M4.3.1: 3.5h, M4.3.2: 1.25h, M4.3.3: 2.5h, M4.3.4: 1.0h, M4.3.5: 4h est)  
+**Status**: ✅ Complete - November 2025 (~18.5 hours)  
 **Summary**: Calendar-based meal planning with enhanced grocery automation
-
-**Dependencies**: M3 Complete ✅, M3.5 Complete ✅
 
 ### **Functional Requirements - Settings Infrastructure**
 
-| ID | Requirement | Implementation | Milestone | Value | Status |
-|----|-------------|----------------|-----------|-------|--------|
-| **FR-MP-001** | **Meal planning preferences** | ✅ Duration (3-14 days), start day, auto-naming | M4.1 | 🎯 **Personalization** | ✅ **COMPLETE** |
-| **FR-MP-002** | **Recipe source display preferences** | ✅ Show/hide recipe sources in lists | M4.1 | 🎯 **User control** | ✅ **COMPLETE** |
-| **FR-MP-003** | **UserPreferences entity** | ✅ Core Data entity for settings persistence | M4.1 | 🎯 **Data persistence** | ✅ **COMPLETE** |
-| **FR-MP-004** | **Real-time validation** | ✅ Validate settings as user changes them | M4.1 | 🎯 **Error prevention** | ✅ **COMPLETE** |
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **FR-MP-001** | **Meal planning preferences** | ✅ Duration (3-14 days), start day, auto-naming | M4.1 | 🎯 **Personalization** |
+| **FR-MP-002** | **Recipe source display preferences** | ✅ Show/hide recipe sources in lists | M4.1 | 🎯 **User control** |
+| **FR-MP-003** | **UserPreferences entity** | ✅ Core Data entity for settings persistence | M4.1 | 🎯 **Data persistence** |
+| **FR-MP-004** | **Real-time validation** | ✅ Validate settings as user changes them | M4.1 | 🎯 **Error prevention** |
 
 ### **Functional Requirements - Meal Planning Core**
 
-| ID | Requirement | Implementation | Milestone | Value | Status |
-|----|-------------|----------------|-----------|-------|--------|
-| **FR-MP-005** | **MealPlan entity** | ✅ Core Data entity with date range | M4.2 | 🎯 **Data structure** | ✅ **COMPLETE** |
-| **FR-MP-006** | **PlannedMeal entity** | ✅ Date-recipe relationship tracking | M4.2 | 🎯 **Meal assignments** | ✅ **COMPLETE** |
-| **FR-MP-007** | **Calendar view** | ✅ Calendar grid with tap-to-add (M4.2.1-3) | M4.2 | 🎯 **Visual planning** | ✅ **COMPLETE** |
-| **FR-MP-008** | **Add to meal plan** | ✅ RecipePickerSheet with search/servings | M4.2 | 🎯 **Easy assignment** | ✅ **COMPLETE** |
-| **FR-MP-009** | **Configurable periods** | ✅ User-defined date ranges | M4.2 | 🎯 **Flexibility** | ✅ **COMPLETE** |
-| **FR-MP-010** | **Meal plan management** | ✅ Create meal plans with date pickers | M4.2 | 🎯 **Plan control** | ✅ **COMPLETE** |
-| **FR-MP-017** | **Recipe usage tracking** | ✅ usageCount and lastUsed on assignment | M4.2 | 🎯 **Analytics data** | ✅ **COMPLETE** |
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **FR-MP-005** | **MealPlan entity** | ✅ Core Data entity with date range | M4.2 | 🎯 **Data structure** |
+| **FR-MP-006** | **PlannedMeal entity** | ✅ Date-recipe relationship tracking | M4.2 | 🎯 **Meal assignments** |
+| **FR-MP-007** | **Calendar view** | ✅ Calendar grid with tap-to-add | M4.2 | 🎯 **Visual planning** |
+| **FR-MP-008** | **Add to meal plan** | ✅ RecipePickerSheet with search/servings | M4.2 | 🎯 **Easy assignment** |
+| **FR-MP-009** | **Configurable periods** | ✅ User-defined date ranges | M4.2 | 🎯 **Flexibility** |
+| **FR-MP-010** | **Meal plan management** | ✅ Create meal plans with date pickers | M4.2 | 🎯 **Plan control** |
+| **FR-MP-017** | **Recipe usage tracking** | ✅ usageCount and lastUsed on assignment | M4.2 | 🎯 **Analytics data** |
 
 ### **Functional Requirements - Enhanced Grocery Integration**
 
-| ID | Requirement | Implementation | Milestone | Value | Status |
-|----|-------------|----------------|-----------|-------|--------|
-| **FR-MP-011** | **Generate list from meal plan** | ✅ Bulk add with progress overlay | M4.3.3 | 🎯 **Automation** | ✅ **COMPLETE** |
-| **FR-MP-012** | **Recipe source tags** | ✅ Recipe badges in grocery lists | M4.3.1 | 🎯 **Transparency** | ✅ **COMPLETE** |
-| **FR-MP-013** | **Smart consolidation** | ✅ Perfect integration with M3 Phase 5 | M4.3.3 | 🎯 **List optimization** | ✅ **COMPLETE** |
-| **FR-MP-014** | **Meal completion tracking** | ✅ Mark meals as completed | M4.3.4 | 🎯 **Progress tracking** | ✅ **COMPLETE** |
-| **FR-MP-015** | **Scaled recipe to list** | ✅ Servings adjustment UI with scale indicators | M4.3.2 | 🎯 **Party planning** | ✅ **COMPLETE** |
-| **FR-MP-016** | **Scaling metadata** | ✅ Servings adjustment in SelectListSheet | M4.3.3 | 🎯 **Context preservation** | ✅ **COMPLETE** |
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **FR-MP-011** | **Generate list from meal plan** | ✅ Bulk add with progress overlay | M4.3.3 | 🎯 **Automation** |
+| **FR-MP-012** | **Recipe source tags** | ✅ Recipe badges in grocery lists | M4.3.1 | 🎯 **Transparency** |
+| **FR-MP-013** | **Smart consolidation** | ✅ Perfect integration with M3 Phase 5 | M4.3.3 | 🎯 **List optimization** |
+| **FR-MP-014** | **Meal completion tracking** | ✅ Mark meals as completed | M4.3.4 | 🎯 **Progress tracking** |
+| **FR-MP-015** | **Scaled recipe to list** | ✅ Servings adjustment UI with scale indicators | M4.3.2 | 🎯 **Party planning** |
+| **FR-MP-016** | **Scaling metadata** | ✅ Servings adjustment in SelectListSheet | M4.3.3 | 🎯 **Context preservation** |
 
 ### **Non-Functional Requirements - M4**
 
-| ID | Requirement | Target | Milestone | Value | Status |
-|----|-------------|--------|-----------|-------|--------|
-| **NFR-M4-001** | **List generation performance** | < 1s for 7-day plan | M4.3.3 | 🎯 **Fast automation** | ✅ **COMPLETE** |
-| **NFR-M4-002** | **Calendar rendering** | < 0.5s | M4.2 | 🎯 **Responsive UI** | ✅ **COMPLETE** |
-| **NFR-M4-003** | **Settings persistence** | Immediate save | M4.1 | 🎯 **Reliability** | ✅ **COMPLETE** |
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **NFR-M4-001** | **List generation performance < 1s** | ✅ Sub-1s for 7-day plan | M4.3.3 | 🎯 **Fast automation** |
+| **NFR-M4-002** | **Calendar rendering < 0.5s** | ✅ Responsive calendar | M4.2 | 🎯 **Responsive UI** |
+| **NFR-M4-003** | **Settings persistence immediate** | ✅ Instant save | M4.1 | 🎯 **Reliability** |
 
-**M4 Progress**: 19 of 19 requirements complete (100%). M4 milestone complete, ready for M5.
+**M4 Summary**: All 19 requirements complete. Calendar-based meal planning operational with automated grocery integration, smart consolidation, and comprehensive tracking.
 
 ---
 
-## 🔮 **FUTURE MILESTONES (M5-M11)**
+## ✅ **M5.0: APP RENAMING & TESTFLIGHT DEPLOYMENT - COMPLETE**
 
-### **M5: Production Infrastructure & CloudKit**
-- Apple Developer Account setup & App Store configuration
-- TestFlight deployment & real device testing
-- CloudKit schema design & sync engine
-- Family account management & sharing features
-- Real-time multi-device synchronization
-- **Estimated**: 12-17 hours
+**Status**: ✅ Complete - December 2025 (6 hours)  
+**Summary**: Complete app renaming to "Forager" and TestFlight deployment for real-device validation
+
+### **Functional Requirements - App Identity**
+
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **FR-TF-001** | **Professional app name** | ✅ Renamed to "Forager: Smart Meal Planner" | M5.0.1 | 🎯 **Brand identity** |
+| **FR-TF-002** | **Bundle identifier update** | ✅ com.richhayn.forager across all targets | M5.0.2 | 🎯 **App Store presence** |
+| **FR-TF-003** | **App icon design** | ✅ Professional 1024x1024 icon (green sprout) | M5.0.5B | 🎯 **Visual identity** |
+| **FR-TF-004** | **File structure consistency** | ✅ All folders, files renamed systematically | M5.0.3 | 🎯 **Project organization** |
+
+### **Functional Requirements - TestFlight Deployment**
+
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **FR-TF-005** | **Apple Developer enrollment** | ✅ Program enrolled ($99/year) | M5.0.5A | 🎯 **Distribution capability** |
+| **FR-TF-006** | **App Store Connect setup** | ✅ App created, configured | M5.0.5C | 🎯 **Deployment infrastructure** |
+| **FR-TF-007** | **CloudKit entitlements** | ✅ Production entitlements configured | M5.0.5D | 🎯 **Sync readiness** |
+| **FR-TF-008** | **Internal TestFlight** | ✅ Internal testing group operational | M5.0.5E | 🎯 **Beta testing** |
+| **FR-TF-009** | **Real device validation** | ✅ App running on physical iPhones | M5.0.5F | 🎯 **Production validation** |
+| **FR-TF-010** | **Multi-tester distribution** | ✅ Multiple testers invited and active | M5.0.5E | 🎯 **Feedback collection** |
+
+### **Non-Functional Requirements - M5.0**
+
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **NFR-TF-001** | **Zero data loss during rename** | ✅ All existing data preserved | M5.0.3B | 🎯 **Data integrity** |
+| **NFR-TF-002** | **Build success after rename** | ✅ Clean builds throughout | M5.0 All | 🎯 **Technical stability** |
+| **NFR-TF-003** | **Performance maintained** | ✅ All M1-M4 targets still met | M5.0.5F | 🎯 **Quality preserved** |
+| **NFR-TF-004** | **Archive/upload success** | ✅ TestFlight upload successful | M5.0.5D | 🎯 **Deployment capability** |
+
+**M5.0 Summary**: All 14 requirements complete. Forager successfully renamed, deployed to TestFlight, and validated on real devices. Internal beta testing operational with multiple testers.
+
+---
+
+## 🚀 **M7: CLOUDKIT SYNC & EXTERNAL TESTFLIGHT - PLANNED**
+
+**Status**: ⏳ Planned - Ready to Start  
+**Estimated**: 27-37 hours base, 32-42 hours with buffer  
+**Summary**: Full CloudKit synchronization, multi-user collaboration, and external public beta
+
+**⚠️ CRITICAL**: M7.0 App Store Prerequisites are MANDATORY before external TestFlight submission (M7.5)
+
+### **Functional Requirements - App Store Prerequisites (M7.0 - MANDATORY)** 🚨
+
+| ID | Requirement | Target Implementation | Milestone | Value |
+|----|-------------|----------------------|-----------|-------|
+| **FR-AS-001** | **Privacy policy published** | Privacy policy hosted at public URL (GitHub Pages) | M7.0.1 | 🎯 **App Store compliance** |
+| **FR-AS-002** | **In-app privacy link** | Settings → Privacy Policy opens hosted URL | M7.0.2 | 🎯 **User transparency** |
+| **FR-AS-003** | **App Privacy questionnaire** | Complete in App Store Connect ("Data Not Collected") | M7.0.3 | 🎯 **Required metadata** |
+| **FR-AS-004** | **Display name disambiguation** | "Forager: Smart Meal Planner" (display) + "Forager" (icon) | M7.0.4 | 🎯 **Brand differentiation** |
+
+**Why M7.0 is MANDATORY:**
+- Apple's November 2025 policies require privacy policy URL for ALL apps
+- External TestFlight requires completed App Privacy questionnaire
+- Name disambiguation avoids rejection under Guideline 4.1 (Copycats)
+- Attempting external TestFlight without M7.0 = automatic rejection
+
+### **Functional Requirements - CloudKit Sync Foundation**
+
+| ID | Requirement | Target Implementation | Milestone | Value |
+|----|-------------|----------------------|-----------|-------|
+| **FR-CK-001** | **CloudKit schema generation** | All 8 entities sync to CloudKit | M7.1.1 | 🎯 **Sync foundation** |
+| **FR-CK-002** | **Multi-device sync** | Changes sync across devices <5s | M7.1.3 | 🎯 **Seamless experience** |
+| **FR-CK-003** | **Automatic background sync** | CloudKit syncs without user action | M7.1.2 | 🎯 **Transparent operation** |
+| **FR-CK-004** | **Offline sync queue** | Changes queue offline, sync when online | M7.1.3 | 🎯 **Reliability** |
+| **FR-CK-005** | **Sync status monitoring** | CloudKit sync state tracking | M7.1.2 | 🎯 **Transparency** |
+
+### **Functional Requirements - Multi-User Collaboration**
+
+| ID | Requirement | Target Implementation | Milestone | Value |
+|----|-------------|----------------------|-----------|-------|
+| **FR-CK-006** | **CKShare implementation** | Share grocery lists, recipes, meal plans | M7.2.1 | 🎯 **Family collaboration** |
+| **FR-CK-007** | **Share invitation flow** | Send/accept share invitations | M7.2.1 | 🎯 **Easy sharing** |
+| **FR-CK-008** | **Permission management** | Owner/participant roles, read/write control | M7.2.3 | 🎯 **Access control** |
+| **FR-CK-009** | **Share management UI** | View/revoke shares, manage participants | M7.2.2 | 🎯 **Share control** |
+| **FR-CK-010** | **Concurrent edit support** | Multiple users edit simultaneously | M7.2.4 | 🎯 **Real-time collaboration** |
+
+### **Functional Requirements - Conflict Resolution**
+
+| ID | Requirement | Target Implementation | Milestone | Value |
+|----|-------------|----------------------|-----------|-------|
+| **FR-CK-011** | **Last-write-wins policy** | Most recent edit wins for simple fields | M7.3.1 | 🎯 **Automatic resolution** |
+| **FR-CK-012** | **Array merge policy** | Intelligently merge ingredient/item arrays | M7.3.1 | 🎯 **Data preservation** |
+| **FR-CK-013** | **Deleted record handling** | Graceful handling of delete conflicts | M7.3.2 | 🎯 **Data consistency** |
+| **FR-CK-014** | **Network error recovery** | Retry logic for transient failures | M7.3.2 | 🎯 **Reliability** |
+| **FR-CK-015** | **CloudKit quota management** | Monitor and optimize storage usage | M7.3.2 | 🎯 **Scalability** |
+
+### **Functional Requirements - Sync UI & Polish**
+
+| ID | Requirement | Target Implementation | Milestone | Value |
+|----|-------------|----------------------|-----------|-------|
+| **FR-CK-016** | **Sync status indicators** | Visual sync status (synced/syncing/error) | M7.4.1 | 🎯 **User awareness** |
+| **FR-CK-017** | **Manual sync trigger** | Pull-to-refresh force sync | M7.4.1 | 🎯 **User control** |
+| **FR-CK-018** | **Last synced timestamp** | Show when last sync occurred | M7.4.1 | 🎯 **Transparency** |
+| **FR-CK-019** | **CloudKit account status** | Display iCloud sign-in status | M7.4.2 | 🎯 **User awareness** |
+| **FR-CK-020** | **Sync diagnostics** | Debug view for troubleshooting | M7.4.2 | 🎯 **Supportability** |
+
+### **Functional Requirements - External TestFlight**
+
+| ID | Requirement | Target Implementation | Milestone | Value |
+|----|-------------|----------------------|-----------|-------|
+| **FR-TF-011** | **External testing group** | Create public external testing group | M7.5.1 | 🎯 **Public beta** |
+| **FR-TF-012** | **App Review submission** | Pass Apple's external testing review | M7.5.2 | 🎯 **Public distribution** |
+| **FR-TF-013** | **Public TestFlight link** | Generate shareable public link | M7.5.4 | 🎯 **Easy distribution** |
+| **FR-TF-014** | **Beta landing page** | Professional web page for beta | M7.6.1 | 🎯 **Professional showcase** |
+| **FR-TF-015** | **LinkedIn showcase** | Public post with beta link | M7.6.2 | 🎯 **Professional visibility** |
+
+### **Non-Functional Requirements - M7**
+
+| ID | Requirement | Target | Milestone | Value |
+|----|-------------|--------|-----------|-------|
+| **NFR-CK-001** | **Sync latency < 5s** | Multi-device sync within 5 seconds | M7.1.3 | 🎯 **Real-time feel** |
+| **NFR-CK-002** | **Sync success rate > 99%** | Reliable synchronization | M7 All | 🎯 **Dependability** |
+| **NFR-CK-003** | **Conflict resolution 100%** | All conflicts handled gracefully | M7.3.1 | 🎯 **Data integrity** |
+| **NFR-CK-004** | **UI responsiveness maintained** | Sync doesn't block UI | M7 All | 🎯 **Performance** |
+| **NFR-CK-005** | **Battery impact < 5%** | Minimal battery drain from sync | M7 All | 🎯 **Efficiency** |
+| **NFR-CK-006** | **Network data < 1MB/sync** | Efficient data transfer | M7 All | 🎯 **Data economy** |
+| **NFR-CK-007** | **App Review pass** | Approval for external testing | M7.5.3 | 🎯 **Public readiness** |
+
+**M7 Summary (Planned)**: 29 requirements including App Store prerequisites (4), CloudKit sync (5), multi-user collaboration (5), conflict resolution (5), sync UI polish (5), external TestFlight (5), and non-functional requirements (7). Transforms Forager into App Store-compliant collaborative family platform with public beta program.
+
+---
+
+## 🔮 **FUTURE MILESTONES (M6, M8-M11)**
 
 ### **M6: Testing Foundation & AI Augmentation**
-- Human-written test baseline (50%+ service layer coverage)
-- AI test reviewer operational on every PR
-- Testing standards & infrastructure documented
-- CI/CD pipeline with automated test execution
-- Foundation for semantic coverage gap detection
+- Comprehensive test suite (50%+ coverage)
+- AI-powered test review
+- Automated testing infrastructure
+- CI/CD pipeline
 - **Estimated**: 12-18 hours
 
-### **M7: Analytics & Insights**
-- Usage analytics
-- Insights dashboard
-- Smart recommendations
-- Export capabilities
+### **M8: Analytics & Insights**
+- Usage analytics dashboard
+- Recipe recommendations
+- Shopping insights
+- Data export
 - **Estimated**: 6-8 hours
 
-### **M8-M11: Advanced Intelligence Platform**
-- **M8**: Nutrition tracking (6-8 hours)
-- **M9**: Budget intelligence (6-8 hours)
-- **M10**: AI recipe assistant (4-6 hours)
-- **M11**: Lifestyle optimization (4-8 hours)
-- **Total**: 20-30 hours
+### **M9-M11: Advanced Intelligence**
+- **M9**: Nutrition tracking (6-8 hours)
+- **M10**: Budget intelligence (6-8 hours)
+- **M11**: AI recipe assistant & lifestyle optimization (8-12 hours)
 
 ---
 
@@ -287,11 +401,11 @@ This document defines all functional and non-functional requirements for the for
 
 ### **By Status**
 
-| Status | M1 | M2 | M3 | M4 | Total |
-|--------|----|----|----|----|-------|
-| ✅ Complete | 19 | 37 | 33 | 19 | **108** |
-| 📋 Planned | 0 | 0 | 0 | 0 | **0** |
-| **Total** | **19** | **37** | **33** | **19** | **108** |
+| Status | M1 | M2 | M3 | M4 | M5.0 | M7 | Total |
+|--------|----|----|----|----|------|----|----|
+| ✅ Complete | 19 | 37 | 33 | 19 | 14 | 0 | **122** |
+| ⏳ Planned | 0 | 0 | 0 | 0 | 0 | 29 | **29** |
+| **Total** | **19** | **37** | **33** | **19** | **14** | **29** | **151** |
 
 ### **By Category**
 
@@ -303,7 +417,11 @@ This document defines all functional and non-functional requirements for the for
 | Recipes | 19 | ✅ Complete |
 | Quantities | 33 | ✅ Complete |
 | Meal Planning | 19 | ✅ Complete |
-| **Total** | **85** | **100% Complete** |
+| TestFlight & Identity | 14 | ✅ Complete |
+| App Store Compliance | 4 | ⏳ Planned (M7.0) |
+| CloudKit Sync | 25 | ⏳ Planned (M7.1-M7.6) |
+| **Complete** | **122** | **81% (122/151)** |
+| **Planned** | **29** | **19% (29/151)** |
 
 ### **Performance Requirements Status**
 
@@ -324,35 +442,42 @@ This document defines all functional and non-functional requirements for the for
 
 ## 🎯 **CURRENT REQUIREMENTS FOCUS**
 
-### **Completed: M4 Meal Planning & Settings** ✅
-**Total Time**: ~18.5 hours  
+### **Completed: M5.0 App Renaming & TestFlight** ✅
+**Total Time**: 6 hours  
 **Status**: All requirements complete
 
 **Achievements:**
-- Settings infrastructure with meal planning preferences ✅
-- UserPreferences entity operational ✅
-- Calendar-based meal planning with tap-to-add ✅
-- MealPlan and PlannedMeal entities complete ✅
-- Recipe assignment with servings tracking ✅
-- Recipe usage analytics (usageCount, lastUsed) ✅
-- Many-to-many recipe source relationships ✅
-- Display Options in Settings ✅
-- Recipe source tracking and badges ✅
-- Bulk add from meal plan with progress overlay ✅
-- Scaled recipe to list with servings adjustment ✅
-- Smart quantity consolidation integration ✅
-- Meal completion tracking ✅
-- Sub-0.5s performance maintained ✅
+- Complete app rename to "Forager" ✅
+- Professional app icon (green sprout) ✅
+- Apple Developer enrollment ✅
+- App Store Connect configuration ✅
+- CloudKit production entitlements ✅
+- Internal TestFlight operational ✅
+- Multi-tester beta program launched ✅
+- Real device validation successful ✅
 
-### **Next Priority: M5 Production Infrastructure & CloudKit** 🚀
-**Timeline**: 12-17 hours  
-**Status**: Ready to plan
+### **Next Priority: M7 CloudKit Sync & External TestFlight** 🚀
+**Timeline**: 27-37 hours base, 32-42 hours with buffer (3-4 weeks with Apple review)  
+**Status**: PRD complete, ready to start
 
 **Priority Areas:**
-- Apple Developer Account enrollment
-- TestFlight deployment configuration
-- CloudKit schema and sync design
-- Family sharing feature implementation
+- **M7.0: App Store Prerequisites (MANDATORY)** - Privacy policy, questionnaire, name disambiguation
+- CloudKit schema validation and sync foundation
+- Multi-user collaboration with CKShare
+- Multi-device synchronization (<5s latency)
+- Conflict resolution strategies
+- Sync status UI indicators
+- External TestFlight with App Review
+- Public beta landing page
+- LinkedIn professional showcase
+
+**Strategic Value:**
+- Achieves App Store compliance for public distribution
+- Transforms single-device app into collaborative platform
+- Enables family sharing and multi-user workflows
+- Public beta expands feedback opportunities
+- Professional portfolio showcase piece
+- Foundation for future App Store launch
 
 ---
 
@@ -362,48 +487,15 @@ This document defines all functional and non-functional requirements for the for
 
 | Entity | Requirements Met | Status |
 |--------|------------------|--------|
-| WeeklyList | FR-GL-001 through FR-GL-005 | ✅ Complete |
+| GroceryList | FR-GL-001 through FR-GL-005 | ✅ Complete |
 | GroceryListItem | FR-GL-002, FR-CAT-004, FR-QM-001-005 | ✅ Complete |
 | Category | FR-CAT-001 through FR-CAT-005 | ✅ Complete |
 | Recipe | FR-RM-001 through FR-RM-013 | ✅ Complete |
 | Ingredient | FR-RM-032, FR-RM-034, FR-QM-001-005 | ✅ Complete |
 | IngredientTemplate | FR-RM-011, FR-RM-033-035 | ✅ Complete |
-| PlannedMeal | FR-MP-005, FR-MP-006 | ✅ Complete |
+| MealPlanRecipe | FR-MP-005, FR-MP-006 | ✅ Complete |
 | MealPlan | FR-MP-007 through FR-MP-010 | ✅ Complete |
 | UserPreferences | FR-MP-001 through FR-MP-004 | ✅ Complete |
-
-### **Service Layer Requirements**
-
-| Service | Requirements Met | Status |
-|---------|------------------|--------|
-| IngredientParsingService | FR-QM-002, FR-QM-005 | ✅ Complete |
-| IngredientTemplateService | FR-RM-011, FR-RM-034 | ✅ Complete |
-| IngredientAutocompleteService | FR-RM-033, FR-QM-019 | ✅ Complete |
-| RecipeScalingService | FR-QM-021 through FR-QM-026 | ✅ Complete |
-| QuantityMergeService | FR-QM-011 through FR-QM-015, FR-QM-027-030 | ✅ Complete |
-| UnitConversionService | FR-QM-027, FR-QM-028 | ✅ Complete |
-| QuantityMigrationService | FR-QM-006 through FR-QM-010 | ✅ Complete |
-| MealPlanService | FR-MP-005 through FR-MP-010, FR-MP-017 | ✅ Complete |
-| UserPreferencesService | FR-MP-001 through FR-MP-004 | ✅ Complete |
-
-### **UI Component Requirements**
-
-| Component | Requirements Met | Status |
-|-----------|------------------|--------|
-| GroceryListView | FR-GL-001 through FR-GL-005 | ✅ Complete |
-| CategoryManagementView | FR-CAT-001 through FR-CAT-005 | ✅ Complete |
-| StaplesView | FR-ST-001 through FR-ST-004 | ✅ Complete |
-| RecipeListView | FR-RM-001, FR-RM-013 | ✅ Complete |
-| RecipeDetailView | FR-RM-002 through FR-RM-009 | ✅ Complete |
-| CreateRecipeView | FR-RM-031 through FR-RM-037 | ✅ Complete |
-| EditRecipeView | FR-RM-036, FR-RM-037 | ✅ Complete |
-| RecipeScalingView | FR-QM-021 through FR-QM-026 | ✅ Complete |
-| ConsolidationPreviewView | FR-QM-011 through FR-QM-015 | ✅ Complete |
-| SettingsView | FR-QM-009, FR-MP-001-004 | ✅ Complete |
-| HelpView | FR-QM-017 | ✅ Complete |
-| MealPlanDetailView | FR-MP-007, FR-MP-008 | ✅ Complete |
-| CreateMealPlanSheet | FR-MP-009, FR-MP-010 | ✅ Complete |
-| RecipePickerSheet | FR-MP-008 | ✅ Complete |
 
 ---
 
@@ -427,7 +519,6 @@ This document defines all functional and non-functional requirements for the for
 - All 6 phases validated ✅
 - All 33 requirements complete ✅
 - Performance targets exceeded ✅
-- User value demonstrated ✅
 - Production-ready quality ✅
 
 **M4 Validation**: ✅ Complete
@@ -435,15 +526,26 @@ This document defines all functional and non-functional requirements for the for
 - Calendar planning operational ✅
 - Grocery integration complete ✅
 - Performance targets met ✅
-- Production-ready quality ✅
+
+**M5.0 Validation**: ✅ Complete
+- App rename successful ✅
+- TestFlight deployment operational ✅
+- Real device validation passed ✅
+- Multi-tester beta active ✅
+
+**M7 Validation**: ⏳ Planned
+- CloudKit sync operational
+- Multi-user collaboration tested
+- External TestFlight approved
+- Public beta launched
 
 ---
 
 ## 🚀 **STRATEGIC REQUIREMENTS ROADMAP**
 
-### **Phase 1: Core Platform (M1-M4)** - Complete
+### **Phase 1: Core Platform (M1-M4)** - ✅ Complete
 **Goal**: Complete essential grocery and recipe workflows  
-**Timeline**: 67.5 hours actual  
+**Timeline**: 77 hours actual  
 **Status**: ✅ Complete
 
 **Value Delivered**:
@@ -452,37 +554,38 @@ This document defines all functional and non-functional requirements for the for
 - Intelligent quantity handling ✅
 - Meal planning automation ✅
 
-### **Phase 2: Production & Quality (M5-M6)** - Planned
-**Goal**: Production deployment and quality assurance  
-**Timeline**: ~24-35 hours  
-**Status**: Requirements planning
+### **Phase 2: Production & Collaboration (M5.0-M7)** - 🔄 In Progress
+**Goal**: Production deployment and collaborative features  
+**Timeline**: 38-48 hours (M5.0: 6h, M7: 32-42h with buffer)  
+**Status**: M5.0 complete ✅, M7 planned 🚀
 
 **Value Delivered**:
-- Apple Developer Account & App Store presence
-- TestFlight deployment for real device testing
-- CloudKit family collaboration
-- Multi-device sync with conflict resolution
-- Comprehensive automated testing (50%+ coverage)
-- AI-augmented test review on every PR
-- Production readiness validation
+- ✅ Apple Developer Program enrollment
+- ✅ TestFlight deployment & real device validation
+- ✅ Internal beta testing program
+- ⏳ App Store compliance (privacy policy, questionnaire)
+- ⏳ CloudKit multi-device sync
+- ⏳ Family collaboration features
+- ⏳ External public beta program
+- ⏳ Professional portfolio showcase
 
-### **Phase 3: Intelligence Platform (M7-M11)** - Future
-**Goal**: Advanced features and insights  
-**Timeline**: ~26-38 hours  
+### **Phase 3: Quality & Intelligence (M6, M8-M11)** - ⏳ Future
+**Goal**: Testing foundation and advanced features  
+**Timeline**: ~38-56 hours  
 **Status**: Strategic planning
 
 **Value Delivered**:
-- Analytics and insights
-- Nutrition tracking
-- Budget intelligence
-- AI assistance
-- Lifestyle optimization
+- Comprehensive test coverage (M6)
+- Analytics and insights (M8)
+- Nutrition tracking (M9)
+- Budget intelligence (M10)
+- AI assistance & lifestyle optimization (M11)
 
 ---
 
-**Strategic Validation**: Core platform requirements (M1-M4) complete with professional quality. Phase 2 (M5-M6) provides production deployment infrastructure and quality assurance. Phase 3 (M7-M11) builds advanced intelligence features on robust foundation representing significant competitive advantage and comprehensive lifestyle optimization platform.
+**Strategic Validation**: Core platform (M1-M4) complete with professional quality (77h, 108 requirements). Production infrastructure (M5.0) delivered TestFlight deployment (6h, 14 requirements). Collaboration platform (M7) will add App Store compliance, CloudKit sync, and public beta (32-42h with buffer, 29 requirements). Combined M1-M7 represents complete collaborative meal planning platform ready for App Store launch.
 
-**Last Updated**: November 26, 2025  
-**Version**: 3.8  
-**Next Update**: After M5 planning  
-**Current Focus**: Prepare for M5 Production Infrastructure & CloudKit
+**Last Updated**: December 3, 2025  
+**Version**: 3.9  
+**Next Update**: After M7 completion  
+**Current Focus**: M7 - CloudKit Sync & External TestFlight

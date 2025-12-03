@@ -1,814 +1,316 @@
-# NEXT PROMPT: M5.0 - App Renaming & TestFlight Deployment
+# Next Implementation Prompt - M7.0 App Store Prerequisites
 
-**Last Updated**: November 28, 2025  
-**Status**: 🚀 READY TO START  
-**Estimated Time**: 4-6 hours across 5 phases  
-**PRD**: M5.0-APP-RENAMING-TESTFLIGHT-PRD.md
-
----
-
-## 🚨 BEFORE YOU START - MANDATORY SESSION STARTUP
-
-**Complete these 4 steps FIRST**:
-1. ✅ Read [session-startup-checklist.md](session-startup-checklist.md)
-2. ✅ Read [project-naming-standards.md](project-naming-standards.md)
-3. ✅ Read [current-story.md](current-story.md)
-4. ✅ Read this file (next-prompt.md)
-
-**This 5-10 minute investment prevents 6-14 hours of rework.**
+**Last Updated**: December 3, 2025  
+**Current Phase**: M7.0.1 - Privacy Policy Creation & Hosting 🚀 READY  
+**Status**: Ready to begin  
+**Estimated Time**: 2-3 hours total for M7.0 (all 4 sub-phases)
 
 ---
 
-## 📋 SESSION STARTUP CHECKLIST FOR M5.0
+## 🎯 **WHAT YOU'RE BUILDING**
 
-### Phase 1: Context Loading (Required)
-- [x] Read session-startup-checklist.md
-- [x] Read project-naming-standards.md
-- [x] Read current-story.md
-- [x] Read M5.0 PRD (M5.0-APP-RENAMING-TESTFLIGHT-PRD.md)
+**M7.0: App Store Prerequisites** - MANDATORY compliance steps before external TestFlight submission (M7.5)
 
-### Phase 2: Pre-Development Preparation
-- [ ] Review proven patterns from M1-M4 documentation approach
-- [ ] Understand validation checkpoint strategy
-- [ ] Have Git ready for frequent commits
-- [ ] Xcode closed (will open/close multiple times)
+This phase prepares Forager for external public beta testing by completing Apple's mandatory App Store requirements:
+1. Privacy policy published and accessible
+2. In-app privacy link implemented
+3. App Privacy questionnaire completed
+4. Display name disambiguated
+
+**⚠️ CRITICAL**: Cannot submit for external TestFlight (M7.5) without completing ALL of M7.0.
 
 ---
 
-## 🎯 QUICK START GUIDE
+## 🚀 **M7.0.1: PRIVACY POLICY CREATION & HOSTING** - READY TO START
 
-### If Starting Fresh (First Session)
+**Estimated Time**: 1 hour  
+**Status**: Not started  
+**Purpose**: Create and host privacy policy at public URL for App Store Connect
 
-**Say this to Claude**:
+### **What You'll Create:**
+
+A simple, professional privacy policy hosted on GitHub Pages that:
+- States data is stored locally on device only
+- Confirms no tracking, analytics, or third-party sharing
+- Explains data deletion (uninstall app)
+- Notes policy will be updated when CloudKit sync added (M7.1-7.4)
+
+**Target URL**: `https://rfhayn.github.io/forager/privacy.html`
+
+### **Step-by-Step Implementation:**
+
+#### **Step 1: Create Privacy Policy HTML** (30 min)
+
+Create file: `docs/privacy.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forager Privacy Policy</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #27ae60;
+            margin-top: 30px;
+        }
+        .last-updated {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        .important {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-left: 4px solid #27ae60;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Forager Privacy Policy</h1>
+    <p class="last-updated">Last updated: December 2025</p>
+
+    <div class="important">
+        <strong>Summary:</strong> Forager stores all data locally on your device. We do not collect, transmit, or share any personal information.
+    </div>
+
+    <h2>Data Collection</h2>
+    <p>Forager does not collect any personal data. All information you enter (grocery lists, recipes, meal plans, and preferences) is stored locally on your device.</p>
+
+    <h2>Data Storage</h2>
+    <p>Your data is stored in the app's local database on your device. This includes:</p>
+    <ul>
+        <li>Grocery lists and shopping items</li>
+        <li>Recipes and ingredients</li>
+        <li>Meal plans and schedules</li>
+        <li>Personal preferences and settings</li>
+    </ul>
+    <p>None of this information is transmitted to external servers or third parties.</p>
+
+    <h2>Third-Party Services</h2>
+    <p>Forager does not use any third-party analytics, tracking, or advertising services. We do not share your data with anyone.</p>
+
+    <h2>Future Updates</h2>
+    <p>When we add iCloud sync capabilities in a future update, this policy will be updated to reflect how Apple's iCloud service handles your data. You will be notified of any policy changes before they take effect.</p>
+
+    <h2>Data Deletion</h2>
+    <p>To delete all your data, simply uninstall the Forager app from your device. This will permanently remove all locally stored information.</p>
+
+    <h2>Children's Privacy</h2>
+    <p>Forager does not knowingly collect information from children under 13. The app does not require any personal information to function.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy, please contact us through the App Store.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update this privacy policy from time to time. We will notify you of any changes by posting the new privacy policy on this page and updating the "Last updated" date.</p>
+
+    <p class="last-updated">This privacy policy is effective as of December 2025.</p>
+</body>
+</html>
 ```
-I'm ready to start M5.0 - App Renaming & TestFlight Deployment.
 
-I've completed:
-✅ session-startup-checklist.md
-✅ project-naming-standards.md
-✅ current-story.md
-✅ M5.0 PRD review
+**Key Elements:**
+- Mobile-responsive design (viewport meta tag + max-width styling)
+- Clean typography using system fonts
+- Green accent color (#27ae60) matching app branding
+- Summary box for quick understanding
+- All required sections covered
+- Future-proofs for CloudKit addition
 
-Let's start with M5.0.1: Name Selection & Planning.
-
-I'm considering these names:
-- Display Name: [YOUR IDEA HERE]
-- Bundle ID: [YOUR IDEA HERE]
-- Marketing Name: [YOUR IDEA HERE]
-
-Help me finalize the choices and create the 42-item checklist.
-```
-
-### If Continuing (Subsequent Sessions)
-
-**Say this to Claude**:
-```
-Continuing M5.0 - App Renaming & TestFlight.
-
-Completed so far:
-✅ M5.0.1: Name selection
-✅ M5.0.2: Xcode renaming (if done)
-[etc.]
-
-Current checkpoint: [M5.0.X Phase Y]
-
-Ready to proceed with next phase.
-```
-
----
-
-## 📊 MILESTONE OVERVIEW
-
-**M5.0 Structure**:
-```
-M5.0: App Renaming & TestFlight Deployment
-├── M5.0.1: Name Selection & Planning (30 min)
-├── M5.0.2: Xcode Project Renaming (1-1.5 hours)
-│   ├── Phase 2A: Bundle IDs
-│   ├── Phase 2B: Display Name
-│   ├── Phase 2C: Scheme Rename
-│   ├── Phase 2D: Project File Rename
-│   └── Phase 2E: Target/Product Names
-├── M5.0.3: File Structure Renaming (1-1.5 hours)
-│   ├── Phase 3A: Source Folders
-│   ├── Phase 3B: Core Data Model
-│   ├── Phase 3C: Entitlements
-│   ├── Phase 3D: App File
-│   └── Phase 3E: File Headers
-├── M5.0.4: Documentation & GitHub (45-60 min)
-│   ├── Phase 4A: Core Docs
-│   ├── Phase 4B: Learning Notes
-│   ├── Phase 4C: GitHub Repo
-│   └── Phase 4D: README
-└── M5.0.5: TestFlight Deployment (45-90 min + wait)
-    ├── Phase 5A: Apple Developer Enrollment
-    ├── Phase 5B: App Icon
-    ├── Phase 5C: App Store Connect
-    ├── Phase 5D: Build Upload
-    ├── Phase 5E: TestFlight Config
-    └── Phase 5F: Device Testing
-```
-
----
-
-## 🚀 M5.0.1: NAME SELECTION & PLANNING
-
-### Session Start Prompt
-
-```
-Let's complete M5.0.1 - Name Selection & Planning.
-
-Here are my name ideas:
-- Display Name (home screen): [YOUR CHOICE]
-- Bundle ID: com.richhayn.[YOUR CHOICE]
-- Marketing Name (App Store): [YOUR CHOICE]
-- GitHub Repo: [your-choice-lowercase-dashes]
-
-Please:
-1. Review these choices for any issues
-2. Help me finalize if needed
-3. Create the complete 42-item rename checklist from the PRD
-4. Document the naming strategy
-5. Identify all files requiring updates
-
-Expected outcome: Complete checklist, documented strategy, ready for M5.0.2
-```
-
-### What Claude Will Do
-
-1. Review your name choices for:
-   - Length (display name should be <12 chars)
-   - Bundle ID format (lowercase, no spaces)
-   - Marketing name SEO
-   - Consistency across choices
-
-2. Create the 42-item checklist customized with your names
-
-3. Document naming strategy in a file
-
-4. Prepare you for M5.0.2
-
-### Validation Before Proceeding
-
-- [ ] All names chosen and finalized
-- [ ] 42-item checklist created
-- [ ] Naming strategy documented
-- [ ] No conflicting names
-- [ ] Ready to start Xcode changes
-
-### Checkpoint Commit
+#### **Step 2: Test Privacy Policy Locally** (5 min)
 
 ```bash
-git add .
-git commit -m "M5.0.1 COMPLETE: Name selection finalized, checklist created"
+# Open in browser to verify rendering
+open docs/privacy.html
+
+# Check:
+# ✓ Readable on narrow window (mobile simulation)
+# ✓ Green accent colors visible
+# ✓ All sections present
+# ✓ No broken formatting
 ```
 
----
+#### **Step 3: Enable GitHub Pages** (10 min)
 
-## 🔧 M5.0.2: XCODE PROJECT RENAMING
+1. **Push privacy.html to GitHub:**
+   ```bash
+   git add docs/privacy.html
+   git commit -m "M7.0.1: Add privacy policy for App Store compliance"
+   git push origin main
+   ```
 
-### Session Start Prompt
+2. **Enable GitHub Pages:**
+   - Go to: https://github.com/rfhayn/forager/settings/pages
+   - Source: "Deploy from a branch"
+   - Branch: `main`
+   - Folder: `/docs`
+   - Click "Save"
 
+3. **Wait for deployment** (1-2 minutes)
+   - GitHub Actions will build site
+   - Check: https://github.com/rfhayn/forager/actions
+
+#### **Step 4: Verify Public URL** (5 min)
+
+Test the published privacy policy:
 ```
-Starting M5.0.2 - Xcode Project Renaming.
-
-Chosen names:
-- Display Name: [YOUR NAME]
-- Bundle ID: [YOUR BUNDLE ID]
-
-I've committed M5.0.1 changes. Xcode is closed.
-
-Let's start with Phase 2A: Bundle Identifier Updates.
-Walk me through each step with validation checkpoints.
+https://rfhayn.github.io/forager/privacy.html
 ```
 
-### Phase-by-Phase Breakdown
+**Verification Checklist:**
+- [ ] URL loads without 404 error
+- [ ] Content renders correctly on desktop browser
+- [ ] Content renders correctly on iPhone (Safari)
+- [ ] All styling (green accents, formatting) displays properly
+- [ ] No console errors (open browser dev tools)
 
-**Phase 2A: Bundle IDs** (20 min)
-- Update 3 targets: Main, Tests, UITests
-- Validation: Clean build succeeds
+#### **Step 5: Git Checkpoint** (5 min)
 
-**Phase 2B: Display Name** (10 min)
-- Set display name in target settings
-- Validation: Simulator shows new name
-
-**Phase 2C: Scheme Rename** (15 min)
-- Rename scheme in scheme manager
-- Validation: Build with new scheme succeeds
-
-**Phase 2D: Project File Rename** (20 min) ⚠️ HIGH RISK
-- Close Xcode, rename .xcodeproj in Finder
-- Reopen, fix broken references
-- Validation: All files green, build succeeds
-
-**Phase 2E: Target/Product Names** (15 min)
-- Rename targets and product names
-- Validation: Archive build succeeds
-
-### Critical Validation After M5.0.2
-
-**Before proceeding to M5.0.3**:
-
+Mark M7.0.1 complete:
 ```bash
-# Full validation test suite:
-
-# 1. Clean build
-Product → Clean Build Folder
-Product → Build
-✓ Expected: BUILD SUCCEEDED
-
-# 2. Run on simulator
-Product → Run
-✓ Expected: App launches, all tabs work
-
-# 3. No red files
-✓ All files green in navigator
-
-# 4. Archive succeeds
-Product → Archive
-✓ Expected: Archive successful
-
-# If ALL pass:
-git add .
-git commit -m "M5.0.2 COMPLETE: Xcode project renamed, all builds pass"
-git push origin main
-
-# If ANY fail:
-STOP - Debug - Re-validate - Do not proceed
-```
-
----
-
-## 📁 M5.0.3: FILE & FOLDER STRUCTURE RENAMING
-
-### Session Start Prompt
-
-```
-Starting M5.0.3 - File & Folder Structure Renaming.
-
-M5.0.2 validation passed ✅:
-- Clean build succeeds
-- App runs on simulator
-- Archive succeeds
-- Git committed and pushed
-
-Let's start with Phase 3A: Source Folder Renaming.
-```
-
-### Phase-by-Phase Breakdown
-
-**Phase 3A: Source Folders** (25 min)
-- Close Xcode, rename 3 folders in Finder
-- Reopen, fix broken references
-- Validation: Build succeeds
-
-**Phase 3B: Core Data Model** (20 min) ⚠️ HIGH RISK
-- Rename .xcdatamodeld file
-- Update NSPersistentCloudKitContainer name
-- Validation: Data loads correctly
-
-**Phase 3C: Entitlements** (15 min)
-- Rename .entitlements file
-- Update CloudKit container ID
-- Validation: No signing errors
-
-**Phase 3D: App File** (10 min)
-- Rename [OldName]App.swift
-- Update struct name
-- Validation: Build succeeds
-
-**Phase 3E: File Headers** (20 min)
-- Update all file header comments
-- Can use script or manual
-- Validation: No unwanted changes
-
-### Critical Validation After M5.0.3
-
-**Before proceeding to M5.0.4**:
-
-```bash
-# Comprehensive test suite:
-
-# 1. Build & run
-Product → Clean Build Folder
-Product → Build
-Product → Run
-✓ All tabs load
-✓ Existing data displays
-
-# 2. Data integrity
-✓ Create new grocery item → Persists
-✓ Create new recipe → Persists
-✓ Create meal plan → Persists
-
-# 3. All features functional
-✓ Categories work
-✓ Recipes work
-✓ Grocery lists work
-✓ Meal planning works
-
-# 4. Archive succeeds
-Product → Archive
-✓ Archive successful
-
-# If ALL pass:
-git add .
-git commit -m "M5.0.3 COMPLETE: File structure renamed, all tests pass"
-git push origin main
-
-# If ANY fail:
-STOP - Debug - May need to revert Core Data changes
-```
-
----
-
-## 📚 M5.0.4: DOCUMENTATION & GITHUB RENAMING
-
-### Session Start Prompt
-
-```
-Starting M5.0.4 - Documentation & GitHub Renaming.
-
-M5.0.3 validation passed ✅:
-- All folders renamed
-- Core Data working
-- All features functional
-- Git committed and pushed
-
-Let's start with Phase 4A: Core Documentation Updates.
-```
-
-### Phase-by-Phase Breakdown
-
-**Phase 4A: Core Docs** (20 min)
-- Update project-index.md, current-story.md, roadmap.md, etc.
-- Search-and-replace strategy
-- Validation: All key docs consistent
-
-**Phase 4B: Learning Notes** (15 min)
-- Preserve historical references
-- Add context notes
-- Update future-facing content
-- Validation: Historical accuracy maintained
-
-**Phase 4C: GitHub Repo** (15 min)
-- Rename repository on GitHub
-- Update local Git remote
-- Validation: Push/pull works
-
-**Phase 4D: README** (10 min)
-- Update README.md
-- Update repo metadata
-- Validation: Professional appearance
-
-### Critical Validation After M5.0.4
-
-**Before proceeding to M5.0.5**:
-
-```bash
-# Documentation audit:
-
-# 1. Core docs updated
-✓ project-index.md has new name
-✓ current-story.md has new name
-✓ roadmap.md has new name
-✓ requirements.md updated
-✓ claude-instructions.md updated (transition note removed)
-
-# 2. GitHub operational
-✓ Repository renamed
-✓ git push works
-✓ git pull works
-✓ README displays correctly
-
-# 3. Consistency check
-grep -r "forager" docs/ | grep -v ".git"
-✓ Only historical references with context
-
-# If ALL pass:
-git add .
-git commit -m "M5.0.4 COMPLETE: Documentation and GitHub renamed"
-git push origin main
-
-# If ANY fail:
-STOP - Fix inconsistencies before TestFlight
-```
-
----
-
-## 📱 M5.0.5: TESTFLIGHT DEPLOYMENT
-
-### Session Start Prompt
-
-```
-Starting M5.0.5 - TestFlight Deployment.
-
-M5.0.4 validation passed ✅:
-- All docs updated
-- GitHub renamed
-- Git operational
-
-Let's start with Phase 5A: Apple Developer Enrollment.
-
-Status:
-- [ ] Already enrolled in Apple Developer Program
-- [ ] Need to enroll ($99/year)
-
-[Indicate your status]
-```
-
-### Phase-by-Phase Breakdown
-
-**Phase 5A: Apple Developer** (15 min + 24-48h wait)
-- Enroll at developer.apple.com
-- Pay $99/year
-- Wait for approval
-
-**Phase 5B: App Icon** (30 min if needed)
-- Create 1024x1024 PNG
-- Add to Assets.xcassets
-- Validation: Icon shows on simulator
-
-**Phase 5C: App Store Connect** (20 min)
-- Create app record
-- Fill metadata
-- Validation: App appears in My Apps
-
-**Phase 5D: Build Upload** (30 min)
-- Archive in Xcode
-- Validate
-- Upload
-- Validation: Build shows in Activity
-
-**Phase 5E: TestFlight Config** (15 min)
-- Add build to TestFlight
-- Create testing group
-- Invite testers
-- Validation: Invitations sent
-
-**Phase 5F: Device Testing** (15 min)
-- Install TestFlight app
-- Accept invitation
-- Install app on device
-- Test all features
-- Validation: App works on real device
-
-### Critical Validation After M5.0.5
-
-**Final M5.0 Validation**:
-
-```bash
-# Complete deployment verification:
-
-# Apple Services
-✓ Developer account active
-✓ App Store Connect configured
-✓ Build uploaded and processed
-
-# TestFlight
-✓ Build available
-✓ Testers invited
-✓ App installable
-
-# Device Testing
-✓ App runs on real iPhone
-✓ All tabs load
-✓ All features work
-✓ Data persists
-✓ No crashes
-
-# If ALL pass:
-git add .
-git commit -m "M5.0.5 COMPLETE: TestFlight deployment successful"
-git push origin main
-
-# Update current-story.md:
-Mark M5.0 ✅ COMPLETE with actual hours
-
-# Create learning note:
-Document rename process and TestFlight experience
-
-🎉 M5.0 COMPLETE!
-```
-
----
-
-## 🎓 LEARNING NOTE CREATION
-
-**After M5.0 Complete**:
-
-Create: `docs/learning-notes/24-m5.0-app-renaming-testflight.md`
-
-**Include**:
-1. **Name Selection Process**: How you chose the name
-2. **Xcode Rename Journey**: What worked, what didn't
-3. **Core Data Gotchas**: Container name matching
-4. **TestFlight Experience**: Approval time, any issues
-5. **Validation Checkpoints**: How they saved time
-6. **Time Accuracy**: Estimated vs actual for each phase
-7. **Recommendations**: What you'd do differently
-
-**Template**:
-```markdown
-# Learning Notes: M5.0 - App Renaming & TestFlight
-
-**Date**: November 28, 2025  
-**Duration**: X hours (estimated 4-6h)  
-**Components**: M5.0.1-5 complete
-
-## Key Concepts Learned
-
-### Systematic Renaming
-[Document the step-by-step process]
-
-### Validation Strategy
-[How checkpoints prevented issues]
-
-### TestFlight Deployment
-[Developer enrollment through device testing]
-
-## Technical Discoveries
-
-### Xcode Configuration
-[What worked for project/scheme renaming]
-
-### Core Data Considerations
-[Container name must match file name exactly]
-
-### Git Strategy
-[Frequent commits were essential]
-
-## Challenges & Solutions
-
-### Challenge 1: [Description]
-**Solution**: [How you solved it]
-
-### Challenge 2: [Description]
-**Solution**: [How you solved it]
-
-## Time Tracking
-
-- M5.0.1: X min (estimated 30 min)
-- M5.0.2: X hours (estimated 1-1.5h)
-- M5.0.3: X hours (estimated 1-1.5h)
-- M5.0.4: X min (estimated 45-60 min)
-- M5.0.5: X min + wait (estimated 45-90 min)
-**Total**: X hours
-
-**Planning Accuracy**: X%
-
-## Recommendations
-
-### Do Again:
-- Validation checkpoints after each phase
-- Git commits before risky operations
-- Systematic checklist approach
-
-### Do Differently:
-- [Any improvements for next time]
-
-## Next Steps
-
-After M5.0:
-- Gather TestFlight feedback
-- Choose M5.1 (CloudKit) vs M6 (Testing)
-- Create PRD for next milestone
-```
-
----
-
-## 📋 PROGRESS TRACKING
-
-**Copy this to track your progress**:
-
-```
-M5.0 PROGRESS TRACKER
-
-[ ] M5.0.1: Name Selection (30 min)
-    [ ] Names chosen
-    [ ] Checklist created
-    [ ] Strategy documented
-    [ ] Git checkpoint
-
-[ ] M5.0.2: Xcode Renaming (1-1.5h)
-    [ ] Phase 2A: Bundle IDs
-    [ ] Phase 2B: Display Name
-    [ ] Phase 2C: Scheme
-    [ ] Phase 2D: Project File
-    [ ] Phase 2E: Targets
-    [ ] All validation tests pass
-    [ ] Git checkpoint
-
-[ ] M5.0.3: File Structure (1-1.5h)
-    [ ] Phase 3A: Folders
-    [ ] Phase 3B: Core Data
-    [ ] Phase 3C: Entitlements
-    [ ] Phase 3D: App File
-    [ ] Phase 3E: Headers
-    [ ] All validation tests pass
-    [ ] Git checkpoint
-
-[ ] M5.0.4: Documentation (45-60 min)
-    [ ] Phase 4A: Core Docs
-    [ ] Phase 4B: Learning Notes
-    [ ] Phase 4C: GitHub
-    [ ] Phase 4D: README
-    [ ] All validation tests pass
-    [ ] Git checkpoint
-
-[ ] M5.0.5: TestFlight (45-90 min + wait)
-    [ ] Phase 5A: Developer Account
-    [ ] Phase 5B: App Icon
-    [ ] Phase 5C: App Store Connect
-    [ ] Phase 5D: Build Upload
-    [ ] Phase 5E: TestFlight Config
-    [ ] Phase 5F: Device Testing
-    [ ] All validation tests pass
-    [ ] Git checkpoint
-
-[ ] M5.0 Complete
-    [ ] Learning note created
-    [ ] current-story.md updated
-    [ ] roadmap.md updated
-    [ ] project-index.md updated
-    [ ] All docs use M5.0 naming
-
-Total Time: _____ hours
-Planning Accuracy: _____%
-```
-
----
-
-## 🆘 TROUBLESHOOTING GUIDE
-
-### Problem: Build fails after rename
-
-**Check**:
-1. All 3 bundle IDs updated consistently?
-2. Any typos in bundle IDs?
-3. Product name updated in build settings?
-4. Clean build folder?
-
-**Solution**:
-```bash
-# In Xcode:
-Product → Clean Build Folder
-# Delete derived data:
-Window → Organizer → Projects → Delete
-# Rebuild
-```
-
----
-
-### Problem: Core Data doesn't load after rename
-
-**Check**:
-1. Container name EXACTLY matches file name?
-2. Case-sensitive - "ShopList" ≠ "shoplist"?
-3. File extension removed in code: "ShopList" not "ShopList.xcdatamodeld"?
-
-**Solution**:
-```swift
-// Verify exact match:
-let container = NSPersistentCloudKitContainer(name: "[EXACT_FILE_NAME]")
-// File: ShopList.xcdatamodeld
-// Code: name: "ShopList"  ← No extension!
-```
-
----
-
-### Problem: Files show red in Xcode after rename
-
-**Solution**:
-```
-1. Select red file/folder
-2. File Inspector (⌘⌥1)
-3. Click folder icon
-4. Navigate to actual file location
-5. Select → reconnects reference
-```
-
----
-
-### Problem: Git push fails after GitHub rename
-
-**Solution**:
-```bash
-# Update remote URL
-git remote set-url origin https://github.com/rfhayn/[new-name].git
-
-# Verify
-git remote -v
-
-# Try again
+git add docs/privacy.html
+git commit -m "M7.0.1 COMPLETE: Privacy policy published at https://rfhayn.github.io/forager/privacy.html"
 git push origin main
 ```
 
----
+### **Acceptance Criteria for M7.0.1:**
 
-### Problem: TestFlight build stuck "Processing"
+- [ ] privacy.html file created in docs/ directory
+- [ ] GitHub Pages enabled for /docs folder
+- [ ] Privacy policy accessible at public URL
+- [ ] Mobile-responsive design verified
+- [ ] All required sections present:
+  - Data Collection
+  - Data Storage
+  - Third-Party Services
+  - Future Updates (iCloud mention)
+  - Data Deletion
+  - Children's Privacy
+  - Contact
+  - Changes to Policy
+- [ ] Git checkpoint created
 
-**Solution**:
-- Wait 30 minutes (can take time)
-- Check Activity tab for errors
-- If >2 hours, upload new build
-- Verify export compliance answered
+### **Troubleshooting:**
 
----
+**Issue**: GitHub Pages 404 error  
+**Solution**: 
+- Wait 2-3 minutes for initial deployment
+- Check GitHub Actions completed successfully
+- Verify file path is exactly `docs/privacy.html` (case-sensitive)
 
-## 🎯 SUCCESS CRITERIA
+**Issue**: Styling doesn't display  
+**Solution**: 
+- Check for HTML syntax errors
+- Verify `<style>` block is in `<head>`
+- Test in incognito window (clear cache)
 
-**M5.0 is complete when**:
-
-### Functional
-- [ ] App launches with new name
-- [ ] All M1-M4 features work
-- [ ] Data loads and saves correctly
-- [ ] App installs via TestFlight
-- [ ] Runs on real device
-
-### Technical
-- [ ] Zero build errors
-- [ ] Zero red files
-- [ ] Archive succeeds
-- [ ] Bundle IDs consistent
-- [ ] Core Data operational
-
-### Documentation
-- [ ] All docs use new name consistently
-- [ ] GitHub renamed
-- [ ] README updated
-- [ ] Learning note created
-
-### Quality
-- [ ] No regressions
-- [ ] Performance maintained
-- [ ] Zero data loss
-- [ ] Professional appearance
+**Issue**: Mobile rendering problems  
+**Solution**: 
+- Verify viewport meta tag present
+- Test `max-width: 800px` is working
+- Check padding on mobile (20px sides)
 
 ---
 
-## 📞 GETTING HELP
+## 📋 **REMAINING M7.0 PHASES** (Execute after M7.0.1 complete)
 
-**If stuck**:
+### **M7.0.2: Privacy Policy Integration** ⏳ NEXT (1 hour)
+**After M7.0.1 complete**
 
-1. **Review validation checkpoint** - Did you pass all tests before proceeding?
-2. **Check Git history** - Can you revert to last good checkpoint?
-3. **Consult PRD** - Detailed solutions in Appendix A
-4. **Search learning notes** - Similar issues in M1-M4?
+Tasks:
+1. Add privacy policy URL to App Store Connect metadata
+2. Add "Privacy Policy" link in SettingsView
+3. Implement SafariServices in-app browser
+4. Test: Tap link → policy opens in-app
 
-**When asking Claude for help**:
+### **M7.0.3: App Privacy Questionnaire** ⏳ AFTER M7.0.2 (30 min)
+
+Tasks:
+1. Navigate to App Store Connect → App Privacy
+2. Select "Data Not Collected" (accurate for current build)
+3. Save and verify complete
+4. Note: Will update after CloudKit (M7.1-7.4)
+
+### **M7.0.4: Display Name Disambiguation** ⏳ AFTER M7.0.3 (30 min)
+
+Tasks:
+1. Update Xcode: Display Name = "Forager: Smart Meal Planner"
+2. Keep Bundle Name = "Forager" (clean home screen icon)
+3. Update App Store Connect display name
+4. Build and test
+
+---
+
+## 🎯 **AFTER M7.0 COMPLETE**
+
+### **Update Documentation:**
+1. **current-story.md**: Mark M7.0 ✅ COMPLETE, update to M7.1 🚀 READY
+2. **next-prompt.md**: Replace M7.0 content with M7.1 content
+3. **Git commit**: "M7.0 COMPLETE: App Store prerequisites done, ready for CloudKit"
+
+### **Next Phase:**
+M7.1 - CloudKit Sync Foundation (8-10 hours)
+- CloudKit schema validation
+- NSPersistentCloudKitContainer integration
+- Multi-device sync testing
+
+---
+
+## 💡 **RECOMMENDED APPROACH**
+
+### **For M7.0.1 (Starting Now):**
+
+Use this prompt to begin:
 ```
-I'm stuck on M5.0.[X] Phase [Y].
+M7.0.1 ready to start.
 
-Error/Issue: [Describe specific problem]
+Let's create the privacy policy HTML file for GitHub Pages.
 
-What I've tried:
-1. [Action 1]
-2. [Action 2]
-
-Validation results:
-- [Test 1]: Pass/Fail
-- [Test 2]: Pass/Fail
-
-Last successful checkpoint: M5.0.[X] Phase [Y-1]
-
-Git status: [committed / uncommitted]
-
-Need help with: [Specific question]
+Walk me through Step 1: Creating docs/privacy.html with the template provided.
+After we create the file, I'll test it locally before enabling GitHub Pages.
 ```
 
----
+### **After M7.0.1 Complete:**
 
-## 🏁 AFTER M5.0 COMPLETION
+Return to this document and follow M7.0.2, then M7.0.3, then M7.0.4 in sequence.
 
-### Immediate Actions
-1. Update current-story.md → Mark M5.0 ✅ COMPLETE
-2. Update roadmap.md → Add M5.0 completion
-3. Create learning note → Document journey
-4. Update project-index.md → Recent activity
-
-### Next Session Planning
-1. Gather TestFlight feedback from family/friends
-2. Test on 2-3 different devices
-3. Choose next milestone:
-   - M5.1: CloudKit Sync (20-25h)
-   - M6: Testing Foundation (12-18h)
-   - M7: Analytics (6-8h)
-
-### Documentation Cleanup
-1. Move M5.0 PRD to docs/prds/complete/
-2. Archive this next-prompt
-3. Create next-prompt for chosen milestone
+Each sub-phase includes:
+- Clear acceptance criteria
+- Step-by-step instructions
+- Validation checkpoints
+- Troubleshooting guidance
 
 ---
 
-**Remember**: Follow the validation checkpoints religiously. They exist to prevent cascading failures and save you hours of debugging!
+## 📊 **M7.0 PROGRESS TRACKER**
 
-**Good luck! 🚀**
+- [ ] **M7.0.1**: Privacy Policy Creation & Hosting (1h) 🚀 READY
+- [ ] **M7.0.2**: Privacy Policy Integration (1h) ⏳ After M7.0.1
+- [ ] **M7.0.3**: App Privacy Questionnaire (30min) ⏳ After M7.0.2
+- [ ] **M7.0.4**: Display Name Disambiguation (30min) ⏳ After M7.0.3
+
+**Total M7.0 Time**: 2-3 hours  
+**Status**: MANDATORY before external TestFlight (M7.5)  
+**Next After M7.0**: M7.1 CloudKit Sync Foundation (8-10 hours)
 
 ---
 
-**Last Updated**: November 28, 2025  
-**Status**: Ready for execution  
-**Next Review**: After M5.0 completion
+**Last Updated**: December 3, 2025  
+**Version**: 1.0 (M7.0 App Store Prerequisites)  
+**PRD Reference**: docs/prds/milestone-7-cloudkit-sync-external-testflight.md  
+**Current Story**: docs/current-story.md

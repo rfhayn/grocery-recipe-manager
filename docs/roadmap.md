@@ -1,8 +1,8 @@
-# forager - Development Roadmap
+# Forager - Development Roadmap
 
-**Last Updated**: November 26, 2025  
-**Current Phase**: M4 COMPLETE ✅  
-**Status**: All M1-M4 milestones complete, ready for M5 or TestFlight
+**Last Updated**: December 3, 2025  
+**Current Phase**: M5.0 COMPLETE ✅ | M7 READY 🚀  
+**Status**: All M1-M5.0 milestones complete, CloudKit sync & external TestFlight ready to start
 
 ---
 
@@ -101,29 +101,50 @@
 
 **M4 Completion**: Core workflow complete (planning accuracy: 90%), ready for CloudKit or TestFlight
 
+**M5.0: App Renaming & TestFlight Deployment (6 hours) - December 2025** ✅
+- Complete app rename from "GroceryRecipeManager" to "Forager"
+- Professional app icon design (green sprout, grocery-themed)
+- Bundle identifier migration (com.richhayn.forager)
+- Systematic file and folder renaming
+- Apple Developer Program enrollment ($99/year)
+- App Store Connect configuration
+- CloudKit production entitlements
+- Internal TestFlight deployment
+- Multi-tester beta program (3+ testers)
+- Real device validation on physical iPhones
+
+**M5.0 Completion**: Forager brand established, TestFlight operational, ready for M7 CloudKit sync
+
 ---
 
 ## 🚀 **IMMEDIATE NEXT STEPS**
 
-### **M4 COMPLETE - Next Priority Decision** ✅
+### **M5.0 COMPLETE - M7 Ready to Start** ✅
 
-With M4 completion, you have two strategic paths:
+With M5.0 completion, Forager is now:
+- **Branded**: Professional "Forager: Smart Meal Planner" identity established
+- **Deployed**: Internal TestFlight operational with multi-tester beta program
+- **Validated**: Running successfully on real devices
+- **Ready**: CloudKit-enabled and prepared for family collaboration
 
-**Option A: M5 - Production Infrastructure & CloudKit Sync**
-- CloudKit family sharing for meal plans
-- Production-ready data sync
-- Conflict resolution
-- Offline support
-- Estimated: 20-25 hours
+**Next Milestone: M7 - CloudKit Sync & External TestFlight**
+- **M7.0: App Store Prerequisites (MANDATORY)** - 2-3 hours
+  - Privacy policy creation and hosting
+  - In-app privacy link implementation
+  - App Privacy questionnaire completion
+  - Display name disambiguation
+- **M7.1-7.4: CloudKit Implementation** - 25-30 hours
+  - CloudKit schema and sync foundation
+  - Multi-user collaboration with CKShare
+  - Conflict resolution and sync UI
+- **M7.5-7.6: External TestFlight & Public Beta** - 5-9 hours
+  - App Review submission
+  - Public beta landing page
+  - LinkedIn showcase
 
-**Option B: TestFlight Beta Deployment**
-- Apple Developer Account enrollment
-- Real device testing
-- User feedback gathering
-- Bug fixes and polish
-- Estimated: 8-12 hours
+**Timeline**: 27-37 hours base, 32-42 hours with buffer (3-4 weeks including Apple Review)
 
-**Recommendation**: TestFlight first for real-world validation before CloudKit investment
+**⚠️ CRITICAL**: M7.0 App Store Prerequisites are MANDATORY before external TestFlight submission
 
 ### **M4 Component Summary:**
 
@@ -197,26 +218,24 @@ With M4 completion, you have two strategic paths:
 - **M4.1 → M4.3.1**: Settings infrastructure ready for Display Options ✅
 - **M4.2 → M4.3**: Meal planning data ready for bulk grocery list generation ✅
 - **M4.3.1 → M4.3.2+**: Core Data relationships enable recipe source display ✅
-- **M4 → M5**: Meal planning data architecture ready for family collaboration
-- **M3 + M4 → M7**: Rich analytics data from structured quantities and meal patterns
-- **M3 + M4 → M8-M11**: Advanced intelligence platform built on structured data foundation
+- **M4 → M7**: Meal planning data architecture ready for CloudKit family collaboration
+- **M5.0 → M7**: TestFlight infrastructure ready for external beta and CloudKit sync
+- **M3 + M4 → M8**: Rich analytics data from structured quantities and meal patterns
+- **M3 + M4 → M9-M12**: Advanced intelligence platform built on structured data foundation
 
 ### **Timeline Summary:**
-- **Core Platform (M1-M7)**: ~103-136 hours total
+- **Core Platform (M1-M8)**: ~140-165 hours estimated
 - **M1 Complete**: 32 hours ✅
 - **M2 Complete**: 16.5 hours ✅
 - **M3 Complete**: 10.5 hours ✅
 - **M3.5 Complete**: 8.5 hours ✅
-- **M4.1 Complete**: 1.5 hours ✅
-- **M4.2 Complete**: ~4 hours ✅
-- **M4.3.1 Complete**: 3.5 hours ✅
-- **M4.3.2 Complete**: 1.25 hours ✅
-- **M4.3.3 Complete**: 2.5 hours ✅
-- **M4.3.4 Complete**: 1.0 hour ✅
-- **M4.3.5 Remaining**: 4 hours (ready to begin)
-- **M4 Total Progress**: ~14.25h complete, ~4h remaining
-- **M4.2.1-3 Enhancement**: 1 hour (optional)
-- **Future (M5-M7)**: ~32-47 hours
+- **M4 Complete**: 19.25 hours ✅
+- **M5.0 Complete**: 6 hours ✅
+- **Total Completed (M1-M5.0)**: ~92.5 hours ✅
+- **M7 Planned**: 32-42 hours (with buffer)
+- **M6 Planned**: 12-18 hours
+- **M8 Planned**: 8-12 hours
+- **Remaining (M6-M8)**: ~52-72 hours
 
 ---
 
@@ -630,51 +649,131 @@ With M4 completion, you have two strategic paths:
 
 ---
 
-### **⏳ M5: Production Infrastructure & CloudKit - PLANNED**
+### **⏳ M7: CloudKit Sync & External TestFlight - PLANNED** 🚀
 
-**Status**: ⏳ Planned  
-**Estimated Time**: 12-17 hours  
-**Dependencies**: M4 complete
+**Status**: ⏳ Planned - Ready to Start  
+**Estimated Time**: 27-37 hours base, 32-42 hours with buffer  
+**Dependencies**: M5.0 complete  
+**PRD**: docs/prds/milestone-7-cloudkit-sync-external-testflight.md
 
-**Phase 1: Apple Developer Account & App Store Setup** (2-3 hours)
-- Apple Developer Program enrollment ($99/year)
-- App Store Connect configuration
-- Bundle identifier and certificates setup
-- App icon and metadata preparation
-- Privacy policy and terms of service
+**⚠️ CRITICAL**: M7.0 App Store Prerequisites are MANDATORY before external TestFlight submission (M7.5)
 
-**Phase 2: TestFlight Deployment & Device Testing** (3-4 hours)
-- TestFlight build configuration
-- Internal testing group setup
-- Real device testing and validation (3+ devices)
-- Performance profiling on actual hardware
-- User feedback collection and iteration
+**M7.0: App Store Prerequisites (2-3 hours) - MANDATORY** 🚨
+- **M7.0.1**: Privacy Policy Creation & Hosting (1h)
+  - Draft privacy policy for local-only data storage
+  - Host on GitHub Pages: https://rfhayn.github.io/forager/privacy.html
+  - Content: Data stored locally, no tracking, delete by uninstalling
+  - Update policy when CloudKit added
+- **M7.0.2**: Privacy Policy Integration (1h)
+  - Add URL to App Store Connect metadata
+  - Add "Privacy Policy" link in SettingsView
+  - Use SafariServices to open in-app
+  - Test: Tap link → policy opens
+- **M7.0.3**: App Privacy Questionnaire (30min)
+  - Complete in App Store Connect → App Privacy
+  - Current build: Select "Data Not Collected"
+  - After CloudKit: Update to reflect iCloud sync
+- **M7.0.4**: Display Name Disambiguation (30min)
+  - Display Name (CFBundleDisplayName): "Forager: Smart Meal Planner"
+  - Bundle Name (CFBundleName): "Forager" (home screen icon)
+  - Avoid name collision with "Forager" game (Guideline 4.1)
 
-**Phase 3: CloudKit Schema Design & Integration** (4-6 hours)
-- CloudKit record types for all entities
-- Sync strategy and conflict resolution design
-- Share permissions and access control
-- Schema migration from local Core Data
-- Bidirectional sync logic implementation
-- Offline support with sync queue
+**M7.1: CloudKit Sync Foundation (8-10 hours)**
+- **M7.1.1**: CloudKit Schema Validation (2-3h)
+  - Verify all 8 entities supported
+  - Define record types and relationships
+  - Set up development and production containers
+- **M7.1.2**: NSPersistentCloudKitContainer Integration (3-4h)
+  - Replace NSPersistentContainer
+  - Configure CloudKit container options
+  - Test automatic sync behavior
+- **M7.1.3**: Initial Sync Testing (3-3h)
+  - Multi-device sync validation
+  - Offline queue verification
+  - Performance testing
 
-**Phase 4: Family Sharing Features** (3-4 hours)
-- Family account management UI
-- Share invitation and acceptance flows
-- Real-time collaboration notifications
-- Shared list and recipe indicators
-- Multi-device testing
-- Conflict scenario validation
+**M7.2: Multi-User Collaboration (8-10 hours)**
+- **M7.2.1**: CKShare Implementation (3-4h)
+  - Share creation for lists, recipes, meal plans
+  - Share invitation flow
+- **M7.2.2**: Share Management UI (2-3h)
+  - View active shares
+  - Manage participants
+  - Revoke shares
+- **M7.2.3**: Permission System (2-2h)
+  - Owner vs participant roles
+  - Read/write access control
+- **M7.2.4**: Concurrent Editing (1-1h)
+  - Handle simultaneous edits
+  - UI updates for multi-user changes
+
+**M7.3: Conflict Resolution & Error Handling (4-6 hours)**
+- **M7.3.1**: Conflict Resolution Policies (2-3h)
+  - Last-write-wins for simple fields
+  - Array merge for ingredients/items
+  - Custom resolution UI where needed
+- **M7.3.2**: Error Handling & Recovery (2-3h)
+  - Network error recovery
+  - CloudKit quota management
+  - Deleted record handling
+  - User-facing error messages
+
+**M7.4: Sync UI & Polish (5-7 hours)**
+- **M7.4.1**: Sync Status Indicators (3-4h)
+  - Visual sync status (synced/syncing/error)
+  - Last synced timestamp
+  - Manual sync trigger (pull-to-refresh)
+- **M7.4.2**: CloudKit Settings & Diagnostics (2-3h)
+  - iCloud account status display
+  - Sync diagnostics view
+  - Debug logging and troubleshooting
+
+**M7.5: External TestFlight Deployment (3-5 hours)**
+- **M7.5.1**: External Testing Group Setup (30min)
+  - Create public external testing group in App Store Connect
+  - Configure group settings
+- **M7.5.2**: App Review Submission (1-2h)
+  - Complete App Store Connect metadata
+  - Submit for external testing review
+  - Respond to review feedback if needed
+- **M7.5.3**: App Review Preparation (1-1.5h)
+  - Complete comprehensive pre-submission checklist:
+    - **Privacy & Compliance**: Policy URL, in-app link, questionnaire
+    - **Branding & Metadata**: Disambiguated names, grocery-themed icon
+    - **Technical Configuration**: CloudKit enabled, no unused capabilities
+    - **Functional QA**: Fresh install testing, core workflows, sync validation
+    - **Metadata Accuracy**: Description matches build, no future promises
+- **M7.5.4**: Public Link Generation (30min)
+  - Generate shareable public TestFlight link
+  - Test link access and installation flow
+
+**M7.6: Public Beta Program (2-4 hours)**
+- **M7.6.1**: Beta Landing Page (1-2h)
+  - Create professional web page for beta program
+  - Host on GitHub Pages
+  - Include: App overview, key features, TestFlight link, feedback form
+- **M7.6.2**: LinkedIn Showcase (1-2h)
+  - Professional post announcing public beta
+  - Highlight: CloudKit collaboration, family sharing
+  - Include TestFlight link and landing page
+  - Gather professional network feedback
 
 **Success Criteria:**
-- [ ] Apple Developer Account activated
-- [ ] TestFlight build deployed successfully
-- [ ] Real device testing complete on 3+ devices
-- [ ] CloudKit schema operational
-- [ ] Real-time multi-user sync working
-- [ ] Conflict resolution tested and reliable
-- [ ] Family sharing flows intuitive
-- [ ] Performance: < 2s sync for typical changes
+- [ ] Privacy policy published and accessible (M7.0.1-2)
+- [ ] App Privacy questionnaire complete (M7.0.3)
+- [ ] Display name disambiguated (M7.0.4)
+- [ ] All 8 entities sync via CloudKit (M7.1)
+- [ ] Multi-device sync < 5s latency (M7.1.3)
+- [ ] CKShare working for lists/recipes/meal plans (M7.2)
+- [ ] Conflict resolution 100% reliable (M7.3)
+- [ ] Sync status UI clear and informative (M7.4)
+- [ ] External TestFlight approved by Apple (M7.5.2)
+- [ ] Public beta link generated and working (M7.5.4)
+- [ ] Beta landing page published (M7.6.1)
+- [ ] LinkedIn showcase post live (M7.6.2)
+- [ ] 10+ external beta testers providing feedback
+
+**Requirements**: 29 total (4 App Store prerequisites, 25 CloudKit/TestFlight features)
 
 ---
 
@@ -758,7 +857,7 @@ With M4 completion, you have two strategic paths:
 
 ---
 
-### **⏳ M7: Analytics & Insights - PLANNED**
+### **⏳ M8: Analytics & Insights - PLANNED**
 
 **Status**: ⏳ Planned  
 **Estimated Time**: 8-12 hours  
@@ -796,34 +895,34 @@ With M4 completion, you have two strategic paths:
 
 ---
 
-### **⏳ M8-M11: Advanced Intelligence Platform - PLANNED**
+### **⏳ M9-M12: Advanced Intelligence Platform - PLANNED**
 
 **Status**: ⏳ Future Development  
 **Estimated Time**: 40-60 hours total  
-**Dependencies**: M1-M7 complete
+**Dependencies**: M1-M8 complete
 
-**M8: Health & Nutrition Integration** (10-15 hours)
+**M9: Health & Nutrition Integration** (10-15 hours)
 - Apple Health integration
 - Nutritional database
 - Dietary goal tracking
 - Health-aware recommendations
 - Allergen and dietary restriction support
 
-**M9: Budget Intelligence** (10-15 hours)
+**M10: Budget Intelligence** (10-15 hours)
 - Price tracking and history
 - Budget planning tools
 - Cost optimization suggestions
 - Store price comparison
 - Deal and coupon integration
 
-**M10: AI-Powered Shopping Assistant** (10-15 hours)
+**M11: AI-Powered Shopping Assistant** (10-15 hours)
 - Natural language meal planning
 - Smart recipe discovery
 - Automated list generation
 - Contextual recommendations
 - Learning user preferences
 
-**M11: Advanced Collaboration** (10-15 hours)
+**M12: Advanced Collaboration** (10-15 hours)
 - Real-time shopping mode
 - Assignment and delegation
 - Shopping history and analytics
@@ -839,19 +938,18 @@ With M4 completion, you have two strategic paths:
 - **M2**: 16.5 hours (estimated 15-18h) - ✅ 92% accuracy
 - **M3**: 10.5 hours (estimated 8-12h) - ✅ 88% accuracy
 - **M3.5**: 8.5 hours (estimated 7h) - ✅ 82% accuracy
-- **M4.1**: 1.5 hours (estimated 1.5h) - ✅ 100% accuracy
-- **M4.2**: ~4 hours (estimated 2.5-3h, extended for UX) - Enhanced implementation
-- **Total**: 73 hours (67.5h baseline + 5.5h M4 progress)
+- **M4**: 19.25 hours (all phases) - ✅ 90% accuracy
+- **M5.0**: 6 hours (estimated 5-7h) - ✅ 86% accuracy
+- **Total Completed**: ~92.5 hours
 
-### **Remaining Core Platform:**
-- **M4.3**: 3.5-4.5 hours (M4.3.1: 2-2.5h, M4.3.2+: 1.5-2h)
-- **M4.2.1-3 Enhancement**: 1 hour (optional UI polish)
-- **M5**: 12-18 hours (CloudKit family collaboration)
-- **M6**: 8-12 hours (comprehensive testing)
-- **M7**: 8-12 hours (analytics and insights)
-- **Remaining**: ~32-46 hours for M4.3-M7
+### **Planned Core Platform:**
+- **M7**: 27-37 hours base, 32-42 hours with buffer (CloudKit sync + external TestFlight)
+  - M7.0: 2-3 hours (App Store prerequisites - MANDATORY)
+  - M7.1-7.6: 25-34 hours (CloudKit + external beta)
+- **M6**: 12-18 hours (comprehensive testing & AI augmentation)
+- **M8**: 8-12 hours (analytics and insights)
 
-**Total Core Platform (M1-M7)**: ~105-119 hours estimated (updated with M4.2 actual)
+**Total Core Platform (M1-M8)**: ~140-165 hours estimated
 
 ### **Planning Accuracy:**
 - **Phase-level estimates**: Consistently accurate within ±15 minutes
@@ -954,9 +1052,11 @@ All identified risks from M1-M3 have been successfully mitigated through:
 - **Risk**: Performance with multiple recipe sources per item
 - **Mitigation**: Fetch indexes, efficient queries, computed properties
 
-**M5: CloudKit**
+**M7: CloudKit & External TestFlight**
 - **Risk**: Sync conflicts and network issues
 - **Mitigation**: Conflict resolution strategy, offline-first design, comprehensive error handling
+- **Risk**: App Review rejection for external TestFlight
+- **Mitigation**: M7.0 prerequisites (privacy policy, questionnaire, name disambiguation)
 
 **M6: Testing**
 - **Risk**: Time investment may exceed estimate
@@ -976,10 +1076,9 @@ Clean architecture maintained throughout M1-M4.3.4 with:
 ## 📚 **RELATED DOCUMENTATION**
 
 ### **Current Milestone:**
-- [M4 PRD](prds/milestone-4-meal-planning-and-settings-integration.md) - Complete requirements
-- [M4.3.5 PRD](prds/milestone-4.3.5-ingredient-normalization.md) - Ingredient normalization (50+ pages)
-- [M4 Current Story](current-story.md) - Current development state
-- [M4.3.5 Next Prompt](next-prompt.md) - Ready for M4.3.5 implementation
+- [M7 PRD](prds/milestone-7-cloudkit-sync-external-testflight.md) - CloudKit sync & external TestFlight
+- [Current Story](current-story.md) - M5.0 complete, M7 ready to start
+- [Requirements Document](requirements.md) - 151 total requirements (122 complete, 29 planned)
 
 ### **Completed Milestones:**
 - [M1 Learning Notes](learning-notes/01-10-milestone-1-phases.md)
@@ -1034,7 +1133,7 @@ Clean architecture maintained throughout M1-M4.3.4 with:
 - Comprehensive in-app help documentation (HelpView.swift)
 - All performance targets exceeded
 
-### **M4 Highlights (In Progress):**
+### **M4 Highlights:**
 - Professional settings infrastructure with UserPreferences ✅
 - Calendar-based meal planning with date pickers ✅
 - MealPlan and PlannedMeal entities operational ✅
@@ -1043,8 +1142,20 @@ Clean architecture maintained throughout M1-M4.3.4 with:
 - Scaled recipe to shopping list with servings adjustment ✅
 - Bulk add from meal plan with progress overlay ✅
 - Meal completion tracking with flexible UX ✅
-- Sheet pattern discovery and fix ✅
-- Ingredient normalization ready to implement 🚀
+- 4-phase ingredient normalization pipeline ✅
+- 30% reduction in template fragmentation ✅
+
+### **M5.0 Highlights:**
+- Complete app rename from GroceryRecipeManager to Forager ✅
+- Professional green sprout app icon ✅
+- Bundle identifier migration (com.richhayn.forager) ✅
+- Apple Developer Program enrollment ✅
+- App Store Connect configuration ✅
+- CloudKit production entitlements ✅
+- Internal TestFlight deployment ✅
+- Multi-tester beta program (3+ testers) ✅
+- Real device validation on physical iPhones ✅
+- Zero data loss through migration ✅
 
 ### **Platform Readiness:**
 - Meal planning foundation complete ✅
@@ -1062,6 +1173,6 @@ Clean architecture maintained throughout M1-M4.3.4 with:
 
 ---
 
-**Next Action**: Begin M4.3.5 Ingredient Normalization (4 hours) or wrap up M4 for TestFlight
+**Next Action**: Begin M7 - CloudKit Sync & External TestFlight (32-42h with buffer)
 
-**Status**: M1-M4.3.4 complete with ~81.25 hours total. M4.3.5 ready to begin with complete 50+ page PRD, 4-phase implementation plan, and strong technical foundation. Normalization will improve data quality by eliminating 30-50% of duplicate ingredient templates through intelligent name standardization. Optional - can defer to post-TestFlight if desired.
+**Status**: M1-M5.0 complete with ~92.5 hours total. M7 ready to begin with complete PRD, CloudKit-enabled infrastructure, and internal TestFlight operational. M7.0 App Store Prerequisites (privacy policy, questionnaire, name disambiguation) are MANDATORY before external TestFlight submission.

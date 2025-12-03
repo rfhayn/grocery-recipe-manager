@@ -1,10 +1,10 @@
 # Current Development Story
 
-**Last Updated**: November 28, 2025  
-**Status**: M5.0 - App Renaming & TestFlight Deployment 🔄 ACTIVE (M5.0.1)  
-**Total Progress**: M1-M4 Complete (86.5 hours) | 89% planning accuracy  
-**Current Phase**: M5.0.1 Name Selection - Nearly Complete  
-**Next Priority**: Complete M5.0.1 checkpoint, then begin M5.0.2 Xcode renaming
+**Last Updated**: December 3, 2025  
+**Status**: M7 - CloudKit Sync & External TestFlight 🚀 READY (M7.0.1)  
+**Total Progress**: M1-M5.0 Complete (~92.5 hours) | 88% planning accuracy  
+**Current Phase**: M7.0 App Store Prerequisites - Ready to Begin  
+**Next Priority**: M7.0.1 Privacy Policy Creation & Hosting (MANDATORY before external TestFlight)
 
 ---
 
@@ -12,285 +12,254 @@
 
 ### **Milestone Progress Overview**
 
-**✅ Foundation Complete (M1-M4)**: 86.5 hours total, 89% planning accuracy
+**✅ Foundation Complete (M1-M5.0)**: ~92.5 hours total, 88% planning accuracy
 
-**🔄 M5.0 ACTIVE**: App Renaming & TestFlight Deployment (4-6 hours estimated)  
-**Progress**: 6 of 42 items complete (14%)
+**🚀 M7 READY**: CloudKit Sync & External TestFlight (32-42 hours with buffer)  
+**Next Phase**: M7.0 App Store Prerequisites (2-3 hours) - MANDATORY before external TestFlight
 
-**⏳ Future**: M5.1 (CloudKit) or M6 (Testing) - Decision after M5.0 + TestFlight feedback
+**⏳ Future**: M6 (Testing Foundation) or M8 (Analytics) - After M7 complete
 
 ---
 
-## 🚀 **M5.0: APP RENAMING & TESTFLIGHT DEPLOYMENT** 🔄 ACTIVE
+## 🚀 **M7: CLOUDKIT SYNC & EXTERNAL TESTFLIGHT** 🚀 READY
 
-**Status**: Phase 1 (M5.0.1) nearly complete  
-**Estimated Time**: 4-6 hours across 5 phases  
-**Dependencies**: M4 Complete ✅, Apple Developer Account enrollment required  
-**PRD**: `M5.0-APP-RENAMING-TESTFLIGHT-PRD.md`  
-**Implementation Guide**: `M5.0-NEXT-PROMPT.md`  
-**Naming Strategy**: `milestone5.0.1-name-decision-record.md` ✅
+**Status**: M7.0 App Store Prerequisites ready to begin  
+**Estimated Time**: 27-37 hours base, 32-42 hours with buffer  
+**Dependencies**: M5.0 Complete ✅ (TestFlight operational)  
+**PRD**: `docs/prds/milestone-7-cloudkit-sync-external-testflight.md`  
+**Implementation Guide**: `docs/next-prompt.md` (M7.0 only initially)
 
 ### **Purpose**
-Systematically rename entire project from "forager" to "Forager", updating all technical identifiers, file structures, documentation, and GitHub repository. Follow with TestFlight deployment for real-device validation before CloudKit investment.
+Transform Forager into a fully collaborative family meal planning platform with CloudKit multi-device sync, real-time collaboration via CKShare, and public external TestFlight beta program. Includes MANDATORY App Store compliance prerequisites before external TestFlight submission.
 
-**Final Names**:
-- **Display Name**: Forager
-- **Bundle ID**: com.richhayn.forager
-- **Marketing Name**: Forager
-- **GitHub**: github.com/rfhayn/forager-ios
+**⚠️ CRITICAL**: M7.0 App Store Prerequisites are MANDATORY before external TestFlight (M7.5). Cannot skip these steps.
 
-### **Why M5.0 Before M5.1 (CloudKit)**
-- Bundle ID is PERMANENT once App Store Connect record created
-- Real device testing may reveal simulator-only issues  
-- User feedback can inform CloudKit priorities
-- Lower investment (4-6h) before major CloudKit work (20-25h)
-- TestFlight experience needed for App Store anyway
+###**Why M7.0 Prerequisites Are MANDATORY**
+- Apple's November 2025 policies require privacy policy URL for ALL apps
+- External TestFlight requires completed App Privacy questionnaire
+- Name disambiguation avoids rejection under Guideline 4.1 (Copycats)
+- Attempting external TestFlight without M7.0 = automatic rejection
 
 ---
 
-## 📋 **M5.0 COMPLETE RENAME CHECKLIST - "FORAGER"**
+## 📋 **M7.0: APP STORE PREREQUISITES** 🚀 READY (MANDATORY)
 
-**Project**: Forager (formerly forager)  
-**Started**: November 28, 2025  
-**Progress**: 6 of 42 items complete (14%)
+**Estimated Time**: 2-3 hours  
+**Status**: Ready to begin  
+**Purpose**: Complete mandatory App Store compliance before external TestFlight submission
 
----
+### **M7.0.1: Privacy Policy Creation & Hosting** 🚀 READY (1 hour)
+**Status**: Not started  
+**Estimated**: 1 hour
 
-### ✅ **PHASE 1: M5.0.1 - NAME SELECTION & PLANNING** (30 min)
+**Tasks:**
+- [ ] **7.0.1.1** Draft privacy policy for local-only data storage
+  - Template: "Data stored locally on device, not transmitted to servers"
+  - Statement: "No tracking, analytics, or third-party data sharing"
+  - Deletion: "Delete app to remove all data"
+  - Update language: "Will be updated when CloudKit sync added"
+- [ ] **7.0.1.2** Create GitHub Pages site structure
+  - Directory: `docs/` in forager repo (already exists)
+  - File: `docs/privacy.html`
+  - Styling: Simple, professional HTML
+- [ ] **7.0.1.3** Write privacy policy HTML
+  - Sections: Data Collection, Data Usage, Data Storage, Your Rights
+  - Mobile-responsive design
+  - Last updated date: December 2025
+- [ ] **7.0.1.4** Enable GitHub Pages
+  - Settings → Pages → Deploy from main branch /docs folder
+  - URL will be: https://rfhayn.github.io/forager/privacy.html
+- [ ] **7.0.1.5** Test privacy policy URL
+  - Verify accessible from browser
+  - Check mobile rendering
+  - Validate all links work
+- [ ] **7.0.1.6** Git checkpoint
+  ```bash
+  git add docs/privacy.html
+  git commit -m "M7.0.1 COMPLETE: Privacy policy created and hosted"
+  git push origin main
+  ```
 
-- [x] **1.1** Display name chosen: Forager
-- [x] **1.2** Bundle ID chosen: com.richhayn.forager
-- [x] **1.3** Marketing name chosen: Forager
-- [x] **1.4** GitHub repo chosen: forager-ios
-- [x] **1.5** 42-item checklist created
-- [x] **1.6** Naming strategy documented (milestone5.0.1-name-decision-record.md)
-- [x] **1.7** Git checkpoint: "M5.0.1 COMPLETE: Forager name finalized" ← **NEXT ACTION**
-
-**Status**: 6/7 complete - Ready for final checkpoint
-
----
-
-### 🔧 **PHASE 2: M5.0.2 - XCODE PROJECT RENAMING** (80 min) 🚀 READY
-
-**Phase 2A: Bundle Identifiers (20 min)**
-- [x] **2.1** Main target → com.richhayn.forager
-- [x] **2.2** Tests target → com.richhayn.foragerTests
-- [x] **2.3** UI Tests target → com.richhayn.foragerUITests
-- [x] **2.4** ✓ Clean build succeeds
-- [x] **2.5** Git: "M5.0.2A: Bundle IDs updated"
-
-**Phase 2B: Display Name (10 min)**
-- [x] **2.6** Set display name: Forager
-- [x] **2.7** ✓ Simulator shows "Forager"
-- [x] **2.8** Git: "M5.0.2B: Display name set"
-
-**Phase 2C: Scheme Renaming (15 min)**
-- [x] **2.9** Rename scheme: forager → Forager
-- [x] **2.10** ✓ Build succeeds with new scheme
-- [x] **2.11** Git: "M5.0.2C: Scheme renamed"
-
-**Phase 2D: Project File Rename (20 min) ⚠️ HIGH RISK**
-- [x] **2.12** Close Xcode completely
-- [x] **2.13** Finder: .xcodeproj → Forager.xcodeproj
-- [x] **2.14** Reopen, fix broken references
-- [x] **2.15** ✓ All files green, builds
-- [x] **2.16** Git: "M5.0.2D: Project file renamed"
-
-**Phase 2E: Target & Product Names (15 min)**
-- [x] **2.17** Rename target to Forager
-- [x] **2.18** Set product name: Forager
-- [x] **2.19** ✓ Build succeeds
-- [x] **2.20** Git: "M5.0.2E COMPLETE: Xcode done"
+**Acceptance Criteria:**
+- ✓ Privacy policy accessible at public URL
+- ✓ Content covers all required sections
+- ✓ Mobile-responsive design
+- ✓ URL ready for App Store Connect
 
 ---
 
-### 📚 **PHASE 3: M5.0.3 - FILE & FOLDER STRUCTURE** (90 min) ✅ COMPLETE
+### **M7.0.2: Privacy Policy Integration** ⏳ PLANNED (1 hour)
+**Status**: After M7.0.1 complete  
+**Estimated**: 1 hour
 
-**Phase 3A: Source Folder Renaming (25 min)** ✅ COMPLETE
-- [x] **3.1** Renamed forager/ → forager/
-- [x] **3.2** Renamed foragerTests/
-- [x] **3.3** Renamed foragerUITests/
-- [x] **3.4** Fixed Xcode references
-- [x] **3.5** ✓ Build succeeds
-- [x] **3.6** ✓ All files green
-- [x] **3.7** Git: "M5.0.3A: Folders renamed"
+**Tasks:**
+- [ ] **7.0.2.1** Add privacy policy URL to App Store Connect
+- [ ] **7.0.2.2** Add "Privacy Policy" link in SettingsView
+- [ ] **7.0.2.3** Implement SafariServices in-app browser
+- [ ] **7.0.2.4** Test: Tap link → policy opens in-app
+- [ ] **7.0.2.5** Git checkpoint
 
-**Phase 3B: Core Data Model Renaming (20 min)** ✅ COMPLETE
-- [x] **3.8** Renamed .xcdatamodeld file
-- [x] **3.9** Updated Persistence.swift container
-- [x] **3.10** Fixed .xccurrentversion file
-- [x] **3.11** Git: "M5.0.3B: Core Data renamed"
-
-**Phase 3C: Entitlements Renaming (15 min)** ✅ COMPLETE
-- [x] **3.12** Renamed entitlements file
-- [x] **3.13** Updated CloudKit container ID
-- [x] **3.14** ✓ No signing errors
-- [x] **3.15** Git: "M5.0.3C: Entitlements renamed"
-
-**Phase 3D: App File Renaming (10 min)** ✅ COMPLETE
-- [x] **3.16** Renamed foragerApp.swift
-- [x] **3.17** Updated @main struct name
-- [x] **3.18** ✓ Build succeeds
-- [x] **3.19** Git: "M5.0.3D: App file renamed"
-
-**Phase 3E: File Headers Update (20 min)** ✅ COMPLETE
-- [x] **3.20** Python script updated 164 refs in 74 files
-- [x] **3.21** ✓ Build succeeds
-- [x] **3.22** ✓ App functions normally
-- [x] **3.23** Git: "M5.0.3E: File headers updated"
+**Acceptance Criteria:**
+- ✓ URL configured in App Store Connect metadata
+- ✓ Settings contains "Privacy Policy" link
+- ✓ Link opens policy in-app (not external browser)
+- ✓ Works on both iPhone and iPad
 
 ---
 
-### 📁 **PHASE 4A: DIRECTORY RESTRUCTURE** (30 min) ✅ COMPLETE (BONUS PHASE)
+### **M7.0.3: App Privacy Questionnaire** ⏳ PLANNED (30 minutes)
+**Status**: After M7.0.2 complete  
+**Estimated**: 30 minutes
 
-**Complete Directory Flattening**
-- [x] **4A.1** Flattened: /grocery-recipe-manager/GroceryRecipeManager/ → /forager/
-- [x] **4A.2** Moved all Xcode files up one level
-- [x] **4A.3** Fixed Xcode project references
-- [x] **4A.4** ✓ Build succeeds
-- [x] **4A.5** ✓ App runs normally
-- [x] **4A.6** Git: "M5.0.4A: Directory flattened to /forager"
+**Tasks:**
+- [ ] **7.0.3.1** Navigate to App Store Connect → App Privacy
+- [ ] **7.0.3.2** Select "Data Not Collected" for current build
+- [ ] **7.0.3.3** Note: Will update after CloudKit implementation (M7.1-7.4)
+- [ ] **7.0.3.4** Save and verify questionnaire complete
+- [ ] **7.0.3.5** Screenshot for documentation
 
-**New Structure:**
-```
-/Users/rich/Development/forager/
-├── forager.xcodeproj
-├── forager/
-├── foragerTests/
-├── foragerUITests/
-├── docs/
-├── Tools/
-└── README.md
-```
+**Acceptance Criteria:**
+- ✓ App Privacy questionnaire marked complete in App Store Connect
+- ✓ "Data Not Collected" selected (accurate for current build)
+- ✓ Status shows as "Complete" not "Not Started"
 
 ---
 
-### 📚 **PHASE 4B: DOCUMENTATION & GITHUB** (60 min) 🔄 IN PROGRESS
+### **M7.0.4: Display Name Disambiguation** ⏳ PLANNED (30 minutes)
+**Status**: After M7.0.3 complete  
+**Estimated**: 30 minutes
 
-**Phase 4B.1: Core Documentation (20 min)** ✅ COMPLETE
-- [x] **4B.1** Python script updated all docs
-- [x] **4B.2** README.md updated with new paths
-- [x] **4B.3** All 74 files updated (164 references)
-- [x] **4B.4** ✓ Documentation consistent
-- [x] **4B.5** Git: "M5.0.4B: Update README for forager rename"
+**Tasks:**
+- [ ] **7.0.4.1** Update Xcode project settings:
+  - Display Name (CFBundleDisplayName): "Forager: Smart Meal Planner"
+  - Bundle Name (CFBundleName): "Forager" (home screen icon - stays clean)
+- [ ] **7.0.4.2** Test in simulator:
+  - App Store/Settings shows: "Forager: Smart Meal Planner"
+  - Home screen icon shows: "Forager"
+- [ ] **7.0.4.3** Verify app icon is grocery-themed (green sprout ✅ already done)
+- [ ] **7.0.4.4** Update App Store Connect display name
+- [ ] **7.0.4.5** Build and test
+- [ ] **7.0.4.6** Git checkpoint:
+  ```bash
+  git commit -m "M7.0.4 COMPLETE: Display name disambiguated"
+  ```
 
-**Phase 4B.2: Learning Notes (10 min)** ⏳ REMAINING
-- [x] **4B.6** Add context notes to recent learning notes
-- [x] **4B.7** Preserve historical accuracy
-- [x] **4B.8** Git: "M5.0.4B: Learning notes contextualized"
-
-**Phase 4B.3: GitHub Repository (15 min)** ✅ COMPLETE
-- [x] **4B.9** Renamed repo: forager
-- [x] **4B.10** Updated remote URL
-- [x] **4B.11** Set up Personal Access Token
-- [x] **4B.12** ✓ Push/pull works
-- [x] **4B.13** Git: "M5.0.4B: GitHub repository renamed to forager"
-
-**Phase 4B.4: Repository Metadata (2 min)** ⏳ REMAINING
-- [x] **4B.14** Update GitHub About section
-- [x] **4B.15** Git: "M5.0.4B COMPLETE: Documentation phase done"
-
----
-
-### 🚀 **PHASE 5: M5.0.5 - TESTFLIGHT DEPLOYMENT** (90 min + wait) ⏳ PLANNED
-
-**Phase 5A: Apple Developer Enrollment (15 min + 24-48h wait)**
-- [ ] **5.1** Enroll in Apple Developer Program ($99)
-- [ ] **5.2** Wait for approval (24-48 hours)
-- [ ] **5.3** ✓ Account active
-
-**Phase 5B: App Icon Creation (30 min)**
-- [ ] **5.4** Create 1024x1024 app icon
-- [ ] **5.5** Add to Assets.xcassets
-- [ ] **5.6** ✓ Icon appears in simulator
-
-**Phase 5C: App Store Connect Setup (20 min)**
-- [ ] **5.7** Create app in App Store Connect
-- [ ] **5.8** Configure bundle ID and metadata
-- [ ] **5.9** ✓ App record created
-
-**Phase 5D: Build Archive & Upload (30 min)**
-- [ ] **5.10** Archive build in Xcode
-- [ ] **5.11** Validate archive
-- [ ] **5.12** Upload to App Store Connect
-- [ ] **5.13** ✓ Build processing complete
-
-**Phase 5E: TestFlight Configuration (15 min)**
-- [ ] **5.14** Add build to TestFlight
-- [ ] **5.15** Create internal testing group
-- [ ] **5.16** Invite testers
-- [ ] **5.17** ✓ Invitations sent
-
-**Phase 5F: Device Testing (15 min)**
-- [ ] **5.18** Install TestFlight app
-- [ ] **5.19** Accept invitation
-- [ ] **5.20** Install and test app
-- [ ] **5.21** ✓ All features work on device
-- [ ] **5.22** Git: "M5.0.5 COMPLETE: TestFlight deployed"
+**Acceptance Criteria:**
+- ✓ Display name: "Forager: Smart Meal Planner" (differentiates from game)
+- ✓ Bundle name: "Forager" (clean home screen)
+- ✓ App icon clearly grocery-themed (not game-like)
+- ✓ No confusion with existing "Forager" game
 
 ---
 
-## ✅ **M5.0 FINAL VALIDATION CRITERIA**
+## 📊 **M7.0 COMPLETION CRITERIA**
 
-**Before marking M5.0 complete, verify ALL of these:**
+**Before proceeding to M7.1, verify ALL of these:**
 
-### **Functional Success**
-- [ ] App runs with name "Forager"
-- [ ] All M1-M4 features work identically post-rename
-- [ ] Data persists correctly (Core Data operational)
-- [ ] App installs via TestFlight
-- [ ] Runs successfully on physical iPhone
+### **App Store Compliance**
+- [ ] Privacy policy published and accessible at public URL
+- [ ] Privacy policy link working in Settings → opens in-app
+- [ ] App Privacy questionnaire completed in App Store Connect
+- [ ] Display name disambiguated ("Forager: Smart Meal Planner")
 
-### **Technical Success**
-- [ ] Zero build errors in Xcode
-- [ ] Zero red files in project navigator
-- [ ] Archive builds successfully
-- [ ] All 3 bundle IDs are consistent
-- [ ] All 42 checklist items complete
+### **Technical Validation**
+- [ ] App builds successfully with updated display name
+- [ ] Privacy link opens correct URL
+- [ ] No broken links or 404 errors
+- [ ] Mobile rendering of privacy policy verified
 
-### **Documentation Success**
-- [ ] All docs reference "Forager" consistently
-- [ ] GitHub renamed and operational
-- [ ] README.md updated professionally
-- [ ] Learning note created (24-m5.0-forager-renaming.md)
-- [ ] current-story.md updated with completion
-- [ ] roadmap.md updated with M5.0 complete
-- [ ] project-index.md updated with recent activity
+### **Documentation**
+- [ ] M7.0 completion documented in current-story.md
+- [ ] next-prompt.md updated for M7.1
+- [ ] Git commits for each M7.0 sub-phase
+- [ ] Learning note created if needed
+
+---
+
+## 🔄 **M7.1-M7.6: CLOUDKIT & EXTERNAL TESTFLIGHT** ⏳ PLANNED
+
+**Status**: After M7.0 complete  
+**Purpose**: Preview of remaining M7 work
+
+### **M7.1: CloudKit Sync Foundation** (8-10 hours)
+- CloudKit schema validation for all 8 entities
+- NSPersistentCloudKitContainer integration
+- Multi-device sync testing (<5s latency target)
+
+### **M7.2: Multi-User Collaboration** (8-10 hours)
+- CKShare implementation for lists/recipes/meal plans
+- Share invitation and acceptance flows
+- Permission management (owner/participant roles)
+
+### **M7.3: Conflict Resolution** (4-6 hours)
+- Last-write-wins for simple fields
+- Array merge for ingredients/items
+- Error handling and recovery
+
+### **M7.4: Sync UI & Polish** (5-7 hours)
+- Sync status indicators (synced/syncing/error)
+- Manual sync trigger (pull-to-refresh)
+- CloudKit settings and diagnostics
+
+### **M7.5: External TestFlight** (3-5 hours)
+**Requires M7.0 complete ✅**
+- External testing group setup
+- App Review submission
+- Public TestFlight link generation
+
+### **M7.6: Public Beta Program** (2-4 hours)
+- Beta landing page on GitHub Pages
+- LinkedIn showcase post
+- Public beta launch
 
 ---
 
 ## 💡 **NEXT IMMEDIATE ACTIONS**
 
-### **Action 1: Complete M5.0.1** (2 minutes)
+### **Action 1: Start M7.0.1 Privacy Policy Creation** (1 hour)
 
-Move naming strategy doc to permanent location:
+Use this prompt to begin:
+```
+M5.0 complete ✅, M7 ready to start.
+
+Let's begin M7.0.1 - Privacy Policy Creation & Hosting.
+
+Walk me through creating the privacy policy HTML file for GitHub Pages.
+Target URL: https://rfhayn.github.io/forager/privacy.html
+
+Requirements:
+- Local-only data storage statement
+- No tracking or analytics
+- Data deletion process
+- Mobile-responsive design
+```
+
+### **Action 2: Review M7 PRD** (Optional, 10 minutes)
+
+If you want full context before starting:
 ```bash
-mv milestone5.0.1-name-decision-record.md docs/
+# View complete M7 plan
+open docs/prds/milestone-7-cloudkit-sync-external-testflight.md
 ```
 
-Create M5.0.1 checkpoint:
-```bash
-git add .
-git commit -m "M5.0.1 COMPLETE: Forager name finalized with strategy doc and checklist"
-git push origin main
-```
-
-### **Action 2: Start M5.0.2 Xcode Renaming**
-
-Use this prompt when ready:
-```
-M5.0.1 complete ✅
-
-Ready to start M5.0.2 - Xcode Project Renaming.
-Xcode is currently [OPEN/CLOSED].
-
-Let's begin with Phase 2A: Bundle Identifier Updates.
-Walk me through each step with validation checkpoints.
-```
+Or search project knowledge: `milestone-7 cloudkit prd`
 
 ---
 
-## 📚 **COMPLETED MILESTONES (M1-M4)**
+## 📚 **COMPLETED MILESTONES (M1-M5.0)**
+
+### **M5.0: App Renaming & TestFlight Deployment** ✅ COMPLETE (6 hours - Nov-Dec 2025)
+- Complete rename from "GroceryRecipeManager" to "Forager"
+- Professional app icon (green sprout, grocery-themed)
+- Bundle identifier migration (com.richhayn.forager)
+- Systematic file and folder renaming
+- Apple Developer Program enrollment
+- App Store Connect configuration
+- CloudKit production entitlements
+- Internal TestFlight deployment
+- Multi-tester beta program (3+ testers active)
+- Real device validation on physical iPhones
+- Zero data loss through migration
 
 ### **M1: Professional Grocery Management** ✅ COMPLETE (32 hours - Aug 2025)
 - Store-layout optimized lists with custom categories

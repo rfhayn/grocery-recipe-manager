@@ -1,9 +1,9 @@
-# forager - Project Index
+# Forager - Project Index
 
-**Last Updated**: November 28, 2025  
+**Last Updated**: December 3, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M5.0 - App Renaming & TestFlight Deployment 🚀 READY  
-**Next Priority**: Execute M5.0 systematically with validation checkpoints
+**Current Milestone**: M7 - CloudKit Sync & External TestFlight 🚀 READY  
+**Next Priority**: Execute M7.0 App Store Prerequisites (MANDATORY before external TestFlight)
 
 ---
 
@@ -49,21 +49,21 @@
 
 ## 🚀 **QUICK START BY ACTIVITY TYPE**
 
-### **Starting M5.0 (Current Priority)**
+### **Starting M7 (Current Priority)**
 1. Complete [Session Startup Checklist](session-startup-checklist.md) (ALL 7 items)
-2. Read [Current Story](current-story.md) - M5.0 details
-3. Read [M5.0 PRD](M5.0-APP-RENAMING-TESTFLIGHT-PRD.md) - Complete plan
-4. Follow [M5.0 Next-Prompt](M5.0-NEXT-PROMPT.md) - Step-by-step guide
-5. Start with M5.0.1: Name Selection & Planning
+2. Read [Current Story](current-story.md) - M7 details
+3. Read [M7 PRD](prds/milestone-7-cloudkit-sync-external-testflight.md) - Complete plan
+4. Follow [Next-Prompt](next-prompt.md) - M7.0 App Store Prerequisites
+5. Start with M7.0.1: Privacy Policy Creation & Hosting
 
-### **Continuing M5.0 Mid-Milestone**
+### **Continuing M7 Mid-Milestone**
 1. Complete [Session Startup Checklist](session-startup-checklist.md)
 2. Check [Current Story](current-story.md) - Verify progress
 3. Review last Git checkpoint - Know where you left off
-4. Follow [M5.0 Next-Prompt](M5.0-NEXT-PROMPT.md) - Resume guidance
+4. Follow [Next-Prompt](next-prompt.md) - Resume from current phase
 
-### **Planning Future Features (After M5.0)**
-1. Review [Requirements](requirements.md) - Check existing requirements
+### **Planning Future Features (After M7)**
+1. Review [Requirements](requirements.md) - Check existing requirements (151 total)
 2. Check [Roadmap](roadmap.md) - Verify strategic fit
 3. Review [Architecture](architecture/) - Check for relevant ADRs
 4. Create PRD in `prds/` if complex (6+ hours)
@@ -201,8 +201,8 @@
 | How to start a session | [session-startup-checklist.md](session-startup-checklist.md) |
 | Correct M#.#.# naming | [project-naming-standards.md](project-naming-standards.md) |
 | What's active now | [current-story.md](current-story.md) |
-| How to implement M5.0 | [M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md) |
-| Complete M5.0 plan | [M5.0-APP-RENAMING-TESTFLIGHT-PRD.md](M5.0-APP-RENAMING-TESTFLIGHT-PRD.md) |
+| How to implement M7.0 | [next-prompt.md](next-prompt.md) |
+| Complete M7 plan | [prds/milestone-7-cloudkit-sync-external-testflight.md](prds/milestone-7-cloudkit-sync-external-testflight.md) |
 | Code standards | [development-guidelines.md](development-guidelines.md) |
 | What features are needed | [requirements.md](requirements.md) |
 | Milestone timeline | [roadmap.md](roadmap.md) |
@@ -214,7 +214,31 @@
 
 ## 🔥 **RECENT ACTIVITY**
 
-### **November 28, 2025** - M5.0 Documentation Complete + Instruction Transition ✅
+### **December 3, 2025** - M7 Documentation Complete + M5.0 Closed ✅
+- **Completed**: M7 PRD - CloudKit Sync & External TestFlight (complete 80-page plan)
+- **Updated**: requirements.md - Added M7.0 App Store Prerequisites (4 new requirements, 151 total)
+- **Updated**: roadmap.md - M7 details with all 6 phases documented
+- **Status**: Ready to execute M7.0.1 - Privacy Policy Creation & Hosting
+- **Critical**: M7.0 prerequisites MANDATORY before external TestFlight
+- **Closed**: M5.0 milestone (6 hours, 86% accuracy) ✅
+
+### **November 28-December 2, 2025** - M5.0 COMPLETE ✅
+- **Completed**: M5.0 - App Renaming & TestFlight Deployment (6 hours)
+- **Achievement**: Complete rename from "GroceryRecipeManager" to "Forager"
+- **Deliverables**:
+  - Professional app icon (green sprout, grocery-themed)
+  - Bundle identifier migration (com.richhayn.forager)
+  - Systematic file and folder renaming
+  - Apple Developer Program enrollment ($99/year)
+  - App Store Connect configuration
+  - CloudKit production entitlements
+  - Internal TestFlight deployment
+  - Multi-tester beta program (3+ testers)
+  - Real device validation on physical iPhones
+  - Zero data loss through migration
+- **Status**: Forager brand established, ready for M7 CloudKit sync
+
+### **November 28, 2025** - M5.0 Documentation Complete
 - **Created**: M5.0 PRD - Complete app renaming & TestFlight plan
 - **Created**: M5.0 Next-Prompt - Implementation guide with validation checkpoints
 - **Updated**: current-story.md for M5.0 start
@@ -282,22 +306,30 @@
 ## 🚦 **QUICK REFERENCE: PROJECT STATUS**
 
 ### **Current State**
-- **Current Milestone**: M5.0 - App Renaming & TestFlight Deployment 🚀 READY
-- **Next Component**: M5.0.1 - Name Selection & Planning (30 min)
-- **Completed Milestones**: M1-M4 (86.5 hours, 89% planning accuracy)
-- **Status**: Ready to begin systematic rename + TestFlight
+- **Current Milestone**: M7 - CloudKit Sync & External TestFlight 🚀 READY
+- **Next Component**: M7.0.1 - Privacy Policy Creation & Hosting (1h)
+- **Completed Milestones**: M1-M5.0 (~92.5 hours, 88% planning accuracy)
+- **Status**: Ready to begin M7.0 App Store Prerequisites (MANDATORY)
 
-### **M5.0 Component Status**
-- 🚀 **M5.0.1**: Name Selection & Planning (30 min) - READY
-- 🚀 **M5.0.2**: Xcode Project Renaming (1-1.5h) - READY after M5.0.1
-- 🚀 **M5.0.3**: File Structure Renaming (1-1.5h) - READY after M5.0.2
-- 🚀 **M5.0.4**: Documentation & GitHub (45-60 min) - READY after M5.0.3
-- 🚀 **M5.0.5**: TestFlight Deployment (45-90 min + wait) - READY after M5.0.4
+### **M7.0 Component Status (App Store Prerequisites - MANDATORY)**
+- 🚀 **M7.0.1**: Privacy Policy Creation & Hosting (1h) - READY
+- ⏳ **M7.0.2**: Privacy Policy Integration (1h) - After M7.0.1
+- ⏳ **M7.0.3**: App Privacy Questionnaire (30 min) - After M7.0.2
+- ⏳ **M7.0.4**: Display Name Disambiguation (30 min) - After M7.0.3
 
-### **Strategic Decision After M5.0**
-- **Option A**: M5.1 - CloudKit Sync (20-25h)
-- **Option B**: M6 - Testing Foundation (12-18h)
-- **Option C**: M7 - Analytics Dashboard (6-8h)
+### **M7 Full Roadmap (After M7.0)**
+- ⏳ **M7.1**: CloudKit Sync Foundation (8-10h) - After M7.0 complete
+- ⏳ **M7.2**: Multi-User Collaboration (8-10h) - After M7.1
+- ⏳ **M7.3**: Conflict Resolution (4-6h) - After M7.2
+- ⏳ **M7.4**: Sync UI & Polish (5-7h) - After M7.3
+- ⏳ **M7.5**: External TestFlight (3-5h) - After M7.4 (requires M7.0 complete)
+- ⏳ **M7.6**: Public Beta Program (2-4h) - After M7.5
+
+### **Next Milestones After M7**
+### **Next Milestones After M7**
+- **M6**: Testing Foundation & AI Augmentation (12-18h)
+- **M8**: Analytics & Insights (8-12h)
+- **M9-M12**: Advanced Intelligence Platform (40-60h)
 - **Decision Based On**: TestFlight feedback + user priorities
 
 ### **Foundation Achievements (M1-M4)**
