@@ -1,10 +1,10 @@
 # Current Development Story
 
 **Last Updated**: December 3, 2025  
-**Status**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE)  
+**Status**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE, M7.1 🔄 ACTIVE)  
 **Total Progress**: M1-M5.0 Complete (~92.5 hours) + M7.0 (3 hours) = ~95.5 hours | 89% planning accuracy  
-**Current Phase**: M7.1 CloudKit Sync Foundation - 🚀 READY  
-**Next Priority**: M7.1 CloudKit Sync Foundation (8-10 hours) OR strategic pause to evaluate M6/M8
+**Current Phase**: M7.1 CloudKit Sync Foundation - 🔄 ACTIVE  
+**Next Priority**: Complete M7.1.1 CloudKit Schema Validation (2-3 hours)
 
 ---
 
@@ -15,9 +15,8 @@
 **✅ Foundation Complete (M1-M5.0)**: ~92.5 hours total, 89% planning accuracy
 
 **✅ M7.0 App Store Prerequisites COMPLETE**: 3 hours (100% estimate accuracy!)  
-**🚀 M7.1 CloudKit Sync Foundation READY**: 8-10 hours (can start immediately)  
-**⏳ M7.2-M7.6 Remaining**: 24-32 hours after M7.1  
-**⏳ Alternative**: M6 (Testing Foundation) or M8 (Analytics) - strategic decision point
+**🔄 M7.1 CloudKit Sync Foundation ACTIVE**: 8-10 hours (started December 3, 2025)  
+**⏳ M7.2-M7.6 Remaining**: 24-32 hours after M7.1
 
 ---
 
@@ -183,10 +182,29 @@ Transform Forager into a fully collaborative family meal planning platform with 
 **Status**: M7.0 complete ✅, M7.1 ready to start 🚀  
 **Purpose**: Multi-device sync and external TestFlight
 
-### **M7.1: CloudKit Sync Foundation** 🚀 READY (8-10 hours)
-- CloudKit schema validation for all 8 entities
-- NSPersistentCloudKitContainer integration
-- Multi-device sync testing (<5s latency target)
+### **M7.1: CloudKit Sync Foundation** 🔄 ACTIVE (8-10 hours)
+**Implementation Guide**: `docs/next-prompt.md`  
+**Started**: December 3, 2025  
+**Current Sub-Phase**: Ready to begin M7.1.1
+
+**M7.1.1: CloudKit Schema Validation** (2-3 hours)
+- Replace NSPersistentContainer with NSPersistentCloudKitContainer
+- Configure CloudKit container options
+- Test schema generation for all 8 entities
+- Verify CloudKit Dashboard shows correct record types
+
+**M7.1.2: Basic Sync Implementation** (2-3 hours)
+- Create CloudKitSyncMonitor service
+- Observe store remote change notifications
+- Implement CloudKit error handling
+- Single-device sync testing
+
+**M7.1.3: Multi-Device Sync Testing** (3-4 hours)
+- Two-device sync setup (iPhone + iPad/Mac)
+- Create → sync → read scenarios
+- Update sync testing (edits, checks, deletions)
+- Offline → online sync validation
+- Performance measurement (<5s target)
 
 ### **M7.2: Multi-User Collaboration** (8-10 hours)
 - CKShare implementation for lists/recipes/meal plans
@@ -238,9 +256,29 @@ Transform Forager into a fully collaborative family meal planning platform with 
 - Smart recommendations
 - **Best if**: Want data-driven feature decisions
 
-### **If Choosing Option A (M7.1):**
+### **M7.1 Implementation Guidance:**
 
-Refer to next-prompt.md for M7.1 implementation guidance (will be created when you're ready).
+**✅ READY**: Complete implementation guide available at `docs/next-prompt.md`
+
+**Current Focus**: M7.1.1 CloudKit Schema Validation (2-3 hours)
+
+**Start Prompt:**
+```
+M7.0 complete ✅, ready to start M7.1.1 CloudKit Schema Validation.
+
+First phase: Replace NSPersistentContainer with NSPersistentCloudKitContainer
+and verify CloudKit schema generation.
+
+Let's start with:
+1. Replace NSPersistentContainer in PersistenceController.swift
+2. Configure CloudKit container options
+3. Test schema generation
+4. Verify CloudKit Dashboard shows 8 record types
+
+Estimated time: 2-3 hours for M7.1.1
+
+Ready to begin!
+```
 
 ### **Review Full M7 Plan:**
 

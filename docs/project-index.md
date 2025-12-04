@@ -2,8 +2,8 @@
 
 **Last Updated**: December 3, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE)  
-**Next Priority**: Strategic Decision - M7.1 (CloudKit), M6 (Testing), or M8 (Analytics)
+**Current Milestone**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE, M7.1 🔄 ACTIVE)  
+**Next Priority**: M7.1.1 CloudKit Schema Validation (2-3 hours)
 
 ---
 
@@ -31,11 +31,12 @@
    - Recently completed work ✅
    - Next steps with prompts
 
-4. **[Next Prompt](next-prompt.md)** or **[M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md)** ← **READ FOURTH**
+4. **[Next Prompt](next-prompt.md)** ← **READ FOURTH**
    - Ready-to-use implementation prompt
    - Current phase guidance
    - Technical requirements
    - Acceptance criteria
+   - **Complete M7.1 implementation guide (8-10 hours) included**
 
 **Why this order matters:**
 - Checklist → Ensures you follow the complete process
@@ -49,18 +50,18 @@
 
 ## 🚀 **QUICK START BY ACTIVITY TYPE**
 
-### **Starting M7 (Current Priority)**
+### **Continuing M7.1 CloudKit Sync (Current Work)** 🔄 ACTIVE
 1. Complete [Session Startup Checklist](session-startup-checklist.md) (ALL 7 items)
-2. Read [Current Story](current-story.md) - M7 details
-3. Read [M7 PRD](prds/milestone-7-cloudkit-sync-external-testflight.md) - Complete plan
-4. Follow [Next-Prompt](next-prompt.md) - M7.0 App Store Prerequisites
-5. Start with M7.0.1: Privacy Policy Creation & Hosting
+2. Read [Current Story](current-story.md) - M7.1 status and progress
+3. Read [Next Prompt](next-prompt.md) - Complete M7.1 implementation guide
+4. Review last Git checkpoint - Know where you left off
+5. Continue with current M7.1 sub-phase (M7.1.1, M7.1.2, or M7.1.3)
 
-### **Continuing M7 Mid-Milestone**
+### **Starting New M7 Phase (After M7.1)**
 1. Complete [Session Startup Checklist](session-startup-checklist.md)
-2. Check [Current Story](current-story.md) - Verify progress
-3. Review last Git checkpoint - Know where you left off
-4. Follow [Next-Prompt](next-prompt.md) - Resume from current phase
+2. Read [M7 PRD](prds/milestone-7-cloudkit-sync-external-testflight.md) - Complete plan
+3. Check [Current Story](current-story.md) - Next phase details
+4. Follow implementation guide for that phase
 
 ### **Planning Future Features (After M7)**
 1. Review [Requirements](requirements.md) - Check existing requirements (151 total)
@@ -113,7 +114,7 @@
 - Recent completions summary (M1-M4)
 - **Updated after every development session**
 
-#### **[next-prompt.md](next-prompt.md)** / **[M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md)**
+#### **[next-prompt.md](next-prompt.md)**
 **Purpose**: Copy-paste ready implementation guidance  
 **Contents**:
 - Current phase implementation guide
@@ -121,7 +122,12 @@
 - Integration points
 - Acceptance criteria
 - Validation checkpoints
-- **Use M5.0-NEXT-PROMPT.md for current work**
+- **Complete M7.1 CloudKit Sync implementation (8-10 hours)**
+- Detailed breakdown of all three M7.1 phases:
+  - M7.1.1: CloudKit Schema Validation (2-3h)
+  - M7.1.2: Basic Sync Implementation (2-3h)
+  - M7.1.3: Multi-Device Sync Testing (3-4h)
+  - Code examples, error handling, testing scenarios
 
 #### **[development-guidelines.md](development-guidelines.md)**
 **Purpose**: How Claude should work - code standards and patterns  
@@ -361,6 +367,37 @@
 
 ---
 
+## 📅 **RECENT ACTIVITY**
+
+### **December 3, 2025**
+
+**M7.1 CloudKit Sync Foundation STARTED** 🔄
+- **Status**: Active - M7.1.1 ready to begin
+- **Estimated Time**: 8-10 hours total (3 phases)
+- **Implementation Guide**: [next-prompt.md](next-prompt.md) - all detail included
+- **What's Being Built**:
+  - NSPersistentCloudKitContainer integration
+  - CloudKit schema validation for all 8 entities
+  - Multi-device sync with <5s latency target
+  - Sync monitoring and error handling
+
+**M7.0 App Store Prerequisites COMPLETE** ✅
+- **Actual Time**: 3 hours (estimated 2-3 hours - 100% accuracy!)
+- **Completed**: Privacy policy, App Privacy questionnaire, display name disambiguation
+- **Impact**: forager cleared for external TestFlight after M7.1-7.4
+- **Learning Note**: To be created after M7.1 complete
+
+### **November 28, 2025**
+
+**M5.0 App Renaming & TestFlight COMPLETE** ✅
+- **Actual Time**: 6 hours (estimated 4-6 hours - 100% accuracy!)
+- **Renamed**: GroceryRecipeManager → forager
+- **Deployed**: Internal TestFlight with 3+ active testers
+- **Impact**: Professional branding, production-ready infrastructure
+- **Learning Note**: 21-m5.0-forager-renaming-testflight.md
+
+---
+
 ## 🎯 **SUCCESS METRICS**
 
 **This project maintains excellence through:**
@@ -373,15 +410,18 @@
 6. **Performance**: All operations < 0.5s target maintained
 7. **Knowledge Preservation**: Comprehensive learning notes for all work
 
-**M1-M4 Track Record:**
+**M1-M7.0 Track Record:**
 - **M1**: 32h (estimated 30-35h) - 91% accuracy ✅
 - **M2**: 16.5h (estimated 15-18h) - 92% accuracy ✅
 - **M3**: 10.5h (estimated 8-12h) - 88% accuracy ✅
 - **M4**: 19.25h (estimated 14.5-17.5h) - 90% accuracy ✅
-- **Average**: 89% planning accuracy
+- **M5.0**: 6h (estimated 4-6h) - 100% accuracy ✅
+- **M7.0**: 3h (estimated 2-3h) - 100% accuracy ✅
+- **Average**: 93% planning accuracy
 
-**M5.0 Estimate**: 4-6 hours  
-**Confidence**: High (systematic process with validation checkpoints)
+**M7.0 Actual**: 3 hours (estimated 2-3 hours - 100% accuracy!)  
+**M7.1 Estimate**: 8-10 hours  
+**Confidence**: Medium-High (CloudKit has learning curve, but systematic approach)
 
 ---
 
@@ -390,9 +430,9 @@
 ### **Every Session Start**
 1. Complete [session-startup-checklist.md](session-startup-checklist.md) (mandatory)
 2. Verify current M#.#.# identifier in [current-story.md](current-story.md)
-3. For M5.0: Follow [M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md) for implementation
+3. For M7.1: Follow [next-prompt.md](next-prompt.md) for implementation
 
-### **Planning New Features (After M5.0)**
+### **Planning New Features (After M7)**
 1. Check [requirements.md](requirements.md) for existing requirements
 2. Review [roadmap.md](roadmap.md) for strategic fit and dependencies
 3. Search [architecture/](architecture/) for relevant ADRs
@@ -406,9 +446,9 @@
 4. If milestone complete, update [roadmap.md](roadmap.md) with completion summary
 
 ### **Finding Information**
-- **Current work**: [current-story.md](current-story.md) → M5.0 details
-- **How to implement**: [M5.0-NEXT-PROMPT.md](M5.0-NEXT-PROMPT.md) → Step-by-step
-- **Complete plan**: [M5.0-APP-RENAMING-TESTFLIGHT-PRD.md](M5.0-APP-RENAMING-TESTFLIGHT-PRD.md) → Full PRD
+- **Current work**: [current-story.md](current-story.md) → M7.1 details
+- **How to implement**: [next-prompt.md](next-prompt.md) → Complete M7.1 guide (8-10h)
+- **Complete plan**: [milestone-7-cloudkit-sync-external-testflight.md](prds/milestone-7-cloudkit-sync-external-testflight.md) → Full M7 PRD
 - **Naming rules**: [project-naming-standards.md](project-naming-standards.md)
 - **Code patterns**: [development-guidelines.md](development-guidelines.md)
 - **Architecture**: [architecture/](architecture/) ADRs
@@ -416,43 +456,52 @@
 
 ---
 
-## 🚀 **READY TO START M5.0?**
+## 🚀 **READY TO CONTINUE M7.1?**
 
-### **First Session Start Prompt**:
+### **Current Session Start Prompt**:
 ```
-I'm ready to start M5.0.1 - Name Selection & Planning.
+M7.0 complete ✅, ready to start M7.1.1 CloudKit Schema Validation.
 
-I've completed:
-✅ session-startup-checklist.md
-✅ project-naming-standards.md
-✅ current-story.md
-✅ M5.0 PRD review
+First phase: Replace NSPersistentContainer with NSPersistentCloudKitContainer
+and verify CloudKit schema generation.
 
-I'm considering these names:
-- Display Name: [YOUR IDEA]
-- Bundle ID: com.richhayn.[YOUR IDEA]
-- Marketing Name: [YOUR IDEA]
+Current setup:
+- App renamed to "forager"
+- CloudKit entitlements configured (from M5.0)
+- 8 Core Data entities operational
+- Privacy policy published
 
-Help me finalize and create the 42-item checklist.
+Let's start with:
+1. Replace NSPersistentContainer with NSPersistentCloudKitContainer in PersistenceController.swift
+2. Configure CloudKit container options (iCloud.com.richhayn.forager)
+3. Enable history tracking and remote change notifications
+4. Test schema generation on physical device
+5. Verify CloudKit Dashboard shows 8 record types
+
+Estimated time: 2-3 hours for M7.1.1
+
+I've read the complete implementation guide at docs/next-prompt.md.
+
+Ready to begin!
 ```
 
-### **Continuing Session Start Prompt**:
+### **Continuing M7.1 Mid-Phase**:
 ```
-Continuing M5.0 - App Renaming & TestFlight.
+Continuing M7.1 - CloudKit Sync Foundation.
 
 Completed so far:
-✅ M5.0.1: Name selection (if done)
-✅ M5.0.2: Xcode renaming (if done)
+✅ M7.1.1: CloudKit Schema Validation (if done)
+✅ M7.1.2: Basic Sync Implementation (if done)
 [list completed phases]
 
-Current checkpoint: M5.0.[X] Phase [Y]
+Current checkpoint: M7.1.[X] 
 
-Ready to proceed with next phase.
+Ready to proceed with next sub-phase.
 ```
 
 ---
 
 **Last Updated**: December 3, 2025  
-**Next Update**: When next milestone chosen (M7.1, M6, or M8)  
-**Current Status**: M7.0 COMPLETE - Strategic decision point, choose next milestone  
-**Documentation Version**: M7.0 complete with 100% planning accuracy
+**Next Update**: When M7.1 complete or M7.2 starts  
+**Current Status**: M7.1 ACTIVE - CloudKit Sync Foundation (8-10 hours estimated)  
+**Documentation Version**: M7.0 complete (✅), M7.1 started (🔄)
