@@ -58,22 +58,22 @@ Transform Forager into a fully collaborative family meal planning platform with 
   - Statement: "No tracking, analytics, or third-party data sharing"
   - Deletion: "Delete app to remove all data"
   - Update language: "Will be updated when CloudKit sync added"
-- [ ] **7.0.1.2** Create GitHub Pages site structure
+- [x] **7.0.1.2** Create GitHub Pages site structure
   - Directory: `docs/` in forager repo (already exists)
   - File: `docs/privacy.html`
   - Styling: Simple, professional HTML
-- [ ] **7.0.1.3** Write privacy policy HTML
+- [x] **7.0.1.3** Write privacy policy HTML
   - Sections: Data Collection, Data Usage, Data Storage, Your Rights
   - Mobile-responsive design
   - Last updated date: December 2025
-- [ ] **7.0.1.4** Enable GitHub Pages
+- [x] **7.0.1.4** Enable GitHub Pages
   - Settings → Pages → Deploy from main branch /docs folder
   - URL will be: https://rfhayn.github.io/forager/privacy.html
-- [ ] **7.0.1.5** Test privacy policy URL
+- [x] **7.0.1.5** Test privacy policy URL
   - Verify accessible from browser
   - Check mobile rendering
   - Validate all links work
-- [ ] **7.0.1.6** Git checkpoint
+- [x] **7.0.1.6** Git checkpoint
   ```bash
   git add docs/privacy.html
   git commit -m "M7.0.1 COMPLETE: Privacy policy created and hosted"
@@ -93,11 +93,11 @@ Transform Forager into a fully collaborative family meal planning platform with 
 **Estimated**: 1 hour
 
 **Tasks:**
-- [ ] **7.0.2.1** Add privacy policy URL to App Store Connect
-- [ ] **7.0.2.2** Add "Privacy Policy" link in SettingsView
-- [ ] **7.0.2.3** Implement SafariServices in-app browser
-- [ ] **7.0.2.4** Test: Tap link → policy opens in-app
-- [ ] **7.0.2.5** Git checkpoint
+- [x] **7.0.2.1** Add privacy policy URL to App Store Connect
+- [x] **7.0.2.2** Add "Privacy Policy" link in SettingsView
+- [x] **7.0.2.3** Implement SafariServices in-app browser
+- [x] **7.0.2.4** Test: Tap link → policy opens in-app
+- [x] **7.0.2.5** Git checkpoint
 
 **Acceptance Criteria:**
 - ✓ URL configured in App Store Connect metadata
@@ -112,11 +112,11 @@ Transform Forager into a fully collaborative family meal planning platform with 
 **Estimated**: 30 minutes
 
 **Tasks:**
-- [ ] **7.0.3.1** Navigate to App Store Connect → App Privacy
-- [ ] **7.0.3.2** Select "Data Not Collected" for current build
-- [ ] **7.0.3.3** Note: Will update after CloudKit implementation (M7.1-7.4)
-- [ ] **7.0.3.4** Save and verify questionnaire complete
-- [ ] **7.0.3.5** Screenshot for documentation
+- [x] **7.0.3.1** Navigate to App Store Connect → App Privacy
+- [x] **7.0.3.2** Select "Data Not Collected" for current build
+- [x] **7.0.3.3** Note: Will update after CloudKit implementation (M7.1-7.4)
+- [x] **7.0.3.4** Save and verify questionnaire complete
+- [x] **7.0.3.5** Screenshot for documentation
 
 **Acceptance Criteria:**
 - ✓ App Privacy questionnaire marked complete in App Store Connect
