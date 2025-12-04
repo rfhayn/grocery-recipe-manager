@@ -4,9 +4,11 @@
 //
 //  Enhanced for M4.1: Added Meal Planning Preferences Section
 //  Enhanced for M4.3.1: Added Display Options Section
+//  Enhanced for M7.0.2: Added Privacy Policy Link with SafariServices
 //
 
 import SwiftUI
+import SafariServices
 
 struct SettingsView: View {
     // M4.1: User preferences service for meal planning settings
@@ -14,6 +16,9 @@ struct SettingsView: View {
     
     // Access to Core Data context for migration service
     @Environment(\.managedObjectContext) private var viewContext
+    
+    // M7.0.2: Privacy policy URL presentation state
+    @State private var showingPrivacyPolicy = false
     
     var body: some View {
         NavigationView {
@@ -24,10 +29,17 @@ struct SettingsView: View {
                 // M4.3.1: Display Options
                 displayOptionsSection
                 
-                // Existing section - Data Management with Migration
-                migrationSection
+                // M7.0.2: About & Privacy
+                aboutSection
+                
+                // M3: Data Management with Migration - Hidden after migration complete
+                // migrationSection
             }
             .navigationTitle("Settings")
+            .sheet(isPresented: $showingPrivacyPolicy) {
+                SafariView(url: URL(string: "https://rfhayn.github.io/forager/privacy.html")!)
+                    .ignoresSafeArea()
+            }
         }
     }
     
@@ -83,10 +95,42 @@ struct SettingsView: View {
         }
     }
     
-    // MARK: - Existing Sections
+    // MARK: - M7.0.2: About Section
+    
+    // About section with app information and legal links
+    // Provides access to privacy policy and app version
+    private var aboutSection: some View {
+        Section {
+            // Privacy Policy link
+            // Opens privacy policy in in-app Safari browser
+            Button {
+                showingPrivacyPolicy = true
+            } label: {
+                HStack {
+                    Image(systemName: "hand.raised")
+                        .foregroundColor(.green)
+                    Text("Privacy Policy")
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Image(systemName: "arrow.up.right.square")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+                }
+            }
+            
+        } header: {
+            Text("About")
+        } footer: {
+            Text("forager stores all data locally on your device. We do not collect, transmit, or share any personal information.")
+                .font(.caption)
+        }
+    }
+    
+    // MARK: - M3: Legacy Sections (Hidden)
     
     // Migration section for quantity data management
-    // Allows users to migrate unparsed quantities to structured format
+    // Hidden after M3 migration complete - preserved for reference
+    /*
     private var migrationSection: some View {
         Section {
             NavigationLink(destination: MigrationDebugView(context: viewContext)) {
@@ -106,6 +150,7 @@ struct SettingsView: View {
             Text("Data Management")
         }
     }
+    */
     
     // MARK: - Helper Methods
     
@@ -114,6 +159,22 @@ struct SettingsView: View {
     private func dayName(for day: Int) -> String {
         let formatter = DateFormatter()
         return formatter.weekdaySymbols[day]
+    }
+}
+
+// MARK: - M7.0.2: SafariView Wrapper
+
+// UIViewControllerRepresentable wrapper for SFSafariViewController
+// Enables in-app Safari browser for displaying web content
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        return SFSafariViewController(url: url)
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {
+        // No updates needed
     }
 }
 
