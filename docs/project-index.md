@@ -2,8 +2,8 @@
 
 **Last Updated**: December 3, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M7 - CloudKit Sync & External TestFlight 🚀 READY  
-**Next Priority**: Execute M7.0 App Store Prerequisites (MANDATORY before external TestFlight)
+**Current Milestone**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE)  
+**Next Priority**: Strategic Decision - M7.1 (CloudKit), M6 (Testing), or M8 (Analytics)
 
 ---
 
@@ -214,6 +214,21 @@
 
 ## 🔥 **RECENT ACTIVITY**
 
+### **December 3, 2025** - M7.0 COMPLETE! 🎉 App Store Prerequisites Done
+- **Completed**: M7.0 - App Store Prerequisites (3 hours, 100% estimate accuracy!)
+- **Achievement**: All mandatory Apple requirements met for external TestFlight
+- **Deliverables**:
+  - Privacy policy published at https://rfhayn.github.io/forager/privacy.html
+  - Privacy policy integration in app (SafariServices in-app browser)
+  - App Privacy questionnaire completed ("Data Not Collected")
+  - Display name disambiguated ("forager: smart meal planner")
+  - Branding consistency: all lowercase "forager" throughout
+  - Migration section hidden from Settings (M3 complete, no longer needed)
+- **Status**: Cleared for external TestFlight after M7.1-7.4 CloudKit sync
+- **Next**: Strategic decision point - M7.1 CloudKit vs M6 Testing vs M8 Analytics
+- **Total Progress**: 95.5 hours (M1-M5.0: 92.5h + M7.0: 3h)
+- **Planning Accuracy**: 89% overall, M7.0: 100%!
+
 ### **December 3, 2025** - M7 Documentation Complete + M5.0 Closed ✅
 - **Completed**: M7 PRD - CloudKit Sync & External TestFlight (complete 80-page plan)
 - **Updated**: requirements.md - Added M7.0 App Store Prerequisites (4 new requirements, 151 total)
@@ -306,16 +321,19 @@
 ## 🚦 **QUICK REFERENCE: PROJECT STATUS**
 
 ### **Current State**
-- **Current Milestone**: M7 - CloudKit Sync & External TestFlight 🚀 READY
-- **Next Component**: M7.0.1 - Privacy Policy Creation & Hosting (1h)
-- **Completed Milestones**: M1-M5.0 (~92.5 hours, 88% planning accuracy)
-- **Status**: Ready to begin M7.0 App Store Prerequisites (MANDATORY)
+- **Current Milestone**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE)
+- **Next Decision**: M7.1 CloudKit (8-10h) OR M6 Testing (12-18h) OR M8 Analytics (8-12h)
+- **Completed Milestones**: M1-M5.0 (92.5 hours) + M7.0 (3 hours) = 95.5 hours total
+- **Planning Accuracy**: 89% overall, M7.0: 100%!
+- **Status**: Strategic decision point - choose next milestone
 
-### **M7.0 Component Status (App Store Prerequisites - MANDATORY)**
-- 🚀 **M7.0.1**: Privacy Policy Creation & Hosting (1h) - READY
-- ⏳ **M7.0.2**: Privacy Policy Integration (1h) - After M7.0.1
-- ⏳ **M7.0.3**: App Privacy Questionnaire (30 min) - After M7.0.2
-- ⏳ **M7.0.4**: Display Name Disambiguation (30 min) - After M7.0.3
+### **M7.0 Component Status (App Store Prerequisites)** ✅ ALL COMPLETE
+- ✅ **M7.0.1**: Privacy Policy Creation & Hosting (1h actual) - COMPLETE
+- ✅ **M7.0.2**: Privacy Policy Integration (1h actual) - COMPLETE
+- ✅ **M7.0.3**: App Privacy Questionnaire (30 min actual) - COMPLETE
+- ✅ **M7.0.4**: Display Name Disambiguation (30 min actual) - COMPLETE
+
+**Achievement**: All Apple App Store prerequisites met! Cleared for external TestFlight after M7.1-7.4.
 
 ### **M7 Full Roadmap (After M7.0)**
 - ⏳ **M7.1**: CloudKit Sync Foundation (8-10h) - After M7.0 complete
@@ -326,11 +344,12 @@
 - ⏳ **M7.6**: Public Beta Program (2-4h) - After M7.5
 
 ### **Next Milestones After M7**
-### **Next Milestones After M7**
-- **M6**: Testing Foundation & AI Augmentation (12-18h)
-- **M8**: Analytics & Insights (8-12h)
-- **M9-M12**: Advanced Intelligence Platform (40-60h)
-- **Decision Based On**: TestFlight feedback + user priorities
+### **Next Milestone Options (Choose One)**
+- **Option A - M7.1**: CloudKit Sync Foundation (8-10h) - Multi-device sync, HIGH complexity
+- **Option B - M6**: Testing Foundation & AI Augmentation (12-18h) - Quality assurance, MEDIUM complexity
+- **Option C - M8**: Analytics & Insights (8-12h) - Usage data, LOW-MEDIUM complexity
+- **Strategic Pause**: Take break, evaluate priorities based on TestFlight feedback
+- **Decision Framework**: See next-prompt.md for detailed comparison
 
 ### **Foundation Achievements (M1-M4)**
 - ✅ Store-layout optimized shopping
@@ -433,7 +452,7 @@ Ready to proceed with next phase.
 
 ---
 
-**Last Updated**: November 28, 2025  
-**Next Update**: After M5.0.1 completion or phase milestones  
-**Current Status**: M5.0 READY - Documentation complete, ready for systematic execution  
-**Documentation Version**: Updated with M5.0 planning and implementation guides
+**Last Updated**: December 3, 2025  
+**Next Update**: When next milestone chosen (M7.1, M6, or M8)  
+**Current Status**: M7.0 COMPLETE - Strategic decision point, choose next milestone  
+**Documentation Version**: M7.0 complete with 100% planning accuracy

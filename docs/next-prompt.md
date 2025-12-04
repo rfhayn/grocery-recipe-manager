@@ -1,316 +1,232 @@
-# Next Implementation Prompt - M7.0 App Store Prerequisites
+# Next Implementation Prompt - Strategic Decision Point
 
 **Last Updated**: December 3, 2025  
-**Current Phase**: M7.0.1 - Privacy Policy Creation & Hosting 🚀 READY  
-**Status**: Ready to begin  
-**Estimated Time**: 2-3 hours total for M7.0 (all 4 sub-phases)
+**Current Phase**: Strategic Decision - M7.1 vs M6 vs M8  
+**Status**: M7.0 Complete ✅ - Choose next milestone  
+**M7.0 Actual Time**: 3 hours (estimated 2-3 hours - 100% accuracy!)
 
 ---
 
-## 🎯 **WHAT YOU'RE BUILDING**
+## 🎉 **M7.0 APP STORE PREREQUISITES - COMPLETE!**
 
-**M7.0: App Store Prerequisites** - MANDATORY compliance steps before external TestFlight submission (M7.5)
+**Achievement Unlocked**: All Apple App Store requirements met!
 
-This phase prepares Forager for external public beta testing by completing Apple's mandatory App Store requirements:
-1. Privacy policy published and accessible
-2. In-app privacy link implemented
-3. App Privacy questionnaire completed
-4. Display name disambiguated
+**Completed December 3, 2025:**
+- ✅ Privacy policy published at https://rfhayn.github.io/forager/privacy.html
+- ✅ Privacy policy integration in app (SafariServices in-app browser)
+- ✅ App Privacy questionnaire completed ("Data Not Collected")
+- ✅ Display name disambiguated ("forager: smart meal planner")
+- ✅ Branding consistency: all lowercase "forager"
 
-**⚠️ CRITICAL**: Cannot submit for external TestFlight (M7.5) without completing ALL of M7.0.
-
----
-
-## 🚀 **M7.0.1: PRIVACY POLICY CREATION & HOSTING** - READY TO START
-
-**Estimated Time**: 1 hour  
-**Status**: Not started  
-**Purpose**: Create and host privacy policy at public URL for App Store Connect
-
-### **What You'll Create:**
-
-A simple, professional privacy policy hosted on GitHub Pages that:
-- States data is stored locally on device only
-- Confirms no tracking, analytics, or third-party sharing
-- Explains data deletion (uninstall app)
-- Notes policy will be updated when CloudKit sync added (M7.1-7.4)
-
-**Target URL**: `https://rfhayn.github.io/forager/privacy.html`
-
-### **Step-by-Step Implementation:**
-
-#### **Step 1: Create Privacy Policy HTML** (30 min)
-
-Create file: `docs/privacy.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forager Privacy Policy</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-            color: #333;
-        }
-        h1 {
-            color: #2c3e50;
-            border-bottom: 2px solid #27ae60;
-            padding-bottom: 10px;
-        }
-        h2 {
-            color: #27ae60;
-            margin-top: 30px;
-        }
-        .last-updated {
-            color: #7f8c8d;
-            font-style: italic;
-        }
-        .important {
-            background-color: #ecf0f1;
-            padding: 15px;
-            border-left: 4px solid #27ae60;
-            margin: 20px 0;
-        }
-    </style>
-</head>
-<body>
-    <h1>Forager Privacy Policy</h1>
-    <p class="last-updated">Last updated: December 2025</p>
-
-    <div class="important">
-        <strong>Summary:</strong> Forager stores all data locally on your device. We do not collect, transmit, or share any personal information.
-    </div>
-
-    <h2>Data Collection</h2>
-    <p>Forager does not collect any personal data. All information you enter (grocery lists, recipes, meal plans, and preferences) is stored locally on your device.</p>
-
-    <h2>Data Storage</h2>
-    <p>Your data is stored in the app's local database on your device. This includes:</p>
-    <ul>
-        <li>Grocery lists and shopping items</li>
-        <li>Recipes and ingredients</li>
-        <li>Meal plans and schedules</li>
-        <li>Personal preferences and settings</li>
-    </ul>
-    <p>None of this information is transmitted to external servers or third parties.</p>
-
-    <h2>Third-Party Services</h2>
-    <p>Forager does not use any third-party analytics, tracking, or advertising services. We do not share your data with anyone.</p>
-
-    <h2>Future Updates</h2>
-    <p>When we add iCloud sync capabilities in a future update, this policy will be updated to reflect how Apple's iCloud service handles your data. You will be notified of any policy changes before they take effect.</p>
-
-    <h2>Data Deletion</h2>
-    <p>To delete all your data, simply uninstall the Forager app from your device. This will permanently remove all locally stored information.</p>
-
-    <h2>Children's Privacy</h2>
-    <p>Forager does not knowingly collect information from children under 13. The app does not require any personal information to function.</p>
-
-    <h2>Contact</h2>
-    <p>If you have questions about this privacy policy, please contact us through the App Store.</p>
-
-    <h2>Changes to This Policy</h2>
-    <p>We may update this privacy policy from time to time. We will notify you of any changes by posting the new privacy policy on this page and updating the "Last updated" date.</p>
-
-    <p class="last-updated">This privacy policy is effective as of December 2025.</p>
-</body>
-</html>
-```
-
-**Key Elements:**
-- Mobile-responsive design (viewport meta tag + max-width styling)
-- Clean typography using system fonts
-- Green accent color (#27ae60) matching app branding
-- Summary box for quick understanding
-- All required sections covered
-- Future-proofs for CloudKit addition
-
-#### **Step 2: Test Privacy Policy Locally** (5 min)
-
-```bash
-# Open in browser to verify rendering
-open docs/privacy.html
-
-# Check:
-# ✓ Readable on narrow window (mobile simulation)
-# ✓ Green accent colors visible
-# ✓ All sections present
-# ✓ No broken formatting
-```
-
-#### **Step 3: Enable GitHub Pages** (10 min)
-
-1. **Push privacy.html to GitHub:**
-   ```bash
-   git add docs/privacy.html
-   git commit -m "M7.0.1: Add privacy policy for App Store compliance"
-   git push origin main
-   ```
-
-2. **Enable GitHub Pages:**
-   - Go to: https://github.com/rfhayn/forager/settings/pages
-   - Source: "Deploy from a branch"
-   - Branch: `main`
-   - Folder: `/docs`
-   - Click "Save"
-
-3. **Wait for deployment** (1-2 minutes)
-   - GitHub Actions will build site
-   - Check: https://github.com/rfhayn/forager/actions
-
-#### **Step 4: Verify Public URL** (5 min)
-
-Test the published privacy policy:
-```
-https://rfhayn.github.io/forager/privacy.html
-```
-
-**Verification Checklist:**
-- [ ] URL loads without 404 error
-- [ ] Content renders correctly on desktop browser
-- [ ] Content renders correctly on iPhone (Safari)
-- [ ] All styling (green accents, formatting) displays properly
-- [ ] No console errors (open browser dev tools)
-
-#### **Step 5: Git Checkpoint** (5 min)
-
-Mark M7.0.1 complete:
-```bash
-git add docs/privacy.html
-git commit -m "M7.0.1 COMPLETE: Privacy policy published at https://rfhayn.github.io/forager/privacy.html"
-git push origin main
-```
-
-### **Acceptance Criteria for M7.0.1:**
-
-- [ ] privacy.html file created in docs/ directory
-- [ ] GitHub Pages enabled for /docs folder
-- [ ] Privacy policy accessible at public URL
-- [ ] Mobile-responsive design verified
-- [ ] All required sections present:
-  - Data Collection
-  - Data Storage
-  - Third-Party Services
-  - Future Updates (iCloud mention)
-  - Data Deletion
-  - Children's Privacy
-  - Contact
-  - Changes to Policy
-- [ ] Git checkpoint created
-
-### **Troubleshooting:**
-
-**Issue**: GitHub Pages 404 error  
-**Solution**: 
-- Wait 2-3 minutes for initial deployment
-- Check GitHub Actions completed successfully
-- Verify file path is exactly `docs/privacy.html` (case-sensitive)
-
-**Issue**: Styling doesn't display  
-**Solution**: 
-- Check for HTML syntax errors
-- Verify `<style>` block is in `<head>`
-- Test in incognito window (clear cache)
-
-**Issue**: Mobile rendering problems  
-**Solution**: 
-- Verify viewport meta tag present
-- Test `max-width: 800px` is working
-- Check padding on mobile (20px sides)
+**Impact**: forager is now cleared for external TestFlight submission once M7.1-7.4 (CloudKit sync) are complete!
 
 ---
 
-## 📋 **REMAINING M7.0 PHASES** (Execute after M7.0.1 complete)
+## 🎯 **STRATEGIC DECISION POINT - THREE OPTIONS**
 
-### **M7.0.2: Privacy Policy Integration** ⏳ NEXT (1 hour)
-**After M7.0.1 complete**
+You've completed M7.0 App Store prerequisites. Now you have three strategic paths forward:
 
-Tasks:
-1. Add privacy policy URL to App Store Connect metadata
-2. Add "Privacy Policy" link in SettingsView
-3. Implement SafariServices in-app browser
-4. Test: Tap link → policy opens in-app
+### **Option A: Continue M7.1 CloudKit Sync Foundation** 🚀
 
-### **M7.0.3: App Privacy Questionnaire** ⏳ AFTER M7.0.2 (30 min)
+**Estimated Time**: 8-10 hours  
+**Complexity**: High (CloudKit learning curve)  
+**Value**: Multi-device sync, family collaboration
 
-Tasks:
-1. Navigate to App Store Connect → App Privacy
-2. Select "Data Not Collected" (accurate for current build)
-3. Save and verify complete
-4. Note: Will update after CloudKit (M7.1-7.4)
-
-### **M7.0.4: Display Name Disambiguation** ⏳ AFTER M7.0.3 (30 min)
-
-Tasks:
-1. Update Xcode: Display Name = "Forager: Smart Meal Planner"
-2. Keep Bundle Name = "Forager" (clean home screen icon)
-3. Update App Store Connect display name
-4. Build and test
-
----
-
-## 🎯 **AFTER M7.0 COMPLETE**
-
-### **Update Documentation:**
-1. **current-story.md**: Mark M7.0 ✅ COMPLETE, update to M7.1 🚀 READY
-2. **next-prompt.md**: Replace M7.0 content with M7.1 content
-3. **Git commit**: "M7.0 COMPLETE: App Store prerequisites done, ready for CloudKit"
-
-### **Next Phase:**
-M7.1 - CloudKit Sync Foundation (8-10 hours)
-- CloudKit schema validation
+**What You'll Build:**
 - NSPersistentCloudKitContainer integration
-- Multi-device sync testing
+- CloudKit schema validation for all 8 Core Data entities
+- Multi-device sync with <5s latency target
+- Sync status monitoring and error handling
+
+**Best If:**
+- Ready for substantial CloudKit learning investment (8-10 focused hours)
+- Want family collaboration features soon
+- Motivated to tackle complex technical challenges
+- TestFlight feedback indicates sync is a priority
+
+**Commitment Level**: HIGH - CloudKit is complex, requires sustained focus
 
 ---
 
-## 💡 **RECOMMENDED APPROACH**
+### **Option B: Pause M7, Start M6 Testing Foundation** 🧪
 
-### **For M7.0.1 (Starting Now):**
+**Estimated Time**: 12-18 hours  
+**Complexity**: Medium  
+**Value**: Quality assurance, bug prevention
 
-Use this prompt to begin:
+**What You'll Build:**
+- Automated XCTest infrastructure
+- AI-powered test review and augmentation
+- Test coverage for critical features
+- Regression prevention system
+
+**Best If:**
+- TestFlight revealed bugs that testing would have caught
+- Want quality foundation before adding more features
+- Ready to establish testing discipline
+- Prefer medium-complexity technical work
+
+**Commitment Level**: MEDIUM - Systematic but not as technically complex as CloudKit
+
+---
+
+### **Option C: Pause M7, Start M8 Analytics Dashboard** 📊
+
+**Estimated Time**: 8-12 hours  
+**Complexity**: Low-Medium  
+**Value**: Usage insights, data-driven decisions
+
+**What You'll Build:**
+- Shopping pattern analytics
+- Recipe usage trends
+- Meal planning insights
+- Smart recommendations engine
+
+**Best If:**
+- Want data-driven feature decisions
+- Interested in user behavior insights
+- Prefer UI/feature work over infrastructure
+- TestFlight feedback requests analytics
+
+**Commitment Level**: LOW-MEDIUM - Feature development, less infrastructure complexity
+
+---
+
+## 💡 **RECOMMENDATION**
+
+**Based on your progress pattern (89% planning accuracy, systematic approach):**
+
+Consider **Option B (M6 Testing Foundation)** or **Option C (M8 Analytics Dashboard)** before diving into CloudKit.
+
+**Why pause M7 before M7.1?**
+1. **CloudKit complexity**: M7.1-7.4 represent 25-33 hours of complex infrastructure work
+2. **Testing discipline**: M6 prevents bugs as forager grows in complexity
+3. **User value**: M8 provides immediate user-facing benefits
+4. **Natural checkpoint**: M7.0 is complete - good time to reassess priorities
+
+**Option A (Continue M7.1) makes sense if:**
+- You're energized and ready for CloudKit challenge RIGHT NOW
+- Family sharing is your top priority
+- You have 8-10 focused hours available soon
+
+---
+
+## 📋 **IF CHOOSING OPTION A: M7.1 CloudKit Sync Foundation**
+
+**Implementation Guide**: Will be created when you're ready to start M7.1
+
+**Preparation Steps:**
+1. Review M7 PRD: `docs/prds/milestone-7-cloudkit-sync-external-testflight.md`
+2. Allocate 8-10 focused hours (CloudKit requires sustained attention)
+3. Prepare for learning curve (CloudKit documentation, debugging)
+
+**Start Prompt (when ready):**
 ```
-M7.0.1 ready to start.
+M7.0 complete ✅, ready to start M7.1 CloudKit Sync Foundation.
 
-Let's create the privacy policy HTML file for GitHub Pages.
+Let's begin by reviewing the CloudKit integration strategy and
+setting up NSPersistentCloudKitContainer for all 8 Core Data entities.
 
-Walk me through Step 1: Creating docs/privacy.html with the template provided.
-After we create the file, I'll test it locally before enabling GitHub Pages.
+I've allocated 8-10 hours for this phase and am ready for the CloudKit learning curve.
 ```
 
-### **After M7.0.1 Complete:**
+---
 
-Return to this document and follow M7.0.2, then M7.0.3, then M7.0.4 in sequence.
+## 📋 **IF CHOOSING OPTION B: M6 Testing Foundation**
 
-Each sub-phase includes:
-- Clear acceptance criteria
-- Step-by-step instructions
-- Validation checkpoints
-- Troubleshooting guidance
+**Implementation Guide**: To be created
+
+**What You'll Need:**
+- Review testing strategy
+- XCTest infrastructure setup
+- AI test review integration
+
+**Start Prompt (when ready):**
+```
+M7.0 complete ✅, ready to start M6 Testing Foundation.
+
+Let's establish automated testing infrastructure with AI-powered
+test review and augmentation.
+
+I want to build quality assurance foundation before adding more features.
+```
 
 ---
 
-## 📊 **M7.0 PROGRESS TRACKER**
+## 📋 **IF CHOOSING OPTION C: M8 Analytics Dashboard**
 
-- [ ] **M7.0.1**: Privacy Policy Creation & Hosting (1h) 🚀 READY
-- [ ] **M7.0.2**: Privacy Policy Integration (1h) ⏳ After M7.0.1
-- [ ] **M7.0.3**: App Privacy Questionnaire (30min) ⏳ After M7.0.2
-- [ ] **M7.0.4**: Display Name Disambiguation (30min) ⏳ After M7.0.3
+**Implementation Guide**: To be created
 
-**Total M7.0 Time**: 2-3 hours  
-**Status**: MANDATORY before external TestFlight (M7.5)  
-**Next After M7.0**: M7.1 CloudKit Sync Foundation (8-10 hours)
+**What You'll Need:**
+- Analytics data model design
+- Dashboard UI components
+- Usage tracking system
+
+**Start Prompt (when ready):**
+```
+M7.0 complete ✅, ready to start M8 Analytics Dashboard.
+
+Let's build usage analytics and insights to enable data-driven
+feature decisions.
+
+I want to understand user behavior patterns and shopping trends.
+```
 
 ---
 
+## 🎓 **LEARNING FROM M7.0**
+
+**What Went Well:**
+- Perfect estimate accuracy (3 hours actual vs 2-3 hours estimated)
+- Systematic execution through all 4 sub-phases
+- Zero technical issues or rework
+- Clean branding consistency achieved
+- All Apple requirements met first try
+
+**Key Insights:**
+- Breaking work into clear sub-phases (M7.0.1-M7.0.4) enabled focus
+- Each phase had clear acceptance criteria
+- Git checkpoints after each phase maintained progress
+- 1-hour phases are highly manageable
+
+**Apply to Next Milestone:**
+- Continue breaking work into 1-2 hour phases
+- Maintain clear acceptance criteria per phase
+- Git checkpoint after each phase completion
+- Update documentation immediately
+
+---
+
+## 📊 **PROJECT STATUS SUMMARY**
+
+**Completed**: M1-M5.0 (92.5 hours) + M7.0 (3 hours) = **95.5 hours total**  
+**Planning Accuracy**: 89% overall, M7.0: 100%!  
+**Build Success**: 100% (zero breaking changes)  
+**Technical Debt**: NONE ✅
+
+**Current Capabilities:**
+- ✅ Professional grocery management with custom store layouts
+- ✅ Complete recipe catalog with scaling and source tracking
+- ✅ Intelligent quantity consolidation (30-50% list reduction)
+- ✅ Calendar-based meal planning
+- ✅ Internal TestFlight operational (3+ testers)
+- ✅ App Store prerequisites complete (ready for external TestFlight after CloudKit)
+
+**Next Decision**: Choose M7.1, M6, or M8 based on priorities
+
+---
+
+## 🚨 **REMINDER: UPDATE DOCUMENTATION FIRST**
+
+Before starting any new milestone, ensure:
+- [x] current-story.md updated with M7.0 completion ✅
+- [x] next-prompt.md updated (this file) ✅
+- [ ] project-index.md updated with M7.0 recent activity
+- [ ] Consider creating M7.0 learning note (optional but valuable)
+
+---
+
+**Version**: 1.0 (M7.0 Complete, Strategic Decision Point)  
 **Last Updated**: December 3, 2025  
-**Version**: 1.0 (M7.0 App Store Prerequisites)  
-**PRD Reference**: docs/prds/milestone-7-cloudkit-sync-external-testflight.md  
-**Current Story**: docs/current-story.md
+**Current Story**: docs/current-story.md  
+**PRD Reference**: See option-specific PRDs when decision made
