@@ -53,7 +53,7 @@ Transform Forager into a fully collaborative family meal planning platform with 
 **Estimated**: 1 hour
 
 **Tasks:**
-- [ ] **7.0.1.1** Draft privacy policy for local-only data storage
+- [x] **7.0.1.1** Draft privacy policy for local-only data storage
   - Template: "Data stored locally on device, not transmitted to servers"
   - Statement: "No tracking, analytics, or third-party data sharing"
   - Deletion: "Delete app to remove all data"
