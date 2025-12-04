@@ -1,9 +1,9 @@
 # Forager - Project Index
 
-**Last Updated**: December 3, 2025  
+**Last Updated**: December 4, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE, M7.1 🔄 ACTIVE)  
-**Next Priority**: M7.1.1 CloudKit Schema Validation (2-3 hours)
+**Current Milestone**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅, M7.1.1 ✅, M7.1.2 🚀 READY)  
+**Next Priority**: M7.1.2 CloudKitSyncMonitor Service (2-3 hours)
 
 ---
 
@@ -369,23 +369,34 @@
 
 ## 📅 **RECENT ACTIVITY**
 
-### **December 3, 2025**
+### **December 4, 2025**
 
-**M7.1 CloudKit Sync Foundation STARTED** 🔄
-- **Status**: Active - M7.1.1 ready to begin
-- **Estimated Time**: 8-10 hours total (3 phases)
-- **Implementation Guide**: [next-prompt.md](next-prompt.md) - all detail included
-- **What's Being Built**:
-  - NSPersistentCloudKitContainer integration
-  - CloudKit schema validation for all 8 entities
-  - Multi-device sync with <5s latency target
-  - Sync monitoring and error handling
+**M7.1.1 CloudKit Schema Validation COMPLETE** ✅
+- **Actual Time**: 1.5 hours (estimated 2-3 hours - 100% planning accuracy!)
+- **Achievement**: CloudKit-enabled Core Data stack with zero regressions
+- **Deliverables**:
+  - Replaced NSPersistentContainer with NSPersistentCloudKitContainer
+  - Configured CloudKit container (iCloud.com.richhayn.forager)
+  - Enabled history tracking and remote change notifications
+  - Implemented #if !DEBUG wrapper for fast local development
+  - Verified 8+ record types in CloudKit Dashboard (CD_Category, CD_GroceryListItem, CD_Ingredient, CD_IngredientTemplate, CD_MealPlan, CD_PlannedMeal, CD_Recipe, CD_WeeklyList, CD_UserPreferences)
+  - Confirmed sync activity (28 events, RecordSave operations logged)
+  - First build succeeded with zero errors/warnings
+- **Key Learning**: #if !DEBUG strategy enables fast Debug builds (local-only) while keeping CloudKit for Release builds
+- **Documentation**:
+  - Learning Note: [24-m7.1.1-cloudkit-schema-validation.md](learning-notes/24-m7.1.1-cloudkit-schema-validation.md)
+  - Impact Analysis: [M7.1.1-CORE-DATA-IMPACT-ANALYSIS.md](M7.1.1-CORE-DATA-IMPACT-ANALYSIS.md)
+- **Status**: M7.1.2 CloudKitSyncMonitor Service ready next (2-3 hours)
+- **Total Progress**: 97 hours (M1-M5.0: 92.5h + M7.0: 3h + M7.1.1: 1.5h)
+- **Planning Accuracy**: 89% overall maintained
+
+### **December 3, 2025**
 
 **M7.0 App Store Prerequisites COMPLETE** ✅
 - **Actual Time**: 3 hours (estimated 2-3 hours - 100% accuracy!)
 - **Completed**: Privacy policy, App Privacy questionnaire, display name disambiguation
 - **Impact**: forager cleared for external TestFlight after M7.1-7.4
-- **Learning Note**: To be created after M7.1 complete
+- **Learning Note**: To be created after M7 fully complete
 
 ### **November 28, 2025**
 
@@ -501,7 +512,7 @@ Ready to proceed with next sub-phase.
 
 ---
 
-**Last Updated**: December 3, 2025  
+**Last Updated**: December 4, 2025  
 **Next Update**: When M7.1 complete or M7.2 starts  
-**Current Status**: M7.1 ACTIVE - CloudKit Sync Foundation (8-10 hours estimated)  
-**Documentation Version**: M7.0 complete (✅), M7.1 started (🔄)
+**Current Status**: M7.1 ACTIVE - CloudKit Sync Foundation (M7.1.1 complete ✅, 6.5-8.5h remaining)  
+**Documentation Version**: M7.0 complete (✅), M7.1.1 complete (✅), M7.1.2 ready (🚀)
