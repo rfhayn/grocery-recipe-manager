@@ -29,6 +29,9 @@ struct SettingsView: View {
                 // M4.3.1: Display Options
                 displayOptionsSection
                 
+                // M7.1.2: Developer Tools
+                developerToolsSection
+                
                 // M7.0.2: About & Privacy
                 aboutSection
                 
@@ -91,6 +94,38 @@ struct SettingsView: View {
             Text("Display Options")
         } footer: {
             Text("When enabled, grocery list items will show which recipes they came from (e.g., \"Ground beef [Tacos]\").")
+                .font(.caption)
+        }
+    }
+    
+    // MARK: - M7.1.2: Developer Tools Section
+    
+    // Developer tools for CloudKit sync testing and debugging
+    // Provides access to sync status monitoring and validation
+    private var developerToolsSection: some View {
+        Section {
+            // CloudKit Sync Status link
+            // Opens test interface for monitoring CloudKit sync events
+            NavigationLink {
+                CloudKitSyncTestView()
+            } label: {
+                HStack {
+                    Image(systemName: "icloud.and.arrow.up")
+                        .foregroundColor(.blue)
+                    VStack(alignment: .leading) {
+                        Text("CloudKit Sync Status")
+                            .font(.headline)
+                        Text("Monitor sync events and test CloudKit")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            
+        } header: {
+            Text("Developer Tools")
+        } footer: {
+            Text("Tools for testing and debugging CloudKit synchronization.")
                 .font(.caption)
         }
     }

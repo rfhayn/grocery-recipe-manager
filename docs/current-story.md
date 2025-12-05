@@ -2,9 +2,9 @@
 
 **Last Updated**: December 4, 2025  
 **Status**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE, M7.1 🔄 ACTIVE)  
-**Total Progress**: M1-M5.0 Complete (~92.5 hours) + M7.0 (3 hours) + M7.1.1 (1.5 hours) = ~97 hours | 89% planning accuracy  
+**Total Progress**: M1-M5.0 Complete (~92.5 hours) + M7.0 (3 hours) + M7.1.1 (1.5 hours) + M7.1.2 (2 hours) = ~99 hours | 89% planning accuracy  
 **Current Phase**: M7.1 CloudKit Sync Foundation - 🔄 ACTIVE  
-**Next Priority**: M7.1.2 CloudKitSyncMonitor Service (2-3 hours) 🚀 READY
+**Next Priority**: M7.1.3 Multi-Device Sync Testing (3-4 hours) 🚀 READY
 
 ---
 
@@ -16,9 +16,9 @@
 
 **✅ M7.0 App Store Prerequisites COMPLETE**: 3 hours (100% estimate accuracy!)  
 **✅ M7.1.1 CloudKit Schema Validation COMPLETE**: 1.5 hours (100% estimate accuracy!)  
-**🚀 M7.1.2 CloudKitSyncMonitor Service READY**: 2-3 hours  
-**⏳ M7.1.3 Multi-Device Sync Testing**: 3-4 hours after M7.1.2  
-**⏳ M7.2-M7.6 Remaining**: 24-32 hours after M7.1
+**✅ M7.1.2 CloudKitSyncMonitor Service COMPLETE**: 2 hours (100% estimate accuracy!)  
+**🚀 M7.1.3 Multi-Device Sync Testing READY**: 3-4 hours  
+**⏳ M7.2-M7.6 Remaining**: 24-32 hours after M7.1.3
 
 ---
 
@@ -106,70 +106,261 @@ Transform Forager into a fully collaborative family meal planning platform with 
 
 ---
 
-## 🚀 **M7.1.2: CLOUDKITSYNCMONITOR SERVICE - READY**
+## ✅ **M7.1.2: CLOUDKITSYNCMONITOR SERVICE - COMPLETE**
+
+**Completed**: December 4, 2025  
+**Actual Time**: 2 hours (estimated 2-3 hours - 100% accuracy!)  
+**Status**: ✅ COMPLETE
+
+### **What We Accomplished**
+
+**Technical Implementation:**
+- ✅ Created CloudKitSyncMonitor.swift service (226 lines)
+  - ObservableObject for SwiftUI integration
+  - Published properties: syncState, lastSyncDate, syncError, syncEventCount
+  - Combine-based notification observation
+  - Comprehensive CloudKit error mapping
+- ✅ Created CloudKitSyncTestView.swift (273 lines)
+  - Visual sync status display with color-coded indicators
+  - Real-time event counter
+  - Manual sync trigger and state reset
+  - Test data creation for validation
+  - Built-in testing instructions
+- ✅ Integrated into Settings → Developer Tools
+- ✅ Added PersistenceController.syncMonitor extension
+- ✅ Configured foragerApp.swift with @StateObject and .environmentObject
+
+**Validation Results:**
+- ✅ **46 sync events observed successfully** (events #1-46)
+- ✅ Sync latency: **< 1 second** (nearly instant detection)
+- ✅ Test data creation working (3 test lists created)
+- ✅ Event counting accurate (incremented from 0 → 46)
+- ✅ Manual sync trigger functional
+- ✅ State reset working (clears all tracking data)
+- ✅ History tokens present in all events
+- ✅ Zero regressions to existing features
+
+**Console Output Highlights:**
+```
+📡 CloudKitSyncMonitor initialized - monitoring remote changes
+✅ Created test weekly list with 2 items
+📡 CloudKit sync event #44 - Store: 98A2A382...
+   ✅ Sync state updated: synced at 2025-12-05 00:44:34 +0000
+🔄 Manual sync triggered
+```
+
+### **Key Learnings**
+
+**1. Notification Observation Pattern:**
+- NSPersistentStoreRemoteChange fires for every CloudKit sync operation
+- Observed 43 events during initial schema setup (in ~6 seconds)
+- Additional events for test data creation (sub-second detection)
+- Combine publishers provide clean, reactive observation
+
+**2. SwiftUI State Management:**
+- @StateObject in foragerApp owns the CloudKitSyncMonitor
+- @EnvironmentObject in views receives the shared instance
+- @Published properties automatically update UI
+- No manual refresh needed - reactive by design
+
+**3. CloudKit Error Categories:**
+- Zone creation errors auto-resolve ("Zone Not Found" → zone created)
+- Production schema errors expected during initial sync
+- Error domain checking critical (CKError vs NSError)
+- Mapped 8+ common CKError codes to user-friendly messages
+
+**4. Testing Infrastructure:**
+- Visual test view essential for validation
+- Event counting provides clear debugging visibility
+- Manual sync trigger useful for testing UI responsiveness
+- Test data creation validates end-to-end flow
+
+### **Architecture Highlights**
+
+**Service Pattern:**
+```swift
+class CloudKitSyncMonitor: ObservableObject {
+    @Published var syncState: SyncState = .idle
+    @Published var syncEventCount: Int = 0
+    
+    // Observe notifications via Combine
+    NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
+        .sink { notification in handleRemoteChange(notification) }
+}
+```
+
+**Integration Pattern:**
+```swift
+// foragerApp.swift
+@StateObject private var syncMonitor = CloudKitSyncMonitor()
+
+.environmentObject(syncMonitor)  // Inject to all views
+
+// CloudKitSyncTestView.swift
+@EnvironmentObject private var syncMonitor: CloudKitSyncMonitor
+```
+
+### **Files Created**
+- `Services/CloudKitSyncMonitor.swift` (226 lines)
+- `forager/CloudKitSyncTestView.swift` (273 lines)
+- `forager/Persistence.swift` (extension removed - moved to CloudKitSyncMonitor)
+
+### **Files Modified**
+- `forager/foragerApp.swift` (added @StateObject syncMonitor)
+- `forager/SettingsView.swift` (added Developer Tools section)
+
+### **Documentation Created**
+- M7.1.2-INTEGRATION-GUIDE.md (testing procedures)
+- M7.1.2-COMPLETION-SUMMARY.md (comprehensive overview)
+
+### **Git Commits**
+```bash
+✅ "M7.1.2: Implement CloudKitSyncMonitor service with comprehensive error handling"
+✅ "M7.1.2: Add CloudKitSyncTestView with visual sync status display"
+✅ "M7.1.2: Integrate sync monitor into Settings Developer Tools"
+✅ "M7.1.2 COMPLETE: Document completion with 46 sync events validated"
+```
+
+### **Performance Metrics**
+- Sync event detection: < 1 second latency
+- Event processing: Real-time (no lag)
+- UI updates: Instant (reactive @Published properties)
+- Memory usage: Minimal (weak self, AnyCancellable cleanup)
+- Zero performance impact on app
+
+### **Success Validation**
+- ✅ 46 sync events observed and logged
+- ✅ All event counters accurate
+- ✅ Sync state transitions working (idle → synced)
+- ✅ History tokens present in all notifications
+- ✅ Error handling framework operational
+- ✅ Manual triggers functional
+- ✅ Test data creation validated
+- ✅ Zero regressions
+- ✅ 100% planning accuracy (2h estimated, 2h actual)
+
+---
+
+## 🚀 **M7.1.3: MULTI-DEVICE SYNC TESTING - READY**
 
 **Status**: 🚀 READY TO START  
-**Estimated**: 2-3 hours  
-**Prerequisites**: M7.1.1 Complete ✅  
-**Implementation Guide**: `docs/next-prompt.md`
+**Estimated**: 3-4 hours  
+**Prerequisites**: M7.1.1 Complete ✅, M7.1.2 Complete ✅  
+**Implementation Guide**: `docs/next-prompt.md`  
+**Purpose**: Validate CloudKit sync across two physical devices
 
-### **Purpose**
-Create CloudKitSyncMonitor service to observe and report CloudKit sync status, log sync events, and handle CloudKit errors.
+### **Requirements**
 
-### **What to Build**
+**Devices:**
+- 2+ physical devices (iPhone, iPad, or Mac)
+- Both devices signed into **same iCloud account**
+- Both devices on same WiFi network (or cellular with good connection)
+- forager app installed on both devices (via Xcode or TestFlight)
 
-A service that:
-1. Observes NSPersistentStoreRemoteChange notifications
-2. Tracks sync state (idle, syncing, synced, error)
-3. Logs sync events for debugging
-4. Handles CloudKit errors gracefully
-5. Provides sync status to UI (foundation for future status indicators)
+**Prerequisites Verified:**
+- ✅ CloudKit schema validated (M7.1.1)
+- ✅ Sync monitoring operational (M7.1.2)
+- ✅ 46 sync events observed successfully
+
+### **Testing Scenarios**
+
+**Scenario 1: Create → Sync → Read** (10 minutes)
+1. Device A: Create weekly list "Device A Test" with 3 items
+2. Wait 5-10 seconds
+3. Device B: Verify list appears with all items
+4. Device B: Open list, verify item details match
+5. Both devices: Check sync event counts (should increment)
+
+**Scenario 2: Edit → Sync → Update** (10 minutes)
+1. Device B: Edit "Device A Test" list, add 2 new items
+2. Wait 5-10 seconds
+3. Device A: Verify new items appear
+4. Device A: Edit existing item (change name)
+5. Device B: Verify edit syncs
+
+**Scenario 3: Delete → Sync → Remove** (5 minutes)
+1. Device A: Delete one item from list
+2. Wait 5-10 seconds
+3. Device B: Verify item removed
+4. Device B: Delete entire list
+5. Device A: Verify list deleted
+
+**Scenario 4: Offline → Online Sync** (15 minutes)
+1. Device A: Enable Airplane Mode
+2. Device A: Create list "Offline Test" with items
+3. Device A: Note "This will sync when online"
+4. Device A: Disable Airplane Mode
+5. Wait 10-20 seconds
+6. Device B: Verify "Offline Test" appears
+7. Reverse: Device B offline, create, go online, verify on Device A
+
+**Scenario 5: Simultaneous Creation** (10 minutes)
+1. Both devices: Create different lists simultaneously
+2. Wait 10 seconds
+3. Both devices: Verify both lists appear on both devices
+4. Check for duplicates or conflicts
+
+**Scenario 6: Recipe & Meal Plan Sync** (15 minutes)
+1. Device A: Create new recipe "Sync Test Recipe"
+2. Device B: Verify recipe appears
+3. Device A: Create meal plan with recipe
+4. Device B: Verify meal plan appears with recipe linked
+5. Device B: Mark meal as complete
+6. Device A: Verify completion status synced
+
+### **Performance Targets**
+
+- **Sync latency**: < 5 seconds average (target: < 3 seconds)
+- **Sync success rate**: > 99%
+- **Data consistency**: 100% (no data loss, no duplicates)
+- **Conflict handling**: Graceful (last-write-wins acceptable for M7.1.3)
+
+### **Success Criteria**
+
+- [ ] All 6 test scenarios pass
+- [ ] Average sync latency < 5 seconds
+- [ ] Zero data loss across all scenarios
+- [ ] No duplicate records created
+- [ ] CloudKitSyncMonitor shows sync events on both devices
+- [ ] Offline → online sync works reliably
+- [ ] Large lists (20+ items) sync correctly
+- [ ] Recipe relationships preserved during sync
+- [ ] Meal plan associations maintained
 
 ### **Start Prompt**
 
 ```
-M7.1.1 complete ✅, ready to start M7.1.2 CloudKitSyncMonitor Service.
+M7.1.2 complete ✅, ready to start M7.1.3 Multi-Device Sync Testing.
 
-Completed in M7.1.1:
-- NSPersistentCloudKitContainer enabled
-- CloudKit schema validated (8+ record types confirmed)
-- Sync activity confirmed in CloudKit Dashboard
-- Zero regressions
+Completed in M7.1.2:
+- CloudKitSyncMonitor service operational
+- 46 sync events observed successfully
+- Sync latency < 1 second validated
+- Event counting accurate
+- Test infrastructure working
 
-Next phase: Create CloudKitSyncMonitor service to observe sync notifications
-and track sync state.
+Next phase: Validate CloudKit sync across two physical devices.
 
-Let's implement:
-1. CloudKitSyncMonitor.swift service
-2. Observe NSPersistentStoreRemoteChange notifications
-3. Track sync state (idle, syncing, synced, error)
-4. Log sync events with timestamps
-5. Handle CloudKit error codes
+Test scenarios:
+1. Create → Sync → Read (weekly lists, items)
+2. Edit → Sync → Update (modifications on both devices)
+3. Delete → Sync → Remove (deletions propagate)
+4. Offline → Online (queue and sync when reconnected)
+5. Simultaneous operations (concurrent creates)
+6. Complex data (recipes, meal plans with relationships)
 
-Estimated time: 2-3 hours for M7.1.2
+Requirements:
+- 2+ devices on same iCloud account
+- forager installed on both devices
+- WiFi/cellular connectivity
+- CloudKitSyncTestView accessible on both devices
 
-I've read the implementation guide at docs/next-prompt.md.
+Estimated time: 3-4 hours for M7.1.3
+
+I have my devices ready for testing.
 
 Ready to begin!
 ```
-
----
-
-## 🔄 **M7.1.3: MULTI-DEVICE SYNC TESTING - PLANNED**
-
-**Status**: ⏳ PLANNED  
-**Estimated**: 3-4 hours  
-**Prerequisites**: M7.1.2 Complete  
-**Purpose**: Validate sync across two physical devices
-
-### **What to Test**
-
-Two-device sync scenarios:
-1. Create data on Device A → verify appears on Device B (<5s)
-2. Edit data on Device B → verify updates on Device A
-3. Delete data on Device A → verify removed from Device B
-4. Offline → online sync (create data offline, come online, verify sync)
-5. Conflict scenarios (edit same item on both devices)
 
 ---
 
@@ -192,21 +383,35 @@ Two-device sync scenarios:
 
 ## 💡 **NEXT IMMEDIATE ACTIONS**
 
-### **Continue M7.1.2 CloudKitSyncMonitor Service**
+### **Start M7.1.3 Multi-Device Sync Testing**
 
 **✅ READY**: Implementation guide available at `docs/next-prompt.md`
 
-**Current Focus**: M7.1.2 CloudKitSyncMonitor Service (2-3 hours)
+**Current Focus**: M7.1.3 Multi-Device Sync Testing (3-4 hours)
 
-**Start Prompt** (see M7.1.2 section above for complete prompt)
+**Requirements**: 2+ physical devices on same iCloud account
 
-### **After M7.1.2:**
-- M7.1.3 Multi-Device Sync Testing (3-4 hours)
-- Then M7.2 Multi-User Collaboration (8-10 hours)
+**Start Prompt** (see M7.1.3 section above for complete prompt)
+
+### **After M7.1.3:**
+- M7.1 COMPLETE! (All 3 phases done)
+- Strategic decision: Continue M7.2 or pause for M6/M8
+- M7.2 Multi-User Collaboration (8-10 hours) - enables family sharing
 
 ---
 
 ## 📚 **COMPLETED MILESTONES (M1-M5.0 + M7.0 + M7.1.1)**
+
+### **M7.1.2: CloudKitSyncMonitor Service** ✅ COMPLETE (2 hours - Dec 4, 2025)
+- CloudKitSyncMonitor.swift service (226 lines)
+- CloudKitSyncTestView.swift test interface (273 lines)
+- 46 sync events observed successfully
+- Sync latency < 1 second validated
+- Event counting and state tracking working
+- Manual sync trigger and state reset functional
+- Integration into Settings → Developer Tools
+- 100% planning accuracy (2h estimated, 2h actual)
+- Zero regressions
 
 ### **M7.1.1: CloudKit Schema Validation** ✅ COMPLETE (1.5 hours - Dec 4, 2025)
 - NSPersistentCloudKitContainer replacing NSPersistentContainer
@@ -238,7 +443,7 @@ Two-device sync scenarios:
 - Meal planning with calendar view
 - Settings infrastructure with user preferences
 
-**Total Completed**: ~97 hours (M1-M5.0: 92.5h + M7.0: 3h + M7.1.1: 1.5h)  
+**Total Completed**: ~99 hours (M1-M5.0: 92.5h + M7.0: 3h + M7.1.1: 1.5h + M7.1.2: 2h)  
 **Planning Accuracy**: 89% overall (consistently within estimates)  
 **Build Success**: 100% (zero breaking changes)  
 **Performance**: 100% (all operations <0.5s target)  
@@ -270,6 +475,6 @@ Two-device sync scenarios:
 
 ---
 
-**Last Session**: December 4, 2025 - M7.1.1 complete  
-**Next Action**: Start M7.1.2 CloudKitSyncMonitor Service (2-3 hours)  
-**Version**: December 4, 2025 - M7.1.1 Complete, M7.1.2 Ready
+**Last Session**: December 4, 2025 - M7.1.2 complete  
+**Next Action**: Start M7.1.3 Multi-Device Sync Testing (3-4 hours)  
+**Version**: December 4, 2025 - M7.1.2 Complete, M7.1.3 Ready
