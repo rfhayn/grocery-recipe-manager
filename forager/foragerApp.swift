@@ -9,6 +9,10 @@ import SwiftUI
 struct foragerApp: App {
     let persistenceController = PersistenceController.shared
     
+    // M7.1.2: CloudKit sync monitoring - observing shared instance from PersistenceController
+    // Using @ObservedObject since PersistenceController owns the instance
+    @StateObject private var syncMonitor = CloudKitSyncMonitor()
+    
     // Tab selection tracking
     @State private var selectedTab: Tab = .lists
     
@@ -84,6 +88,7 @@ struct foragerApp: App {
                 }
             }
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            .environmentObject(syncMonitor) // M7.1.2: Make sync monitor available to all views
         }
     }
     

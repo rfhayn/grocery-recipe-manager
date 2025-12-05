@@ -1,7 +1,7 @@
 # Session Startup Checklist
 
 **Purpose**: Mandatory startup procedure for every Claude development session  
-**Last Updated**: October 23, 2025  
+**Last Updated**: December 5, 2025  
 **Required Reading**: **EVERY SESSION** - No exceptions
 
 ---
@@ -14,8 +14,9 @@ This checklist ensures:
 - ✅ No duplicate work or services
 - ✅ Documentation continuity
 - ✅ Efficient development workflow
+- ✅ Clean git history with feature branches
 
-**Estimated Time**: 5-10 minutes  
+**Estimated Time**: 10-15 minutes  
 **Impact**: Prevents hours of rework and confusion
 
 ---
@@ -33,14 +34,14 @@ This checklist ensures:
 **Location**: `docs/project-naming-standards.md`  
 **Purpose**: Understand M#.#.# naming hierarchy and status indicators  
 **What to verify:**
-- [ ] Current active milestone (e.g., M4)
-- [ ] Current active component (e.g., M4.1)
+- [ ] Current active milestone (e.g., M7)
+- [ ] Current active component (e.g., M7.1)
 - [ ] Status indicator meanings (✅ 🔄 🚀 ⏳)
 - [ ] Quick reference card at top of document
 
 **Key Takeaway**: 
 ```
-Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
+Always use full identifiers: "M7.1.3" not "Phase 3" or "Step 3"
 ```
 
 #### **3. Read Current Story** ✅
@@ -127,8 +128,59 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 - QuantityMergeService (consolidation)
 - UnitConversionService (measurements)
 - RecipeScalingService (recipe scaling)
+- CloudKitSyncMonitor (sync monitoring)
 
 **Key Takeaway**: Search before creating - avoid duplicate infrastructure
+
+#### **8. Create Feature Branch for Phase** ✅
+**Location**: Git command line  
+**When**: Before writing ANY code for a phase  
+**Purpose**: Isolate phase work for clean history, safe experimentation, and easy rollback
+
+**Git Workflow:**
+```bash
+# 1. Ensure main is up to date
+git checkout main
+git pull origin main
+
+# 2. Create feature branch (format: feature/M#.#.#-brief-description)
+git checkout -b feature/M7.1.3-multi-device-testing
+
+# Examples:
+# git checkout -b feature/M7.1.1-cloudkit-schema
+# git checkout -b feature/M7.1.2-sync-monitoring
+# git checkout -b feature/M7.2.1-ckshare-implementation
+
+# 3. Verify you're on the new branch
+git branch  # Should show * feature/M7.1.3-...
+
+# 4. Create initial checkpoint (commit planning docs if created)
+git add docs/M7.1.3-TESTING-PLAN.md  # Or whatever planning docs exist
+git commit -m "M7.1.3: Add multi-device testing plan
+
+- 6 testing scenarios documented
+- Performance targets established (< 5s sync latency)
+- Acceptance criteria defined"
+
+git push -u origin feature/M7.1.3-multi-device-testing
+```
+
+**Branch Naming Convention:**
+- Prefix: `feature/` (always)
+- Milestone: `M#.#.#` (exact milestone number)
+- Description: brief-kebab-case (3-5 words max)
+
+**During Development:**
+- Commit frequently (every 15-30 minutes)
+- Push after each commit (backs up work to GitHub)
+- Use M#.#.# format in all commit messages
+
+**Key Takeaway**: 
+- One phase = one branch = one PR = one squash commit to main
+- Clean main branch history for easy understanding
+- Safe to experiment (can abandon branch if needed)
+
+**See Also**: [git-workflow-for-milestones.md](git-workflow-for-milestones.md) for complete workflow
 
 ---
 
@@ -137,7 +189,7 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 **Before writing ANY code, verify you've completed:**
 
 **Phase 1: Context Loading** (ALL sessions)
-- [x] Read session-startup-checklist.md (this file)
+- [ ] Read session-startup-checklist.md (this file)
 - [ ] Read project-naming-standards.md
 - [ ] Read current-story.md
 
@@ -146,12 +198,14 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 - [ ] Search for Core Data schema (if needed)
 - [ ] Review relevant ADRs (if needed)
 - [ ] Search for existing services (if creating new infrastructure)
+- [ ] **Create feature branch** (before any code)
 
 **Red Flag Check:**
 - [ ] No duplicate services being created
 - [ ] Using correct M#.#.# naming convention
 - [ ] Current work documented in current-story.md
 - [ ] Architecture patterns match existing decisions
+- [ ] On feature branch (not main)
 
 ---
 
@@ -161,11 +215,13 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 
 ❌ **Without Checklist:**
 - Creating duplicate services that already exist
-- Using inconsistent naming (Phase 1 vs M4.1)
+- Using inconsistent naming (Phase 1 vs M7.1)
 - Breaking existing Core Data relationships
 - Contradicting established architecture decisions
 - Starting work that's not documented
 - Missing critical context from previous sessions
+- Committing directly to main
+- Messy git history
 
 ✅ **With Checklist:**
 - Consistent naming across all documentation
@@ -174,6 +230,8 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 - Building on current work correctly
 - Maintaining documentation continuity
 - Efficient, focused development
+- Clean git history with feature branches
+- Safe experimentation and rollback capability
 
 ### **Time Saved:**
 
@@ -184,8 +242,9 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 | Core Data conflicts | 1-3 hours | 0 (prevented) |
 | Architecture rework | 2-6 hours | 0 (prevented) |
 | Documentation cleanup | 30-90 min | 0 (prevented) |
+| Git history cleanup | 1-2 hours | 0 (prevented) |
 
-**Total Time Saved Per Session**: 6-14 hours of potential rework
+**Total Time Saved Per Session**: 7-16 hours of potential rework
 
 ---
 
@@ -200,17 +259,19 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 - ✅ Zero architecture contradictions
 - ✅ 100% documentation continuity
 - ✅ Clear, focused development path
+- ✅ Clean git history with feature branches
 
 ### **Historical Results**
 
-**Sessions Using Checklist (M1-M3.5):**
-- 67.5 hours total development
-- < 10% variance from estimates
+**Sessions Using Checklist (M1-M7.0):**
+- 95.5 hours total development
+- ~89% planning accuracy
 - Zero major rework required
 - 100% documentation consistency
 - Zero breaking changes to working features
+- Clean git history maintained
 
-**Impact**: This checklist is a proven success factor for the project's 88% planning accuracy
+**Impact**: This checklist is a proven success factor for the project's 89% planning accuracy
 
 ---
 
@@ -221,6 +282,7 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 **For Development:**
 - [development-guidelines.md](development-guidelines.md) - Code standards and patterns
 - [next-prompt.md](next-prompt.md) - Current implementation guidance
+- [git-workflow-for-milestones.md](git-workflow-for-milestones.md) - Complete git workflow
 
 **For Context:**
 - [requirements.md](requirements.md) - Feature requirements
@@ -236,18 +298,19 @@ Always use full identifiers: "M4.1.2" not "Phase 2" or "Step 2"
 ## 💡 PRO TIPS
 
 ### **First Session of the Day**
-Complete ALL 7 checklist items - full context load is critical
+Complete ALL 8 checklist items - full context load is critical
 
 ### **Continuing Previous Session's Work**
 Can skip items 5-7 if:
 - Working on same feature
 - No Core Data changes planned
 - No new services being created
+- Already on correct feature branch
 
-BUT always complete items 1-4 - these ensure naming consistency and current context
+BUT always complete items 1-4 + 8 - these ensure naming consistency and current context
 
 ### **Starting New Milestone/Component**
-Complete ALL 7 items + additionally review:
+Complete ALL 8 items + additionally review:
 - Relevant PRDs in `docs/prds/`
 - Similar milestone learning notes
 - Related ADRs for the feature area
@@ -257,6 +320,7 @@ If interrupted or switching contexts mid-session:
 1. Re-read current-story.md (item 3)
 2. Re-read next-prompt.md (item 4)
 3. Verify M#.#.# naming still correct
+4. Check git branch: `git branch` (should be on feature branch)
 
 ---
 
@@ -270,6 +334,8 @@ If interrupted or switching contexts mid-session:
 - Core Data changes without schema verification
 - Documentation updates without checking current-story.md
 - Code that contradicts established patterns
+- Committing directly to main instead of feature branch
+- Working without creating feature branch first
 
 **If you catch non-compliance:**
 1. Stop current work
@@ -286,6 +352,8 @@ If interrupted or switching contexts mid-session:
 - [ ] No duplicate services or infrastructure
 - [ ] Architecture follows established ADRs
 - [ ] Documentation uses correct status indicators (✅ 🔄 🚀 ⏳)
+- [ ] On feature branch (not main)
+- [ ] Commits use M#.#.# format
 
 ---
 
@@ -303,12 +371,13 @@ If interrupted or switching contexts mid-session:
 
 ---
 
-**Remember**: 10 minutes of checklist time saves hours of rework.
+**Remember**: 10-15 minutes of checklist time saves hours of rework.
 
 **Start every session here. No exceptions.**
 
 ---
 
-**Version**: 1.0  
+**Version**: 2.0 - Git Workflow Integration  
 **Created**: October 23, 2025  
-**Next Review**: After M4 completion
+**Last Updated**: December 5, 2025  
+**Next Review**: After M7 completion

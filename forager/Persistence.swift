@@ -1,4 +1,5 @@
 import CoreData
+import CloudKit
 
 // MARK: - DateFormatter Extension
 extension DateFormatter {
@@ -411,18 +412,50 @@ struct PersistenceController {
         #endif
     }
 
-    let container: NSPersistentContainer
+    // M7.1.1: Changed to NSPersistentCloudKitContainer for CloudKit sync support
+    let container: NSPersistentCloudKitContainer
 
     init(inMemory: Bool = false) {
-        container = NSPersistentContainer(name: "forager")  
-        if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+        // M7.1.1: Initialize with CloudKit-enabled container
+        container = NSPersistentCloudKitContainer(name: "forager")
+        
+        // M7.1.1: Configure CloudKit container options
+        if let description = container.persistentStoreDescriptions.first {
+            // Enable CloudKit sync only in Release builds
+            // Debug builds use local-only Core Data for fast iteration
+            #if !DEBUG
+            description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(
+                containerIdentifier: "iCloud.com.richhayn.forager"
+            )
+            print("☁️ CloudKit sync enabled (Release build)")
+            #else
+            print("💻 Local-only Core Data (Debug build - fast iteration)")
+            #endif
+            
+            // Enable history tracking (required for CloudKit sync)
+            description.setOption(true as NSNumber, 
+                                forKey: NSPersistentHistoryTrackingKey)
+            
+            // Enable remote change notifications (observes CloudKit updates)
+            description.setOption(true as NSNumber, 
+                                forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+            
+            // For in-memory testing (previews)
+            if inMemory {
+                description.url = URL(fileURLWithPath: "/dev/null")
+                print("🧪 In-memory store for testing")
+            }
         }
+        
+        // Load persistent stores
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
+            print("✅ Core Data stack loaded successfully")
         })
+        
+        // Configure view context
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
