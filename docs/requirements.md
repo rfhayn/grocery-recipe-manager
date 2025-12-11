@@ -1,8 +1,9 @@
 # Forager - Requirements Document
 
-**Last Updated**: December 3, 2025  
-**Version**: 4.0  
-**Current Milestone**: M5.0 Complete ✅ | M7.0 Ready 🚀
+**Last Updated**: December 10, 2024  
+**Version**: 4.1 - M7.1.3 Semantic Uniqueness  
+**Current Milestone**: M7.1 ACTIVE (M7.0 ✅, M7.1.1 ✅, M7.1.2 ✅, M7.1.3 🚀)  
+**Total Requirements**: 155 (151 baseline + 4 new M7.1.3 semantic uniqueness)
 
 ---
 
@@ -285,38 +286,96 @@ This document defines all functional and non-functional requirements for the For
 
 ---
 
-## 🚀 **M7: CLOUDKIT SYNC & EXTERNAL TESTFLIGHT - PLANNED**
+## 🔄 **M7: CLOUDKIT SYNC & EXTERNAL TESTFLIGHT - ACTIVE**
 
-**Status**: ⏳ Planned - Ready to Start  
-**Estimated**: 27-37 hours base, 32-42 hours with buffer  
-**Summary**: Full CloudKit synchronization, multi-user collaboration, and external public beta
+**Status**: 🔄 ACTIVE (M7.0 ✅, M7.1.1 ✅, M7.1.2 ✅, M7.1.3 🚀)  
+**Original Estimate**: 27-37 hours base, 32-42 hours with buffer  
+**Revised Estimate**: 38-48 hours base, 43-53 hours with buffer (M7.1.3 expansion: +11h)  
+**Summary**: Full CloudKit synchronization with semantic uniqueness, multi-user collaboration, and external public beta
 
-**⚠️ CRITICAL**: M7.0 App Store Prerequisites are MANDATORY before external TestFlight submission (M7.5)
+**⚠️ CRITICAL SCOPE CHANGE**: M7.1.3 expanded from 3-4h basic testing to 11-15h comprehensive architectural fix for CloudKit semantic uniqueness issue
 
-### **Functional Requirements - App Store Prerequisites (M7.0 - MANDATORY)** 🚨
+### **✅ Functional Requirements - App Store Prerequisites (M7.0 - COMPLETE)** ✅
 
-| ID | Requirement | Target Implementation | Milestone | Value |
-|----|-------------|----------------------|-----------|-------|
-| **FR-AS-001** | **Privacy policy published** | Privacy policy hosted at public URL (GitHub Pages) | M7.0.1 | 🎯 **App Store compliance** |
-| **FR-AS-002** | **In-app privacy link** | Settings → Privacy Policy opens hosted URL | M7.0.2 | 🎯 **User transparency** |
-| **FR-AS-003** | **App Privacy questionnaire** | Complete in App Store Connect ("Data Not Collected") | M7.0.3 | 🎯 **Required metadata** |
-| **FR-AS-004** | **Display name disambiguation** | "Forager: Smart Meal Planner" (display) + "Forager" (icon) | M7.0.4 | 🎯 **Brand differentiation** |
+| ID | Requirement | Implementation | Milestone | Status |
+|----|-------------|----------------|-----------|--------|
+| **FR-AS-001** | **Privacy policy published** | ✅ Hosted at https://rfhayn.github.io/forager/privacy.html | M7.0.1 | ✅ COMPLETE |
+| **FR-AS-002** | **In-app privacy link** | ✅ Settings → Privacy Policy (SafariServices) | M7.0.2 | ✅ COMPLETE |
+| **FR-AS-003** | **App Privacy questionnaire** | ✅ Completed in App Store Connect | M7.0.3 | ✅ COMPLETE |
+| **FR-AS-004** | **Display name disambiguation** | ✅ "forager: smart meal planner" (display) + "Forager" (icon) | M7.0.4 | ✅ COMPLETE |
 
-**Why M7.0 is MANDATORY:**
+**M7.0 Summary**: All 4 App Store prerequisites complete (3 hours, 100% accuracy). Cleared for external TestFlight.
+
+**Why M7.0 was MANDATORY:**
 - Apple's November 2025 policies require privacy policy URL for ALL apps
 - External TestFlight requires completed App Privacy questionnaire
 - Name disambiguation avoids rejection under Guideline 4.1 (Copycats)
 - Attempting external TestFlight without M7.0 = automatic rejection
 
-### **Functional Requirements - CloudKit Sync Foundation**
+### **🔄 Functional Requirements - CloudKit Sync Foundation (M7.1 - ACTIVE)**
 
-| ID | Requirement | Target Implementation | Milestone | Value |
-|----|-------------|----------------------|-----------|-------|
-| **FR-CK-001** | **CloudKit schema generation** | All 8 entities sync to CloudKit | M7.1.1 | 🎯 **Sync foundation** |
-| **FR-CK-002** | **Multi-device sync** | Changes sync across devices <5s | M7.1.3 | 🎯 **Seamless experience** |
-| **FR-CK-003** | **Automatic background sync** | CloudKit syncs without user action | M7.1.2 | 🎯 **Transparent operation** |
-| **FR-CK-004** | **Offline sync queue** | Changes queue offline, sync when online | M7.1.3 | 🎯 **Reliability** |
-| **FR-CK-005** | **Sync status monitoring** | CloudKit sync state tracking | M7.1.2 | 🎯 **Transparency** |
+| ID | Requirement | Implementation | Milestone | Status |
+|----|-------------|----------------|-----------|--------|
+| **FR-CK-001** | **CloudKit schema generation** | ✅ All 8 entities sync to CloudKit | M7.1.1 | ✅ COMPLETE |
+| **FR-CK-002** | **Automatic background sync** | ✅ CloudKit syncs without user action | M7.1.1 | ✅ COMPLETE |
+| **FR-CK-003** | **Sync status monitoring** | ✅ Real-time CloudKit sync state tracking | M7.1.2 | ✅ COMPLETE |
+| **FR-CK-004** | **Multi-device sync** | 🚀 Changes sync across devices <5s | M7.1.3 | 🔄 ACTIVE |
+| **FR-CK-005** | **Offline sync queue** | 🚀 Changes queue offline, sync when online | M7.1.3 | 🔄 ACTIVE |
+
+---
+
+### **🚀 NEW: Functional Requirements - Semantic Uniqueness (M7.1.3)**
+
+**Context**: Discovered CloudKit creates duplicate entities when multiple devices create semantically identical objects (e.g., same Category name with different UUIDs). This causes crashes and data integrity issues. M7.1.3 implements production-ready semantic uniqueness architecture.
+
+| ID | Requirement | Implementation | Milestone | Value |
+|----|-------------|----------------|-----------|-------|
+| **FR-SU-001** | **Category semantic uniqueness** | Repository pattern with normalizedName field and uniqueness constraint | M7.1.3 | 🎯 **Prevent duplicate categories** |
+| **FR-SU-002** | **IngredientTemplate semantic uniqueness** | Repository pattern with canonicalName field and uniqueness constraint | M7.1.3 | 🎯 **Prevent duplicate templates** |
+| **FR-SU-003** | **PlannedMeal slot protection** | Repository pattern with slotKey (date + mealType) and uniqueness constraint | M7.1.3 | 🎯 **One meal per slot** |
+| **FR-SU-004** | **Recipe duplicate detection** | User-assisted detection with dialog (View Existing \| Save as New \| Cancel) | M7.1.3 | 🎯 **Intentional duplicates allowed** |
+
+**Implementation Architecture**:
+
+1. **Two-Stage Migration**: 
+   - Stage A: Add optional semantic key fields
+   - Stage B: Make required, add uniqueness constraints
+   - Prevents CloudKit crashes during migration
+
+2. **Repository Pattern**: 
+   - CategoryRepository - Get-or-create for categories
+   - PlannedMealRepository - Slot protection for meal planning
+   - Enhanced IngredientTemplateService - Canonical ingredient names
+   - RecipeDuplicateDetector - User-assisted duplicate detection
+
+3. **Field Standardization**: 
+   - All entities rename `name`/`title` → `displayName` for consistency
+
+4. **11 Architectural Decision Records**: 
+   - ADR-009 through ADR-019 document all decisions
+
+**Entities With Semantic Uniqueness**:
+- Category: `normalizedName` (lowercase, trimmed)
+- IngredientTemplate: `canonicalName` (via IngredientTemplateService)
+- PlannedMeal: `slotKey` (format: "2024-12-10-breakfast")
+
+**User-Assisted Detection**:
+- Recipe: `titleKey` → Detect similar, show dialog with existing recipe details
+
+**Intentional Duplicates Allowed**:
+- GroceryListItem: Source tracking requires duplicates (Recipe A + Recipe B + Manual)
+- WeeklyList: Simple list container, no date range constraint
+- MealPlan: Week container, no uniqueness needed
+
+**Why This Matters**:
+- Prevents CloudKit crashes from duplicate entity creation
+- Production-ready multi-device sync
+- Clean architectural foundation
+- Doubles forager's ADR count (7 → 18 total)
+
+**PRD**: docs/prds/active/M7.1.3-CloudKit-Sync-Integrity-PRD-v4.1-FINAL.md
+
+---
 
 ### **Functional Requirements - Multi-User Collaboration**
 
@@ -369,8 +428,19 @@ This document defines all functional and non-functional requirements for the For
 | **NFR-CK-005** | **Battery impact < 5%** | Minimal battery drain from sync | M7 All | 🎯 **Efficiency** |
 | **NFR-CK-006** | **Network data < 1MB/sync** | Efficient data transfer | M7 All | 🎯 **Data economy** |
 | **NFR-CK-007** | **App Review pass** | Approval for external testing | M7.5.3 | 🎯 **Public readiness** |
+| **NFR-CK-008** | **Zero duplicate entities** | Semantic uniqueness enforced | M7.1.3 | 🔄 **ACTIVE** |
 
-**M7 Summary (Planned)**: 29 requirements including App Store prerequisites (4), CloudKit sync (5), multi-user collaboration (5), conflict resolution (5), sync UI polish (5), external TestFlight (5), and non-functional requirements (7). Transforms Forager into App Store-compliant collaborative family platform with public beta program.
+**M7 Summary**: 33 requirements total (up from 29 with M7.1.3 expansion):
+- App Store prerequisites: 4 requirements ✅ COMPLETE
+- CloudKit sync foundation: 5 requirements (3 complete, 2 active)
+- **Semantic uniqueness: 4 requirements** ⭐ NEW (M7.1.3)
+- Multi-user collaboration: 5 requirements (planned)
+- Conflict resolution: 5 requirements (planned)
+- Sync UI polish: 5 requirements (planned)
+- External TestFlight: 5 requirements (planned)
+- Non-functional: 8 requirements (7 original + 1 new)
+
+Transforms Forager into App Store-compliant collaborative family platform with production-ready CloudKit sync and public beta program.
 
 ---
 
@@ -556,15 +626,18 @@ This document defines all functional and non-functional requirements for the For
 
 ### **Phase 2: Production & Collaboration (M5.0-M7)** - 🔄 In Progress
 **Goal**: Production deployment and collaborative features  
-**Timeline**: 38-48 hours (M5.0: 6h, M7: 32-42h with buffer)  
-**Status**: M5.0 complete ✅, M7 planned 🚀
+**Timeline**: 38-48 hours (M5.0: 6h, M7.0: 3h, M7.1-7.6: 35-45h with buffer)  
+**Status**: M5.0 complete ✅, M7.0 complete ✅, M7.1 active 🔄 (M7.1.1 ✅, M7.1.2 ✅, M7.1.3 🚀)
 
 **Value Delivered**:
 - ✅ Apple Developer Program enrollment
 - ✅ TestFlight deployment & real device validation
 - ✅ Internal beta testing program
-- ⏳ App Store compliance (privacy policy, questionnaire)
-- ⏳ CloudKit multi-device sync
+- ✅ App Store compliance (privacy policy, questionnaire, name disambiguation)
+- ✅ CloudKit infrastructure operational
+- ✅ Real-time sync monitoring
+- 🔄 CloudKit semantic uniqueness architecture (M7.1.3 in progress)
+- ⏳ Multi-device sync validation
 - ⏳ Family collaboration features
 - ⏳ External public beta program
 - ⏳ Professional portfolio showcase
@@ -583,9 +656,9 @@ This document defines all functional and non-functional requirements for the For
 
 ---
 
-**Strategic Validation**: Core platform (M1-M4) complete with professional quality (77h, 108 requirements). Production infrastructure (M5.0) delivered TestFlight deployment (6h, 14 requirements). Collaboration platform (M7) will add App Store compliance, CloudKit sync, and public beta (32-42h with buffer, 29 requirements). Combined M1-M7 represents complete collaborative meal planning platform ready for App Store launch.
+**Strategic Validation**: Core platform (M1-M4) complete with professional quality (87h, 108 requirements ✅). Production infrastructure (M5.0) delivered TestFlight deployment (6h, 14 requirements ✅). App Store compliance (M7.0) complete (3h, 4 requirements ✅). CloudKit foundation (M7.1) in progress with production-ready semantic uniqueness architecture (6.5h so far, 6 requirements active, 11-15h remaining for M7.1.3). Combined M1-M7 represents complete collaborative meal planning platform ready for App Store launch.
 
-**Last Updated**: December 3, 2025  
-**Version**: 3.9  
-**Next Update**: After M7 completion  
-**Current Focus**: M7 - CloudKit Sync & External TestFlight
+**Last Updated**: December 10, 2024  
+**Version**: 4.1 - M7.1.3 Semantic Uniqueness  
+**Next Update**: After M7.1.3 completion  
+**Current Focus**: M7.1.3 - CloudKit Sync Integrity (comprehensive architectural fix)

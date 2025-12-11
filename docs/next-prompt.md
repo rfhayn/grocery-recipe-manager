@@ -1,540 +1,588 @@
-# M7.1 Implementation Guide - CloudKit Sync Foundation
+# M7.1.3 Implementation Guide - CloudKit Sync Integrity
 
-**Last Updated**: December 4, 2025  
-**Current Phase**: M7.1.3 Multi-Device Sync Testing - 🚀 READY  
-**Status**: M7.1.1 Complete ✅, M7.1.2 Complete ✅, Ready for M7.1.3  
-**Estimated Time**: 8-10 hours total (three phases), 3.5h done, 3-4h remaining  
-**Dependencies**: M7.0 Complete ✅, M7.1.1 Complete ✅, M7.1.2 Complete ✅
-
----
-
-## 🎯 **M7.1 OVERVIEW**
-
-**Purpose**: Establish CloudKit schema, enable basic multi-device sync, validate infrastructure
-
-**What You've Built:**
-- ✅ NSPersistentCloudKitContainer integration replacing NSPersistentContainer
-- ✅ CloudKit schema validation for all 8 Core Data entities
-- ✅ CloudKitSyncMonitor service with real-time sync observation
-- ✅ Sync status monitoring and error handling
-- 🚀 Multi-device sync testing (next: 3-4h)
-
-**Prerequisites Verified:**
-- ✅ M7.0 Complete (App Store prerequisites)
-- ✅ M7.1.1 Complete (CloudKit schema validated)
-- ✅ M7.1.2 Complete (Sync monitoring operational)
-- ✅ CloudKit entitlements configured (from M5.0)
-- ✅ Apple Developer enrollment active
-- ✅ Core Data model with 8 entities operational
-
-**Learning Investment:**
-- CloudKit is complex - expect learning curve
-- NSPersistentCloudKitContainer docs essential reading
-- CloudKit Dashboard for monitoring and debugging
-- Multi-device testing requires 2+ physical devices on same iCloud account
+**Last Updated**: December 10, 2024  
+**Current Phase**: M7.1.3 CloudKit Sync Integrity - Phase 1.1 Stage A Migration  
+**Status**: M7.1.1 Complete ✅, M7.1.2 Complete ✅, M7.1.3 Ready to Start 🚀  
+**Estimated Time**: 11-15 hours total (conservative: 12 hours)  
+**Dependencies**: M7.0 Complete ✅, M7.1.1 Complete ✅, M7.1.2 Complete ✅  
+**PRD**: `docs/prds/active/M7.1.3-CloudKit-Sync-Integrity-PRD-v4.1-FINAL.md`
 
 ---
 
-## 📋 **M7.1 PHASE BREAKDOWN**
+## 🎯 **M7.1.3 OVERVIEW**
 
-### **✅ M7.1.1: CloudKit Schema Validation - COMPLETE**
+### **CRITICAL: Scope Changed from Original Plan**
 
-**Completed**: December 4, 2025 (1.5 hours - 100% accuracy!)
+**Original M7.1.3 (3-4h):** Basic two-device sync testing
 
-**Purpose**: Verify CloudKit schema generation, configure container, validate entities
+**⚠️ DISCOVERED ISSUE:** CloudKit creates duplicate entities when multiple devices create semantically identical objects (e.g., same Category name). This causes crashes: `"Duplicate values for key: 'Produce'"`.
 
-**What Was Accomplished:**
-- ✅ Replaced NSPersistentContainer with NSPersistentCloudKitContainer
-- ✅ Configured CloudKit container (iCloud.com.richhayn.forager)
-- ✅ Enabled history tracking and remote change notifications
-- ✅ Implemented #if !DEBUG wrapper for fast development
-- ✅ Verified 8+ record types in CloudKit Dashboard
-- ✅ Confirmed sync activity (28 events, RecordSave operations)
-- ✅ Zero regressions, first build succeeded
+**New M7.1.3 (11-15h):** Comprehensive architectural fix + testing
 
-**Key Learning**: #if !DEBUG strategy enables fast local development (Debug builds) while keeping CloudKit available for Release builds.
-
-**Documentation**:
-- Learning Note: `docs/learning-notes/24-m7.1.1-cloudkit-schema-validation.md`
-- Impact Analysis: `docs/M7.1.1-CORE-DATA-IMPACT-ANALYSIS.md`
+**This is the RIGHT approach - fixing the root cause, not patching symptoms.**
 
 ---
 
-### **✅ M7.1.2: CloudKitSyncMonitor Service - COMPLETE**
+### **What You're Building**
 
-**Completed**: December 4, 2025 (2 hours - 100% accuracy!)
+**Three-Layer Semantic Uniqueness Architecture:**
 
-**Purpose**: Monitor CloudKit sync status, handle notifications, log events
+**Layer 1: Core Data Model**
+- Add semantic key fields (normalizedName, canonicalName, slotKey)
+- Uniqueness constraints on semantic keys
+- Standardize: `name` → `displayName` across ALL entities
+- Two-stage migration for CloudKit safety
 
-**What Was Accomplished:**
-- ✅ Created CloudKitSyncMonitor.swift service (226 lines)
-  - ObservableObject for SwiftUI integration
-  - Published properties: syncState, lastSyncDate, syncError, syncEventCount
-  - Combine-based notification observation
-  - Comprehensive CloudKit error mapping
-- ✅ Created CloudKitSyncTestView.swift (273 lines)
-  - Visual sync status display with color-coded indicators
-  - Real-time event counter
-  - Manual sync trigger and state reset
-  - Test data creation for validation
-  - Built-in testing instructions
-- ✅ Integrated into Settings → Developer Tools
-- ✅ Configured foragerApp.swift with @StateObject and .environmentObject
-- ✅ **46 sync events observed successfully** (events #1-46)
-- ✅ Sync latency: **< 1 second** (nearly instant detection)
-- ✅ Test data creation working (3 test lists created)
-- ✅ Event counting accurate
-- ✅ Manual sync trigger functional
-- ✅ Zero regressions
+**Layer 2: Repository Pattern**
+- CategoryRepository - Get-or-create for categories
+- PlannedMealRepository - Slot protection for meal planning
+- Enhanced IngredientTemplateService - Canonical names
+- RecipeDuplicateDetector - User-assisted detection
 
-**Key Learnings:**
-1. NSPersistentStoreRemoteChange fires for every CloudKit sync operation
-2. Observed 43 events during initial schema setup (in ~6 seconds)
-3. @StateObject in foragerApp owns the CloudKitSyncMonitor
-4. @EnvironmentObject in views receives the shared instance
-5. Combine publishers provide clean, reactive observation
-6. Zone creation errors auto-resolve automatically
-
-**Documentation**:
-- Integration Guide: `M7.1.2-INTEGRATION-GUIDE.md`
-- Completion Summary: `M7.1.2-COMPLETION-SUMMARY.md`
+**Layer 3: Application Layer**
+- NO direct `Category(context:)` instantiation
+- ALL creation through repositories
+- User dialogs for ambiguous cases (Recipe duplicates, slot conflicts)
 
 ---
 
-### **🚀 M7.1.3: Multi-Device Sync Testing - READY NEXT** (3-4 hours)
+### **Entities Affected**
 
-**Purpose**: Validate CloudKit sync across two physical devices, test offline scenarios, measure performance
+| Entity | Change | Semantic Key | Strategy |
+|--------|--------|--------------|----------|
+| **Category** | Add fields | `normalizedName` | Repository |
+| **IngredientTemplate** | Add fields | `canonicalName` | Repository |
+| **PlannedMeal** | Add fields + mealType | `slotKey` | Repository |
+| **Recipe** | Add field | `titleKey` | Detection dialog |
+| **WeeklyList** | Rename only | None | No constraint |
+| **MealPlan** | Rename only | None | No constraint |
+| **GroceryListItem** | Rename only | None | Allow duplicates |
+| **Ingredient** | Rename only | None | No changes |
+| **GroceryItem** | Rename only | None | No changes |
 
-**Prerequisites:**
-- ✅ M7.1.1 Complete (CloudKit schema validated)
-- ✅ M7.1.2 Complete (Sync monitoring operational)
-- ✅ 46 sync events observed successfully
-- 🔜 2+ physical devices on same iCloud account
-- 🔜 forager app installed on both devices (via Xcode or TestFlight)
-- 🔜 Both devices on same WiFi network or cellular with good connection
+**All entities:** Rename `name`/`title` → `displayName` for consistency
 
-**Testing Scenarios:**
+---
 
-**Scenario 1: Create → Sync → Read** (10 minutes)
-1. Device A: Create weekly list "Device A Test" with 3 items
-2. Wait 5-10 seconds
-3. Device B: Verify list appears with all items
-4. Device B: Open list, verify item details match
-5. Both devices: Check CloudKitSyncTestView - verify event counts increment
+## 🚀 **START HERE: PHASE 1.1 - STAGE A MIGRATION**
 
-**Expected Result:**
-- List appears on Device B within 5 seconds
-- All 3 items present with correct details
-- Sync event count increments on both devices
-- CloudKit Dashboard shows CD_WeeklyList record
+### **Purpose**
+Add semantic key fields as OPTIONAL, populate them, prepare for Stage B constraints.
 
-**Scenario 2: Edit → Sync → Update** (10 minutes)
-1. Device B: Edit "Device A Test" list, add 2 new items
-2. Wait 5-10 seconds
-3. Device A: Verify new items appear
-4. Device A: Edit existing item (change name)
-5. Device B: Verify edit syncs
+**Why Two Stages?**
+- CloudKit can inject duplicates during migration
+- Adding constraints before all devices sync causes crashes
+- Stage A: Add fields → populate → sync
+- Stage B: Make required → add constraints
+- **This prevents `NSConstraintConflictError`**
 
-**Expected Result:**
-- Edits sync within 5 seconds
-- No data loss or corruption
-- All changes reflected on both devices
+---
 
-**Scenario 3: Delete → Sync → Remove** (5 minutes)
-1. Device A: Delete one item from list
-2. Wait 5-10 seconds
-3. Device B: Verify item removed
-4. Device B: Delete entire list
-5. Device A: Verify list deleted
+### **Phase 1.1 Tasks (1.5 hours)**
 
-**Expected Result:**
-- Deletions sync within 5 seconds
-- Item and list removed from both devices
-- CloudKit Dashboard shows deletion
+**1. Create Model Version 2** (15 min)
 
-**Scenario 4: Offline → Online Sync** (15 minutes)
-1. Device A: Enable Airplane Mode
-2. Device A: Create list "Offline Test" with 3 items
-3. Device A: Note "This will sync when online"
-4. Device A: Disable Airplane Mode
-5. Wait 10-20 seconds
-6. Device B: Verify "Offline Test" appears
-7. Reverse: Device B offline, create data, go online, verify on Device A
-
-**Expected Result:**
-- Offline-created data queued locally
-- Sync occurs automatically when online
-- All data appears on other device
-- No data loss during offline period
-
-**Scenario 5: Simultaneous Creation** (10 minutes)
-1. Both devices: Create different lists simultaneously
-2. Device A: "List A" with items
-3. Device B: "List B" with items
-4. Wait 10 seconds
-5. Both devices: Verify both lists appear on both devices
-6. Check for duplicates or conflicts
-
-**Expected Result:**
-- Both lists appear on both devices
-- No duplicates created
-- No data loss
-- Both devices show consistent data
-
-**Scenario 6: Recipe & Meal Plan Sync** (15 minutes)
-1. Device A: Create new recipe "Sync Test Recipe" with 3 ingredients
-2. Wait 5-10 seconds
-3. Device B: Verify recipe appears with all ingredients
-4. Device A: Create meal plan with "Sync Test Recipe"
-5. Wait 5-10 seconds
-6. Device B: Verify meal plan appears with recipe linked correctly
-7. Device B: Mark meal as complete
-8. Device A: Verify completion status synced
-
-**Expected Result:**
-- Complex relationships preserved (Recipe → Ingredient)
-- Meal plan links to recipe correctly
-- Status changes sync
-- No orphaned records
-
-**Performance Measurement:**
-
-For each scenario, record:
-- **Sync Latency**: Time from action to appearance on other device
-- **Event Count**: Number of sync events triggered
-- **Success Rate**: % of operations that synced successfully
-- **Data Consistency**: Verify no data loss, corruption, or duplication
-
-**Performance Targets:**
-- **Sync latency**: < 5 seconds average (target: < 3 seconds)
-- **Sync success rate**: > 99%
-- **Data consistency**: 100% (no data loss, no duplicates)
-- **Conflict handling**: Graceful (last-write-wins acceptable for M7.1.3)
-
-**Acceptance Criteria:**
-- ✓ All 6 test scenarios pass
-- ✓ Average sync latency < 5 seconds
-- ✓ Zero data loss across all scenarios
-- ✓ No duplicate records created
-- ✓ CloudKitSyncMonitor shows sync events on both devices
-- ✓ Offline → online sync works reliably
-- ✓ Large lists (20+ items) sync correctly
-- ✓ Recipe relationships preserved during sync
-- ✓ Meal plan associations maintained
-- ✓ Performance metrics documented
-
-**Git Checkpoint:**
 ```bash
-git add -A
-git commit -m "M7.1.3 COMPLETE: Multi-device sync validated with <5s latency across all scenarios"
-git push origin main
+# In Xcode
+1. Select forager.xcdatamodeld in Project Navigator
+2. Menu: Editor → Add Model Version
+3. Name: "forager 2"
+4. Based on: "forager" (current)
+5. Click "Finish"
+
+6. Select forager.xcdatamodeld
+7. File Inspector (right panel)
+8. Under "Versioned Core Data Model"
+9. Set "Current": forager 2
 ```
+
+**Verify:** Green checkmark appears next to "forager 2.xcdatamodel"
 
 ---
 
-## 📝 **START PROMPTS FOR EACH PHASE**
-
-### **For M7.1.1: CloudKit Schema Validation** ✅ COMPLETE
-
-Used December 4, 2025 - successfully completed in 1.5 hours.
-
----
-
-### **For M7.1.2: CloudKitSyncMonitor Service** ✅ COMPLETE
-
-Used December 4, 2025 - successfully completed in 2 hours with 46 sync events validated.
-
----
-
-### **For M7.1.3: Multi-Device Sync Testing** 🚀 READY NEXT
+**2. Add Semantic Key Fields to Category** (10 min)
 
 ```
-M7.1.2 complete ✅, ready to start M7.1.3 Multi-Device Sync Testing.
+Select Category entity in "forager 2" model:
 
-Completed in M7.1.2:
-- CloudKitSyncMonitor service operational
-- 46 sync events observed successfully
-- Sync latency < 1 second validated
-- Event counting accurate
-- Test infrastructure working
-
-Next phase: Validate CloudKit sync across two physical devices.
-
-Test scenarios:
-1. Create → Sync → Read (weekly lists, items)
-2. Edit → Sync → Update (modifications on both devices)
-3. Delete → Sync → Remove (deletions propagate)
-4. Offline → Online (queue and sync when reconnected)
-5. Simultaneous operations (concurrent creates)
-6. Complex data (recipes, meal plans with relationships)
-
-Requirements:
-- 2+ devices on same iCloud account
-- forager installed on both devices (via Xcode or TestFlight)
-- WiFi/cellular connectivity
-- CloudKitSyncTestView accessible on both devices (Settings → Developer Tools)
-
-Testing approach:
-- Run each scenario systematically
-- Record sync latency for each operation
-- Verify data consistency across devices
-- Check CloudKit Dashboard for record validation
-- Document any issues or unexpected behavior
-
-Performance targets:
-- Average sync latency < 5 seconds
-- Sync success rate > 99%
-- Zero data loss or corruption
-
-Estimated time: 3-4 hours for M7.1.3
-
-I have my devices ready for testing (both on same iCloud account).
-
-Ready to begin!
-```
-
----
-
-## 🔧 **TECHNICAL REFERENCES**
-
-### Core Data Entities (All 8)
-```
-1. WeeklyList (name, dateCreated, isCompleted)
-   └─> GroceryItem (name, category, isStaple, dateCreated)
+Add Attributes:
+1. displayName: String, Optional ☑️
+   - This replaces 'name' (we'll migrate data, then remove 'name')
    
-2. IngredientTemplate (canonicalName, isStaple, category)
+2. normalizedName: String, Optional ☑️
+   - Will become required in Stage B
+   - Add index: Click "+" under Indexes → Add "normalizedName"
 
-3. Recipe (title, servings, instructions, cookTime, prepTime, usageCount)
-   └─> Ingredient (name, quantity, unit, displayOrder)
-   
-4. MealPlan (name, startDate, durationDays, isActive)
-   └─> PlannedMeal (date, mealType, servings, isComplete)
-   
-5. Category (name, displayOrder, icon)
+3. updatedAt: Date, Optional ☑️
+   - For conflict resolution
 
-6. UserPreferences (various settings from M4.1)
+Keep existing 'name' field for now (migration will copy data)
 ```
 
-### CloudKit Container Configuration
+---
+
+**3. Add Semantic Key Fields to IngredientTemplate** (10 min)
+
+```
+Select IngredientTemplate entity:
+
+Add Attributes:
+1. displayName: String, Optional ☑️
+   - This replaces 'name'
+   
+2. canonicalName: String, Optional ☑️
+   - Will become required in Stage B
+   - Add index: Click "+" under Indexes → Add "canonicalName"
+
+3. createdAt: Date, Optional ☑️
+   - Already exists? Verify present
+
+4. updatedAt: Date, Optional ☑️
+   - For conflict resolution
+
+Keep existing 'name' field for now
+```
+
+---
+
+**4. Add Fields to PlannedMeal** (10 min)
+
+```
+Select PlannedMeal entity:
+
+Add Attributes:
+1. mealType: String, Optional ☑️
+   - NEW field for "breakfast", "lunch", "dinner", "snack"
+   
+2. slotKey: String, Optional ☑️
+   - Will become required in Stage B
+   - Add index: Click "+" under Indexes → Add "slotKey"
+
+3. createdAt: Date, Optional ☑️
+   - Already may exist - verify or add
+
+Keep all existing fields
+```
+
+---
+
+**5. Add titleKey to Recipe** (5 min)
+
+```
+Select Recipe entity:
+
+Add Attributes:
+1. displayName: String, Optional ☑️
+   - This replaces 'title'
+
+2. titleKey: String, Optional ☑️
+   - For duplicate detection (no constraint)
+   - Add index: Click "+" under Indexes → Add "titleKey"
+
+Keep existing 'title' field for now
+```
+
+---
+
+**6. Add displayName to Other Entities** (15 min)
+
+```
+For each of these entities, add:
+- displayName: String, Optional ☑️
+
+Entities to update:
+- WeeklyList (has 'name')
+- MealPlan (has 'name')
+- GroceryItem (has 'name')
+- GroceryListItem (has 'name')
+- Ingredient (has 'name')
+
+Keep existing 'name' fields for now (we'll migrate then remove)
+```
+
+---
+
+**7. Add Migration Code** (20 min)
+
+Create file: `forager/Persistence+Migration.swift`
+
 ```swift
-// Container identifier (from M5.0)
-"iCloud.com.richhayn.forager"
+import CoreData
 
-// Required entitlements (already configured in M5.0)
-- iCloud capability enabled
-- CloudKit service enabled
-- Default container: iCloud.com.richhayn.forager
+extension PersistenceController {
+    
+    /// Stage A Migration: Populate semantic keys for existing entities
+    func performStageAMigration(in context: NSManagedObjectContext) {
+        let stageAKey = "M7.1.3.StageA.Completed"
+        
+        guard !UserDefaults.standard.bool(forKey: stageAKey) else {
+            print("ℹ️ Stage A migration already completed")
+            return
+        }
+        
+        print("🚀 Stage A Migration: Populating semantic keys...")
+        
+        do {
+            // Populate Category semantic keys
+            try populateCategorySemanticKeys(in: context)
+            
+            // Populate IngredientTemplate semantic keys
+            try populateIngredientTemplateSemanticKeys(in: context)
+            
+            // Populate PlannedMeal semantic keys (if any exist)
+            try populatePlannedMealSemanticKeys(in: context)
+            
+            // Populate Recipe semantic keys
+            try populateRecipeSemanticKeys(in: context)
+            
+            // Populate other displayName fields
+            try populateDisplayNames(in: context)
+            
+            // Save changes
+            if context.hasChanges {
+                try context.save()
+                print("✅ Stage A migration completed successfully")
+            }
+            
+            // Mark as completed
+            UserDefaults.standard.set(true, forKey: stageAKey)
+            UserDefaults.standard.set(Date(), forKey: "M7.1.3.StageA.Date")
+            
+        } catch {
+            print("❌ Stage A migration failed: \\(error)")
+        }
+    }
+    
+    private func populateCategorySemanticKeys(in context: NSManagedObjectContext) throws {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        let categories = try context.fetch(request)
+        
+        for category in categories {
+            if let name = category.name {
+                category.displayName = name
+                category.normalizedName = name.lowercased()
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                category.updatedAt = Date()
+            }
+        }
+        
+        print("  ✅ Populated semantic keys for \\(categories.count) categories")
+    }
+    
+    private func populateIngredientTemplateSemanticKeys(in context: NSManagedObjectContext) throws {
+        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+        let templates = try context.fetch(request)
+        
+        for template in templates {
+            if let name = template.name {
+                template.displayName = name
+                // Use existing normalization if available, otherwise simple lowercase
+                template.canonicalName = name.lowercased()
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                template.updatedAt = Date()
+                
+                if template.createdAt == nil {
+                    template.createdAt = template.dateCreated ?? Date()
+                }
+            }
+        }
+        
+        print("  ✅ Populated semantic keys for \\(templates.count) templates")
+    }
+    
+    private func populatePlannedMealSemanticKeys(in context: NSManagedObjectContext) throws {
+        let request: NSFetchRequest<PlannedMeal> = PlannedMeal.fetchRequest()
+        let meals = try context.fetch(request)
+        
+        // PlannedMeal likely empty in development, but handle if exists
+        for meal in meals {
+            // Default mealType to "dinner" for existing meals
+            if meal.mealType == nil {
+                meal.mealType = "dinner"
+            }
+            
+            if let date = meal.date, let mealType = meal.mealType {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                let dateString = formatter.string(from: date)
+                meal.slotKey = "\\(dateString)-\\(mealType.lowercased())"
+            }
+            
+            if meal.createdAt == nil {
+                meal.createdAt = meal.createdDate ?? Date()
+            }
+        }
+        
+        print("  ✅ Populated semantic keys for \\(meals.count) planned meals")
+    }
+    
+    private func populateRecipeSemanticKeys(in context: NSManagedObjectContext) throws {
+        let request: NSFetchRequest<Recipe> = Recipe.fetchRequest()
+        let recipes = try context.fetch(request)
+        
+        for recipe in recipes {
+            if let title = recipe.title {
+                recipe.displayName = title
+                recipe.titleKey = title.lowercased()
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        
+        print("  ✅ Populated semantic keys for \\(recipes.count) recipes")
+    }
+    
+    private func populateDisplayNames(in context: NSManagedObjectContext) throws {
+        // WeeklyList
+        let weeklyListRequest: NSFetchRequest<WeeklyList> = WeeklyList.fetchRequest()
+        let weeklyLists = try context.fetch(weeklyListRequest)
+        for list in weeklyLists {
+            if let name = list.name {
+                list.displayName = name
+            }
+        }
+        
+        // MealPlan
+        let mealPlanRequest: NSFetchRequest<MealPlan> = MealPlan.fetchRequest()
+        let mealPlans = try context.fetch(mealPlanRequest)
+        for plan in mealPlans {
+            if let name = plan.name {
+                plan.displayName = name
+            }
+        }
+        
+        // Similar for GroceryItem, GroceryListItem, Ingredient
+        // (Add as needed based on your model)
+        
+        print("  ✅ Populated displayName for other entities")
+    }
+}
 ```
-
-### CloudKitSyncMonitor Service Location
-```
-Services/CloudKitSyncMonitor.swift (226 lines)
-- ObservableObject pattern
-- Observes .NSPersistentStoreRemoteChange notifications
-- Tracks sync state, event count, last sync date
-- Error handling with user-friendly messages
-- Manual sync trigger capability
-```
-
-### CloudKitSyncTestView Location
-```
-forager/CloudKitSyncTestView.swift (273 lines)
-- Accessible via Settings → Developer Tools → CloudKit Sync Status
-- Real-time sync status display
-- Event counter
-- Test data creation button
-- Manual sync and reset controls
-```
-
-### Essential Apple Documentation
-1. [NSPersistentCloudKitContainer](https://developer.apple.com/documentation/coredata/nspersistentcloudkitcontainer)
-2. [Setting Up Core Data with CloudKit](https://developer.apple.com/documentation/coredata/mirroring_a_core_data_store_with_cloudkit)
-3. [CloudKit Dashboard](https://icloud.developer.apple.com/dashboard)
-4. [Handling CloudKit Errors](https://developer.apple.com/documentation/cloudkit/ckerror)
-
-### Performance Targets
-- Sync latency: <5 seconds (target: <3 seconds)
-- UI responsiveness: <0.5 seconds (maintained)
-- Sync success rate: >99%
-- Zero data loss
 
 ---
 
-## ⚠️ **KNOWN CHALLENGES & SOLUTIONS**
+**8. Wire Up Migration in Persistence.swift** (10 min)
 
-### Challenge 1: Simulator CloudKit Sync Issues
-**Problem**: CloudKit sync may not work reliably on simulators
-**Solution**: Use physical devices for M7.1.3 testing
-**Workaround**: Can test schema generation on simulator, but multi-device sync needs real hardware
+```swift
+// In Persistence.swift, modify init() to call migration
 
-### Challenge 2: Same iCloud Account Required
-**Problem**: Both test devices must be on same iCloud account for M7.1.3
-**Solution**: Ensure test devices logged into same Apple ID before starting
-**Note**: M7.2 will add multi-user sharing via CKShare for different accounts
-
-### Challenge 3: Sync Latency Variability
-**Problem**: Sync times vary based on network, Apple server load
-**Solution**: Test multiple times, record averages
-**Target**: Average <5s, understanding occasional spikes are normal
-
-### Challenge 4: Development vs Production Containers
-**Problem**: CloudKit has separate Development and Production databases
-**Solution**: M7.1-7.4 use Development container, M7.5 switches to Production
-**Note**: Data in Development container is separate from Production
-
-### Challenge 5: Network Connectivity
-**Problem**: Poor WiFi/cellular can cause sync delays
-**Solution**: Use strong WiFi connection for testing, document any network-related delays
-**Note**: Offline → online testing validates queue behavior
-
----
-
-## 📚 **LEARNING ACCOMPLISHMENTS FROM M7.1.1-7.1.2**
-
-**What You've Already Mastered:**
-
-1. **NSPersistentCloudKitContainer** ✅
-   - Replacing NSPersistentContainer
-   - Configuring CloudKit container options
-   - Enabling history tracking and remote notifications
-   - #if !DEBUG strategy for development efficiency
-
-2. **CloudKit Dashboard** ✅
-   - Inspecting auto-generated schema
-   - Viewing record data
-   - Debugging sync issues
-   - Understanding record types and fields
-
-3. **Sync Monitoring** ✅
-   - Observing store remote change notifications
-   - Tracking sync state with ObservableObject
-   - Logging sync events for debugging
-   - Real-time UI updates via @Published properties
-
-4. **CloudKit Error Handling** ✅
-   - Common CKError types identification
-   - User-friendly error messaging
-   - Error domain checking (CKError vs NSError)
-   - Auto-recovery patterns (zone creation)
-
-**What You'll Learn in M7.1.3:**
-
-5. **Multi-Device Sync** 🚀
-   - Testing sync across devices
-   - Offline queue behavior
-   - Performance characteristics
-   - Data consistency validation
-   - Concurrent operation handling
-
-**This knowledge prepares you for:**
-- M7.2: Multi-User Collaboration (CKShare)
-- M7.3: Conflict Resolution
-- M7.4: Sync UI & Polish
+init(inMemory: Bool = false) {
+    container = NSPersistentCloudKitContainer(name: "forager")
+    
+    #if !DEBUG
+    // ... CloudKit configuration (existing code)
+    #endif
+    
+    container.loadPersistentStores { description, error in
+        if let error = error {
+            fatalError("Core Data failed to load: \\(error)")
+        }
+    }
+    
+    // Configure merge policy
+    container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+    container.viewContext.automaticallyMergesChangesFromParent = true
+    
+    // RUN STAGE A MIGRATION
+    container.performBackgroundTask { backgroundContext in
+        self.performStageAMigration(in: backgroundContext)
+    }
+}
+```
 
 ---
 
-## 🎯 **NEXT STEPS AFTER M7.1.3**
+**9. Build and Test** (15 min)
 
-**When M7.1.3 is complete:**
-
-1. **Update Documentation**
-   - Mark M7.1.3 ✅ COMPLETE in current-story.md
-   - Mark M7.1 ✅ COMPLETE (all three phases done!)
-   - Record actual hours (compare to 8-10h estimate)
-   - Document performance metrics (sync latencies)
-   - Create comprehensive M7.1 learning note
-   - Update next-prompt.md for M7.2
-
-2. **Celebrate Progress!**
-   - Multi-device sync is a major technical achievement
-   - CloudKit infrastructure is complex - great learning
-   - Foundation established for family collaboration (M7.2)
-   - Sub-second sync latency achieved (< 1s in M7.1.2!)
-
-3. **Strategic Decision**
-   - **Continue M7.2**: Multi-User Collaboration (8-10h) - enables family sharing
-   - **Pause M7, Start M6**: Testing Foundation (12-18h) - build test infrastructure
-   - **Pause M7, Start M8**: Analytics Dashboard (8-12h) - usage insights
-
-4. **M7.2 Preview** (if continuing)
-   - Implement CKShare for grocery lists, recipes, meal plans
-   - Build share invitation and acceptance flows
-   - Handle concurrent editing from multiple users
-   - Permission management (owner vs participant roles)
-   - Real-time collaboration features
-
----
-
-## ✅ **PRE-TESTING CHECKLIST FOR M7.1.3**
-
-**Before starting M7.1.3, verify:**
-
-- [ ] M7.1.1 Complete ✅ (CloudKit schema validated)
-- [ ] M7.1.2 Complete ✅ (Sync monitoring operational)
-- [ ] 2+ physical devices available (iPhone, iPad, or Mac)
-- [ ] Both devices logged into **same iCloud account**
-- [ ] Both devices on same WiFi network (or good cellular)
-- [ ] forager app installed on both devices (via Xcode or TestFlight)
-- [ ] CloudKitSyncTestView accessible on both devices (Settings → Developer Tools)
-- [ ] CloudKit Dashboard accessible (https://icloud.developer.apple.com/dashboard)
-- [ ] Ready for 3-4 hour testing investment
-
-**Git Status Clean:**
 ```bash
-git status  # Should show "nothing to commit, working tree clean"
-git log --oneline -5  # Verify M7.1.1 and M7.1.2 commits present
-```
+# Build
+⌘B (should succeed)
 
-**App Status Verified:**
-```
-✓ App builds and runs on both devices
-✓ CloudKitSyncMonitor shows sync events
-✓ Can create test data (weekly lists, recipes, meal plans)
-✓ Settings → Developer Tools → CloudKit Sync Status accessible
+# Run on Simulator (Debug mode - local only)
+⌘R
+
+# Check console for:
+"🚀 Stage A Migration: Populating semantic keys..."
+"  ✅ Populated semantic keys for X categories"
+"  ✅ Populated semantic keys for X templates"
+"✅ Stage A migration completed successfully"
+
+# Verify in Core Data Debug:
+1. Add breakpoint after migration
+2. Check Category entities have:
+   - displayName populated
+   - normalizedName populated
+   - updatedAt populated
+
+# Run on Device (Release mode - CloudKit enabled)
+1. Archive → Distribute → Debugging
+2. Install on iPhone
+3. Launch and verify migration runs
+4. No crashes, no errors
 ```
 
 ---
 
-## 🚨 **MANDATORY REMINDERS**
+### **Phase 1.1 Acceptance Criteria**
 
-1. **Use M#.#.# Naming**: Always reference as "M7.1.3"
-2. **Physical Devices Required**: Simulators unreliable for multi-device sync
-3. **Same iCloud Account**: Both devices must be on same Apple ID
-4. **Document Performance**: Record sync latencies for each scenario
-5. **Zero Data Loss**: Validate no data corruption throughout
-6. **Learning Notes**: Document CloudKit behavior and any surprises
-7. **Git Checkpoints**: Commit after M7.1.3 completion with metrics
-
----
-
-## 📊 **M7.1 PROGRESS SUMMARY**
-
-**Phases Completed: 2 of 3**
-
-- ✅ M7.1.1: CloudKit Schema Validation (1.5h - 100% accuracy)
-- ✅ M7.1.2: CloudKitSyncMonitor Service (2h - 100% accuracy)
-- 🚀 M7.1.3: Multi-Device Sync Testing (3-4h remaining)
-
-**Total Time:**
-- Estimated: 8-10 hours
-- Completed: 3.5 hours (35%)
-- Remaining: 3-4 hours (45%)
-- **Current Accuracy**: 100% (both phases within estimates)
-
-**Technical Achievements:**
-- ✅ CloudKit infrastructure operational
-- ✅ 46 sync events observed
-- ✅ Sub-second sync latency (< 1s)
-- ✅ Comprehensive error handling
-- ✅ Real-time UI monitoring
-- ✅ Zero regressions
-
-**Ready to validate multi-device sync and complete M7.1!**
+- [ ] Model Version 2 created successfully
+- [ ] All semantic key fields added as optional
+- [ ] All indexes created
+- [ ] Migration code compiles
+- [ ] Migration code wired into Persistence.swift
+- [ ] Build succeeds on simulator
+- [ ] Migration runs successfully (check console)
+- [ ] Semantic keys populated for existing data
+- [ ] UserDefaults flag set (prevents re-run)
+- [ ] No crashes, no errors
+- [ ] Ready for Phase 1.2 (Stage B)
 
 ---
 
-**Version**: 2.0  
-**Last Updated**: December 4, 2025  
-**For Milestone**: M7.1 CloudKit Sync Foundation  
-**Estimated Time**: 8-10 hours total (3.5h done, 3-4h remaining)  
-**Current Phase**: M7.1.3 Multi-Device Sync Testing - 🚀 READY
+### **After Phase 1.1 Success**
+
+**✅ Git Commit:**
+```bash
+git add .
+git commit -m "M7.1.3 Phase 1.1: Stage A migration - Add optional semantic keys
+
+- Created Model Version 2 (forager 2.xcdatamodel)
+- Added optional semantic key fields to Category, IngredientTemplate, PlannedMeal, Recipe
+- Added displayName to all entities
+- Implemented migration code to populate semantic keys
+- Migration validated on simulator and device
+- UserDefaults flag prevents re-run
+- Zero crashes, zero data loss"
+
+git push
+```
+
+**Next:** Phase 1.2 - Stage B Migration (make fields required, add constraints)
+
+---
+
+## 📋 **COMPLETE PHASE BREAKDOWN**
+
+### **Phase 1: Core Data Model (2-3 hours)**
+- **Phase 1.1**: Stage A Migration - Add optional fields ✅ ← **YOU ARE HERE**
+- **Phase 1.2**: Stage B Migration - Make required, add constraints (45 min)
+
+### **Phase 2: Repositories (2-3 hours)**
+- **Phase 2.1**: CategoryRepository (45 min)
+- **Phase 2.2**: PlannedMealRepository (1 hour)
+- **Phase 2.3**: Enhanced IngredientTemplateService (45 min)
+- **Phase 2.4**: RecipeDuplicateDetector (30 min)
+
+### **Phase 3: Code Integration (2-3 hours)**
+- **Phase 3.1**: Wire up repositories (30 min)
+- **Phase 3.2**: Update Category creation (45 min)
+- **Phase 3.3**: Update IngredientTemplate creation (30 min)
+- **Phase 3.4**: Update PlannedMeal creation (1 hour)
+- **Phase 3.5**: Add Recipe duplicate detection (1 hour)
+
+### **Phase 4: Two-Device Testing (2-3 hours)**
+- **Phase 4.1**: Environment setup (30 min)
+- **Phase 4.2**: Repository pattern testing (1 hour)
+- **Phase 4.3**: Simultaneous creation (critical) (30 min)
+- **Phase 4.4**: CloudKit Dashboard verification (30 min)
+
+### **Phase 5: Basic Documentation (1 hour)**
+- **Phase 5.1**: Create learning notes (30 min)
+- **Phase 5.2**: Update project documentation (30 min)
+
+### **Phase 6: ADRs & Learning Documents (1.5-2 hours)**
+- **Phase 6.1**: Create 11 ADR documents (1 hour)
+- **Phase 6.2**: Comprehensive learning notes (30 min)
+- **Phase 6.3**: Update architecture index (15 min)
+- **Phase 6.4**: Cross-reference documentation (15 min)
+
+**Total: 11-15 hours (conservative: 12 hours)**
+
+---
+
+## 🎯 **SUCCESS METRICS**
+
+### **Phase 1 Metrics**
+- Migration succeeds: ✅ / ❌
+- Semantic keys populated: _____ entities
+- Build success: ✅ / ❌
+- Zero crashes: ✅ / ❌
+- Time spent: _____ hours (estimated: 2-3h)
+
+### **Overall M7.1.3 Metrics** (track as you go)
+- Planning accuracy: _____ % (actual / estimated × 100)
+- Target: 85-95% (historical: 89%)
+- Performance: All operations < 0.5s? ✅ / ❌
+- CloudKit sync < 5s? ✅ / ❌
+
+---
+
+## ⚠️ **CRITICAL REMINDERS**
+
+1. **Two-Stage Migration is Non-Negotiable**
+   - Stage A: Optional fields → populate → sync
+   - Stage B: Required + constraints
+   - Skipping Stage A causes crashes
+
+2. **Keep Old Fields During Stage A**
+   - Don't delete `name` or `title` fields yet
+   - Migration copies data to new fields
+   - Stage B removes old fields
+
+3. **Merge Policy Required**
+   - `NSMergeByPropertyObjectTrumpMergePolicy`
+   - Handles edge-case constraint conflicts
+   - Last-write-wins (acceptable for M7.1.3)
+
+4. **Physical Devices for Testing**
+   - Phase 4 requires 2 iPhones on same iCloud account
+   - Simulators unreliable for multi-device sync
+   - Plan ahead for device availability
+
+5. **No Shortcuts**
+   - This is production-ready architecture
+   - Shortcuts create technical debt
+   - 11 ADRs document "why" not just "what"
+
+---
+
+## 📚 **KEY RESOURCES**
+
+**PRD:** `docs/prds/active/M7.1.3-CloudKit-Sync-Integrity-PRD-v4.1-FINAL.md`
+
+**Sections to Reference:**
+- Architectural Decisions (11 ADRs documented)
+- Detailed Entity Specifications (code examples)
+- Two-Stage Migration Strategy (critical safety)
+- Complete relationship migration table
+
+**Apple Documentation:**
+- [Core Data Model Versioning](https://developer.apple.com/documentation/coredata/core_data_model_versioning_and_data_migration)
+- [NSPersistentCloudKitContainer](https://developer.apple.com/documentation/coredata/nspersistentcloudkitcontainer)
+- [Merge Policies](https://developer.apple.com/documentation/coredata/nsmergebypolicytype)
+
+---
+
+## 🚨 **QUALITY GATES**
+
+**Stop if:**
+- ❌ Migration fails or crashes
+- ❌ More than 5 build errors consecutively
+- ❌ Breaking existing features
+- ❌ Data loss during migration
+- ❌ Spending > 30 min on single issue (escalate)
+
+**Continue if:**
+- ✅ Build succeeds
+- ✅ Migration runs successfully
+- ✅ Semantic keys populated
+- ✅ Console logs show success
+- ✅ No regressions
+
+---
+
+**Ready to start Phase 1.1? Let's build production-ready CloudKit sync! 🚀**
+
+**Version**: 3.0 - M7.1.3 CloudKit Sync Integrity  
+**Last Updated**: December 10, 2024  
+**Current Phase**: Phase 1.1 - Stage A Migration  
+**Estimated Total**: 11-15 hours (conservative: 12 hours)
