@@ -1,5 +1,7 @@
 import CoreData
 import CloudKit
+import Foundation
+import UIKit
 
 // MARK: - DateFormatter Extension
 extension DateFormatter {
@@ -8,6 +10,79 @@ extension DateFormatter {
         formatter.dateStyle = .short
         return formatter
     }()
+}
+
+// MARK: - M7.1.3: iCloud Key-Value Store Coordinator
+/// Coordinates multi-device operations using iCloud Key-Value Store
+/// This ensures only ONE device creates shared resources like default categories
+class iCloudCoordinator {
+    
+    private static let store = NSUbiquitousKeyValueStore.default
+    
+    // Keys for coordination
+    private struct Keys {
+        static let categoriesCreated = "com.richhayn.forager.categoriesCreated"
+        static let categoriesCreatedDate = "com.richhayn.forager.categoriesCreatedDate"
+        static let creatingDeviceID = "com.richhayn.forager.creatingDeviceID"
+    }
+    
+    /// Check if default categories have been created by ANY device
+    static var categoriesCreatedByAnyDevice: Bool {
+        return store.bool(forKey: Keys.categoriesCreated)
+    }
+    
+    /// Mark that default categories have been created (broadcasts to all devices)
+    static func markCategoriesAsCreated() {
+        store.set(true, forKey: Keys.categoriesCreated)
+        store.set(Date(), forKey: Keys.categoriesCreatedDate)
+        store.set(UIDevice.current.identifierForVendor?.uuidString ?? "unknown", forKey: Keys.creatingDeviceID)
+        store.synchronize()
+        
+        print("☁️ Marked categories as created in iCloud KVS (broadcasts to all devices)")
+    }
+    
+    /// Get the date when categories were created
+    static var categoriesCreatedDate: Date? {
+        return store.object(forKey: Keys.categoriesCreatedDate) as? Date
+    }
+    
+    /// Get the device ID that created the categories
+    static var creatingDeviceID: String? {
+        return store.string(forKey: Keys.creatingDeviceID)
+    }
+    
+    /// Reset coordination state (for testing/debugging only)
+    static func reset() {
+        store.removeObject(forKey: Keys.categoriesCreated)
+        store.removeObject(forKey: Keys.categoriesCreatedDate)
+        store.removeObject(forKey: Keys.creatingDeviceID)
+        store.synchronize()
+        print("🔄 iCloud KVS coordination state reset")
+    }
+    
+    /// Get status report for debugging
+    static func getStatusReport() -> String {
+        var report = "☁️ iCLOUD KVS COORDINATION STATUS\n\n"
+        
+        if categoriesCreatedByAnyDevice {
+            report += "✅ Categories Created: YES\n"
+            if let date = categoriesCreatedDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .short
+                report += "📅 Created Date: \(formatter.string(from: date))\n"
+            }
+            if let deviceID = creatingDeviceID {
+                report += "📱 Created By Device: \(deviceID)\n"
+            }
+        } else {
+            report += "⏳ Categories Created: NO (waiting for creation)\n"
+        }
+        
+        report += "\n🔧 Current Device: \(UIDevice.current.identifierForVendor?.uuidString ?? "unknown")"
+        
+        return report
+    }
 }
 
 // MARK: - IngredientTemplate Migration Support (STEP 4 - ADDED)
@@ -419,25 +494,36 @@ struct PersistenceController {
         // M7.1.1: Initialize with CloudKit-enabled container
         container = NSPersistentCloudKitContainer(name: "forager")
         
-        // M7.1.1: Configure CloudKit container options
+        // ========================================================================
+        // M7.1.3 TESTING: CloudKit enabled in ALL builds (Debug + Release)
+        // ========================================================================
+        // REASON: Release builds use Production CloudKit (schema doesn't exist yet)
+        //         Debug builds use Development CloudKit (schema exists from M7.1.1-M7.1.2)
+        //         This allows M7.1.3 multi-device testing with Development environment
+        //
+        // TODO M7.5: Restore #if !DEBUG after M7.1.3 testing complete
+        //            Deploy schema to Production before external TestFlight
+        // ========================================================================
+        
+        // M7.1.3: Configure CloudKit container options for ALL builds
         if let description = container.persistentStoreDescriptions.first {
-            // Enable CloudKit sync only in Release builds
-            // Debug builds use local-only Core Data for fast iteration
-            #if !DEBUG
+            // Enable CloudKit sync in both Debug (Development) and Release (Production)
             description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(
                 containerIdentifier: "iCloud.com.richhayn.forager"
             )
-            print("☁️ CloudKit sync enabled (Release build)")
+            
+            #if DEBUG
+            print("☁️ CloudKit sync enabled (Debug build → Development environment)")
             #else
-            print("💻 Local-only Core Data (Debug build - fast iteration)")
+            print("☁️ CloudKit sync enabled (Release build → Production environment)")
             #endif
             
             // Enable history tracking (required for CloudKit sync)
-            description.setOption(true as NSNumber, 
+            description.setOption(true as NSNumber,
                                 forKey: NSPersistentHistoryTrackingKey)
             
             // Enable remote change notifications (observes CloudKit updates)
-            description.setOption(true as NSNumber, 
+            description.setOption(true as NSNumber,
                                 forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
             
             // For in-memory testing (previews)
@@ -465,12 +551,13 @@ struct PersistenceController {
         }
     }
     
-    // MARK: - One-Time Setup (ENHANCED with Step 4 Migration - UPDATED)
-    /// Performs all setup operations in the correct order to prevent duplicates
+    // MARK: - M7.1.3: One-Time Setup with iCloud KVS Coordination
+    /// Performs all setup operations in the correct order with multi-device coordination
+    /// Uses iCloud Key-Value Store to prevent duplicate category creation across devices
     private func performOneTimeSetup() {
         // Use a single background context for all setup operations
         container.performBackgroundTask { backgroundContext in
-            // Step 1: Ensure categories exist first (only once)
+            // M7.1.3: Step 0 - Multi-device coordination via iCloud KVS
             self.ensureCategoriesExist(in: backgroundContext)
             
             // Step 2: Migrate existing data to use category relationships
@@ -479,7 +566,7 @@ struct PersistenceController {
             // Step 3: Migrate nil assignments to Uncategorized
             self.migrateToUncategorizedCategory(in: backgroundContext)
             
-            // Step 4: NEW - Execute Step 4 staples migration
+            // Step 4: Execute Step 4 staples migration
             self.executeStaplesMigrationIfNeeded(in: backgroundContext)
             
             // Step 5: Add sample data only if database is empty
@@ -497,21 +584,54 @@ struct PersistenceController {
         }
     }
     
-    /// Ensures categories exist (called only once)
+    /// M7.1.3: Ensures categories exist with multi-device coordination via iCloud KVS
+    /// This prevents duplicate category creation when multiple devices launch simultaneously
     private func ensureCategoriesExist(in context: NSManagedObjectContext) {
+        // Step 1: Check if ANY device has already created categories (via iCloud KVS)
+        if iCloudCoordinator.categoriesCreatedByAnyDevice {
+            print("☁️ Categories created by another device, waiting for CloudKit sync...")
+            
+            // Wait briefly for CloudKit to sync categories from other device
+            // iCloud KVS syncs almost instantly, but CloudKit Core Data sync takes 2-5 seconds
+            Thread.sleep(forTimeInterval: 3.0)
+            
+            // Check if categories have arrived via CloudKit sync
+            let request: NSFetchRequest<Category> = Category.fetchRequest()
+            if let count = try? context.count(for: request), count > 0 {
+                print("✅ Categories synced from other device (\(count) found)")
+                return
+            } else {
+                print("⚠️ Categories not yet synced - will create locally and let CloudKit deduplicate")
+                // Continue to creation - CloudKit will handle eventual consistency
+            }
+        }
+        
+        // Step 2: Check local context for categories
         let request: NSFetchRequest<Category> = Category.fetchRequest()
         
         do {
             let existingCategories = try context.fetch(request)
+            
             if existingCategories.isEmpty {
+                // No categories exist locally - create them
                 Category.createDefaultCategories(in: context)
-                print("✅ Created default categories")
+                print("✅ Created default categories on this device")
+                
+                // Mark as created in iCloud KVS (broadcasts to ALL devices)
+                iCloudCoordinator.markCategoriesAsCreated()
             } else {
                 print("ℹ️ Categories already exist (\(existingCategories.count) found)")
+                
+                // Ensure iCloud KVS is marked (in case this device created them but didn't mark)
+                if !iCloudCoordinator.categoriesCreatedByAnyDevice {
+                    iCloudCoordinator.markCategoriesAsCreated()
+                }
             }
         } catch {
             print("❌ Error checking categories: \(error)")
+            // Fallback: create categories
             Category.createDefaultCategories(in: context)
+            iCloudCoordinator.markCategoriesAsCreated()
         }
     }
     
@@ -539,7 +659,7 @@ struct PersistenceController {
         Category.migrateNilAssignmentsToUncategorized(in: context)
     }
     
-    /// NEW - Execute Step 4 staples migration if needed (ADDED)
+    /// Execute Step 4 staples migration if needed
     private func executeStaplesMigrationIfNeeded(in context: NSManagedObjectContext) {
         // Check if migration has already been completed
         guard !IngredientTemplate.isMigrationCompleted else {
@@ -634,7 +754,7 @@ struct PersistenceController {
     }
 }
 
-// MARK: - Step 4 Migration Support Extension (ADDED)
+// MARK: - Step 4 Migration Support Extension
 extension PersistenceController {
     
     // MARK: - Step 4 Migration Support
@@ -708,6 +828,9 @@ extension PersistenceController {
         } catch {
             report += "\n❌ Error fetching counts: \(error.localizedDescription)"
         }
+        
+        // Add iCloud KVS status
+        report += "\n" + iCloudCoordinator.getStatusReport()
         
         return report
     }
