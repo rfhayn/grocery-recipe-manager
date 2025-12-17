@@ -120,14 +120,19 @@
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isCompleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="mealType" optional="YES" attributeType="String"/>
         <attribute name="notes" optional="YES" attributeType="String"/>
         <attribute name="scaleFactor" attributeType="Double" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="servings" attributeType="Integer 16" defaultValueString="4" usesScalarValueType="YES"/>
+        <attribute name="slotKey" optional="YES" attributeType="String"/>
         <relationship name="mealPlan" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MealPlan" inverseName="plannedMeals" inverseEntity="MealPlan"/>
         <relationship name="recipe" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recipe" inverseName="plannedMeals" inverseEntity="Recipe"/>
         <fetchIndex name="bydateandisCompleted">
             <fetchIndexElement property="date" type="Binary" order="ascending"/>
             <fetchIndexElement property="isCompleted" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <fetchIndex name="bySlotKey">
+            <fetchIndexElement property="slotKey" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
     <entity name="Recipe" representedClassName="Recipe" syncable="YES">
