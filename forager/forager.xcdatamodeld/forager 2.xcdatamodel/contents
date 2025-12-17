@@ -146,6 +146,7 @@
         <attribute name="servings" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="sourceURL" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="titleKey" optional="YES" attributeType="String"/>
         <attribute name="usageCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="groceryListItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryListItem" inverseName="sourceRecipes" inverseEntity="GroceryListItem"/>
         <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ingredient" inverseName="recipe" inverseEntity="Ingredient"/>
@@ -154,6 +155,9 @@
             <fetchIndexElement property="usageCount" type="Binary" order="ascending"/>
             <fetchIndexElement property="lastUsed" type="Binary" order="ascending"/>
             <fetchIndexElement property="isFavorite" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <fetchIndex name="byTitleKey">
+            <fetchIndexElement property="titleKey" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
     <entity name="Tag" representedClassName="Tag" syncable="YES">
