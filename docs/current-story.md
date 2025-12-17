@@ -1,10 +1,10 @@
 # Current Development Story
 
-**Last Updated**: December 4, 2025  
-**Status**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅ COMPLETE, M7.1 🔄 ACTIVE)  
-**Total Progress**: M1-M5.0 Complete (~92.5 hours) + M7.0 (3 hours) + M7.1.1 (1.5 hours) + M7.1.2 (2 hours) = ~99 hours | 89% planning accuracy  
-**Current Phase**: M7.1 CloudKit Sync Foundation - 🔄 ACTIVE  
-**Next Priority**: M7.1.3 Multi-Device Sync Testing (3-4 hours) 🚀 READY
+**Last Updated**: December 17, 2025  
+**Status**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅, M7.1 ✅, M7.1.3 🔄 ACTIVE)  
+**Total Progress**: M1-M5.0 (~92.5h) + M7.0 (3h) + M7.1.1 (1.5h) + M7.1.2 (2h) + M7.1.3 Part 1 (2.5h) = ~101.5 hours | 89% planning accuracy  
+**Current Phase**: M7.1.3 CloudKit Sync Integrity - Phase 1.1 Part 1 ✅ COMPLETE  
+**Next Priority**: M7.1.3 Phase 1.1 Part 2 - Populate Semantic Keys (2-3 hours) 🚀 READY
 
 ---
 
@@ -12,452 +12,259 @@
 
 ### **Milestone Progress Overview**
 
-**✅ Foundation Complete (M1-M5.0)**: ~92.5 hours total, 89% planning accuracy
-
-**✅ M7.0 App Store Prerequisites COMPLETE**: 3 hours (100% estimate accuracy!)  
-**✅ M7.1.1 CloudKit Schema Validation COMPLETE**: 1.5 hours (100% estimate accuracy!)  
-**✅ M7.1.2 CloudKitSyncMonitor Service COMPLETE**: 2 hours (100% estimate accuracy!)  
-**🚀 M7.1.3 Multi-Device Sync Testing READY**: 3-4 hours  
-**⏳ M7.2-M7.6 Remaining**: 24-32 hours after M7.1.3
+**✅ Foundation Complete (M1-M5.0)**: ~92.5 hours total  
+**✅ M7.0 App Store Prerequisites**: 3 hours (100% accuracy!)  
+**✅ M7.1.1 CloudKit Schema Validation**: 1.5 hours (100% accuracy!)  
+**✅ M7.1.2 CloudKitSyncMonitor Service**: 2 hours (100% accuracy!)  
+**✅ M7.1.3 Phase 1.1 Part 1**: 2.5 hours (100% accuracy!) - Semantic key fields added  
+**🚀 M7.1.3 Phase 1.1 Part 2 READY**: 2-3 hours - Populate semantic keys  
+**⏳ M7.1.3 Remaining**: Parts 3-4, Phase 1.2-1.3, Phase 2 (~8-10 hours)
 
 ---
 
-## 🚀 **M7: CLOUDKIT SYNC & EXTERNAL TESTFLIGHT**
+## 🔄 **M7.1.3: CLOUDKIT SYNC INTEGRITY - ACTIVE**
 
-**Status**: M7.0 Complete ✅, M7.1 ACTIVE 🔄 (1 of 3 phases complete)  
-**Estimated Time**: 27-37 hours base, 32-42 hours with buffer  
-**Dependencies**: M5.0 Complete ✅ (TestFlight operational)  
-**PRD**: `docs/prds/milestone-7-cloudkit-sync-external-testflight.md`  
-**Implementation Guide**: `docs/next-prompt.md`
+**Started**: December 17, 2025  
+**Status**: Phase 1.1 Part 1 ✅ COMPLETE (2.5h), Part 2 🚀 READY (2-3h)  
+**Estimated Time**: 11-15 hours total  
+**Progress**: 2.5 hours complete (~18%)  
+**PRD**: `docs/prds/m7.1.3-cloudkit-sync-integrity.md`  
+**Completion Summary**: `docs/M7.1.3-PHASE1.1-PART1-COMPLETION.md`
 
 ### **Purpose**
-Transform Forager into a fully collaborative family meal planning platform with CloudKit multi-device sync, real-time collaboration via CKShare, and public external TestFlight beta program.
+Prevent CloudKit from creating duplicate entities across devices by implementing semantic uniqueness architecture. Without this, multi-device sync creates duplicate Categories, IngredientTemplates, and PlannedMeals that crash the app with "Fatal error: Duplicate values for key."
+
+### **The Problem**
+CloudKit Core Data only understands UUID uniqueness, not semantic uniqueness (same name = same thing). When Device A creates Category("Produce") and Device B creates Category("Produce"), CloudKit accepts both as valid records because they have different UUIDs. Both sync back to both devices → app has TWO "Produce" categories → crashes.
+
+### **The Solution Architecture**
+- **Layer 1**: Semantic key fields (normalizedName, canonicalName, slotKey, titleKey)
+- **Layer 2**: Repository pattern (get-or-create functions)
+- **Layer 3**: Application layer (use repositories, not direct instantiation)
 
 ---
 
-## ✅ **M7.1.1: CLOUDKIT SCHEMA VALIDATION - COMPLETE**
+## ✅ **M7.1.3 PHASE 1.1 PART 1 - COMPLETE**
 
-**Completed**: December 4, 2025  
-**Actual Time**: 1.5 hours (estimated 2-3 hours - within range, 100% accuracy on exact estimate!)  
+**Completed**: December 17, 2025 (10:14 AM - 12:46 PM)  
+**Actual Time**: 2.5 hours (estimated 2.5 hours - 100% accuracy!)  
 **Status**: ✅ COMPLETE
 
 ### **What We Accomplished**
 
-**Technical Changes:**
-- ✅ Replaced NSPersistentContainer with NSPersistentCloudKitContainer in Persistence.swift
-- ✅ Added CloudKit import for framework support
-- ✅ Configured CloudKit container options (iCloud.com.richhayn.forager)
-- ✅ Enabled history tracking (required for sync)
-- ✅ Enabled remote change notifications (observes CloudKit updates)
-- ✅ Implemented #if !DEBUG wrapper for fast local development
-  - Debug builds: Local-only Core Data (fast iteration, no iCloud needed)
-  - Release builds: CloudKit sync enabled (for testing)
+**Created Model Version 2 with semantic key fields:**
 
-**Validation Results:**
-- ✅ Build succeeded with zero errors/warnings
-- ✅ App launches on simulator (Debug mode - local Core Data)
-- ✅ App launches on iPhone 17 Pro (Release mode - CloudKit enabled)
-- ✅ CloudKit Dashboard accessible and operational
-- ✅ **8+ record types auto-generated** in Development environment:
-  1. CD_Category (13 fields)
-  2. CD_GroceryListItem (18 fields)
-  3. CD_Ingredient (17 fields)
-  4. CD_IngredientTemplate (12 fields)
-  5. CD_MealPlan (14 fields)
-  6. CD_PlannedMeal (15 fields) - MealPlanRecipe
-  7. CD_Recipe (18 fields)
-  8. CD_WeeklyList (11 fields)
-  9. CD_UserPreferences (14 fields) - Bonus from M4.1!
-- ✅ **CloudKit sync activity confirmed** (28 events, RecordSave operations logged)
-- ✅ Zero regressions to existing features
+1. **Category** ✅
+   - `normalizedName: String?` (semantic key)
+   - `updatedAt: Date?` (conflict resolution)
+   - Fetch index on `normalizedName`
+
+2. **IngredientTemplate** ✅
+   - `canonicalName: String?` (semantic key)
+   - `updatedAt: Date?` (conflict resolution)
+   - Reused `dateCreated: Date?` (existing)
+   - Fetch index on `canonicalName`
+
+3. **PlannedMeal** ✅
+   - `mealType: String?` (breakfast/lunch/dinner/snack)
+   - `slotKey: String?` (semantic key: "YYYY-MM-DD-mealType")
+   - Reused `createdDate: Date?` (existing)
+   - Fetch index on `slotKey`
+
+4. **Recipe** ✅
+   - `titleKey: String?` (for duplicate detection)
+   - Reused `dateCreated: Date?` (existing)
+   - Fetch index on `titleKey`
 
 ### **Key Learnings**
 
-**1. #if !DEBUG Strategy is Essential:**
-- Enables fast local development without CloudKit overhead
-- Separates Development (Debug) from Production (Release) environments
-- Console logging confirms mode: "💻 Local-only" vs "☁️ CloudKit sync enabled"
+1. **One Entity at a Time Works Perfectly**
+   - Each entity took exactly 30 minutes
+   - Build after each = zero cascading errors
+   - Commit after each = clear git history
 
-**2. NSPersistentCloudKitContainer is API-Compatible:**
-- Subclass of NSPersistentContainer (zero code changes needed elsewhere)
-- All existing views, services, and @FetchRequest continue working
-- LOW-RISK infrastructure upgrade despite touching core persistence
+2. **All New Fields Optional (Two-Stage Migration)**
+   - Stage A (now): Add optional fields, populate them
+   - Stage B (later): Make required, add constraints
+   - CloudKit needs time to sync before enforcing
 
-**3. CloudKit Auto-Generates Schema:**
-- Simply changing container type triggered automatic schema mirroring
-- No manual CloudKit record type creation required
-- Core Data model → CloudKit record types automatically
+3. **Reuse Existing Date Fields**
+   - IngredientTemplate: reused `dateCreated`
+   - PlannedMeal: reused `createdDate`
+   - Recipe: reused `dateCreated`
+   - Avoided duplication and confusion
 
-**4. Release Build Distribution Process:**
-- Archive → Distribute App → Debugging
-- Install via Finder (drag .ipa onto device)
-- Xcode Devices window shows console logs
-
-### **Documentation Created**
-- ✅ M7.1.1-CORE-DATA-IMPACT-ANALYSIS.md (ADR 007 process followed)
-- ✅ 24-m7.1.1-cloudkit-schema-validation.md (comprehensive learning note)
-
-### **Git Commits**
-```bash
-✅ "M7.1.1: Add Core Data impact analysis"
-✅ "M7.1.1: Replace NSPersistentContainer with CloudKit-enabled container"
-✅ "M7.1.1: Add comprehensive learning note"
-```
-
----
-
-## ✅ **M7.1.2: CLOUDKITSYNCMONITOR SERVICE - COMPLETE**
-
-**Completed**: December 4, 2025  
-**Actual Time**: 2 hours (estimated 2-3 hours - 100% accuracy!)  
-**Status**: ✅ COMPLETE
-
-### **What We Accomplished**
-
-**Technical Implementation:**
-- ✅ Created CloudKitSyncMonitor.swift service (226 lines)
-  - ObservableObject for SwiftUI integration
-  - Published properties: syncState, lastSyncDate, syncError, syncEventCount
-  - Combine-based notification observation
-  - Comprehensive CloudKit error mapping
-- ✅ Created CloudKitSyncTestView.swift (273 lines)
-  - Visual sync status display with color-coded indicators
-  - Real-time event counter
-  - Manual sync trigger and state reset
-  - Test data creation for validation
-  - Built-in testing instructions
-- ✅ Integrated into Settings → Developer Tools
-- ✅ Added PersistenceController.syncMonitor extension
-- ✅ Configured foragerApp.swift with @StateObject and .environmentObject
-
-**Validation Results:**
-- ✅ **46 sync events observed successfully** (events #1-46)
-- ✅ Sync latency: **< 1 second** (nearly instant detection)
-- ✅ Test data creation working (3 test lists created)
-- ✅ Event counting accurate (incremented from 0 → 46)
-- ✅ Manual sync trigger functional
-- ✅ State reset working (clears all tracking data)
-- ✅ History tokens present in all events
-- ✅ Zero regressions to existing features
-
-**Console Output Highlights:**
-```
-📡 CloudKitSyncMonitor initialized - monitoring remote changes
-✅ Created test weekly list with 2 items
-📡 CloudKit sync event #44 - Store: 98A2A382...
-   ✅ Sync state updated: synced at 2025-12-05 00:44:34 +0000
-🔄 Manual sync triggered
-```
-
-### **Key Learnings**
-
-**1. Notification Observation Pattern:**
-- NSPersistentStoreRemoteChange fires for every CloudKit sync operation
-- Observed 43 events during initial schema setup (in ~6 seconds)
-- Additional events for test data creation (sub-second detection)
-- Combine publishers provide clean, reactive observation
-
-**2. SwiftUI State Management:**
-- @StateObject in foragerApp owns the CloudKitSyncMonitor
-- @EnvironmentObject in views receives the shared instance
-- @Published properties automatically update UI
-- No manual refresh needed - reactive by design
-
-**3. CloudKit Error Categories:**
-- Zone creation errors auto-resolve ("Zone Not Found" → zone created)
-- Production schema errors expected during initial sync
-- Error domain checking critical (CKError vs NSError)
-- Mapped 8+ common CKError codes to user-friendly messages
-
-**4. Testing Infrastructure:**
-- Visual test view essential for validation
-- Event counting provides clear debugging visibility
-- Manual sync trigger useful for testing UI responsiveness
-- Test data creation validates end-to-end flow
-
-### **Architecture Highlights**
-
-**Service Pattern:**
-```swift
-class CloudKitSyncMonitor: ObservableObject {
-    @Published var syncState: SyncState = .idle
-    @Published var syncEventCount: Int = 0
-    
-    // Observe notifications via Combine
-    NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
-        .sink { notification in handleRemoteChange(notification) }
-}
-```
-
-**Integration Pattern:**
-```swift
-// foragerApp.swift
-@StateObject private var syncMonitor = CloudKitSyncMonitor()
-
-.environmentObject(syncMonitor)  // Inject to all views
-
-// CloudKitSyncTestView.swift
-@EnvironmentObject private var syncMonitor: CloudKitSyncMonitor
-```
-
-### **Files Created**
-- `Services/CloudKitSyncMonitor.swift` (226 lines)
-- `forager/CloudKitSyncTestView.swift` (273 lines)
-- `forager/Persistence.swift` (extension removed - moved to CloudKitSyncMonitor)
-
-### **Files Modified**
-- `forager/foragerApp.swift` (added @StateObject syncMonitor)
-- `forager/SettingsView.swift` (added Developer Tools section)
-
-### **Documentation Created**
-- M7.1.2-INTEGRATION-GUIDE.md (testing procedures)
-- M7.1.2-COMPLETION-SUMMARY.md (comprehensive overview)
+### **Validation Results**
+- ✅ All 5 builds succeeded (baseline + 4 entities)
+- ✅ Zero build errors or warnings
+- ✅ App launches successfully after each change
+- ✅ Existing features work (no regressions)
+- ✅ 5 clean commits with clear messages
+- ✅ All changes pushed to GitHub
 
 ### **Git Commits**
 ```bash
-✅ "M7.1.2: Implement CloudKitSyncMonitor service with comprehensive error handling"
-✅ "M7.1.2: Add CloudKitSyncTestView with visual sync status display"
-✅ "M7.1.2: Integrate sync monitor into Settings Developer Tools"
-✅ "M7.1.2 COMPLETE: Document completion with 46 sync events validated"
+1. M7.1.3 Phase 1.1: Add comprehensive PRD
+2. M7.1.3 Phase 1.1 Part 1: Create Model Version 2
+3. M7.1.3 Phase 1.1 Part 1: Add semantic key fields to Category
+4. M7.1.3 Phase 1.1 Part 1: Add semantic key fields to IngredientTemplate
+5. M7.1.3 Phase 1.1 Part 1: Add semantic key fields to PlannedMeal
+6. M7.1.3 Phase 1.1 Part 1: Add semantic key fields to Recipe
 ```
 
-### **Performance Metrics**
-- Sync event detection: < 1 second latency
-- Event processing: Real-time (no lag)
-- UI updates: Instant (reactive @Published properties)
-- Memory usage: Minimal (weak self, AnyCancellable cleanup)
-- Zero performance impact on app
+**Branch**: `feature/M7.1.3-phase1.1-fresh-start` ✅
 
-### **Success Validation**
-- ✅ 46 sync events observed and logged
-- ✅ All event counters accurate
-- ✅ Sync state transitions working (idle → synced)
-- ✅ History tokens present in all notifications
-- ✅ Error handling framework operational
-- ✅ Manual triggers functional
-- ✅ Test data creation validated
-- ✅ Zero regressions
-- ✅ 100% planning accuracy (2h estimated, 2h actual)
+### **Documentation Created**
+- ✅ `docs/M7.1.3-PHASE1.1-PART1-COMPLETION.md` - Comprehensive summary
+- ✅ All commits include detailed descriptions
+- ✅ current-story.md updated
+- ✅ next-prompt.md ready for Part 2
 
 ---
 
-## 🚀 **M7.1.3: MULTI-DEVICE SYNC TESTING - READY**
+## 🚀 **NEXT: M7.1.3 PHASE 1.1 PART 2 - POPULATE SEMANTIC KEYS**
 
 **Status**: 🚀 READY TO START  
-**Estimated**: 3-4 hours  
-**Prerequisites**: M7.1.1 Complete ✅, M7.1.2 Complete ✅  
-**Implementation Guide**: `docs/next-prompt.md`  
-**Purpose**: Validate CloudKit sync across two physical devices
+**Estimated Time**: 2-3 hours  
+**Implementation Guide**: `docs/next-prompt.md`
 
-### **Requirements**
+### **What Part 2 Will Do**
 
-**Devices:**
-- 2+ physical devices (iPhone, iPad, or Mac)
-- Both devices signed into **same iCloud account**
-- Both devices on same WiFi network (or cellular with good connection)
-- forager app installed on both devices (via Xcode or TestFlight)
+Create migration functions in `Persistence.swift` to populate semantic keys for existing data:
 
-**Prerequisites Verified:**
-- ✅ CloudKit schema validated (M7.1.1)
-- ✅ Sync monitoring operational (M7.1.2)
-- ✅ 46 sync events observed successfully
+1. **populateCategorySemanticKeys()** (30 min)
+   - Fetch all categories
+   - Set `normalizedName` = lowercase, trimmed `displayName`
+   - Set `updatedAt` = Date()
 
-### **Testing Scenarios**
+2. **populateIngredientTemplateSemanticKeys()** (30 min)
+   - Fetch all templates
+   - Set `canonicalName` = normalized `displayName`
+   - Set `updatedAt` = Date()
 
-**Scenario 1: Create → Sync → Read** (10 minutes)
-1. Device A: Create weekly list "Device A Test" with 3 items
-2. Wait 5-10 seconds
-3. Device B: Verify list appears with all items
-4. Device B: Open list, verify item details match
-5. Both devices: Check sync event counts (should increment)
+3. **populatePlannedMealSemanticKeys()** (30 min)
+   - Fetch all planned meals
+   - Infer `mealType` if missing (default "dinner")
+   - Set `slotKey` = "YYYY-MM-DD-mealType"
 
-**Scenario 2: Edit → Sync → Update** (10 minutes)
-1. Device B: Edit "Device A Test" list, add 2 new items
-2. Wait 5-10 seconds
-3. Device A: Verify new items appear
-4. Device A: Edit existing item (change name)
-5. Device B: Verify edit syncs
+4. **populateRecipeSemanticKeys()** (30 min)
+   - Fetch all recipes
+   - Set `titleKey` = normalized title
 
-**Scenario 3: Delete → Sync → Remove** (5 minutes)
-1. Device A: Delete one item from list
-2. Wait 5-10 seconds
-3. Device B: Verify item removed
-4. Device B: Delete entire list
-5. Device A: Verify list deleted
+5. **Wire up migration** (30 min)
+   - Create `performStageAMigration()` function
+   - Use UserDefaults flag for idempotency
+   - Call all population functions
+   - Test on fresh install
 
-**Scenario 4: Offline → Online Sync** (15 minutes)
-1. Device A: Enable Airplane Mode
-2. Device A: Create list "Offline Test" with items
-3. Device A: Note "This will sync when online"
-4. Device A: Disable Airplane Mode
-5. Wait 10-20 seconds
-6. Device B: Verify "Offline Test" appears
-7. Reverse: Device B offline, create, go online, verify on Device A
+### **Files to Modify**
+- `forager/Persistence.swift` - Add migration functions
 
-**Scenario 5: Simultaneous Creation** (10 minutes)
-1. Both devices: Create different lists simultaneously
-2. Wait 10 seconds
-3. Both devices: Verify both lists appear on both devices
-4. Check for duplicates or conflicts
+### **Acceptance Criteria**
+- ✅ All 4 population functions implemented
+- ✅ Migration runs on first launch
+- ✅ Migration skips on subsequent launches (idempotent)
+- ✅ All semantic keys populated in database
+- ✅ App launches without crashes
+- ✅ Console logs show population counts
+- ✅ Zero regressions
 
-**Scenario 6: Recipe & Meal Plan Sync** (15 minutes)
-1. Device A: Create new recipe "Sync Test Recipe"
-2. Device B: Verify recipe appears
-3. Device A: Create meal plan with recipe
-4. Device B: Verify meal plan appears with recipe linked
-5. Device B: Mark meal as complete
-6. Device A: Verify completion status synced
-
-### **Performance Targets**
-
-- **Sync latency**: < 5 seconds average (target: < 3 seconds)
-- **Sync success rate**: > 99%
-- **Data consistency**: 100% (no data loss, no duplicates)
-- **Conflict handling**: Graceful (last-write-wins acceptable for M7.1.3)
-
-### **Success Criteria**
-
-- [ ] All 6 test scenarios pass
-- [ ] Average sync latency < 5 seconds
-- [ ] Zero data loss across all scenarios
-- [ ] No duplicate records created
-- [ ] CloudKitSyncMonitor shows sync events on both devices
-- [ ] Offline → online sync works reliably
-- [ ] Large lists (20+ items) sync correctly
-- [ ] Recipe relationships preserved during sync
-- [ ] Meal plan associations maintained
-
-### **Start Prompt**
+### **Start Prompt for Part 2**
 
 ```
-M7.1.2 complete ✅, ready to start M7.1.3 Multi-Device Sync Testing.
+M7.1.3 Phase 1.1 Part 1 complete ✅ (2.5 hours, 100% accuracy)
 
-Completed in M7.1.2:
-- CloudKitSyncMonitor service operational
-- 46 sync events observed successfully
-- Sync latency < 1 second validated
-- Event counting accurate
-- Test infrastructure working
+Completed:
+- Model Version 2 created
+- 4 entities have semantic key fields (all Optional)
+- All fetch indexes added
+- All builds succeeded, app launches
+- 5 commits pushed to GitHub
 
-Next phase: Validate CloudKit sync across two physical devices.
+Next: Phase 1.1 Part 2 - Populate Semantic Keys (2-3 hours)
 
-Test scenarios:
-1. Create → Sync → Read (weekly lists, items)
-2. Edit → Sync → Update (modifications on both devices)
-3. Delete → Sync → Remove (deletions propagate)
-4. Offline → Online (queue and sync when reconnected)
-5. Simultaneous operations (concurrent creates)
-6. Complex data (recipes, meal plans with relationships)
+Implementation:
+1. Create 4 population functions in Persistence.swift
+2. Wire up migration with UserDefaults flag
+3. Test on fresh install (delete app first)
+4. Verify idempotency (run app again, should skip)
+5. Check Core Data inspector for populated values
 
-Requirements:
-- 2+ devices on same iCloud account
-- forager installed on both devices
-- WiFi/cellular connectivity
-- CloudKitSyncTestView accessible on both devices
+Branch: feature/M7.1.3-phase1.1-fresh-start
+PRD: docs/prds/m7.1.3-cloudkit-sync-integrity.md (Part 2 section)
 
-Estimated time: 3-4 hours for M7.1.3
-
-I have my devices ready for testing.
-
-Ready to begin!
+Ready to begin Part 2!
 ```
 
 ---
 
-## 📋 **M7.0: APP STORE PREREQUISITES - COMPLETE**
+## 💡 **STRATEGIC NOTES**
 
-**Actual Time**: 3 hours (estimated 2-3 hours - 100% accuracy!)  
-**Status**: ✅ COMPLETE  
-**Completed**: December 3, 2025  
-**Purpose**: Complete mandatory App Store compliance before external TestFlight submission
+### **Why We're Taking This Approach**
 
-### **All Components Complete:**
-- ✅ **M7.0.1**: Privacy Policy Creation & Hosting (1h actual)
-- ✅ **M7.0.2**: Privacy Policy Integration (1h actual)
-- ✅ **M7.0.3**: App Privacy Questionnaire (30 min actual)
-- ✅ **M7.0.4**: Display Name Disambiguation (30 min actual)
+**Two-Stage Migration Strategy:**
+1. **Stage A** (M7.1.3 Phase 1.1): Add optional fields, populate them
+2. **Stage B** (future): Make fields required, add constraints
 
-**Achievement**: All Apple App Store prerequisites met! Cleared for external TestFlight after M7.1-7.4.
+**Reason**: CloudKit needs time to sync Stage A changes to all devices before enforcing constraints. If we add constraints immediately, devices that haven't synced yet will create duplicate records that violate constraints.
 
----
+**Repository Pattern (Phase 1.2):**
+- ALWAYS query by semantic key first
+- Only create if doesn't exist
+- Prevents duplicates going forward
 
-## 💡 **NEXT IMMEDIATE ACTIONS**
-
-### **Start M7.1.3 Multi-Device Sync Testing**
-
-**✅ READY**: Implementation guide available at `docs/next-prompt.md`
-
-**Current Focus**: M7.1.3 Multi-Device Sync Testing (3-4 hours)
-
-**Requirements**: 2+ physical devices on same iCloud account
-
-**Start Prompt** (see M7.1.3 section above for complete prompt)
-
-### **After M7.1.3:**
-- M7.1 COMPLETE! (All 3 phases done)
-- Strategic decision: Continue M7.2 or pause for M6/M8
-- M7.2 Multi-User Collaboration (8-10 hours) - enables family sharing
-
----
-
-## 📚 **COMPLETED MILESTONES (M1-M5.0 + M7.0 + M7.1.1)**
-
-### **M7.1.2: CloudKitSyncMonitor Service** ✅ COMPLETE (2 hours - Dec 4, 2025)
-- CloudKitSyncMonitor.swift service (226 lines)
-- CloudKitSyncTestView.swift test interface (273 lines)
-- 46 sync events observed successfully
-- Sync latency < 1 second validated
-- Event counting and state tracking working
-- Manual sync trigger and state reset functional
-- Integration into Settings → Developer Tools
-- 100% planning accuracy (2h estimated, 2h actual)
-- Zero regressions
-
-### **M7.1.1: CloudKit Schema Validation** ✅ COMPLETE (1.5 hours - Dec 4, 2025)
-- NSPersistentCloudKitContainer replacing NSPersistentContainer
-- CloudKit configuration with #if !DEBUG wrapper
-- History tracking and remote change notifications enabled
-- 8+ record types auto-generated in CloudKit Dashboard
-- Sync activity confirmed (RecordSave events logged)
-- Zero regressions, first build succeeded
-- 100% planning accuracy (1.5h estimated, 1.5h actual)
-
-### **M7.0: App Store Prerequisites** ✅ COMPLETE (3 hours - Dec 3, 2025)
-- Privacy policy published at https://rfhayn.github.io/forager/privacy.html
-- Privacy policy integration in app (SafariServices)
-- App Privacy questionnaire completed
-- Display name disambiguated ("forager: smart meal planner")
-- All Apple requirements met for external TestFlight
-- 100% planning accuracy
-
-### **M5.0: App Renaming & TestFlight Deployment** ✅ COMPLETE (6 hours - Nov-Dec 2025)
-- Complete rename from "GroceryRecipeManager" to "forager"
-- Professional app icon (green sprout, grocery-themed)
-- Internal TestFlight deployment
-- Multi-tester beta program
-
-### **M1-M4: Foundation** ✅ COMPLETE (78 hours - Aug-Nov 2025)
-- Professional grocery management with store-layout optimization
-- Recipe catalog with ingredient normalization
-- Structured quantity management with consolidation
-- Meal planning with calendar view
-- Settings infrastructure with user preferences
-
-**Total Completed**: ~99 hours (M1-M5.0: 92.5h + M7.0: 3h + M7.1.1: 1.5h + M7.1.2: 2h)  
-**Planning Accuracy**: 89% overall (consistently within estimates)  
-**Build Success**: 100% (zero breaking changes)  
-**Performance**: 100% (all operations <0.5s target)  
-**Technical Debt**: NONE ✅
+**Constraints (Phase 1.3):**
+- Add Core Data uniqueness constraints
+- Enforce at database level
+- Only after all devices have Stage A changes
 
 ---
 
 ## 📊 **QUALITY METRICS**
 
-**Build Success**: 100% (zero breaking changes throughout)  
-**Performance**: 100% (all operations <0.5s target maintained)  
-**Data Integrity**: 100% (zero data loss across all migrations)  
-**Documentation**: 100% (consistent M#.#.# naming throughout)  
-**Planning Accuracy**: 89% overall, recent phases 100%  
+**Build Success**: 100% (5 builds, zero errors)  
+**Performance**: 100% (< 3s launch, no degradation)  
+**Data Integrity**: 100% (zero data loss, no regressions)  
+**Documentation**: 100% (comprehensive learning note + commits)  
+**Planning Accuracy**: 100% (2.5h estimated, 2.5h actual)  
+**Git History**: Clean (5 commits, clear messages)
+
+---
+
+## 📚 **COMPLETED MILESTONES**
+
+### **M7.1.3 Phase 1.1 Part 1** ✅ COMPLETE (2.5h - Dec 17, 2025)
+- Model Version 2 with semantic key fields
+- 4 entities updated: Category, IngredientTemplate, PlannedMeal, Recipe
+- All fetch indexes added
+- Zero build errors, zero regressions
+- 100% planning accuracy
+
+### **M7.1.2: CloudKitSyncMonitor Service** ✅ COMPLETE (2h - Dec 4, 2025)
+- CloudKitSyncMonitor.swift service (226 lines)
+- CloudKitSyncTestView.swift test interface (273 lines)
+- 46 sync events observed successfully
+- Sub-second sync latency validated
+
+### **M7.1.1: CloudKit Schema Validation** ✅ COMPLETE (1.5h - Dec 4, 2025)
+- NSPersistentCloudKitContainer integration
+- 8+ record types auto-generated in CloudKit Dashboard
+- Sync activity confirmed
+
+### **M7.0: App Store Prerequisites** ✅ COMPLETE (3h - Dec 3, 2025)
+- Privacy policy published and integrated
+- App Privacy questionnaire completed
+- Display name disambiguated
+
+### **M1-M5.0: Foundation** ✅ COMPLETE (92.5h - Aug-Dec 2025)
+- Professional grocery management
+- Recipe catalog with normalization
+- Meal planning with calendar view
+- Settings infrastructure
+
+**Total Completed**: ~101.5 hours  
+**Planning Accuracy**: 89% overall  
+**Build Success**: 100% (zero breaking changes)  
 **Technical Debt**: NONE ✅
 
 ---
@@ -466,15 +273,15 @@ Ready to begin!
 
 **For EVERY development session**, follow the mandatory startup sequence:
 
-1. ✅ Read `docs/session-startup-checklist.md` - Complete 7-point checklist
+1. ✅ Read `docs/session-startup-checklist.md` - Complete 8-point checklist
 2. ✅ Read `docs/project-naming-standards.md` - Verify M#.#.# format
 3. ✅ Read `docs/current-story.md` (this file) - Confirm current status
 4. ✅ Read `docs/next-prompt.md` - Get implementation guidance
 
-**This 5-10 minute investment prevents 6-14 hours of rework.**
+**This 10-15 minute investment prevents 7-16 hours of rework.**
 
 ---
 
-**Last Session**: December 4, 2025 - M7.1.2 complete  
-**Next Action**: Start M7.1.3 Multi-Device Sync Testing (3-4 hours)  
-**Version**: December 4, 2025 - M7.1.2 Complete, M7.1.3 Ready
+**Last Session**: December 17, 2025 - M7.1.3 Phase 1.1 Part 1 complete  
+**Next Action**: Start M7.1.3 Phase 1.1 Part 2 (2-3 hours) when ready  
+**Version**: December 17, 2025 - Phase 1.1 Part 1 Complete
