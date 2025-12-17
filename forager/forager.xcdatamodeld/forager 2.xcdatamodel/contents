@@ -74,11 +74,13 @@
         </fetchIndex>
     </entity>
     <entity name="IngredientTemplate" representedClassName="IngredientTemplate" syncable="YES" codeGenerationType="class">
+        <attribute name="canonicalName" optional="YES" attributeType="String"/>
         <attribute name="category" optional="YES" attributeType="String"/>
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isStaple" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="usageCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Ingredient" inverseName="ingredientTemplate" inverseEntity="Ingredient"/>
         <relationship name="stapleItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryItem" inverseName="ingredientTemplate" inverseEntity="GroceryItem"/>
@@ -92,6 +94,9 @@
             <fetchIndexElement property="category" type="Binary" order="ascending"/>
             <fetchIndexElement property="name" type="Binary" order="ascending"/>
             <fetchIndexElement property="usageCount" type="Binary" order="descending"/>
+        </fetchIndex>
+        <fetchIndex name="byCanonicalName">
+            <fetchIndexElement property="canonicalName" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
     <entity name="MealPlan" representedClassName="MealPlan" syncable="YES" codeGenerationType="class">
