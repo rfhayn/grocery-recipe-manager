@@ -485,6 +485,9 @@ struct PersistenceController {
             // Step 5: Add sample data only if database is empty
             self.addSampleDataIfNeeded(in: backgroundContext)
             
+            // Step 6: M7.1.3 - Execute Stage A migration (populate semantic keys)
+            self.performStageAMigration(in: backgroundContext)
+            
             // Save all changes at once
             do {
                 if backgroundContext.hasChanges {
@@ -867,5 +870,49 @@ extension PersistenceController {
         }
         
         print("✅ M7.1.3: Populated titleKey for \(populatedCount) recipes")
+    }
+    
+    // MARK: - M7.1.3 Stage A Migration Orchestration
+    
+    /// M7.1.3: Performs Stage A migration (populate semantic keys for existing data)
+    /// This is a one-time migration that runs on first launch after schema update
+    /// Uses UserDefaults to ensure idempotency (only runs once)
+    private func performStageAMigration(in context: NSManagedObjectContext) {
+        // Check if Stage A migration already completed
+        let migrationKey = "M7.1.3_StageA_Migration_Completed"
+        guard !UserDefaults.standard.bool(forKey: migrationKey) else {
+            print("ℹ️ M7.1.3 Stage A: Migration already completed, skipping...")
+            return
+        }
+        
+        print("🚀 M7.1.3 Stage A: Starting semantic key population migration...")
+        let startTime = Date()
+        
+        // Populate semantic keys for all 4 entities
+        populateCategorySemanticKeys(in: context)
+        populateIngredientTemplateSemanticKeys(in: context)
+        populatePlannedMealSemanticKeys(in: context)
+        populateRecipeSemanticKeys(in: context)
+        
+        // Save populated data
+        do {
+            if context.hasChanges {
+                try context.save()
+                print("✅ M7.1.3 Stage A: Successfully saved semantic keys")
+            } else {
+                print("ℹ️ M7.1.3 Stage A: No changes to save")
+            }
+        } catch {
+            print("❌ M7.1.3 Stage A: Failed to save: \(error)")
+            // Don't mark as complete if save failed
+            return
+        }
+        
+        // Mark migration as complete
+        UserDefaults.standard.set(true, forKey: migrationKey)
+        UserDefaults.standard.set(Date(), forKey: "M7.1.3_StageA_Migration_Date")
+        
+        let duration = Date().timeIntervalSince(startTime)
+        print("✅ M7.1.3 Stage A: Migration completed in \(String(format: "%.2f", duration))s")
     }
 }
