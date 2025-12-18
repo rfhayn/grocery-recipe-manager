@@ -787,4 +787,47 @@ extension PersistenceController {
         
         print("✅ M7.1.3: Populated canonicalName for \(populatedCount) templates")
     }
+    
+    /// M7.1.3: Populate semantic keys for existing PlannedMeal entities
+    /// Generates slotKey from date and mealType for semantic uniqueness
+    private func populatePlannedMealSemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<PlannedMeal> = PlannedMeal.fetchRequest()
+        
+        guard let meals = try? context.fetch(request) else {
+            print("⚠️ M7.1.3: Failed to fetch planned meals for population")
+            return
+        }
+        
+        var populatedCount = 0
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withFullDate] // YYYY-MM-DD only
+        
+        for meal in meals {
+            guard let date = meal.date else {
+                print("⚠️ M7.1.3: Skipping planned meal with nil date")
+                continue
+            }
+            
+            // Extract mealType from existing data or default to "meal"
+            // TODO: In future, properly categorize meals by time of day
+            let mealType = meal.mealType ?? "meal"
+            
+            // Generate slotKey: "YYYY-MM-DD-mealType"
+            // TODO M7.1.3 Part 3: Move to PlannedMeal.generateSlotKey() helper
+            let dateString = dateFormatter.string(from: date)
+            let slotKey = "\(dateString)-\(mealType)"
+            
+            meal.slotKey = slotKey
+            meal.mealType = mealType
+            
+            // Set createdDate if missing (reusing existing field)
+            if meal.createdDate == nil {
+                meal.createdDate = Date()
+            }
+            
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated slotKey for \(populatedCount) planned meals")
+    }
 }
