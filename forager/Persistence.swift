@@ -749,4 +749,42 @@ extension PersistenceController {
         
         print("✅ M7.1.3: Populated normalizedName for \(populatedCount) categories")
     }
+    
+    /// M7.1.3: Populate semantic keys for existing IngredientTemplate entities
+    /// Normalizes name to canonical form for semantic uniqueness
+    private func populateIngredientTemplateSemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+        
+        guard let templates = try? context.fetch(request) else {
+            print("⚠️ M7.1.3: Failed to fetch templates for population")
+            return
+        }
+        
+        var populatedCount = 0
+        for template in templates {
+            guard let name = template.name,
+                  !name.isEmpty else {
+                print("⚠️ M7.1.3: Skipping template with nil/empty name")
+                continue
+            }
+            
+            // Normalize: lowercase, trim whitespace
+            // TODO M7.1.3 Part 3: Move to IngredientTemplate.canonicalName(from:) helper
+            let canonical = name
+                .lowercased()
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            template.canonicalName = canonical
+            
+            // Set dateCreated if missing (reusing existing field)
+            if template.dateCreated == nil {
+                template.dateCreated = Date()
+            }
+            
+            template.updatedAt = Date()
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated canonicalName for \(populatedCount) templates")
+    }
 }
