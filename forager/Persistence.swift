@@ -830,4 +830,42 @@ extension PersistenceController {
         
         print("✅ M7.1.3: Populated slotKey for \(populatedCount) planned meals")
     }
+    
+    /// M7.1.3: Populate semantic keys for existing Recipe entities
+    /// Normalizes title for duplicate detection (not prevention)
+    /// Note: Recipes allow duplicates - titleKey only for showing user warnings
+    private func populateRecipeSemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Recipe> = Recipe.fetchRequest()
+        
+        guard let recipes = try? context.fetch(request) else {
+            print("⚠️ M7.1.3: Failed to fetch recipes for population")
+            return
+        }
+        
+        var populatedCount = 0
+        for recipe in recipes {
+            guard let title = recipe.title,
+                  !title.isEmpty else {
+                print("⚠️ M7.1.3: Skipping recipe with nil/empty title")
+                continue
+            }
+            
+            // Normalize: lowercase, trim whitespace
+            // TODO M7.1.3 Part 3: Move to Recipe.titleKey(from:) helper
+            let normalizedTitle = title
+                .lowercased()
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            recipe.titleKey = normalizedTitle
+            
+            // Set dateCreated if missing (reusing existing field)
+            if recipe.dateCreated == nil {
+                recipe.dateCreated = Date()
+            }
+            
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated titleKey for \(populatedCount) recipes")
+    }
 }
