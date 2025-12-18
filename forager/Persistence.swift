@@ -713,3 +713,40 @@ extension PersistenceController {
     }
     #endif
 }
+
+// MARK: - M7.1.3 Phase 1.1 Part 2: Semantic Key Population
+extension PersistenceController {
+    
+    /// M7.1.3: Populate semantic keys for existing Category entities
+    /// Normalizes displayName to lowercase, trimmed format for semantic uniqueness
+    private func populateCategorySemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        
+        guard let categories = try? context.fetch(request) else { 
+            print("⚠️ M7.1.3: Failed to fetch categories for population")
+            return 
+        }
+        
+        var populatedCount = 0
+        for category in categories {
+            // Use 'name' field (optional), not 'displayName' (computed property)
+            guard let name = category.name, 
+                  !name.isEmpty else { 
+                print("⚠️ M7.1.3: Skipping category with nil/empty name")
+                continue 
+            }
+            
+            // Normalize: lowercase, trim whitespace
+            // TODO M7.1.3 Part 3: Move to Category.normalizedName(from:) helper
+            let normalized = name
+                .lowercased()
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            category.normalizedName = normalized
+            category.updatedAt = Date()
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated normalizedName for \(populatedCount) categories")
+    }
+}

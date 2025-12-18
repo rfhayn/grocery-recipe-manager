@@ -21,6 +21,8 @@ extension Category {
     @NSManaged public var sortOrder: Int16
     @NSManaged public var isDefault: Bool
     @NSManaged public var dateCreated: Date?
+    @NSManaged public var normalizedName: String?  // M7.1.3: Semantic key for uniqueness
+    @NSManaged public var updatedAt: Date?        // M7.1.3: Conflict resolution
     @NSManaged public var groceryItems: NSSet?
 }
 
