@@ -53,12 +53,22 @@ struct AddIngredientView: View {
     }
     
     private func saveIngredient() {
-        let ingredient = IngredientTemplate(context: viewContext)
-        ingredient.id = UUID()
-        ingredient.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        // M7.1.3: Use repository pattern to prevent duplicates
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let ingredient = IngredientTemplateRepository.getOrCreate(
+            displayName: trimmedName,
+            in: viewContext
+        )
+        
+        // Update properties (repository handles displayName and canonicalName)
         ingredient.category = selectedCategory == "Uncategorized" ? nil : selectedCategory
         ingredient.isStaple = isStaple
-        ingredient.dateCreated = Date()
+        
+        // If this was an existing template, update its metadata
+        if ingredient.dateCreated == nil {
+            ingredient.dateCreated = Date()
+        }
+        ingredient.updatedAt = Date()
         
         do {
             try viewContext.save()

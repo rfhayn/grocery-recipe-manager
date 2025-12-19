@@ -452,16 +452,19 @@ class MealPlanService: ObservableObject {
             return nil
         }
         
-        // Create the planned meal
-        let plannedMeal = PlannedMeal(context: context)
+        // M7.1.3 Phase 1.2: Create planned meal using repository pattern
+        // Default mealType to "dinner" - future enhancement: allow user to select
+        let plannedMeal = PlannedMealRepository.getOrCreate(
+            date: startOfDay,
+            mealType: "dinner",
+            recipe: recipe,
+            mealPlan: mealPlan,
+            in: context
+        )
         plannedMeal.id = UUID()
-        plannedMeal.date = startOfDay
         plannedMeal.servings = servings ?? Int16(recipe.servings)
         plannedMeal.scaleFactor = Double(plannedMeal.servings) / Double(recipe.servings)
         plannedMeal.isCompleted = false
-        plannedMeal.createdDate = Date()
-        plannedMeal.mealPlan = mealPlan
-        plannedMeal.recipe = recipe
         
         // M4.2.4: NEW - Update recipe usage tracking
         // Track when added to meal plan (better signal than grocery list)

@@ -11,15 +11,41 @@ extension PlannedMeal {
     
     // MARK: - M7.1.3 Semantic Key Helpers
     
-    /// Generates slot key for semantic uniqueness (one meal per date+type)
-    /// - Parameters:
-    ///   - date: The date of the meal
-    ///   - mealType: The type of meal (breakfast, lunch, dinner, snack)
-    /// - Returns: Slot key in format "YYYY-MM-DD-mealType"
+    /// Single source of truth for meal slot keys
+    /// 
+    /// Format: "YYYY-MM-DD-mealType"
+    /// Uses Calendar.current timezone to keep meals on calendar dates
+    /// 
+    /// Examples:
+    /// - Date(2024-12-13 18:00 UTC), "dinner" → "2024-12-13-dinner"
+    /// - Date(2024-12-13 07:00 UTC), "breakfast" → "2024-12-13-breakfast"
+    /// 
+    /// Why ISO8601 date format:
+    /// - Unambiguous, sortable
+    /// - No timezone confusion
+    /// - Consistent across devices
+    static func slotKey(date: Date, mealType: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate]  // YYYY-MM-DD only
+        formatter.timeZone = Calendar.current.timeZone  // Use user's timezone
+        
+        let dateString = formatter.string(from: date)
+        let normalizedMealType = mealType.lowercased()
+        
+        return "\(dateString)-\(normalizedMealType)"
+    }
+    
+    /// Valid meal types for validation
+    static let validMealTypes = ["breakfast", "lunch", "dinner", "snack"]
+    
+    /// Validate mealType is one of the accepted values
+    static func isValidMealType(_ mealType: String) -> Bool {
+        validMealTypes.contains(mealType.lowercased())
+    }
+    
+    /// DEPRECATED: Use slotKey(date:mealType:) instead
+    /// Kept for backward compatibility
     static func generateSlotKey(date: Date, mealType: String) -> String {
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withFullDate] // YYYY-MM-DD only
-        let dateString = dateFormatter.string(from: date)
-        return "\(dateString)-\(mealType)"
+        return slotKey(date: date, mealType: mealType)
     }
 }

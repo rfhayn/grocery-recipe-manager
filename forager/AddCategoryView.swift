@@ -101,11 +101,10 @@ struct AddCategoryView: View {
             return
         }
         
-        // Create new category
+        // M7.1.3 Phase 1.2: Create category using repository pattern
         PersistenceController.shared.performWrite({ context in
-            let newCategory = Category(context: context)
+            let newCategory = CategoryRepository.getOrCreate(displayName: trimmedName, in: context)
             newCategory.id = UUID()
-            newCategory.name = trimmedName
             newCategory.color = selectedColor
             newCategory.isDefault = false
             newCategory.dateCreated = Date()
