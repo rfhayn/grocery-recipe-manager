@@ -66,24 +66,9 @@ extension IngredientTemplate {
             throw ValidationError.nameTooLong
         }
         
-        // Check for duplicate names (case-insensitive)
-        if let context = self.managedObjectContext {
-            let fetchRequest: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "name ==[c] %@ AND self != %@", trimmedName, self)
-            fetchRequest.fetchLimit = 1
-            
-            do {
-                let duplicates = try context.fetch(fetchRequest)
-                if !duplicates.isEmpty {
-                    throw ValidationError.duplicateName(trimmedName)
-                }
-            } catch let error as ValidationError {
-                throw error
-            } catch {
-                // Log but don't fail on fetch errors
-                print("⚠️ Warning: Could not check for duplicate template names: \(error)")
-            }
-        }
+        // M7.1.3: Duplicate checking removed - now handled by IngredientTemplateRepository
+        // Repository pattern enforces semantic uniqueness via canonicalName
+        // This validation layer only checks basic field constraints
     }
     
     private func validateCategory() throws {

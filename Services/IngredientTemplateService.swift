@@ -313,32 +313,32 @@ class IngredientTemplateService: ObservableObject {
         // M4.3.5: Normalize ingredient name before lookup/creation
         let normalizedName = normalize(name: name)
         
-        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
-        request.predicate = NSPredicate(format: "name ==[cd] %@", normalizedName)
+        // M7.1.3 Phase 1.2: Use repository pattern to prevent duplicate creation
+        let template = IngredientTemplateRepository.getOrCreate(displayName: normalizedName, in: context)
         
+        // Set category if provided and not already set
+        if let category = category, template.category == nil || template.category?.isEmpty == true {
+            template.category = category
+        }
+        
+        // Increment usage count
+        template.usageCount += 1
+        
+        // Ensure UUID is set
+        if template.id == nil {
+            template.id = UUID()
+        }
+        
+        // Save changes
         do {
-            if let existingTemplate = try context.fetch(request).first {
-                return existingTemplate
+            if context.hasChanges {
+                try context.save()
             }
         } catch {
-            print("Error searching for existing template: \(error)")
+            print("❌ IngredientTemplateService: Error saving template: \(error)")
         }
         
-        // M4.3.5: Store normalized name in template
-        let newTemplate = IngredientTemplate(context: context)
-        newTemplate.id = UUID()
-        newTemplate.name = normalizedName
-        newTemplate.category = category  // String assignment
-        newTemplate.usageCount = 1
-        newTemplate.dateCreated = Date()
-        
-        do {
-            try context.save()
-        } catch {
-            print("Error saving new ingredient template: \(error)")
-        }
-        
-        return newTemplate
+        return template
     }
     
     func incrementUsage(template: IngredientTemplate) {
