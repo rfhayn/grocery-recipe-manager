@@ -218,55 +218,59 @@ CloudKit Core Data only understands UUID uniqueness, not semantic uniqueness (sa
 
 ---
 
-## 🚀 **NEXT: M7.1.3 PHASE 1.1 PART 3 - NORMALIZATION HELPER FUNCTIONS**
+## 🚀 **NEXT: M7.1.3 PHASE 1.2 - REPOSITORY PATTERN IMPLEMENTATION**
 
 **Status**: 🚀 READY TO START  
-**Estimated Time**: 1-1.5 hours  
+**Estimated Time**: 3-4 hours  
 **Implementation Guide**: `docs/next-prompt.md`
 
-### **What Part 3 Will Do**
+### **What Phase 1.2 Will Do**
 
-Refactor normalization logic from inline code into entity extension helper functions for better maintainability and reusability.
+**Goal**: Implement repository pattern for all 4 entities to prevent duplicates when creating new records. Use semantic keys to query before creating, ensuring uniqueness at application level.
 
-1. **Category Extension** (15-20 min)
-   - Add `static func normalizedName(from:) -> String` helper
-   - Update `populateCategorySemanticKeys()` to use helper
-   - Add tests in population function
+1. **CategoryRepository** (45-60 min)
+   - `findOrCreate(name:)` using normalizedName
+   - Returns existing or creates new
+   - Validates all category creation goes through repository
 
-2. **IngredientTemplate Extension** (15-20 min)
-   - Add `static func canonicalName(from:) -> String` helper
-   - Update `populateIngredientTemplateSemanticKeys()` to use helper
-   - Add tests in population function
+2. **IngredientTemplateRepository** (45-60 min)
+   - `findOrCreate(name:category:)` using canonicalName
+   - Returns existing or creates new
+   - Validates all template creation goes through repository
 
-3. **PlannedMeal Extension** (15-20 min)
-   - Add `static func generateSlotKey(date:mealType:) -> String` helper
-   - Update `populatePlannedMealSemanticKeys()` to use helper
-   - Add tests in population function
+3. **PlannedMealRepository** (45-60 min)
+   - `findOrCreate(date:mealType:recipe:)` using slotKey
+   - Returns existing or creates new
+   - Validates all meal planning goes through repository
 
-4. **Recipe Extension** (15-20 min)
-   - Add `static func titleKey(from:) -> String` helper
-   - Update `populateRecipeSemanticKeys()` to use helper
-   - Add tests in population function
+4. **RecipeRepository** (45-60 min)
+   - WARNING: Recipes ALLOW duplicates (by design)
+   - `findSimilar(title:)` for user warnings only
+   - Does NOT prevent duplicates - titleKey for detection only
 
-### **Benefits of Helper Functions**
-- Single source of truth for normalization logic
-- Reusable in repository pattern (Phase 1.2)
-- Easier to test and maintain
-- Consistent normalization across app
+### **Benefits of Repository Pattern**
+- Application-level duplicate prevention
+- Consistent query-before-create logic
+- Clean separation of concerns
+- Prepares for Phase 1.3 constraints
+
+### **Files to Create**
+- `CategoryRepository.swift`
+- `IngredientTemplateRepository.swift`
+- `PlannedMealRepository.swift`
+- `RecipeRepository.swift`
 
 ### **Files to Modify**
-- `Category+CoreDataClass.swift` - Add helper function
-- `IngredientTemplate+CoreDataClass.swift` - Add helper function
-- `PlannedMeal+CoreDataClass.swift` - Add helper function
-- `Recipe+CoreDataClass.swift` - Add helper function
-- `forager/Persistence.swift` - Update population functions to use helpers
+- All view models that create entities
+- `Persistence.swift` - Sample data creation
+- Any direct entity creation code
 
 ### **Acceptance Criteria**
-- ✅ All 4 helper functions implemented
-- ✅ All 4 population functions refactored
+- ✅ All 4 repositories implemented
+- ✅ All entity creation uses repositories
+- ✅ Duplicate prevention working (except recipes)
 - ✅ App builds and launches successfully
-- ✅ Fresh install test passes (delete app, run, verify migration)
-- ✅ Idempotency test passes (run again, verify skip)
+- ✅ Manual testing: Try creating duplicate categories/templates
 - ✅ Zero regressions
 
 ---
@@ -295,18 +299,56 @@ Refactor normalization logic from inline code into entity extension helper funct
 
 ## 📊 **QUALITY METRICS**
 
-**Build Success**: 100% (11 builds, zero errors)  
-**Performance**: 100% (< 3s launch, no degradation, 0.02s migration)  
-**Data Integrity**: 100% (zero data loss, no regressions, 53 entities populated)  
+**Build Success**: 100% (17 builds, zero errors)  
+**Performance**: 100% (< 3s launch, no degradation, 0.04s migration)  
+**Data Integrity**: 100% (zero data loss, no regressions, helpers validated)  
 **Documentation**: 100% (comprehensive breadcrumb trails + commits)  
-**Planning Accuracy**: 100% (5h estimated, 5h actual for Parts 1-2)  
-**Git History**: Clean (11 commits, clear messages)
+**Planning Accuracy**: 92% (5.5h estimated, 5h actual for all 4 parts)  
+**Git History**: Clean (17 commits, clear messages, ready for squash merge)
 
 ---
 
 ## 📚 **COMPLETED MILESTONES**
 
-### **M7.1.3 Phase 1.1 Part 2** ✅ COMPLETE (2.5h - Dec 18, 2025)
+### **M7.1.3 Phase 1.1** ✅ COMPLETE (5.5h - Dec 17-18, 2025)
+**All 4 Parts Complete:**
+
+**Part 1 - Schema Updates** (1h actual)
+- Model Version 2 with semantic key fields
+- 4 entities updated: Category, IngredientTemplate, PlannedMeal, Recipe
+- 8 new fields added (4 semantic keys + 4 timestamps)
+- All fetch indexes configured
+
+**Part 2 - Population Functions** (1.5h actual)
+- 4 population functions for semantic keys
+- Master migration orchestration with idempotency
+- Performance: 0.02s for 53 entities (5x faster than target)
+- UserDefaults-based migration tracking
+
+**Part 3 - Helper Functions** (1.5h actual)
+- 4 static helper functions (DRY refactoring)
+- Category.normalizedName(from:)
+- IngredientTemplate.canonicalName(from:)
+- PlannedMeal.generateSlotKey(date:mealType:)
+- Recipe.titleKey(from:)
+- All population functions refactored to use helpers
+
+**Part 4 - Testing & Validation** (1.5h actual)
+- Fresh install validation (0.04s migration)
+- Idempotency testing (correctly skips)
+- MigrationTestHelper.swift created
+- Settings integration (DEBUG only)
+- Zero build errors, zero regressions
+
+**Achievements:**
+- ✅ 8 new Core Data fields (4 semantic keys + 4 timestamps)
+- ✅ 4 extension files with static helpers
+- ✅ Complete migration infrastructure
+- ✅ Performance: 0.04s (2.5x better than target)
+- ✅ 100% idempotent (UserDefaults tracking)
+- ✅ Ready for Phase 1.2 (Repository Pattern)
+
+### **M7.1.3 Phase 1.1 Part 2** ✅ COMPLETE (2.5h - Dec 18, 2025) [CONSOLIDATED ABOVE]
 - 4 population functions for semantic keys
 - Master migration orchestration with idempotency
 - Performance: 0.02s for 53 entities (5x faster than target)
@@ -362,6 +404,6 @@ Refactor normalization logic from inline code into entity extension helper funct
 
 ---
 
-**Last Session**: December 18, 2025 - M7.1.3 Phase 1.1 Part 2 complete  
-**Next Action**: Start M7.1.3 Phase 1.1 Part 3 (1-1.5 hours) when ready  
-**Version**: December 18, 2025 - Phase 1.1 Part 2 Complete
+**Last Session**: December 18, 2025 - M7.1.3 Phase 1.1 complete (all 4 parts)  
+**Next Action**: Start M7.1.3 Phase 1.2 Repository Pattern (3-4 hours) when ready  
+**Version**: December 18, 2025 - Phase 1.1 Complete
