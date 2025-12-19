@@ -739,13 +739,8 @@ extension PersistenceController {
                 continue 
             }
             
-            // Normalize: lowercase, trim whitespace
-            // TODO M7.1.3 Part 3: Move to Category.normalizedName(from:) helper
-            let normalized = name
-                .lowercased()
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            
-            category.normalizedName = normalized
+            // Use helper function for normalization
+            category.normalizedName = Category.normalizedName(from: name)
             category.updatedAt = Date()
             populatedCount += 1
         }
@@ -771,13 +766,8 @@ extension PersistenceController {
                 continue
             }
             
-            // Normalize: lowercase, trim whitespace
-            // TODO M7.1.3 Part 3: Move to IngredientTemplate.canonicalName(from:) helper
-            let canonical = name
-                .lowercased()
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            
-            template.canonicalName = canonical
+            // Use helper function for normalization
+            template.canonicalName = IngredientTemplate.canonicalName(from: name)
             
             // Set dateCreated if missing (reusing existing field)
             if template.dateCreated == nil {
