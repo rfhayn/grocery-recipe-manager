@@ -805,12 +805,8 @@ extension PersistenceController {
             // TODO: In future, properly categorize meals by time of day
             let mealType = meal.mealType ?? "meal"
             
-            // Generate slotKey: "YYYY-MM-DD-mealType"
-            // TODO M7.1.3 Part 3: Move to PlannedMeal.generateSlotKey() helper
-            let dateString = dateFormatter.string(from: date)
-            let slotKey = "\(dateString)-\(mealType)"
-            
-            meal.slotKey = slotKey
+            // Generate slotKey using helper function
+            meal.slotKey = PlannedMeal.generateSlotKey(date: date, mealType: mealType)
             meal.mealType = mealType
             
             // Set createdDate if missing (reusing existing field)
