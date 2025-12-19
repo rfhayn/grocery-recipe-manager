@@ -792,8 +792,6 @@ extension PersistenceController {
         }
         
         var populatedCount = 0
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withFullDate] // YYYY-MM-DD only
         
         for meal in meals {
             guard let date = meal.date else {
@@ -839,13 +837,8 @@ extension PersistenceController {
                 continue
             }
             
-            // Normalize: lowercase, trim whitespace
-            // TODO M7.1.3 Part 3: Move to Recipe.titleKey(from:) helper
-            let normalizedTitle = title
-                .lowercased()
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            
-            recipe.titleKey = normalizedTitle
+            // Use helper function for normalization
+            recipe.titleKey = Recipe.titleKey(from: title)
             
             // Set dateCreated if missing (reusing existing field)
             if recipe.dateCreated == nil {
