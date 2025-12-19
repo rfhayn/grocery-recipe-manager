@@ -485,6 +485,9 @@ struct PersistenceController {
             // Step 5: Add sample data only if database is empty
             self.addSampleDataIfNeeded(in: backgroundContext)
             
+            // Step 6: M7.1.3 - Execute Stage A migration (populate semantic keys)
+            self.performStageAMigration(in: backgroundContext)
+            
             // Save all changes at once
             do {
                 if backgroundContext.hasChanges {
@@ -712,4 +715,183 @@ extension PersistenceController {
         return report
     }
     #endif
+}
+
+// MARK: - M7.1.3 Phase 1.1 Part 2: Semantic Key Population
+extension PersistenceController {
+    
+    /// M7.1.3: Populate semantic keys for existing Category entities
+    /// Normalizes displayName to lowercase, trimmed format for semantic uniqueness
+    private func populateCategorySemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        
+        guard let categories = try? context.fetch(request) else { 
+            print("⚠️ M7.1.3: Failed to fetch categories for population")
+            return 
+        }
+        
+        var populatedCount = 0
+        for category in categories {
+            // Use 'name' field (optional), not 'displayName' (computed property)
+            guard let name = category.name, 
+                  !name.isEmpty else { 
+                print("⚠️ M7.1.3: Skipping category with nil/empty name")
+                continue 
+            }
+            
+            // Use helper function for normalization
+            category.normalizedName = Category.normalizedName(from: name)
+            category.updatedAt = Date()
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated normalizedName for \(populatedCount) categories")
+    }
+    
+    /// M7.1.3: Populate semantic keys for existing IngredientTemplate entities
+    /// Normalizes name to canonical form for semantic uniqueness
+    private func populateIngredientTemplateSemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<IngredientTemplate> = IngredientTemplate.fetchRequest()
+        
+        guard let templates = try? context.fetch(request) else {
+            print("⚠️ M7.1.3: Failed to fetch templates for population")
+            return
+        }
+        
+        var populatedCount = 0
+        for template in templates {
+            guard let name = template.name,
+                  !name.isEmpty else {
+                print("⚠️ M7.1.3: Skipping template with nil/empty name")
+                continue
+            }
+            
+            // Use helper function for normalization
+            template.canonicalName = IngredientTemplate.canonicalName(from: name)
+            
+            // Set dateCreated if missing (reusing existing field)
+            if template.dateCreated == nil {
+                template.dateCreated = Date()
+            }
+            
+            template.updatedAt = Date()
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated canonicalName for \(populatedCount) templates")
+    }
+    
+    /// M7.1.3: Populate semantic keys for existing PlannedMeal entities
+    /// Generates slotKey from date and mealType for semantic uniqueness
+    private func populatePlannedMealSemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<PlannedMeal> = PlannedMeal.fetchRequest()
+        
+        guard let meals = try? context.fetch(request) else {
+            print("⚠️ M7.1.3: Failed to fetch planned meals for population")
+            return
+        }
+        
+        var populatedCount = 0
+        
+        for meal in meals {
+            guard let date = meal.date else {
+                print("⚠️ M7.1.3: Skipping planned meal with nil date")
+                continue
+            }
+            
+            // Extract mealType from existing data or default to "meal"
+            // TODO: In future, properly categorize meals by time of day
+            let mealType = meal.mealType ?? "meal"
+            
+            // Generate slotKey using helper function
+            meal.slotKey = PlannedMeal.generateSlotKey(date: date, mealType: mealType)
+            meal.mealType = mealType
+            
+            // Set createdDate if missing (reusing existing field)
+            if meal.createdDate == nil {
+                meal.createdDate = Date()
+            }
+            
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated slotKey for \(populatedCount) planned meals")
+    }
+    
+    /// M7.1.3: Populate semantic keys for existing Recipe entities
+    /// Normalizes title for duplicate detection (not prevention)
+    /// Note: Recipes allow duplicates - titleKey only for showing user warnings
+    private func populateRecipeSemanticKeys(in context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Recipe> = Recipe.fetchRequest()
+        
+        guard let recipes = try? context.fetch(request) else {
+            print("⚠️ M7.1.3: Failed to fetch recipes for population")
+            return
+        }
+        
+        var populatedCount = 0
+        for recipe in recipes {
+            guard let title = recipe.title,
+                  !title.isEmpty else {
+                print("⚠️ M7.1.3: Skipping recipe with nil/empty title")
+                continue
+            }
+            
+            // Use helper function for normalization
+            recipe.titleKey = Recipe.titleKey(from: title)
+            
+            // Set dateCreated if missing (reusing existing field)
+            if recipe.dateCreated == nil {
+                recipe.dateCreated = Date()
+            }
+            
+            populatedCount += 1
+        }
+        
+        print("✅ M7.1.3: Populated titleKey for \(populatedCount) recipes")
+    }
+    
+    // MARK: - M7.1.3 Stage A Migration Orchestration
+    
+    /// M7.1.3: Performs Stage A migration (populate semantic keys for existing data)
+    /// This is a one-time migration that runs on first launch after schema update
+    /// Uses UserDefaults to ensure idempotency (only runs once)
+    private func performStageAMigration(in context: NSManagedObjectContext) {
+        // Check if Stage A migration already completed
+        let migrationKey = "M7.1.3_StageA_Migration_Completed"
+        guard !UserDefaults.standard.bool(forKey: migrationKey) else {
+            print("ℹ️ M7.1.3 Stage A: Migration already completed, skipping...")
+            return
+        }
+        
+        print("🚀 M7.1.3 Stage A: Starting semantic key population migration...")
+        let startTime = Date()
+        
+        // Populate semantic keys for all 4 entities
+        populateCategorySemanticKeys(in: context)
+        populateIngredientTemplateSemanticKeys(in: context)
+        populatePlannedMealSemanticKeys(in: context)
+        populateRecipeSemanticKeys(in: context)
+        
+        // Save populated data
+        do {
+            if context.hasChanges {
+                try context.save()
+                print("✅ M7.1.3 Stage A: Successfully saved semantic keys")
+            } else {
+                print("ℹ️ M7.1.3 Stage A: No changes to save")
+            }
+        } catch {
+            print("❌ M7.1.3 Stage A: Failed to save: \(error)")
+            // Don't mark as complete if save failed
+            return
+        }
+        
+        // Mark migration as complete
+        UserDefaults.standard.set(true, forKey: migrationKey)
+        UserDefaults.standard.set(Date(), forKey: "M7.1.3_StageA_Migration_Date")
+        
+        let duration = Date().timeIntervalSince(startTime)
+        print("✅ M7.1.3 Stage A: Migration completed in \(String(format: "%.2f", duration))s")
+    }
 }

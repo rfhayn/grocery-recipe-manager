@@ -122,6 +122,27 @@ struct SettingsView: View {
                 }
             }
             
+            #if DEBUG
+            // M7.1.3 Part 4: Migration reset button (TEMPORARY - testing only)
+            // Resets Stage A migration flag to re-run migration with current data
+            Button {
+                MigrationTestHelper.resetStageAMigration()
+                print(MigrationTestHelper.getMigrationStatus())
+            } label: {
+                HStack {
+                    Image(systemName: "arrow.counterclockwise")
+                        .foregroundColor(.orange)
+                    VStack(alignment: .leading) {
+                        Text("Reset Migration")
+                            .font(.headline)
+                        Text("Re-run Stage A migration for testing")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            #endif
+            
         } header: {
             Text("Developer Tools")
         } footer: {
