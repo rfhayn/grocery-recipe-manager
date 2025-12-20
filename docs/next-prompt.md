@@ -1,17 +1,231 @@
-# Next Implementation Prompt - M7.1.3 Phase 1.3
+# Next Implementation Prompt - Strategic Decision Point
 
-**Phase**: M7.1.3 - CloudKit Sync Integrity  
-**Sub-Phase**: Phase 1.3 - Uniqueness Constraints  
-**Estimated Time**: 1-2 hours  
-**Status**: 🚀 READY TO START  
-**Prerequisites**: Phase 1.1 ✅ COMPLETE, Phase 1.2 ✅ COMPLETE  
-**Date**: December 19, 2025
+**Current Status**: M7.1.3 ✅ COMPLETE (Adjusted Scope)  
+**Phase 1.3**: ❌ CANCELLED (CloudKit incompatible)  
+**Date**: December 20, 2024  
+**Next**: Choose next milestone
 
 ---
 
-## 🚨 **CRITICAL: GIT WORKFLOW CLEANUP FIRST**
+## ✅ **M7.1.3 COMPLETE - What We Accomplished**
 
-**Before starting Phase 1.3, we need to fix the git workflow:**
+**Phase 1.1** (7 hours): Semantic keys added to all entities  
+**Phase 1.2** (1 hour): Repository pattern implemented  
+**Phase 1.3** (2 hours): Cancelled - CloudKit doesn't support constraints
+
+**Key Discovery**: CloudKit fundamentally rejects Core Data uniqueness constraints. The repository pattern is the correct solution.
+
+**Result**: CloudKit-compatible duplicate prevention via application-level enforcement
+
+---
+
+## 📝 **IMMEDIATE ACTIONS NEEDED**
+
+### **1. Delete Model Version 3 in Xcode** (⏳ 2 min)
+
+1. In Project Navigator, expand `forager.xcdatamodeld`
+2. Right-click on `forager 3.xcdatamodel`
+3. Select **"Delete"** → **"Move to Trash"**
+4. Click on `forager.xcdatamodeld` (parent)
+5. File Inspector → Model Version → Current: **forager 2**
+
+### **2. Verify App Runs** (⏳ 1 min)
+
+1. Clean Build Folder (Shift+Command+K)
+2. Build (Command+B)
+3. Run (Command+R)
+4. App should launch successfully with Model Version 2
+
+### **3. Commit Everything** (⏳ 5 min)
+
+```bash
+cd /Users/rich/Development/forager
+
+# Stage all changes
+git add -A
+
+# Commit with comprehensive message
+git commit -m "M7.1.3 COMPLETE: Repository pattern for CloudKit sync integrity
+
+✅ Completed Work:
+- Phase 1.1: Semantic keys (normalizedName, canonicalName, slotKey, titleKey)
+- Phase 1.2: Repository pattern with get-or-create functions
+- Updated all app code to use repositories (prevents duplicates)
+- Category.createDefaultCategories populates normalizedName
+- Category.migrateNilAssignmentsToUncategorized populates normalizedName
+
+🚫 Phase 1.3 CANCELLED:
+- CloudKit does not support Core Data uniqueness constraints
+- Attempted Model Version 3 with constraints - rejected by NSPersistentCloudKitContainer
+- Repository pattern already provides code-level uniqueness enforcement
+- Model Version 3 reverted, staying on Model Version 2
+
+📊 Time Tracking:
+- Phase 1.1: 7 hours (semantic keys)
+- Phase 1.2: 1 hour (repository pattern)
+- Phase 1.3: 2 hours (CloudKit constraint discovery)
+- Total M7.1.3: 10 hours (vs 11-15h estimate = 91% accuracy)
+
+🎯 Architecture Decision:
+CloudKit requires application-level uniqueness enforcement via repositories.
+Core Data constraints are incompatible with NSPersistentCloudKitContainer.
+Repository pattern is the correct CloudKit-compatible solution.
+
+Next: Strategic decision point (M7.2 / M6.0 / M8.0 / M7.5)
+
+Files modified:
+- forager/Repositories/*.swift (3 new repositories)
+- forager/Persistence.swift (removed temp code, cleaned debug prints)
+- Category+CoreDataClass.swift (removed debug prints, kept semantic key population)
+- AddIngredientView.swift (uses CategoryRepository)
+- IngredientTemplateService.swift (uses IngredientTemplateRepository)
+- MealPlanService.swift (uses PlannedMealRepository)
+- docs/current-story.md (updated with completion)
+- docs/next-prompt.md (updated with strategic decision)
+- docs/m7-docs/M7.1.3-PHASE1.3-CANCELLED.md (new)"
+
+# Push to GitHub
+git push
+```
+
+---
+
+## 🎯 **STRATEGIC DECISION: CHOOSE NEXT MILESTONE**
+
+### **Option 1: M7.2 - Multi-Device Sync Testing** (⏳ 2-3 hours) **VALIDATES M7.1.3**
+
+**What**: Test repository pattern prevents duplicates across 2 physical devices
+
+**Why Now**:
+- ✅ Validates M7.1.3 work immediately
+- ✅ Confirms semantic uniqueness works in real CloudKit sync
+- ✅ Quick validation before moving forward
+
+**Why Wait**:
+- ❌ Still not ready for external beta (parsing edge cases exist)
+- ❌ Doesn't directly improve user experience
+
+**Test Scenarios**:
+1. Create category on Device A → sync → verify on Device B
+2. Create same category on Device B → repository returns existing
+3. Offline: Create ingredient on Device A → go online → sync → verify Device B
+4. Concurrent: Both devices create "Milk" → repositories merge correctly
+
+### **Option 2: M6.0 - Testing Foundation** (⏳ 8-12 hours) **SAFETY NET**
+
+**What**: Comprehensive XCTest suite for repositories, services, and Core Data
+
+**Why Now**:
+- ✅ Prevents regressions as codebase grows
+- ✅ Safety net before external users
+- ✅ Professional development practice
+
+**Why Wait**:
+- ❌ Large time investment
+- ❌ No immediate user-facing benefit
+- ❌ Can be done incrementally later
+
+**Test Coverage**:
+- Repository pattern (uniqueness enforcement)
+- IngredientParsingService (regex accuracy)
+- QuantityMergeService (consolidation logic)
+- RecipeScalingService (math correctness)
+
+### **Option 3: M8.0 - Analytics Dashboard** (⏳ 6-8 hours) **PRODUCTION READINESS**
+
+**What**: Usage metrics, performance monitoring, crash reporting
+
+**Why Now**:
+- ✅ Production readiness feature
+- ✅ Helps identify issues in external beta
+- ✅ User insights for feature prioritization
+
+**Why Wait**:
+- ❌ Not on critical path to launch
+- ❌ Can be added post-launch
+- ❌ Parsing issues more urgent for UX
+
+**Features**:
+- Recipe usage frequency
+- Ingredient template popularity
+- Parsing success rate
+- CloudKit sync metrics
+
+### **Option 4: M7.5 - Parsing Resilience & Polish** (⏳ 4-6 hours) **RECOMMENDED 🌟**
+
+**What**: Graceful degradation + user correction UI for parsing edge cases
+
+**Why Now** (🔥 STRONGEST CASE):
+- ✅ **Directly addresses biggest UX risk for external beta**
+- ✅ **Prevents user frustration when parser fails on edge cases**
+- ✅ **Production-ready experience before external users**
+- ✅ Moderate time investment (4-6h)
+- ✅ High impact on user satisfaction
+
+**Why Wait**:
+- ❌ Parser works well for common cases (but edge cases exist)
+- ❌ Could defer to M9.5 (hybrid regex + NLP)
+
+**Key Features**:
+1. **Fallback UI**: When parser confidence < 0.7, show correction UI
+2. **User Correction**: Let user fix quantity/unit/ingredient
+3. **Learning**: Save corrections to improve future parsing
+4. **Graceful Degradation**: App never breaks, always lets user continue
+
+**Edge Cases Addressed**:
+- "2-3 cups flour" (range handling)
+- "1 1/2 teaspoons salt" (mixed number parsing)
+- "handful of nuts" (imprecise quantities)
+- "Eggs (3 large)" (parenthetical quantities)
+- "2 15-oz cans beans" (multiple quantities)
+
+**User Flow**:
+```
+User adds ingredient: "2-3 cups flour"
+  → Parser confidence: 0.6 (< 0.7 threshold)
+  → Show correction UI: "I parsed this as: 2 cups flour. Is this correct?"
+  → User taps "Edit" → Corrects to "2.5 cups flour"
+  → Save correction → Learn for future
+  → Continue seamlessly
+```
+
+---
+
+## 🎯 **RECOMMENDATION: M7.5 - Parsing Resilience**
+
+**Rationale**:
+1. **External beta readiness**: Parsing edge cases are the #1 UX risk
+2. **User satisfaction**: Prevents frustration when parser fails
+3. **Time-to-value**: 4-6 hours for high-impact improvement
+4. **Foundation for learning**: Captures real-world data to improve parser
+5. **Professional polish**: Shows attention to detail
+
+**Alternative Path** (if you prefer validation first):
+1. Do M7.2 (2-3h) to validate CloudKit sync
+2. Then do M7.5 (4-6h) before external beta
+3. Total: 6-9 hours to production-ready state
+
+**See**: `docs/prds/m7.5-parsing-resilience-polish.md` (if exists, or create)
+
+---
+
+## 📝 **NEXT SESSION STARTUP**
+
+When you return:
+
+1. Read `docs/session-startup-checklist.md`
+2. Read `docs/project-naming-standards.md`
+3. Read `docs/current-story.md` (updated with M7.1.3 complete)
+4. Read this file (next-prompt.md) for strategic options
+5. **Decide which milestone to tackle next**
+6. Create feature branch for chosen milestone
+7. Begin implementation
+
+---
+
+**Last Updated**: December 20, 2024  
+**Status**: M7.1.3 Complete → Strategic Decision Point  
+**Recommendation**: M7.5 (Parsing Resilience) for external beta readiness
 
 ### **Current Situation**
 - ⚠️ Phase 1.2 changes committed directly to `main` branch
