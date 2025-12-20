@@ -238,6 +238,8 @@ extension Category {
                 uncategorizedCategory = Category(context: context)
                 uncategorizedCategory.id = UUID()
                 uncategorizedCategory.name = "Uncategorized"
+                uncategorizedCategory.normalizedName = Category.normalizedName(from: "Uncategorized") // M7.1.3: Populate semantic key
+                uncategorizedCategory.updatedAt = Date() // M7.1.3: Set timestamp
                 uncategorizedCategory.color = "#9E9E9E" // Gray color
                 uncategorizedCategory.isDefault = false // Custom category, not a default
                 uncategorizedCategory.dateCreated = Date()
@@ -431,6 +433,12 @@ struct PersistenceController {
             #else
             print("💻 Local-only Core Data (Debug build - fast iteration)")
             #endif
+            
+            // M7.1.3: Enable automatic lightweight migration for schema changes
+            description.setOption(true as NSNumber,
+                                forKey: NSMigratePersistentStoresAutomaticallyOption)
+            description.setOption(true as NSNumber,
+                                forKey: NSInferMappingModelAutomaticallyOption)
             
             // Enable history tracking (required for CloudKit sync)
             description.setOption(true as NSNumber, 

@@ -28,6 +28,8 @@ public class Category: NSManagedObject {
             let category = Category(context: context)
             category.id = UUID()
             category.name = name
+            category.normalizedName = Category.normalizedName(from: name) // M7.1.3: Populate semantic key
+            category.updatedAt = Date() // M7.1.3: Set timestamp
             category.color = color
             category.sortOrder = sortOrder
             category.isDefault = true

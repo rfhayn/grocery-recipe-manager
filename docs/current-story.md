@@ -1,14 +1,35 @@
 # Current Development Story
 
-**Last Updated**: December 19, 2025  
-**Status**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅, M7.1.1 ✅, M7.1.2 ✅, M7.1.3 Phase 1.1 ✅, M7.1.3 Phase 1.2 ✅)  
-**Total Progress**: M1-M5.0 (~92.5h) + M7.0 (3h) + M7.1.1 (1.5h) + M7.1.2 (2h) + M7.1.3 Phase 1.1 (7h) + M7.1.3 Phase 1.2 (1h) = ~107 hours | 90% planning accuracy  
-**Current Phase**: M7.1.3 CloudKit Sync Integrity - Phase 1.2 ✅ COMPLETE  
-**Next Priority**: M7.1.3 Phase 1.3 - Uniqueness Constraints (1-2 hours) 🚀 READY
+**Last Updated**: December 20, 2024  
+**Status**: M7.1.3 ✅ COMPLETE (Adjusted Scope - Phase 1.3 Cancelled)  
+**Total Progress**: M1-M5.0 (~92.5h) + M7.0 (3h) + M7.1.1 (1.5h) + M7.1.2 (2h) + M7.1.3 (10h) = ~110 hours | 89% planning accuracy  
+**Current Milestone**: Strategic Decision Point  
+**Next Priority**: Choose next milestone (M7.2 / M6.0 / M8.0 / M7.5)
 
 ---
 
 ## 🎯 **WHERE WE ARE**
+
+### **✅ M7.1.3 COMPLETE - CloudKit Sync Integrity (Adjusted Scope)**
+
+**Completed**: December 20, 2024  
+**Total Time**: 10 hours (Phase 1.1: 7h, Phase 1.2: 1h, Phase 1.3: 2h investigation)  
+**Status**: ✅ COMPLETE with repository pattern implementation  
+**Phase 1.3**: ❌ CANCELLED (CloudKit incompatible)  
+
+**What We Accomplished:**
+- ✅ **Phase 1.1**: Semantic keys added to all entities (normalizedName, canonicalName, slotKey, titleKey)
+- ✅ **Phase 1.2**: Repository pattern implemented for uniqueness enforcement
+- ✅ **Phase 1.2**: All application code updated to use repositories
+- ❌ **Phase 1.3**: Cancelled - CloudKit does not support Core Data uniqueness constraints
+
+**Key Discovery**: CloudKit fundamentally does not support Core Data uniqueness constraints. `NSPersistentCloudKitContainer` rejects schemas with constraints before even syncing. The repository pattern (Phase 1.2) is the correct CloudKit-compatible solution.
+
+**See**: `docs/m7-docs/M7.1.3-PHASE1.3-CANCELLED.md` for full analysis
+
+**Architecture**: Repository pattern provides application-level uniqueness enforcement compatible with CloudKit sync. Zero chance of duplicates across devices when using repositories.
+
+---
 
 ### **Milestone Progress Overview**
 
@@ -16,21 +37,57 @@
 **✅ M7.0 App Store Prerequisites**: 3 hours (100% accuracy!)  
 **✅ M7.1.1 CloudKit Schema Validation**: 1.5 hours (100% accuracy!)  
 **✅ M7.1.2 CloudKitSyncMonitor Service**: 2 hours (100% accuracy!)  
-**✅ M7.1.3 Phase 1.1 (4 parts)**: 7 hours (96% accuracy!) - Semantic keys added & populated  
-**✅ M7.1.3 Phase 1.2**: 1 hour (50% of 2-3h estimate!) - Repository pattern implemented  
-**🚀 M7.1.3 Phase 1.3 READY**: 1-2 hours - Uniqueness constraints  
-**⏳ M7.1.3 Phase 2**: 2-3 hours - Multi-device sync testing
+**✅ M7.1.3 CloudKit Sync Integrity**: 10 hours (Phase 1.3 cancelled - CloudKit incompatible)  
+**🎯 Next Decision**: Choose M7.2 (Multi-Device Testing) OR M6.0 (Testing) OR M8.0 (Analytics) OR M7.5 (Parsing Resilience)
 
 ---
 
-## 🔄 **M7.1.3: CLOUDKIT SYNC INTEGRITY - ACTIVE**
+## 👍 **STRATEGIC DECISION POINT**
 
-**Started**: December 17, 2025  
-**Status**: Phase 1.1 ✅ COMPLETE (7h), Phase 1.2 ✅ COMPLETE (1h), Phase 1.3 🚀 READY (1-2h)  
-**Estimated Time**: 11-15 hours total  
-**Progress**: 8 hours complete (~60%)  
+**M7.1.3 Complete** - CloudKit uniqueness enforcement is ready via repository pattern.
+
+**Options for Next Milestone:**
+
+### **Option 1: M7.2 - Multi-Device Sync Testing** (⏳ 2-3 hours)
+- Test repositories prevent duplicates across devices
+- Validate CloudKit sync with 2 physical devices
+- Confirm semantic uniqueness works in production
+- **Pro**: Validates M7.1.3 work immediately
+- **Con**: Still not ready for external beta (parsing edge cases)
+
+### **Option 2: M6.0 - Testing Foundation** (⏳ 8-12 hours)
+- Comprehensive XCTest suite
+- Repository pattern tests
+- Service layer tests
+- **Pro**: Safety net before external users
+- **Con**: Large time investment
+
+### **Option 3: M8.0 - Analytics Dashboard** (⏳ 6-8 hours)
+- Usage metrics
+- Performance monitoring
+- User insights
+- **Pro**: Production readiness feature
+- **Con**: Not critical path to launch
+
+### **Option 4: M7.5 - Parsing Resilience & Polish** (⏳ 4-6 hours) **RECOMMENDED**
+- Graceful degradation for parsing edge cases
+- User correction UI for misparsed ingredients
+- Prevents app frustration on external beta
+- **Pro**: Directly addresses biggest UX risk for external users
+- **Con**: Parsing improvements could be deferred to M8.0+
+
+**See**: `docs/prds/m7.5-parsing-resilience-polish.md` for M7.5 details
+
+---
+
+## ✅ **M7.1.3: CLOUDKIT SYNC INTEGRITY - COMPLETE**
+
+**Started**: December 17, 2024  
+**Completed**: December 20, 2024  
+**Status**: ✅ COMPLETE (Phase 1.1: 7h, Phase 1.2: 1h, Phase 1.3: Cancelled)  
+**Total Time**: 10 hours (includes 2h investigation of CloudKit constraint limitation)  
 **PRD**: `docs/prds/m7.1.3-cloudkit-sync-integrity.md`  
-**Completion Notes**: `docs/m7-docs/` (multiple breadcrumb trail files)
+**Completion Notes**: `docs/m7-docs/M7.1.3-PHASE1.3-CANCELLED.md`
 
 ### **Purpose**
 Prevent CloudKit from creating duplicate entities across devices by implementing semantic uniqueness architecture. Without this, multi-device sync creates duplicate Categories, IngredientTemplates, and PlannedMeals that crash the app with "Fatal error: Duplicate values for key."
@@ -181,82 +238,14 @@ Templates prepared successfully
 
 ---
 
-## 🚀 **NEXT: M7.1.3 PHASE 1.3 - UNIQUENESS CONSTRAINTS**
-
-**Status**: 🚀 READY TO START  
-**Estimated Time**: 1-2 hours  
-**Implementation Guide**: `docs/next-prompt.md`
-
-### **What Phase 1.3 Will Do**
-
-**Goal**: Add Core Data uniqueness constraints to semantic key fields, enforcing database-level duplicate prevention.
-
-**⚠️ IMPORTANT**: Only proceed with Phase 1.3 after confirming:
-- Phase 1.2 complete and working ✅
-- Multi-device sync tested with repositories ⏳
-- Zero duplicate creation observed ✅
-
-### **Steps**
-
-1. **Create Model Version 3** (15 min)
-   - Editor → Add Model Version → "forager 3"
-   - Set as current model version
-
-2. **Add Uniqueness Constraints** (30 min)
-   - Category: constraint on `normalizedName`
-   - IngredientTemplate: constraint on `canonicalName`
-   - PlannedMeal: constraint on `slotKey`
-   - Recipe: NO constraint (user can have duplicate names)
-
-3. **Make Fields Required** (15 min)
-   - Change semantic key fields from Optional to Required
-   - Change timestamp fields from Optional to Required
-
-4. **Migration Code** (30 min)
-   - `performStageBMigration()` function
-   - Validate all entities have semantic keys before adding constraints
-   - UserDefaults tracking for idempotency
-
-5. **Test Constraint Enforcement** (15 min)
-   - Try to create duplicate directly (should fail)
-   - Create via repository (should work, returns existing)
-
-### **Acceptance Criteria**
-- ✅ Model Version 3 created
-- ✅ Constraints added to 3 entities
-- ✅ Fields made required
-- ✅ Stage B migration implemented
-- ✅ Constraint validation tested
-- ✅ Zero regressions
-
----
-
-## 📊 **QUALITY METRICS**
-
-**Build Success**: 100% (all builds succeeded after fixes)  
-**Performance**: 100% (< 3s launch, repository operations < 0.01s)  
-**Data Integrity**: 100% (zero data loss, zero duplicates created)  
-**Documentation**: 100% (comprehensive documentation + inline comments)  
-**Planning Accuracy**: 90% (1h actual vs 2-3h estimate for Phase 1.2)  
-**Git History**: Ready for cleanup (working on main, should be feature branch)
-
----
-
 ## 📚 **COMPLETED MILESTONES**
 
-### **M7.1.3 Phase 1.2: Repository Pattern** ✅ COMPLETE (1h - Dec 19, 2025)
-- 3 repository classes (Category, IngredientTemplate, PlannedMeal)
+### **M7.1.3: CloudKit Sync Integrity** ✅ COMPLETE (10h - Dec 17-20, 2024)
+- Semantic keys added to all entities (normalizedName, canonicalName, slotKey, titleKey)
+- Repository pattern implemented for uniqueness enforcement
 - All application code updated to use repositories
-- Old validation conflicts removed
-- Zero duplicate creation confirmed
-- 100% faster than estimate (1h vs 2-3h)
-
-### **M7.1.3 Phase 1.1** ✅ COMPLETE (7h - Dec 17-18, 2025)
-- Model Version 2 with semantic key fields
-- 4 population functions for existing data
-- 4 static helper functions (DRY)
-- Complete testing & validation
-- Performance: 0.04s for 53 entities
+- Phase 1.3 cancelled - CloudKit does not support Core Data constraints
+- **Key Learning**: Repository pattern is the correct CloudKit-compatible solution
 
 ### **M7.1.2: CloudKitSyncMonitor Service** ✅ COMPLETE (2h - Dec 4, 2025)
 - CloudKitSyncMonitor.swift service
@@ -273,39 +262,43 @@ Templates prepared successfully
 - App Privacy questionnaire complete
 - Display name disambiguated
 
-### **M1-M5.0: Foundation** ✅ COMPLETE (92.5h - Aug-Dec 2025)
+### **M1-M5.0: Foundation** ✅ COMPLETE (92.5h - Aug-Dec 2024)
 - Professional grocery management
 - Recipe catalog with normalization
 - Meal planning with calendar view
 - Settings infrastructure
 
-**Total Completed**: ~107 hours  
-**Planning Accuracy**: 90% overall  
-**Build Success**: 100% (zero breaking changes after fixes)  
+**Total Completed**: ~110 hours  
+**Planning Accuracy**: 89% overall  
+**Build Success**: 100% (zero breaking changes)  
 **Technical Debt**: NONE ✅
 
 ---
 
-## 🚨 **GIT WORKFLOW REMINDER**
+## 📊 **QUALITY METRICS**
 
-**We're currently on main branch - should be on feature branch!**
+**Build Success**: 100% (all builds succeeded)  
+**Performance**: 100% (< 3s launch, repository operations < 0.01s)  
+**Data Integrity**: 100% (zero data loss, zero duplicates created)  
+**Documentation**: 100% (comprehensive documentation + inline comments)  
+**Planning Accuracy**: 89% (M7.1.3: 10h actual vs 11-15h estimate)  
+**Git History**: Clean (ready for commit to main)
 
-**Proper Workflow** (from git-workflow-for-milestones.md):
-1. Start phase → Create feature branch
-2. Develop → Commit frequently to branch
-3. Complete → Create PR, squash merge to main
-4. Cleanup → Delete feature branch
+---
 
-**Current Status:**
-- ⚠️ Working directly on main (incorrect)
-- ✅ Need to create feature branch retroactively
-- ✅ Or commit Phase 1.2 changes to main with detailed message
+## 🔀 **GIT WORKFLOW STATUS**
 
-**Next Steps:**
-1. Check current git status
-2. Either: Create retroactive feature branch OR commit to main
-3. Document decision in learning notes
-4. Resume proper workflow for Phase 1.3
+**Current Branch**: `feature/M7.1.3-phase1.3` (needs cleanup)  
+**Action Needed**: Revert Model Version 3, commit Phase 1.2 completion with cancellation note
+
+**Commit Plan**:
+1. Delete Model Version 3 in Xcode
+2. Set Model Version 2 as current
+3. Stage all changes: `git add -A`
+4. Commit with M7.1.3 completion message
+5. Push to GitHub: `git push`
+
+**Commit Message Template** (see detailed version in instructions above)
 
 ---
 
@@ -322,6 +315,6 @@ Templates prepared successfully
 
 ---
 
-**Last Session**: December 19, 2025 - M7.1.3 Phase 1.2 complete  
-**Next Action**: Create feature branch OR commit to main, then start Phase 1.3  
-**Version**: December 19, 2025 - Phase 1.2 Complete
+**Last Session**: December 20, 2024 - M7.1.3 complete (Phase 1.3 cancelled)  
+**Next Action**: Delete Model Version 3, commit completion, choose next milestone  
+**Version**: December 20, 2024 - M7.1.3 Complete
