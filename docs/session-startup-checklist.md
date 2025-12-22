@@ -1,7 +1,7 @@
 # Session Startup Checklist
 
 **Purpose**: Mandatory startup procedure for every Claude development session  
-**Last Updated**: December 5, 2025  
+**Last Updated**: December 21, 2025  
 **Required Reading**: **EVERY SESSION** - No exceptions
 
 ---
@@ -132,7 +132,68 @@ Always use full identifiers: "M7.1.3" not "Phase 3" or "Step 3"
 
 **Key Takeaway**: Search before creating - avoid duplicate infrastructure
 
-#### **8. Create Feature Branch for Phase** ✅
+#### **8. VALIDATE Architecture Approach (For Complex Features)** ✅
+**When**: Before implementing features with multiple possible approaches  
+**Purpose**: Ensure you're building the right thing before writing code  
+**Required for**: Multi-user features, sharing, sync, complex workflows
+
+**Validation Process:**
+1. Identify if feature has multiple architectural approaches
+2. Document each approach with pros/cons
+3. Present options to user with explicit recommendation
+4. Get confirmation before writing any code
+
+**Validation Template:**
+```markdown
+## 🎯 Architecture Validation Required
+
+**Feature**: [Name]
+**Milestone**: [M#.#.#]
+
+I see multiple architectural approaches for this feature:
+
+### Option 1: [Approach Name]
+**How it works**: [Brief description]
+**Pros**: 
+- [Benefit 1]
+- [Benefit 2]
+**Cons**: 
+- [Limitation 1]
+- [Limitation 2]
+**Best for**: [Use case]
+**Time estimate**: [Hours]
+**Example**: [Real-world scenario]
+
+### Option 2: [Approach Name]
+**How it works**: [Brief description]
+**Pros**: 
+- [Benefit 1]
+- [Benefit 2]
+**Cons**: 
+- [Limitation 1]
+- [Limitation 2]
+**Best for**: [Use case]
+**Time estimate**: [Hours]
+**Example**: [Real-world scenario]
+
+**RECOMMENDATION**: Option [#] because [reasoning]
+
+**QUESTION**: Which approach matches your requirements?
+```
+
+**Red Flags That Require Validation:**
+- "Multi-user" (could mean sharing items OR shared database)
+- "Collaboration" (could mean CKShare OR shared zone)
+- "Sync" (could mean personal OR household)
+- "Share" (could mean selective OR wholesale)
+- "Family" (could mean Apple Family Sharing OR household database)
+
+**Historical Example:**
+M7.2 "Multi-user collaboration" - Should have validated CKShare vs Shared Zone BEFORE implementing. This would have saved 3.5 hours.
+
+**Key Takeaway**: 15 minutes of validation saves hours of rework. Present options, get confirmation, THEN code.
+
+#### **9. Create Feature Branch for Phase** ✅
 **Location**: Git command line  
 **When**: Before writing ANY code for a phase  
 **Purpose**: Isolate phase work for clean history, safe experimentation, and easy rollback
@@ -198,6 +259,7 @@ git push -u origin feature/M7.1.3-multi-device-testing
 - [ ] Search for Core Data schema (if needed)
 - [ ] Review relevant ADRs (if needed)
 - [ ] Search for existing services (if creating new infrastructure)
+- [ ] **VALIDATE architecture approach** (if complex feature with multiple options)
 - [ ] **Create feature branch** (before any code)
 
 **Red Flag Check:**
@@ -377,7 +439,7 @@ If interrupted or switching contexts mid-session:
 
 ---
 
-**Version**: 2.0 - Git Workflow Integration  
+**Version**: 2.1 - Product Validation Checkpoint  
 **Created**: October 23, 2025  
-**Last Updated**: December 5, 2025  
+**Last Updated**: December 21, 2025  
 **Next Review**: After M7 completion

@@ -1,9 +1,9 @@
 # Forager - Project Index
 
-**Last Updated**: December 19, 2025  
+**Last Updated**: December 21, 2025  
 **Purpose**: Central navigation hub for all project documentation  
-**Current Milestone**: M7 - CloudKit Sync & External TestFlight (M7.0 ✅, M7.1.1 ✅, M7.1.2 ✅, M7.1.3 Phase 1.1 ✅)  
-**Next Priority**: M7.1.3 Phase 1.2 - Repository Pattern Implementation (3-4 hours) 🚀 READY
+**Current Milestone**: M7 - CloudKit Sync, Household Sharing & External TestFlight (M7.0 ✅, M7.1 ✅, M7.2 Architecture Validated ✅)  
+**Next Priority**: M7.2.1 - Household Setup & Shared Zone (3-4 hours) 🚀 READY
 
 ---
 
@@ -52,18 +52,26 @@ _[All other sections remain the same until PRDs section]_
 #### **PRDs (Product Requirements Documents)**
 
 **Active PRD**:
-- **[milestone-7-cloudkit-sync-external-testflight.md](prds/milestone-7-cloudkit-sync-external-testflight.md)** ← Current milestone
-  - Complete CloudKit sync + external TestFlight
-  - 7 phases (M7.0-M7.7) with detailed breakdowns
-  - M7.0 complete ✅ (3h)
-  - M7.1 active 🔄 (multiple sub-phases)
-  - 35-46 hours estimated total (+3-4h for M7.5)
+- **[milestone-7-cloudkit-sync-external-testflight.md](prds/milestone-7-cloudkit-sync-external-testflight.md)** ← Current milestone (v2.0)
+  - Complete CloudKit sync + household sharing + external TestFlight
+  - **Architecture Update (Dec 21)**: Pivoted to Shared Zone approach
+  - M7.0 complete ✅ (3h), M7.1 complete ✅ (6.5h)
+  - M7.2 ready 🚀 (8-10h) - Household sharing
+  - 27-37 hours estimated total
 
-**M7.1.3 Specific PRD**:
-- **[m7.1.3-cloudkit-sync-integrity.md](prds/m7.1.3-cloudkit-sync-integrity.md)**
-  - Comprehensive 3-phase plan to prevent CloudKit duplicates
-  - Phase 1.1 complete (5.5h actual)
-  - Semantic keys + population functions operational
+**M7.2 Detailed PRD** (NEW):
+- **[m7.2-shared-household-zone.md](prds/m7.2-shared-household-zone.md)**
+  - Comprehensive implementation guide for household sharing
+  - CloudKit Shared Zones (not CKShare)
+  - 4 phases with detailed task breakdowns
+  - Complete user journey (Sarah & Mike scenarios)
+  - Full service implementation guide
+
+**M7.3-M7.6 Outlines** (NEW):
+- **[m7.3-conflict-resolution-outline.md](prds/m7.3-conflict-resolution-outline.md)**
+- **[m7.4-sync-status-ui-outline.md](prds/m7.4-sync-status-ui-outline.md)**
+- **[m7.5-external-testflight-outline.md](prds/m7.5-external-testflight-outline.md)**
+- **[m7.6-beta-landing-page-outline.md](prds/m7.6-beta-landing-page-outline.md)**
 
 **Parsing Enhancement PRDs** (NEW - Strategic Evolution) 💡:
 - **[M7.5-parsing-resilience-polish-prd.md](prds/parsing/M7.5-parsing-resilience-polish-prd.md)**
@@ -91,7 +99,43 @@ _[Continue with rest of file content...]_
 
 ## 🔥 **RECENT ACTIVITY**
 
-### **December 19, 2025** - Parsing Resilience Roadmap Integration 💡 NEW STRATEGIC DIRECTION
+### **December 21, 2025** - M7.2 Architecture Pivot 🔄 VALIDATED & DOCUMENTED
+- **Completed**: Major architecture validation and documentation for household sharing
+- **Achievement**: Pivoted from CKShare (wrong approach) to Shared Zones (correct approach)
+- **What Happened**:
+  - Started M7.2.1 implementing CKShare (individual item sharing)
+  - Completed Phases 1-3 (Core Data, Service, UI) - 3.5h invested
+  - Discovered architecture mismatch during validation
+  - User needs: Shared household database (all data shared automatically)
+  - What was being built: CKShare (manual sharing per item)
+- **Pivot Decision**:
+  - ❌ Abandoned CKShare approach (3.5h invested but valuable learning)
+  - ✅ New Approach: CloudKit Shared Zones for household database
+  - ✅ Better UX: Invite once, share everything automatically
+  - ✅ Perfect for couples/roommates managing household together
+- **Documentation Created** (~3 hours):
+  - **[learning-notes/25-m7-architecture-pivot-ckshare-vs-shared-zone.md](learning-notes/25-m7-architecture-pivot-ckshare-vs-shared-zone.md)** - Comprehensive decision analysis
+  - **[architecture/m7-shared-zone-architecture.md](architecture/m7-shared-zone-architecture.md)** - Complete technical framework
+  - **[prds/m7.2-shared-household-zone.md](prds/m7.2-shared-household-zone.md)** - Detailed implementation guide (28KB!)
+  - **[prds/m7.3-conflict-resolution-outline.md](prds/m7.3-conflict-resolution-outline.md)** - Future work outline
+  - **[prds/m7.4-sync-status-ui-outline.md](prds/m7.4-sync-status-ui-outline.md)** - Future work outline
+  - **[prds/m7.5-external-testflight-outline.md](prds/m7.5-external-testflight-outline.md)** - Future work outline
+  - **[prds/m7.6-beta-landing-page-outline.md](prds/m7.6-beta-landing-page-outline.md)** - Future work outline
+  - Updated [milestone-7-cloudkit-sync-external-testflight.md](prds/milestone-7-cloudkit-sync-external-testflight.md) to v2.0
+- **Process Improvement**:
+  - ✅ Added **Product Validation Checkpoint** to session-startup-checklist.md (Step 8)
+  - Validates architectural approach BEFORE coding for complex features
+  - Prevents building wrong thing in future (worth 10x in avoided rework)
+- **Net Cost**:
+  - Time lost: 3.5h on CKShare implementation
+  - Documentation time: ~3h for complete framework
+  - M7.1 work preserved: 6.5h still valuable (✅ reusable)
+  - Learning value: HIGH (process improvement prevents future mistakes)
+- **Branch Status**: docs/m7-architecture-pivot (ready to merge)
+- **Next**: Commit docs, PR, delete abandoned M7.2.1 branch, start fresh M7.2.1
+- **Total Progress**: ~109 hours (M1-M7.1: 102h + documentation: 3h + investigation: 3.5h)
+
+### **December 19, 2025** - Parsing Resilience Roadmap Integration 💡 STRATEGIC DIRECTION
 - **Completed**: Strategic planning for ingredient parsing evolution
 - **Achievement**: Three-phase parsing improvement roadmap (M7.5, M8.0, M9.5)
 - **Deliverables**:
