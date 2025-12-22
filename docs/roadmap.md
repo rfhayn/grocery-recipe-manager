@@ -1,8 +1,8 @@
 # Forager - Development Roadmap
 
-**Last Updated**: December 19, 2025  
-**Current Phase**: M5.0 COMPLETE ✅ | M7 READY 🚀  
-**Status**: All M1-M5.0 milestones complete, CloudKit sync & external TestFlight ready to start
+**Last Updated**: December 21, 2025  
+**Current Phase**: M5.0 COMPLETE ✅ | M7.1 COMPLETE ✅ | M7.2 READY 🚀  
+**Status**: All M1-M5.0 milestones complete, M7.1 CloudKit foundation operational, M7.2 household sharing ready to start
 
 ---
 
@@ -64,31 +64,38 @@ _[Continue with existing roadmap structure but skip to the detailed M7 section]_
 
 ---
 
-### **⏳ M7: CloudKit Sync & External TestFlight - PLANNED** 🚀
+### **🔄 M7: CloudKit Sync, Household Sharing & External TestFlight - IN PROGRESS** 🚀
 
-**Status**: ⏳ Planned - Ready to Start  
-**Estimated Time**: 30-41 hours base, 35-46 hours with buffer (+3-4h for M7.5)  
-**Dependencies**: M5.0 complete  
-**PRD**: docs/prds/milestone-7-cloudkit-sync-external-testflight.md
+**Status**: 🔄 In Progress - M7.1 Complete ✅, M7.2 Architecture Validated 🚀  
+**Estimated Time**: 30-41 hours base, 35-46 hours with buffer  
+**Actual Progress**: 9.5 hours (M7.0: 3h, M7.1: 6.5h)  
+**Dependencies**: M5.0 complete ✅  
+**PRD**: docs/prds/milestone-7-cloudkit-sync-external-testflight.md (v2.0 - Shared Zone Architecture)
 
-**⚠️ CRITICAL**: M7.0 App Store Prerequisites are MANDATORY before external TestFlight submission
+**⚠️ ARCHITECTURE PIVOT (Dec 21, 2025)**: Pivoted from CKShare (per-item sharing) to Shared Household Zone (all data shared automatically). See learning note 25 for rationale.
 
-**M7.0: App Store Prerequisites (2-3 hours) - MANDATORY** 🚨
-- **M7.0.1**: Privacy Policy Creation & Hosting (1h)
-- **M7.0.2**: Privacy Policy Integration (1h)
-- **M7.0.3**: App Privacy Questionnaire (30min)
-- **M7.0.4**: Display Name Disambiguation (30min)
+**M7.0: App Store Prerequisites (3 hours) - COMPLETE** ✅
+- ✅ **M7.0.1**: Privacy Policy Creation & Hosting (1h)
+- ✅ **M7.0.2**: Privacy Policy Integration (1h)
+- ✅ **M7.0.3**: App Privacy Questionnaire (30min)
+- ✅ **M7.0.4**: Display Name Disambiguation (30min)
 
-**M7.1: CloudKit Sync Foundation (6-8 hours)**
-- **M7.1.1**: CloudKit Schema Validation (2-3h)
-- **M7.1.2**: NSPersistentCloudKitContainer Integration (3-4h)
-- **M7.1.3**: Initial Sync Testing (3h)
+**M7.1: CloudKit Sync Foundation (6.5 hours) - COMPLETE** ✅
+- ✅ **M7.1.1**: CloudKit Schema Validation (1.5h)
+- ✅ **M7.1.2**: CloudKitSyncMonitor Service (2h)
+- ⏭️ **M7.1.3**: Multi-Device Testing (skipped - integrated into M7.2)
 
-**M7.2: Multi-User Collaboration (8-10 hours)**
-- **M7.2.1**: CKShare Implementation (3-4h)
-- **M7.2.2**: Share Management UI (2-3h)
-- **M7.2.3**: Permission System (2h)
-- **M7.2.4**: Concurrent Editing (1h)
+**M7.2: Shared Household Zone (8-10 hours) - READY** 🚀
+- 🚀 **M7.2.1**: Household Setup & Shared Zone (3-4h)
+- ⏳ **M7.2.2**: Member Invitation & Acceptance (2-3h)
+- ⏳ **M7.2.3**: Sync Validation & Testing (1-2h)
+- ⏳ **M7.2.4**: Household Management (1-2h)
+
+**Architecture Change:**
+- ❌ **Abandoned**: CKShare per-item sharing (3.5h invested)
+- ✅ **New Approach**: CloudKit Shared Zones (household database)
+- ✅ **Better UX**: Invite once, share everything automatically
+- ✅ **Documentation**: Complete technical framework and PRD
 
 **M7.3: Conflict Resolution & Error Handling (4-6 hours)**
 - **M7.3.1**: Conflict Resolution Policies (2-3h)

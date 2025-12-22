@@ -1,31 +1,31 @@
-# M7: CloudKit Sync, Family Sharing & External TestFlight - PRD
+# M7: CloudKit Sync, Household Sharing & External TestFlight - PRD
 
-**Milestone**: M7 - CloudKit Sync, Multi-User Collaboration, External TestFlight  
-**Version**: 1.1  
+**Milestone**: M7 - CloudKit Sync, Household Collaboration, External TestFlight  
+**Version**: 2.0 - Shared Zone Architecture  
 **Created**: December 3, 2025  
-**Last Updated**: December 3, 2025  
-**Status**: 🚀 READY TO START  
+**Last Updated**: December 21, 2025  
+**Status**: 🚀 READY TO START (M7.1 Complete, M7.2 Ready)  
 **Estimated Duration**: 27-37 hours (including M7.0 prerequisites)
+
+**⚠️ ARCHITECTURE UPDATE (Dec 21, 2025)**: Pivoted from CKShare (per-item sharing) to Shared Zone (household database) architecture. See [Learning Note 25](../learning-notes/25-m7-architecture-pivot-ckshare-vs-shared-zone.md) for details on this decision.
 
 ---
 
 ## 🎯 Executive Summary
 
-M7 transforms Forager from a single-device app into a collaborative, multi-user platform with real-time CloudKit synchronization and public beta testing capability. This milestone enables families to share grocery lists and recipes across devices, while expanding the TestFlight beta program for broader feedback and professional portfolio showcase.
-
-**⚠️ STRATEGIC NOTE**: This PRD assumes CloudKit implementation BEFORE external TestFlight (Path A). An alternative approach is to submit the current build to external TestFlight first, then add CloudKit as an update (Path B). See "Strategic Decision Point" section below for detailed comparison.
+M7 transforms Forager from a single-device app into a collaborative household platform with CloudKit shared zone synchronization and public beta testing capability. This milestone enables household members (couples, roommates, families) to automatically share ALL grocery lists, recipes, and meal plans via a single shared database, while expanding the TestFlight beta program for broader feedback and professional portfolio showcase.
 
 **Key Deliverables:**
 0. Privacy policy and App Store prerequisites (MANDATORY before external TestFlight)
-1. Full CloudKit sync for all data (grocery lists, recipes, meal plans, categories, ingredients)
-2. Multi-user collaboration with family sharing
+1. Full CloudKit sync for all data across user's devices
+2. **Shared household zone** - automatic sharing of all data with household members
 3. Multi-device sync for seamless experience across iPhones/iPads
-4. Conflict resolution for concurrent edits
+4. Conflict resolution for concurrent household edits
 5. External TestFlight setup with public link
 6. Professional beta landing page for LinkedIn/portfolio
 
 **Why This Milestone:**
-- **User Value**: Families can collaborate on meal planning and shopping
+- **User Value**: Household members seamlessly collaborate on groceries and meal planning
 - **Technical Foundation**: CloudKit infrastructure for future features
 - **Professional Showcase**: Public beta demonstrates real-world product
 - **Strategic**: Positions app for App Store launch readiness
@@ -49,94 +49,14 @@ M7 transforms Forager from a single-device app into a collaborative, multi-user 
 - ❌ **Privacy policy URL and in-app link (REQUIRED by Apple)**
 - ❌ **App Privacy questionnaire completed in App Store Connect**
 - ❌ **Display name disambiguated from existing "Forager" game**
-- ❌ CloudKit schema defined and tested
-- ❌ Multi-device sync implementation
-- ❌ CKShare for multi-user collaboration
+- ❌ CloudKit schema defined and tested (✅ M7.1.1 complete)
+- ❌ Multi-device sync implementation (✅ M7.1.2 complete)
+- ❌ **Household shared zone for collaboration**
 - ❌ Conflict resolution strategy
 - ❌ Sync status UI indicators
 - ❌ External TestFlight configuration
 - ❌ Public beta landing page
 - ❌ App Review submission (for external testing)
-
----
-
-## 🚨 Strategic Decision Point
-
-Before starting M7.1, choose your implementation path:
-
-### **Path A: CloudKit-First (Current PRD Plan)**
-
-**Sequence:**
-1. M7.0: Privacy policy + prerequisites (2-3h)
-2. M7.1-M7.4: Implement CloudKit sync (25-30h)
-3. M7.5: Submit to external TestFlight with CloudKit enabled
-4. M7.6: Public beta showcase
-
-**Total Time**: 27-37 hours  
-**Calendar Time**: 3-4 weeks (including Apple review)
-
-**Pros:**
-- ✅ First public beta has headline collaboration feature
-- ✅ Professional portfolio piece with advanced tech
-- ✅ Family sharing available from day one of public beta
-- ✅ CloudKit capabilities justified when Apple reviews
-
-**Cons:**
-- ⏳ More complex first App Review submission
-- ⏳ Longer wait before public feedback
-- ⚠️ Higher rejection risk if CloudKit implementation has issues
-- ⏳ 3-4 weeks total timeline
-
-**Best For:**
-- You want CloudKit as first impression to external testers
-- You have 3-4 weeks available for full implementation
-- Professional showcase emphasizing technical sophistication
-
----
-
-### **Path B: Simple-First (Alternative)**
-
-**Sequence:**
-1. M7.0: Privacy policy + prerequisites (2-3h)
-2. M7.5: Submit CURRENT build to external TestFlight (1h)
-3. M7.6: Public beta showcase (2-3h)
-4. Later: Add CloudKit as separate milestone/update
-
-**Total Time**: 5-7 hours to public beta  
-**Calendar Time**: ~1 week (including Apple review)
-
-**Pros:**
-- ✅ Faster public feedback (1 week vs 4 weeks)
-- ✅ Simpler first App Review (lower rejection risk)
-- ✅ Local-only data = simpler privacy story
-- ✅ Proves core value proposition before adding complexity
-
-**Cons:**
-- ❌ Public beta lacks collaboration features initially
-- ❌ Less impressive technical showcase
-- ❌ Need to explain "sync coming soon"
-- ❌ Two App Review cycles instead of one
-
-**Best For:**
-- You want public feedback as fast as possible
-- You want to validate core features before adding sync
-- You prefer incremental public releases
-
----
-
-### **Recommendation**
-
-**For M7**: Proceed with **Path A** (CloudKit-First) if:
-- You have 3-4 weeks available for focused development
-- CloudKit is important for your professional portfolio story
-- You want to showcase technical sophistication
-
-**Choose Path B** (Simple-First) if:
-- You want public feedback within 1 week
-- You prefer lower-risk first submission
-- You want to validate core features before adding complexity
-
-**This PRD documents Path A**. If you choose Path B, skip M7.1-M7.4 initially and proceed directly to M7.5 after M7.0.
 
 ---
 
@@ -151,12 +71,12 @@ Before starting M7.1, choose your implementation path:
 - **Success**: No data loss during sync operations
 - **Metric**: 99%+ sync success rate
 
-**G2: Multi-User Family Collaboration**
-- **Success**: User can share grocery list with family members
-- **Success**: Multiple users can edit same list concurrently
-- **Success**: Changes from all users sync correctly
-- **Success**: Shared recipes accessible to all family members
-- **Metric**: Zero data corruption from concurrent edits
+**G2: Household Collaboration (Shared Zone)**
+- **Success**: User creates household and invites partner
+- **Success**: Partner accepts and sees all existing data automatically
+- **Success**: Both users can add/edit/delete - all changes sync automatically
+- **Success**: Changes from all household members sync within 5 seconds
+- **Metric**: Zero data corruption from concurrent household edits
 
 **G3: External TestFlight & Public Beta**
 - **Success**: Public TestFlight link created and shareable
@@ -187,69 +107,68 @@ Before starting M7.1, choose your implementation path:
 
 ## 🏗️ Technical Architecture
 
+**⚠️ ARCHITECTURE DECISION**: Using CloudKit **Shared Zones**, not CKShare. See [m7-shared-zone-architecture.md](../architecture/m7-shared-zone-architecture.md) for complete technical details.
+
 ### CloudKit Schema Design
 
-**Entities to Sync (All 8):**
-1. **GroceryList** (CKRecord)
-   - Fields: name, date, isActive, stapleCategory
-   - Relationships: items (to GroceryListItem)
-   - Sharing: ✅ Shareable via CKShare
-
+**All Existing Entities Sync to CloudKit (No Changes Required):**
+1. **WeeklyList** (CKRecord)
 2. **GroceryListItem** (CKRecord)
-   - Fields: name, quantity, unit, category, isChecked, isParsed, notes
-   - Relationships: list (to GroceryList), template (reference)
-   - Sharing: Inherits from parent GroceryList
-
 3. **IngredientTemplate** (CKRecord)
-   - Fields: canonicalName, isStaple, category
-   - Relationships: None (global templates)
-   - Sharing: ❌ Not shareable (app-level data)
-
 4. **Recipe** (CKRecord)
-   - Fields: name, servings, instructions, notes, usageCount, lastUsed, sourceURL
-   - Relationships: ingredients (to Ingredient)
-   - Sharing: ✅ Shareable via CKShare
-
 5. **Ingredient** (CKRecord)
-   - Fields: name, quantity, unit, category, displayOrder
-   - Relationships: recipe (to Recipe), template (reference)
-   - Sharing: Inherits from parent Recipe
-
 6. **MealPlan** (CKRecord)
-   - Fields: name, startDate, durationDays, isActive
-   - Relationships: meals (to MealPlanRecipe)
-   - Sharing: ✅ Shareable via CKShare
-
-7. **MealPlanRecipe** (CKRecord)
-   - Fields: date, mealType, servings, isComplete
-   - Relationships: plan (to MealPlan), recipe (to Recipe)
-   - Sharing: Inherits from parent MealPlan
-
+7. **PlannedMeal** (CKRecord)
 8. **Category** (CKRecord)
-   - Fields: name, displayOrder, icon
-   - Relationships: None
-   - Sharing: ❌ Not shareable (user-specific ordering)
+9. **UserPreferences** (CKRecord)
+
+**New Entities for Household Management:**
+10. **Household** (CKRecord)
+    - Fields: id, name, createdDate, ownerEmail, shareRecord
+    - Relationships: members (to HouseholdMember)
+11. **HouseholdMember** (CKRecord)
+    - Fields: id, email, displayName, joinedDate, role
+    - Relationships: household (to Household)
+
+**Key Insight**: No `ckShareRecord` attributes needed on existing entities. When records are created in a shared zone, CloudKit automatically handles sharing.
 
 ### Sync Architecture
 
-**Strategy: NSPersistentCloudKitContainer**
-- ✅ Built-in automatic sync
-- ✅ Handles schema mirroring
-- ✅ Conflict resolution with policies
+**Strategy: NSPersistentCloudKitContainer with Shared Zone**
+- ✅ Built-in automatic sync (same as M7.1)
+- ✅ Shared database scope for household zone
+- ✅ Private database scope for non-household users
+- ✅ Conflict resolution with merge policies
 - ✅ Background sync support
 
-**Sync Zones:**
-- **Private Database**: User's personal data
-- **Shared Database**: CKShare records for collaboration
-- **Public Database**: NOT USED (all data is private/shared)
+**Database Scopes:**
+- **Private Database**: User's personal data (before creating household)
+- **Shared Database**: Household zone (after creating/joining household) ← **PRIMARY FOCUS**
+- **Public Database**: NOT USED (all data is private or shared)
 
-**Sharing Model:**
+**Household Sharing Model:**
 ```
-User A creates GroceryList
-  → User A owns CKShare
-  → User B accepts share invitation
-  → Both users can edit
+Owner creates Household
+  → CloudKit shared zone created
+  → All owner's data migrated to shared zone
+  → Owner invites Participant via email
+  → Participant accepts invitation
+  → Participant's app switches to shared zone
+  → Both users see ALL data automatically
   → Changes sync bidirectionally
+```
+
+**Configuration:**
+```swift
+// Persistence.swift (M7.2.1)
+let cloudKitOptions = NSPersistentCloudKitContainerOptions(
+    containerIdentifier: "iCloud.com.richhayn.forager"
+)
+
+// Enable shared database scope for household
+cloudKitOptions.databaseScope = .shared
+
+description.cloudKitContainerOptions = cloudKitOptions
 ```
 
 ---
@@ -370,89 +289,119 @@ Apple's November 2025 policy updates require ALL apps (not just kids/paid apps) 
 
 ---
 
-### M7.2: Multi-User Sharing Infrastructure (8-10 hours)
+### M7.2: Shared Household Zone (8-10 hours)
 
-**Purpose**: Implement CKShare for grocery lists, recipes, and meal plans
+**Purpose**: Enable household members to share ALL data automatically via CloudKit shared zone
+
+**⚠️ ARCHITECTURE NOTE**: This uses CloudKit Shared Zones, NOT CKShare per-item sharing. See [m7-shared-zone-architecture.md](../architecture/m7-shared-zone-architecture.md) for technical details.
+
+**Use Case**: 
+- Sarah and Mike live together and manage groceries/meals jointly
+- Sarah creates household → invites Mike
+- ALL recipes, lists, meal plans automatically shared
+- No manual sharing per item required
+- Like sharing an Apple Notes folder
 
 **Phases:**
 
-**M7.2.1: CKShare Implementation (3-4 hours)**
-- Add CKShare to GroceryList entity
-- Implement share creation flow
-- Build share invitation UI
-- Handle share acceptance
+**M7.2.1: Household Setup & Shared Zone (3-4 hours)**
+- Create `Household` and `HouseholdMember` Core Data entities
+- Create `HouseholdService` for shared zone management
+- Build Settings → Household UI section
+- Implement "Create Household" flow
+- Configure NSPersistentCloudKitContainer for shared database scope
+- Migrate existing user data to shared zone
 
-**M7.2.2: Sharing UI Components (2-3 hours)**
-- "Share List" button in GroceryListDetailView
-- "Share Recipe" button in RecipeDetailView  
-- "Share Meal Plan" button in MealPlanView
-- Share management screen (see/revoke shares)
+**M7.2.2: Member Invitation & Acceptance (2-3 hours)**
+- Implement invitation sending via UICloudSharingController
+- Build member acceptance flow
+- Create `HouseholdMember` entity on acceptance
+- Welcome screen for new household members
+- Member list display with roles (Owner/Member)
 
-**M7.2.3: Permission Management (2-3 hours)**
-- Owner vs Participant permissions
-- Read-only vs Read-Write shares
-- Share revocation handling
-- Participant removal capability
+**M7.2.3: Sync Validation & Testing (1-2 hours)**
+- Multi-device testing (Owner's iPhone + Participant's iPhone)
+- Verify all entities sync automatically
+- Test concurrent edits across household members
+- Validate offline → online sync queue
+- Measure sync performance (<5 seconds target)
 
-**M7.2.4: Share Acceptance Flow (1 hour)**
-- Accept share invitation UI
-- Verify shared data appears correctly
-- Test permissions enforcement
-- Handle share rejection
+**M7.2.4: Household Management (1-2 hours)**
+- View household members list
+- Remove member functionality (owner only)
+- Leave household functionality (member only)
+- Dissolve household functionality (owner only)
+- Data migration back to private zone on dissolution
 
 **Deliverables:**
-- ✅ CKShare creation and management
-- ✅ Share invitation flow (send/accept)
-- ✅ Permission controls (owner/participant)
-- ✅ Share management UI
+- ✅ Household creation and shared zone setup
+- ✅ Invitation and acceptance flows
+- ✅ All data automatically shared with household members
+- ✅ Household management (add/remove/leave/dissolve)
 
 **Validation Criteria:**
 ```
-✓ User A shares grocery list with User B
-✓ User B receives and accepts invitation
-✓ Both users see same list
-✓ Changes from either user sync to both
-✓ Owner can revoke share
-✓ Revoked share removes access for participant
+✓ Sarah creates household "Sarah & Mike's Home"
+✓ Sarah invites Mike via iCloud email
+✓ Mike receives invitation and accepts
+✓ Mike sees ALL of Sarah's existing recipes, lists, meal plans
+✓ Sarah adds "milk" to grocery list → Mike sees it within 5s
+✓ Mike creates meal plan → Sarah sees it within 5s
+✓ Both edit same list → changes sync bidirectionally
+✓ Owner can remove member (member loses access)
+✓ Owner can dissolve household (data migrates back to private)
 ```
+
+**Key Differences from CKShare Approach:**
+- ✅ ONE database for household (not selective sharing)
+- ✅ ALL data automatically shared (no share buttons needed)
+- ✅ Simpler UX (invite once vs share each item)
+- ✅ Better for couples/roommates managing household together
+- ❌ Cannot share with people outside household
+- ❌ All-or-nothing sharing (not granular per-item)
 
 ---
 
 ### M7.3: Conflict Resolution & Edge Cases (4-6 hours)
 
-**Purpose**: Handle concurrent edits, conflicts, and edge cases gracefully
+**Purpose**: Handle concurrent household edits, conflicts, and edge cases gracefully
 
 **Phases:**
 
 **M7.3.1: Conflict Resolution Strategy (2-3 hours)**
-- Define conflict resolution policies:
-  - **Last-Write-Wins**: For most fields
-  - **Merge**: For arrays (ingredients, items)
-  - **Custom**: For specific scenarios
+- Define conflict resolution policies for household zone:
+  - **Last-Write-Wins**: For most fields (NSMergeByPropertyObjectTrumpMergePolicy)
+  - **Array Merging**: For list items, ingredients (preserve both edits when possible)
+  - **Custom Handling**: For critical fields (e.g., isChecked status)
 - Implement NSMergePolicy configurations
-- Test concurrent edit scenarios
+- Test concurrent edit scenarios between household members
+- Add conflict logging for debugging
 
 **M7.3.2: Edge Case Handling (2-3 hours)**
-- Offline → Online sync with conflicts
-- Deleted records during sync
-- Share participant deletes shared item
+- Offline → Online sync with conflicts (member offline, then reconnects)
+- Deleted records during sync (Owner deletes recipe while Member edits it)
+- Member removed from household (revoke access gracefully)
+- Household dissolved (migrate data back to private zone)
 - Network timeout during sync
 - CloudKit quota exceeded
 - Account mismatch (wrong iCloud user)
+- Simultaneous household creation (prevent duplicate households)
 
 **Deliverables:**
 - ✅ Conflict resolution policies implemented
-- ✅ Edge cases handled gracefully
+- ✅ Household-specific edge cases handled
 - ✅ Error recovery mechanisms
 - ✅ User-friendly error messages
 
 **Validation Criteria:**
 ```
-✓ User A and User B edit same grocery item concurrently → merges correctly
-✓ User A deletes recipe while User B edits it → handles gracefully
-✓ App syncs correctly after 24h offline
-✓ Network timeout doesn't crash app
-✓ Clear error messages for sync failures
+✓ Sarah and Mike edit same grocery item concurrently → merges correctly (last-write-wins)
+✓ Sarah deletes recipe while Mike edits it → handles gracefully (Mike notified)
+✓ Mike offline for 24h, makes changes → syncs correctly when online
+✓ Sarah removes Mike from household → Mike's access revoked, data preserved locally
+✓ Network timeout doesn't crash app or lose data
+✓ Clear error messages for sync failures ("Mike was removed from household")
+✓ Sarah dissolves household → data migrates back to private zone
 ```
 
 ---
@@ -819,12 +768,15 @@ Apple's November 2025 policy updates require ALL apps (not just kids/paid apps) 
 
 **Existing References:**
 - M5.0 Learning Note (21): CloudKit entitlements setup
+- M7.1.1 Learning Note (24): CloudKit schema validation
+- **M7 Architecture Pivot (25): CKShare vs Shared Zone decision**
+- **M7 Shared Zone Architecture**: Complete technical framework
 - ADR 007: Core Data Change Process
-- session-startup-checklist.md: Development discipline
+- session-startup-checklist.md: Development discipline (with validation checkpoint)
 
 **To Create:**
-- M7 Learning Note: CloudKit sync + App Store readiness journey
-- ADR: CloudKit sync architecture decisions
+- M7 Learning Note: CloudKit household sharing + App Store readiness journey
+- ADR: Shared Zone architecture decision (post-M7 completion)
 - CloudKit troubleshooting guide
 - App Review preparation checklist (reusable)
 
@@ -835,10 +787,10 @@ Apple's November 2025 policy updates require ALL apps (not just kids/paid apps) 
 **M7.0 is complete when:**
 
 ### Technical Completeness
-- [ ] All 8 entities sync to CloudKit
+- [ ] All 9+ entities sync to CloudKit (including Household, HouseholdMember)
 - [ ] Multi-device sync works (iPhone ↔ iPad)
-- [ ] Multi-user sharing operational (CKShare)
-- [ ] Conflict resolution handles concurrent edits
+- [ ] **Household sharing operational** (shared zone with automatic sync)
+- [ ] Conflict resolution handles concurrent household edits
 - [ ] Sync status visible to users
 - [ ] Error handling graceful and user-friendly
 
@@ -881,8 +833,9 @@ Apple's November 2025 policy updates require ALL apps (not just kids/paid apps) 
 - [ ] Privacy policy documented
 
 **Final Validation:**
-- [ ] User A and User B successfully collaborate on shared grocery list
-- [ ] Changes sync across 3+ devices within 5 seconds
+- [ ] Sarah creates household and invites Mike
+- [ ] Mike accepts and sees all of Sarah's data automatically
+- [ ] Changes sync across household members within 5 seconds
 - [ ] External beta tester installs via public link and provides feedback
 - [ ] No critical bugs reported within first week of public beta
 - [ ] Privacy policy accessible to all testers
@@ -1005,17 +958,18 @@ First task: Draft privacy policy for local-only data storage.
 **M7 will be successfully complete when:**
 
 1. ✅ Privacy policy is live and accessible to all users
-2. ✅ You edit a grocery list on your iPhone, and your spouse sees it update on their iPhone within 5 seconds
-3. ✅ 50+ external beta testers have installed Forager via public TestFlight link
-4. ✅ Your LinkedIn post about "Forager: Smart Meal Planner" has 100+ views and 10+ reactions
-5. ✅ Zero data loss incidents during multi-user collaboration
-6. ✅ Professional beta landing page showcases your work
-7. ✅ CloudKit Dashboard shows successful sync operations
-8. ✅ App Store Connect shows "Approved" status for external testing
+2. ✅ You create a household and invite your spouse - they see all your recipes/lists instantly
+3. ✅ You edit a grocery list on your iPhone, and your spouse sees it update on their iPhone within 5 seconds
+4. ✅ 50+ external beta testers have installed Forager via public TestFlight link
+5. ✅ Your LinkedIn post about "Forager: Smart Meal Planner" has 100+ views and 10+ reactions
+6. ✅ Zero data loss incidents during household collaboration
+7. ✅ Professional beta landing page showcases your work
+8. ✅ CloudKit Dashboard shows successful sync operations across household zone
+9. ✅ App Store Connect shows "Approved" status for external testing
 
 **This milestone transforms Forager from solo project into:**
 - Compliant App Store-ready product ✅
-- Collaborative family tool with CloudKit ✅
+- Collaborative household tool with CloudKit shared zone ✅
 - Professional portfolio showcase ✅
 
 ---
