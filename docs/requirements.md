@@ -59,15 +59,17 @@ _[All M1-M5.0 sections remain exactly as they are in the current file - not repe
 | **FR-CK-004** | **Offline sync queue** | Changes queue offline, sync when online | M7.1.3 | 🎯 **Reliability** |
 | **FR-CK-005** | **Sync status monitoring** | CloudKit sync state tracking | M7.1.2 | 🎯 **Transparency** |
 
-### **Functional Requirements - Multi-User Collaboration**
+### **Functional Requirements - Household Collaboration (Shared Zone Architecture)**
+
+**⚠️ ARCHITECTURE NOTE (Dec 23, 2025)**: M7.2 uses CloudKit **Shared Zones** (household database), not CKShare (per-item sharing). All 8 entities are household-scoped for security and consistency. See [ADR 008](architecture/008-shared-zone-architecture.md) and [Learning Note 26](learning-notes/26-m7.2-household-scoped-architecture.md).
 
 | ID | Requirement | Target Implementation | Milestone | Value |
 |----|-------------|----------------------|-----------|-------|
-| **FR-CK-006** | **CKShare implementation** | Share grocery lists, recipes, meal plans | M7.2.1 | 🎯 **Family collaboration** |
-| **FR-CK-007** | **Share invitation flow** | Send/accept share invitations | M7.2.1 | 🎯 **Easy sharing** |
-| **FR-CK-008** | **Permission management** | Owner/participant roles, read/write control | M7.2.3 | 🎯 **Access control** |
-| **FR-CK-009** | **Share management UI** | View/revoke shares, manage participants | M7.2.2 | 🎯 **Share control** |
-| **FR-CK-010** | **Concurrent edit support** | Multiple users edit simultaneously | M7.2.4 | 🎯 **Real-time collaboration** |
+| **FR-CK-006** | **Household creation & shared zone** | Create household, migrate data to shared zone | M7.2.1 | 🎯 **Household collaboration** |
+| **FR-CK-007** | **Member invitation flow** | Invite household members via email, iCloud integration | M7.2.2 | 🎯 **Easy sharing** |
+| **FR-CK-008** | **Household management** | View members, remove/leave household, dissolve | M7.2.4 | 🎯 **Access control** |
+| **FR-CK-009** | **All entities household-scoped** | GroceryItem, Recipe, WeeklyList, MealPlan, Tag, Ingredient, GroceryListItem, IngredientTemplate | M7.2.1 | 🎯 **Data ownership** |
+| **FR-CK-010** | **Automatic sync across household** | All household members see all data automatically | M7.2.3 | 🎯 **Seamless collaboration** |
 
 ### **Functional Requirements - Conflict Resolution**
 

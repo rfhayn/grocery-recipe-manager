@@ -70,6 +70,13 @@
 **Estimated**: 8-10 hours (4 phases)  
 **PRD**: `docs/prds/m7.2-shared-household-zone.md` (comprehensive)
 
+**⚠️ ARCHITECTURE UPDATE (Dec 23, 2025)**:
+- ✅ **ALL 8 entities household-scoped**: GroceryItem, Recipe, WeeklyList, MealPlan, Tag, Ingredient, GroceryListItem, **IngredientTemplate**
+- ✅ **Security-first decision**: Explicit data ownership prevents leakage
+- ✅ **Zero exceptions**: Consistent architecture, one pattern for all
+- ✅ **Documentation updated**: ADR 008, Learning Note 26, M7.2 PRD, next-prompt.md, roadmap.md, requirements.md
+- ✅ **Future-proof**: Clean extension path (PublicIngredientTemplate when needed)
+
 **Purpose**: 
 Enable household members to share ALL grocery lists, recipes, meal plans automatically via CloudKit shared zone.
 

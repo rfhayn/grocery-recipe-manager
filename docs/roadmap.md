@@ -86,10 +86,17 @@ _[Continue with existing roadmap structure but skip to the detailed M7 section]_
 - ⏭️ **M7.1.3**: Multi-Device Testing (skipped - integrated into M7.2)
 
 **M7.2: Shared Household Zone (8-10 hours) - READY** 🚀
-- 🚀 **M7.2.1**: Household Setup & Shared Zone (3-4h)
+- 🚀 **M7.2.1**: Household Setup & Shared Zone (3.5-4.5h) - All 8 entities household-scoped
 - ⏳ **M7.2.2**: Member Invitation & Acceptance (2-3h)
 - ⏳ **M7.2.3**: Sync Validation & Testing (1-2h)
 - ⏳ **M7.2.4**: Household Management (1-2h)
+
+**Architecture Decision (Dec 23, 2025):**
+- ✅ **ALL 8 entities household-scoped**: GroceryItem, Recipe, WeeklyList, MealPlan, Tag, Ingredient, GroceryListItem, IngredientTemplate
+- ✅ **Security-first**: Explicit data ownership prevents leakage
+- ✅ **Consistency**: Zero special cases, one pattern for all entities
+- ✅ **Future-proof**: Clean extension path (PublicIngredientTemplate when needed)
+- ✅ **Documentation**: ADR 008, Learning Note 26, M7.2 PRD updated
 
 **Architecture Change:**
 - ❌ **Abandoned**: CKShare per-item sharing (3.5h invested)

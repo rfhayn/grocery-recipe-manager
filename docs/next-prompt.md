@@ -71,9 +71,11 @@ First task: Add Household and HouseholdMember entities to Core Data model.
 
 ## 📋 **M7.2.1 PHASE BREAKDOWN**
 
-### **Task 1: Core Data Model (45 min)**
+### **Task 1: Core Data Model (75 min)**
 
-**Goal**: Add Household and HouseholdMember entities to data model
+**ARCHITECTURAL DECISION**: All 8 user-created entities will have explicit `household` relationship for security, consistency, and future-proofing. See [ADR 008](architecture/008-shared-zone-architecture.md#critical-architecture-decision-all-entities-household-scoped).
+
+**Goal**: Add Household and HouseholdMember entities, add household relationships to ALL 8 existing entities
 
 **Steps:**
 
@@ -112,18 +114,42 @@ First task: Add Household and HouseholdMember entities to Core Data model.
 4. **Set Inverse Relationships**
    - Household.members ↔ HouseholdMember.household
 
-5. **Add Fetch Indexes**
-   - Household: ownerEmail
-   - HouseholdMember: email, status
+5. **Add household relationships to 8 existing entities** (30 min):
+   For EACH of these entities, add:
+   - `household`: To-One, Destination: Household, Optional: YES, Delete Rule: Nullify
+   
+   **Entities to modify:**
+   - GroceryItem
+   - Recipe
+   - WeeklyList
+   - MealPlan
+   - Tag
+   - Ingredient
+   - GroceryListItem
+   - **IngredientTemplate** (security requirement)
 
-6. **Build Project** (⌘B)
-   - Verify no errors
-   - Check that classes auto-generate
+6. **Add Fetch Indexes**
+   - Household: Add fetch index on `ownerEmail`
+   - HouseholdMember: Add fetch indexes on `email` and `status`
+
+7. **Regenerate Core Data Property Files** (20 min)
+   - Editor → Create NSManagedObject Subclass
+   - Select ALL modified entities (8 existing + 2 new = 10 total)
+   - Replace existing property files
+   - Verify all classes regenerated
+
+8. **Build & Verify**
+   - Build project (⌘B)
+   - Verify zero errors
+   - Check CloudKit Dashboard for household field on all 8 entities
 
 **Validation:**
 - ✅ Build succeeds
 - ✅ No Core Data model errors
-- ✅ Both entities visible in model editor
+- ✅ Household and HouseholdMember entities created
+- ✅ All 8 existing entities have household relationship added
+- ✅ All 10 entity property files regenerated (8 modified + 2 new)
+- ✅ CloudKit Dashboard shows household field on all 8 entities
 
 ---
 
@@ -231,8 +257,22 @@ First task: Add Household and HouseholdMember entities to Core Data model.
 
 **Before moving to M7.2.2, verify:**
 
+**Core Data Model:**
 - ✅ Household entity exists in Core Data model
-- ✅ HouseholdMember entity exists
+- ✅ HouseholdMember entity exists in Core Data model
+- ✅ All 8 existing entities have `household` relationship:
+  - ✅ GroceryItem.household (optional, to-one, nullify)
+  - ✅ Recipe.household (optional, to-one, nullify)
+  - ✅ WeeklyList.household (optional, to-one, nullify)
+  - ✅ MealPlan.household (optional, to-one, nullify)
+  - ✅ Tag.household (optional, to-one, nullify)
+  - ✅ Ingredient.household (optional, to-one, nullify)
+  - ✅ GroceryListItem.household (optional, to-one, nullify)
+  - ✅ IngredientTemplate.household (optional, to-one, nullify)
+- ✅ CloudKit Dashboard shows household field on all 8 entities
+- ✅ All property files regenerated (10 entities total)
+
+**Service & UI:**
 - ✅ HouseholdService implemented with all methods
 - ✅ Settings → Household section functional
 - ✅ User can tap "Create Household"
@@ -240,8 +280,11 @@ First task: Add Household and HouseholdMember entities to Core Data model.
 - ✅ Household created in Core Data
 - ✅ Owner added as first member
 - ✅ CloudKit shared zone created (verify in CloudKit Dashboard)
+
+**Quality:**
 - ✅ Build succeeds with zero errors
 - ✅ No regressions to existing features
+- ✅ All existing M1-M5.0 features still working
 
 ---
 

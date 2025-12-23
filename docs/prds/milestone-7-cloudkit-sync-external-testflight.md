@@ -304,13 +304,16 @@ Apple's November 2025 policy updates require ALL apps (not just kids/paid apps) 
 
 **Phases:**
 
-**M7.2.1: Household Setup & Shared Zone (3-4 hours)**
+**M7.2.1: Household Setup & Shared Zone (3.5-4.5 hours)**
 - Create `Household` and `HouseholdMember` Core Data entities
+- **Add `household` relationship to ALL 8 existing entities** (GroceryItem, Recipe, WeeklyList, MealPlan, Tag, Ingredient, GroceryListItem, **IngredientTemplate**)
 - Create `HouseholdService` for shared zone management
 - Build Settings → Household UI section
 - Implement "Create Household" flow
 - Configure NSPersistentCloudKitContainer for shared database scope
 - Migrate existing user data to shared zone
+
+**⚠️ ARCHITECTURE DECISION (Dec 23, 2025)**: ALL 8 entities are household-scoped for security and consistency. See [ADR 008](../architecture/008-shared-zone-architecture.md) and [Learning Note 26](../learning-notes/26-m7.2-household-scoped-architecture.md) for rationale.
 
 **M7.2.2: Member Invitation & Acceptance (2-3 hours)**
 - Implement invitation sending via UICloudSharingController

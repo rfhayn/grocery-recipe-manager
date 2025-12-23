@@ -351,20 +351,99 @@ class HouseholdService {
 
 ## 📊 **Data Model**
 
+### **CRITICAL ARCHITECTURE DECISION: All Entities Household-Scoped**
+
+**Decision Date**: December 23, 2025  
+**Status**: ✅ APPROVED  
+
+**Decision**: ALL user-created entities will have explicit `household` relationship, including IngredientTemplate.
+
+**Rationale**:
+1. **Security & Privacy**: Explicit data ownership prevents potential leakage
+2. **Architectural Consistency**: Zero special cases - all entities follow same pattern
+3. **Clear Mental Model**: Everything the user touches is household-scoped
+4. **Future-Proof**: Clean migration path when adding external ingredient databases
+5. **YAGNI Principle**: Don't build for hypothetical global template use case today
+
+**Entities Requiring Household Relationship (8 total)**:
+- ✅ GroceryItem - Top-level user content
+- ✅ Recipe - Top-level user content  
+- ✅ WeeklyList - Top-level user content
+- ✅ MealPlan - Top-level user content
+- ✅ Tag - Top-level user content
+- ✅ Ingredient - Child entity, explicit ownership for security
+- ✅ GroceryListItem - Child entity, explicit ownership for security
+- ✅ **IngredientTemplate - HOUSEHOLD-SCOPED** (architectural pivot)
+
+**Why IngredientTemplate Gets Household Relationship**:
+- User concern: "If I had ingredients showing up that I didn't put there, I'd be concerned about security"
+- Templates are created automatically during ingredient parsing - user should only see THEIR templates
+- Future external integration (Spoonacular, Open Food Facts) will use SEPARATE entity: `PublicIngredientTemplate`
+- Clean separation: household templates vs public templates (when needed)
+- No migration required when adding external databases - just add new entity
+
+**Implementation Pattern** (ALL entities):
+```swift
+// Every user entity
+entity.household = currentHousehold // Explicit ownership
+
+// CloudKit query
+let predicate = NSPredicate(format: "household == %@", currentHousehold)
+// ✅ Can filter at database level
+// ✅ No possibility of seeing other household's data
+```
+
+**Future External Integration** (M10+):
+```swift
+// When adding external databases
++ PublicIngredientTemplate (new entity, external sources)
++ PublicRecipe (new entity, external sources)
+
+// Lookup strategy
+func findTemplate(name: String, household: Household) -> Template {
+    // 1. Check household templates first (user's custom entries)
+    if let custom = household.templates.find(name) { return custom }
+    
+    // 2. Fall back to public database (external source)
+    if let public = PublicIngredientTemplate.find(name) { return public }
+    
+    // 3. Create new household template if not found
+    return household.createTemplate(name)
+}
+```
+
+**Alternatives Considered & Rejected**:
+- ❌ Global IngredientTemplate (no household): Violates security principle, user confusion
+- ❌ Mixed approach (5 with household, 3 without): Inconsistent architecture, special cases
+- ❌ Dual storage (household + global): Premature optimization, YAGNI violation
+
+**Benefits of This Decision**:
+- ✅ **Zero special cases** - all entities follow identical pattern
+- ✅ **Security first** - explicit ownership prevents data leakage  
+- ✅ **Clear to users** - everything is "mine" or "my household's"
+- ✅ **Simple to implement** - one pattern for all entities
+- ✅ **Easy to extend** - add external databases when actually needed
+
+---
+
 ### **Modified Entities**
 
-**No Changes to Existing Entities!**
+**All Existing Entities Modified to Add Household Relationship**:
 
-One of the beauties of shared zones: **existing entities don't need modification**.
+- GroceryItem → Add `household` relationship (optional, to-one, nullify)
+- Recipe → Add `household` relationship (optional, to-one, nullify)  
+- WeeklyList → Add `household` relationship (optional, to-one, nullify)
+- MealPlan → Add `household` relationship (optional, to-one, nullify)
+- Tag → Add `household` relationship (optional, to-one, nullify)
+- Ingredient → Add `household` relationship (optional, to-one, nullify)
+- GroceryListItem → Add `household` relationship (optional, to-one, nullify)
+- **IngredientTemplate → Add `household` relationship (optional, to-one, nullify)**
 
-- Recipe (unchanged)
-- WeeklyList (unchanged)
-- MealPlan (unchanged)
-- Category (unchanged)
-- IngredientTemplate (unchanged)
-- etc.
-
-**Why?** When records are created in a shared zone, CloudKit automatically handles the sharing. No `ckShareRecord` attribute needed (that's only for CKShare per-item sharing).
+**Why Optional Relationships**:
+- Existing data remains valid (no household = individual mode)
+- Backward compatible during migration
+- CloudKit sync works with or without household
+- Users can use app solo or in household mode
 
 ---
 

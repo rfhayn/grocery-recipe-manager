@@ -99,6 +99,30 @@ _[Continue with rest of file content...]_
 
 ## 🔥 **RECENT ACTIVITY**
 
+### **December 23, 2025** - M7.2.1 Household Architecture Decision ✅ FINALIZED
+- **Completed**: Pre-implementation architectural decision for M7.2.1
+- **Achievement**: ALL 8 entities household-scoped for security and consistency
+- **Decision**: 
+  - ✅ GroceryItem, Recipe, WeeklyList, MealPlan, Tag household-scoped (planned)
+  - ✅ Ingredient, GroceryListItem household-scoped (security requirement)
+  - ✅ **IngredientTemplate household-scoped** (architectural pivot from "global catalog")
+- **Rationale**:
+  - Security-first: Explicit data ownership prevents leakage
+  - Consistency: Zero special cases, one pattern for all entities
+  - YAGNI: Don't build for hypothetical global template needs
+  - Future-proof: Clean extension path (PublicIngredientTemplate when needed)
+- **Documentation Updated** (~45 minutes):
+  - **[learning-notes/26-m7.2-household-scoped-architecture.md](learning-notes/26-m7.2-household-scoped-architecture.md)** - Complete decision analysis
+  - **[architecture/008-shared-zone-architecture.md](architecture/008-shared-zone-architecture.md)** - Added critical decision section
+  - **[prds/m7.2-shared-household-zone.md](prds/m7.2-shared-household-zone.md)** - Updated Task 1 (75 min, all 8 entities)
+  - **[next-prompt.md](next-prompt.md)** - Updated M7.2.1 implementation steps
+  - **[roadmap.md](roadmap.md)** - Added architectural decision note
+  - **[requirements.md](requirements.md)** - Updated M7.2 requirements section
+  - **[current-story.md](current-story.md)** - Added architecture update note
+- **Impact**: M7.2.1 Task 1 time estimate updated (45 min → 75 min)
+- **Ready**: Complete documentation consistency, ready to implement
+- **Total Progress**: ~102.5 hours (previous + 0.75h documentation)
+
 ### **December 21, 2025** - M7.2 Architecture Pivot 🔄 VALIDATED & DOCUMENTED
 - **Completed**: Major architecture validation and documentation for household sharing
 - **Achievement**: Pivoted from CKShare (wrong approach) to Shared Zones (correct approach)
