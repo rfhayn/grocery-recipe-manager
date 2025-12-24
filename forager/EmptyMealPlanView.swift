@@ -21,6 +21,9 @@ struct EmptyMealPlanView: View {
     // M4.2: User preferences for displaying configured settings
     @StateObject private var preferences = UserPreferencesService.shared
     
+    // M7.2.1: Core Data context for SettingsView
+    @Environment(\.managedObjectContext) private var viewContext
+    
     // MARK: - Body
     
     var body: some View {
@@ -86,7 +89,7 @@ struct EmptyMealPlanView: View {
             .padding(.horizontal, 32)
             
             // Settings link
-            NavigationLink(destination: SettingsView()) {
+            NavigationLink(destination: SettingsView(context: viewContext)) {
                 Text("Change meal plan settings")
                     .font(.caption)
                     .foregroundColor(.blue)

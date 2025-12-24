@@ -153,12 +153,8 @@ class HouseholdService: ObservableObject {
     /// Creates a CloudKit share for the household
     /// This creates the shared zone that other users can access
     private func createCloudKitShare(for household: Household) async throws -> CKShare {
-        // Get the CKRecord for this household from Core Data
-        guard let recordID = household.objectID.uriRepresentation().absoluteString as? String else {
-            throw HouseholdError.creationFailed("Could not get record ID")
-        }
-        
         // Create a new CKShare
+        // Note: Actual CloudKit record association will be handled by NSPersistentCloudKitContainer
         let share = CKShare(rootRecord: CKRecord(recordType: "CD_Household"))
         share[CKShare.SystemFieldKey.title] = household.name as CKRecordValue?
         share.publicPermission = .none  // Private sharing only
@@ -169,6 +165,7 @@ class HouseholdService: ObservableObject {
     /// Gets the current user's email from CloudKit
     private func getCurrentUserEmail() async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
+            // TODO: M7.2.2 - Update to modern CloudKit API (iOS 17+)
             container.fetchUserRecordID { recordID, error in
                 if let error = error {
                     continuation.resume(throwing: error)

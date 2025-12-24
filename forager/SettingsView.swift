@@ -5,14 +5,19 @@
 //  Enhanced for M4.1: Added Meal Planning Preferences Section
 //  Enhanced for M4.3.1: Added Display Options Section
 //  Enhanced for M7.0.2: Added Privacy Policy Link with SafariServices
+//  Enhanced for M7.2.1: Added Household Management Section
 //
 
 import SwiftUI
 import SafariServices
+import CoreData
 
 struct SettingsView: View {
     // M4.1: User preferences service for meal planning settings
     @StateObject private var preferencesService = UserPreferencesService.shared
+    
+    // M7.2.1: Household service for household management
+    @StateObject private var householdService: HouseholdService
     
     // Access to Core Data context for migration service
     @Environment(\.managedObjectContext) private var viewContext
@@ -20,9 +25,20 @@ struct SettingsView: View {
     // M7.0.2: Privacy policy URL presentation state
     @State private var showingPrivacyPolicy = false
     
+    // M7.2.1: Household creation sheet state
+    @State private var showCreateHouseholdSheet = false
+    
+    // M7.2.1: Initializer to inject HouseholdService
+    init(context: NSManagedObjectContext) {
+        _householdService = StateObject(wrappedValue: HouseholdService(context: context))
+    }
+    
     var body: some View {
         NavigationView {
             Form {
+                // M7.2.1: Household Management
+                householdSection
+                
                 // M4.1: Meal Planning Preferences
                 mealPlanningSection
                 
@@ -42,6 +58,79 @@ struct SettingsView: View {
             .sheet(isPresented: $showingPrivacyPolicy) {
                 SafariView(url: URL(string: "https://rfhayn.github.io/forager/privacy.html")!)
                     .ignoresSafeArea()
+            }
+            .sheet(isPresented: $showCreateHouseholdSheet) {
+                CreateHouseholdSheet(householdService: householdService)
+            }
+        }
+    }
+    
+    // MARK: - M7.2.1: Household Section
+    
+    // Household management section for creating and viewing household details
+    // Enables users to share grocery lists, recipes, and meal plans with family
+    private var householdSection: some View {
+        Section {
+            if let household = householdService.currentHousehold {
+                // User is in a household - show details
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Household Name")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(household.name ?? "Unnamed Household")
+                            .fontWeight(.medium)
+                    }
+                    
+                    HStack {
+                        Text("Members")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(household.members?.count ?? 0)")
+                            .fontWeight(.medium)
+                    }
+                    
+                    HStack {
+                        Text("Owner")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(household.ownerEmail ?? "Unknown")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.vertical, 4)
+                
+            } else {
+                // No household - show create button
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Create or join a household to share grocery lists, recipes, and meal plans with family or roommates.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    Button(action: {
+                        showCreateHouseholdSheet = true
+                    }) {
+                        HStack {
+                            Image(systemName: "house.fill")
+                            Text("Create Household")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                    .padding(.top, 4)
+                }
+            }
+        } header: {
+            Text("Household")
+        } footer: {
+            if householdService.currentHousehold == nil {
+                Text("All household members will automatically see and share all grocery lists, recipes, and meal plans.")
+                    .font(.caption)
             }
         }
     }
@@ -218,6 +307,86 @@ struct SettingsView: View {
     }
 }
 
+// MARK: - M7.2.1: Create Household Sheet
+
+// Sheet view for creating a new household
+// Allows user to enter household name and creates CloudKit shared zone
+struct CreateHouseholdSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var householdService: HouseholdService
+    
+    @State private var householdName: String = ""
+    @State private var isCreating: Bool = false
+    @State private var showError: Bool = false
+    @State private var errorMessage: String = ""
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("Household Details")) {
+                    TextField("Household Name", text: $householdName)
+                        .autocapitalization(.words)
+                }
+                
+                Section {
+                    Text("A household allows you to share all your grocery lists, recipes, and meal plans with family members or roommates.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .navigationTitle("Create Household")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .disabled(isCreating)
+                }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Create") {
+                        createHousehold()
+                    }
+                    .disabled(householdName.isEmpty || isCreating)
+                }
+            }
+            .overlay {
+                if isCreating {
+                    ProgressView("Creating household...")
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(10)
+                        .shadow(radius: 10)
+                }
+            }
+            .alert("Error Creating Household", isPresented: $showError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
+        }
+    }
+    
+    // Creates household using HouseholdService
+    // Displays loading indicator and handles errors
+    private func createHousehold() {
+        isCreating = true
+        
+        Task {
+            do {
+                _ = try await householdService.createHousehold(name: householdName)
+                dismiss()
+            } catch {
+                errorMessage = error.localizedDescription
+                showError = true
+                print("❌ Failed to create household: \(error)")
+            }
+            isCreating = false
+        }
+    }
+}
+
 // MARK: - M7.0.2: SafariView Wrapper
 
 // UIViewControllerRepresentable wrapper for SFSafariViewController
@@ -238,7 +407,7 @@ struct SafariView: UIViewControllerRepresentable {
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView()
+        SettingsView(context: PersistenceController.preview.container.viewContext)
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
