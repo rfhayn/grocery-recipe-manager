@@ -19,6 +19,9 @@ enum HouseholdError: LocalizedError {
     case emailNotFound
     case creationFailed(String)
     case invitationFailed(String)
+    case alreadyMember
+    case invitationPending
+    case noInvitation
     
     var errorDescription: String? {
         switch self {
@@ -34,6 +37,12 @@ enum HouseholdError: LocalizedError {
             return "Failed to create household: \(reason)"
         case .invitationFailed(let reason):
             return "Failed to send invitation: \(reason)"
+        case .alreadyMember:
+            return "This person is already a member of the household"
+        case .invitationPending:
+            return "An invitation is already pending for this email"
+        case .noInvitation:
+            return "No pending invitation found"
         }
     }
 }
@@ -194,12 +203,131 @@ class HouseholdService: ObservableObject {
         }
     }
     
-    // MARK: - Member Management (Stub for M7.2.2)
+    // MARK: - Member Management
     
-    /// Invites a member to the household
-    /// Implementation will be completed in M7.2.2
-    func inviteMember(email: String, to household: Household) async throws {
-        // TODO: M7.2.2 - Implement invitation flow
-        print("⚠️ inviteMember stub - will implement in M7.2.2")
+    /// Invites a member to the household by creating a pending member record
+    /// Owner must then present UICloudSharingController with the returned share
+    /// - Parameters:
+    ///   - email: iCloud email address of person to invite
+    ///   - household: Household to invite them to
+    /// - Returns: CKShare to present in UICloudSharingController
+    func inviteMember(email: String, to household: Household) async throws -> CKShare {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            // 1. Verify caller is owner
+            guard await isOwner(household: household) else {
+                throw HouseholdError.notOwner
+            }
+            
+            // 2. Check if already a member
+            let existingMember = household.memberArray.first { $0.email == email }
+            if let existing = existingMember {
+                if existing.isActive {
+                    throw HouseholdError.alreadyMember
+                } else {
+                    throw HouseholdError.invitationPending
+                }
+            }
+            
+            // 3. Create pending member
+            let pendingMember = HouseholdMember(context: viewContext)
+            pendingMember.id = UUID()
+            pendingMember.email = email
+            pendingMember.displayName = extractDisplayName(from: email)
+            pendingMember.role = "member"
+            pendingMember.status = "pending"
+            pendingMember.household = household
+            // joinedDate remains nil until acceptance
+            
+            // 4. Save pending member
+            try viewContext.save()
+            
+            // 5. Get share for UICloudSharingController
+            let share = try await getShare(for: household)
+            
+            print("✅ Pending invitation created for: \(email)")
+            return share
+            
+        } catch {
+            print("❌ Invitation failed: \(error)")
+            if let hhError = error as? HouseholdError {
+                throw hhError
+            } else {
+                throw HouseholdError.invitationFailed(error.localizedDescription)
+            }
+        }
+    }
+    
+    /// Accepts a household invitation
+    /// Called when user taps "Join Household" after receiving invitation
+    /// - Parameter household: Household being joined
+    func acceptInvitation(for household: Household) async throws {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            // 1. Get current user's email
+            let currentEmail = try await getCurrentUserEmail()
+            
+            // 2. Find pending member record
+            guard let pendingMember = household.memberArray.first(where: { 
+                $0.email == currentEmail && $0.isPending 
+            }) else {
+                throw HouseholdError.noInvitation
+            }
+            
+            // 3. Activate member
+            pendingMember.status = "active"
+            pendingMember.joinedDate = Date()
+            
+            // 4. Save changes
+            try viewContext.save()
+            
+            // 5. Update current household
+            currentHousehold = household
+            
+            print("✅ Invitation accepted")
+            print("✅ Member activated: \(currentEmail)")
+            print("✅ Joined household: \(household.name ?? "Unknown")")
+            
+        } catch {
+            print("❌ Failed to accept invitation: \(error)")
+            throw HouseholdError.invitationFailed(error.localizedDescription)
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    /// Gets the CKShare record for the household
+    /// Used for invitation and share management
+    private func getShare(for household: Household) async throws -> CKShare {
+        guard let shareData = household.shareRecord else {
+            throw HouseholdError.noShareRecord
+        }
+        
+        // Unarchive the CKShare from stored data
+        guard let share = try NSKeyedUnarchiver.unarchivedObject(
+            ofClass: CKShare.self,
+            from: shareData
+        ) else {
+            throw HouseholdError.noShareRecord
+        }
+        
+        return share
+    }
+    
+    /// Extracts display name from email address
+    /// Example: "sarah.smith@icloud.com" → "Sarah Smith"
+    private func extractDisplayName(from email: String) -> String {
+        // Get part before @
+        let localPart = email.components(separatedBy: "@").first ?? email
+        
+        // Split by dots and capitalize each part
+        let parts = localPart.components(separatedBy: ".")
+        let capitalized = parts.map { $0.capitalized }
+        
+        return capitalized.joined(separator: " ")
     }
 }
