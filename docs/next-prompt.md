@@ -1,405 +1,338 @@
 # Next Implementation Prompt
 
-**Last Updated**: December 21, 2025  
-**For Milestone**: M7.2 - Shared Household Zone  
-**Status**: 🚀 READY TO START  
-**Estimated Duration**: 8-10 hours (4 phases)
+**Last Updated**: December 23, 2025  
+**For Milestone**: Strategic Decision Point  
+**Status**: M7.2.1 ✅ COMPLETE | Next Steps: M7.2.2 vs M6 vs M8  
+**Estimated Duration**: Depends on choice (5-15 hours)
 
 ---
 
 ## 🎯 **CONTEXT: WHAT JUST HAPPENED**
 
-### **Architecture Pivot Complete**
+### **M7.2.1 Complete - Household Setup Foundation**
 
-We just completed a major architecture validation and pivot for M7.2:
+We just completed M7.2.1 with 100% planning accuracy (75 min estimated, 75 min actual):
 
-**Original Plan (Abandoned):**
-- M7.2.1 CKShare implementation (individual item sharing)
-- 3.5 hours invested in Phases 1-3
-- Discovered this doesn't match actual user need
+**Implemented:**
+- ✅ Household & HouseholdMember Core Data entities
+- ✅ All 10 user entities household-scoped (not just 8!)
+- ✅ HouseholdService with CloudKit integration
+- ✅ Settings UI with CreateHouseholdSheet
+- ✅ Complete error handling and validation
+- ✅ Zero regressions, zero breaking changes
 
-**New Validated Plan:**
-- M7.2 Shared Household Zone (all data shared automatically)
-- CloudKit shared zones for household database
-- One-time setup, automatic sharing
-- Perfect for couples/roommates
+**Architectural Decisions Validated:**
+- Category household-scoped for custom store layouts
+- UserPreferences household-scoped to prevent sync conflicts
+- Complete data isolation - no global shared data
+- See Learning Note 26 for complete rationale
 
-**Documentation Created:**
-- ✅ Learning note explaining pivot decision
-- ✅ M7 Shared Zone Architecture document (technical framework)
-- ✅ Detailed M7.2 PRD (implementation guide)
-- ✅ M7.3-M7.6 outlines for future work
-- ✅ Product validation checkpoint added to session checklist
-
-**Current Branch**: `docs/m7-architecture-pivot` (ready to commit)
+**Current State:**
+- All code committed on `feature/M7.2.1-household-setup`
+- Build successful, UI validated
+- Ready for PR and merge
+- Foundation complete for household sharing
 
 ---
 
-## 🚀 **NEXT: M7.2.1 - Household Setup & Shared Zone**
+## 🚀 **STRATEGIC DECISION: WHAT'S NEXT?**
 
-**When you're ready to start M7.2.1:**
+### **You have three options. Let's discuss which makes the most sense:**
 
-### **Session Startup (MANDATORY)**
+---
+
+## **Option 1: Continue M7.2 (Member Invitation & Testing)**
+
+**Remaining Work**: 5-6 hours (3 phases)
+
+### **M7.2.2: Member Invitation & Acceptance** (2-3 hours)
+
+**What you'll build:**
+- Invitation sending via UICloudSharingController
+- Accept invitation flow for new members
+- HouseholdMember creation on acceptance
+- Welcome screen for joining members
+
+**Implementation:**
+```swift
+// Add to HouseholdService
+func inviteMember(email: String) async throws
+func acceptInvitation(share: CKShare) async throws
+
+// New UI in Settings
+- "Invite Member" button
+- Email input sheet
+- Present UICloudSharingController
+```
+
+**Challenges:**
+- Requires 2+ physical devices with iCloud accounts
+- Can't fully test in simulator
+- Need production CloudKit environment for testing
+
+---
+
+### **M7.2.3: Sync Validation & Testing** (1-2 hours)
+
+**What you'll test:**
+- Multi-device sync scenarios
+- Concurrent edit handling
+- Offline → online sync
+- Performance validation
+
+**Testing Matrix:**
+```
+Device A creates item → Device B sees it (< 5s)
+Device A edits → Device B updates
+Device A deletes → Device B removes
+Both edit same item → Last-write-wins
+Offline queue → Sync when online
+```
+
+---
+
+### **M7.2.4: Household Management** (1-2 hours)
+
+**What you'll build:**
+- View household members list
+- Remove member (owner only)
+- Leave household (member)
+- Dissolve household (owner)
+
+**UI in Settings:**
+```swift
+// Household section additions
+- Members list with roles
+- "Remove" button (owner only)
+- "Leave Household" button (member)
+- "Dissolve Household" button (owner) with confirmation
+```
+
+---
+
+### **Option 1 Pros & Cons:**
+
+**Pros:**
+- ✅ Complete M7.2 feature
+- ✅ External TestFlight ready sooner
+- ✅ CloudKit shared zones fully validated
+- ✅ User can actually collaborate with household
+
+**Cons:**
+- ❌ Need 2+ physical devices for proper testing
+- ❌ Can't fully validate without real iCloud accounts
+- ❌ Member invitation requires production testing environment
+- ❌ More complex to test than solo features
+
+**Best for**: If you have access to multiple devices and want to complete household sharing now.
+
+---
+
+## **Option 2: Pivot to M6 (Testing Foundation)**
+
+**Estimated**: 12-15 hours  
+**PRD**: Create new comprehensive testing PRD
+
+### **Why This Makes Sense Now:**
+
+**M7.2.1 is perfect to protect with tests:**
+- HouseholdService has complex logic
+- CloudKit integration needs test mocking
+- Household relationships need validation
+- Easy to break without test coverage
+
+**What you'll build:**
+```
+M6.1: Testing Infrastructure (3-4h)
+- XCTest framework setup
+- Core Data test helpers
+- Mock CloudKit services
+- Test fixtures and factories
+
+M6.2: Service Layer Tests (6-8h)
+- HouseholdService tests (NEW - protect M7.2.1!)
+- OptimizedRecipeDataService tests
+- IngredientParsingService tests
+- QuantityMergeService tests
+- Target: 70% service coverage
+
+M6.3: UI Test Foundation (3-4h)
+- SwiftUI Preview tests
+- ViewInspector setup
+- Critical flow tests
+- Target: 40% UI coverage
+```
+
+---
+
+### **Option 2 Pros & Cons:**
+
+**Pros:**
+- ✅ Protect M7.2.1 investment with tests
+- ✅ Easier to add M7.2.2 features with safety net
+- ✅ Can test household logic without CloudKit
+- ✅ Foundation for confident refactoring
+- ✅ Prevents regressions as features grow
+- ✅ Solo work (no multi-device needed)
+
+**Cons:**
+- ❌ Delays household sharing completion
+- ❌ External TestFlight launch delayed
+- ❌ Context switch from feature development
+
+**Best for**: If you want solid foundation before adding more complex features, or don't have multiple devices available.
+
+---
+
+## **Option 3: Pivot to M8 (Analytics Dashboard)**
+
+**Estimated**: 10-12 hours  
+**PRD**: `docs/prds/milestone-8-analytics-dashboard.md` (needs creation)
+
+### **What you'll build:**
+
+**M8.1: Usage Tracking (3-4h)**
+- RecipeUsageLog entity
+- Track recipe usage when added to meal plans
+- Track ingredient purchase frequency
+- Store analytics in Core Data
+
+**M8.2: Analytics Dashboard UI (4-5h)**
+- "Most Used Recipes" list
+- "Frequently Bought" ingredients
+- "Shopping Patterns" insights
+- Charts with Swift Charts framework
+
+**M8.3: Insights Engine (3-4h)**
+- "Recipes you haven't made in a while"
+- "Seasonal patterns"
+- "Budget optimization suggestions"
+- Smart recommendations
+
+---
+
+### **Option 3 Pros & Cons:**
+
+**Pros:**
+- ✅ Standalone value (doesn't require M7.2 completion)
+- ✅ Can demo to users immediately
+- ✅ Different feature area (variety after CloudKit work)
+- ✅ Solo development (no multi-device needed)
+- ✅ Immediate user value
+
+**Cons:**
+- ❌ Leaves M7.2 incomplete
+- ❌ Household sharing delayed
+- ❌ Context switch from CloudKit work
+
+**Best for**: If you want user-facing value now and will return to M7.2 later.
+
+---
+
+## 💭 **RECOMMENDATION**
+
+### **My Suggestion: Option 2 (Testing Foundation)**
+
+**Rationale:**
+
+1. **Protect Your Investment**:
+   - M7.2.1 has complex CloudKit logic
+   - Tests prevent breaking changes
+   - Easier to add M7.2.2 with test coverage
+
+2. **Solo-Friendly**:
+   - Don't need multiple devices
+   - Can test household logic with mocks
+   - Work efficiently without physical hardware constraints
+
+3. **Foundation for Growth**:
+   - Every future feature benefits from test coverage
+   - Confident refactoring
+   - Prevents regressions
+
+4. **Strategic Timing**:
+   - Good pause point after M7.2.1
+   - Can return to M7.2.2 later with tests in place
+   - External TestFlight can wait until M7.2 fully complete
+
+---
+
+## 🎬 **NEXT SESSION PROMPT (If Choosing Option 2 - Testing)**
 
 ```
-I'm ready to start M7.2.1 - Household Setup & Shared Zone.
+I'm ready to start M6 - Testing Foundation.
+
+Strategic decision: Add test coverage to protect M7.2.1 investment
+before continuing with M7.2.2.
 
 I've completed:
-✅ session-startup-checklist.md (including new validation checkpoint)
+✅ session-startup-checklist.md
 ✅ project-naming-standards.md
-✅ current-story.md (architecture pivot understood)
-✅ next-prompt.md (this file)
+✅ current-story.md (M7.2.1 complete noted)
+✅ next-prompt.md (this file - strategic decision)
 
-Architecture Validation:
-✅ Read: docs/architecture/m7-shared-zone-architecture.md
-✅ Read: docs/prds/m7.2-shared-household-zone.md
-✅ Understand: Shared zones vs CKShare difference
-✅ Understand: Why we pivoted
+Let's create M6 PRD and start with M6.1 (Testing Infrastructure).
 
-Let's start with M7.2.1 Task 1: Core Data Model (45 min).
-
-Current state:
-- M7.1 complete (CloudKit foundation working)
-- Docs branch ready to merge
-- Clean architecture validated
-- Ready for household entity creation
-
-First task: Add Household and HouseholdMember entities to Core Data model.
+Priority: HouseholdService tests to protect CloudKit logic.
 ```
 
 ---
 
-## 📋 **M7.2.1 PHASE BREAKDOWN**
+## 🎬 **NEXT SESSION PROMPT (If Choosing Option 1 - Continue M7.2)**
 
-### **Task 1: Core Data Model (75 min)**
+```
+I'm ready to continue M7.2.2 - Member Invitation & Acceptance.
 
-**ARCHITECTURAL DECISION**: All 8 user-created entities will have explicit `household` relationship for security, consistency, and future-proofing. See [ADR 008](architecture/008-shared-zone-architecture.md#critical-architecture-decision-all-entities-household-scoped).
+I've completed:
+✅ session-startup-checklist.md
+✅ project-naming-standards.md
+✅ current-story.md
+✅ next-prompt.md (this file)
+✅ Have 2+ physical devices available for testing
+✅ iCloud accounts configured on both devices
 
-**Goal**: Add Household and HouseholdMember entities, add household relationships to ALL 8 existing entities
-
-**Steps:**
-
-1. **Open Core Data Model**
-   ```
-   Open: forager.xcdatamodeld in Xcode
-   ```
-
-2. **Create Household Entity**
-   - Click + at bottom left
-   - Name: "Household"
-   - Codegen: Class Definition
-   - Add attributes:
-     - `id`: UUID, Optional: NO
-     - `name`: String, Optional: NO
-     - `createdDate`: Date, Optional: NO
-     - `ownerEmail`: String, Optional: NO
-     - `shareRecord`: Binary Data, Optional: YES, Allows External Storage: YES
-   - Add relationship:
-     - `members`: To-Many, Destination: HouseholdMember, Delete Rule: Cascade
-
-3. **Create HouseholdMember Entity**
-   - Click + at bottom left
-   - Name: "HouseholdMember"
-   - Codegen: Class Definition
-   - Add attributes:
-     - `id`: UUID, Optional: NO
-     - `email`: String, Optional: NO
-     - `displayName`: String, Optional: YES
-     - `joinedDate`: Date, Optional: YES
-     - `role`: String, Optional: NO, Default: "member"
-     - `status`: String, Optional: NO, Default: "pending"
-   - Add relationship:
-     - `household`: To-One, Destination: Household, Inverse: members, Delete Rule: Nullify
-
-4. **Set Inverse Relationships**
-   - Household.members ↔ HouseholdMember.household
-
-5. **Add household relationships to 8 existing entities** (30 min):
-   For EACH of these entities, add:
-   - `household`: To-One, Destination: Household, Optional: YES, Delete Rule: Nullify
-   
-   **Entities to modify:**
-   - GroceryItem
-   - Recipe
-   - WeeklyList
-   - MealPlan
-   - Tag
-   - Ingredient
-   - GroceryListItem
-   - **IngredientTemplate** (security requirement)
-
-6. **Add Fetch Indexes**
-   - Household: Add fetch index on `ownerEmail`
-   - HouseholdMember: Add fetch indexes on `email` and `status`
-
-7. **Regenerate Core Data Property Files** (20 min)
-   - Editor → Create NSManagedObject Subclass
-   - Select ALL modified entities (8 existing + 2 new = 10 total)
-   - Replace existing property files
-   - Verify all classes regenerated
-
-8. **Build & Verify**
-   - Build project (⌘B)
-   - Verify zero errors
-   - Check CloudKit Dashboard for household field on all 8 entities
-
-**Validation:**
-- ✅ Build succeeds
-- ✅ No Core Data model errors
-- ✅ Household and HouseholdMember entities created
-- ✅ All 8 existing entities have household relationship added
-- ✅ All 10 entity property files regenerated (8 modified + 2 new)
-- ✅ CloudKit Dashboard shows household field on all 8 entities
+Let's start M7.2.2 Task 1: Update HouseholdService with invitation methods.
+```
 
 ---
 
-### **Task 2: Manual Entity Extensions (30 min)**
+## 🎬 **NEXT SESSION PROMPT (If Choosing Option 3 - Analytics)**
 
-**Goal**: Add computed properties for easier data access
+```
+I'm ready to start M8 - Analytics Dashboard.
 
-**Files to Create:**
+Strategic decision: Build user-facing analytics value while
+M7.2 household sharing is deferred.
 
-1. **Create `Household+Extensions.swift`**
-   ```swift
-   import CoreData
-   
-   extension Household {
-       public var isOwner: Bool {
-           guard let ownerEmail = ownerEmail else { return false }
-           // TODO: Get current user email from CloudKit
-           return false  // Placeholder for M7.2.1
-       }
-       
-       public var memberCount: Int {
-           return members?.count ?? 0
-       }
-       
-       public var memberArray: [HouseholdMember] {
-           let set = members as? Set<HouseholdMember> ?? []
-           return set.sorted { 
-               ($0.joinedDate ?? Date.distantPast) < ($1.joinedDate ?? Date.distantPast) 
-           }
-       }
-   }
-   ```
+I've completed:
+✅ session-startup-checklist.md
+✅ project-naming-standards.md
+✅ current-story.md
+✅ next-prompt.md (this file)
 
-2. **Create `HouseholdMember+Extensions.swift`**
-   ```swift
-   import CoreData
-   
-   extension HouseholdMember {
-       public var isOwner: Bool {
-           return role == "owner"
-       }
-       
-       public var isPending: Bool {
-           return status == "pending"
-       }
-       
-       public var isActive: Bool {
-           return status == "active"
-       }
-   }
-   ```
-
-3. **Build Project** (⌘B)
-   - Verify extensions compile
-
-**Validation:**
-- ✅ Extension files created
-- ✅ Build succeeds
-- ✅ Computed properties accessible
+Let's create M8 PRD and start with M8.1 (Usage Tracking).
+```
 
 ---
 
-### **Task 3: HouseholdService Implementation (90 min)**
+## ⏸️ **OR: Take a Break & Decide Later**
 
-**Goal**: Create service for household management
+**M7.2.1 is a great stopping point.**
 
-**Reference**: See detailed implementation in `docs/prds/m7.2-shared-household-zone.md`
+You've accomplished:
+- Complete architectural foundation
+- 10 entities household-scoped
+- Professional UI implementation
+- Zero technical debt
 
-**Key Methods to Implement:**
-- `createHousehold(name:)` - Creates household and shared zone
-- `inviteMember(email:to:)` - Sends invitation
-- `acceptInvitation(household:)` - Accepts invitation
-- `removeMember(_:)` - Removes member (owner only)
-- `leaveHousehold()` - Member leaves
-- `dissolveHousehold(_:)` - Owner dissolves
+**You can safely pause here and decide next steps later.**
 
-**File**: `Services/HouseholdService.swift`
-
-**Validation:**
-- ✅ Service compiles
-- ✅ All methods documented
-- ✅ Error handling complete
+All three options are viable. The choice depends on:
+- Do you have multiple devices available? (Option 1)
+- Want solid foundation before more features? (Option 2)
+- Want immediate user value? (Option 3)
 
 ---
 
-### **Task 4: Settings UI - Household Section (60 min)**
-
-**Goal**: Add household management to Settings
-
-**Files to Update/Create:**
-1. `SettingsView.swift` - Add Household section
-2. `HouseholdCreateView.swift` - Create household sheet
-3. `HouseholdDetailView.swift` - Household management view
-
-**Reference**: See UI mockups in M7.2 PRD
-
-**Validation:**
-- ✅ Settings shows Household section
-- ✅ Tapping "Create Household" shows sheet
-- ✅ Can enter household name and create
-
----
-
-### **M7.2.1 Acceptance Criteria**
-
-**Before moving to M7.2.2, verify:**
-
-**Core Data Model:**
-- ✅ Household entity exists in Core Data model
-- ✅ HouseholdMember entity exists in Core Data model
-- ✅ All 8 existing entities have `household` relationship:
-  - ✅ GroceryItem.household (optional, to-one, nullify)
-  - ✅ Recipe.household (optional, to-one, nullify)
-  - ✅ WeeklyList.household (optional, to-one, nullify)
-  - ✅ MealPlan.household (optional, to-one, nullify)
-  - ✅ Tag.household (optional, to-one, nullify)
-  - ✅ Ingredient.household (optional, to-one, nullify)
-  - ✅ GroceryListItem.household (optional, to-one, nullify)
-  - ✅ IngredientTemplate.household (optional, to-one, nullify)
-- ✅ CloudKit Dashboard shows household field on all 8 entities
-- ✅ All property files regenerated (10 entities total)
-
-**Service & UI:**
-- ✅ HouseholdService implemented with all methods
-- ✅ Settings → Household section functional
-- ✅ User can tap "Create Household"
-- ✅ User can enter household name
-- ✅ Household created in Core Data
-- ✅ Owner added as first member
-- ✅ CloudKit shared zone created (verify in CloudKit Dashboard)
-
-**Quality:**
-- ✅ Build succeeds with zero errors
-- ✅ No regressions to existing features
-- ✅ All existing M1-M5.0 features still working
-
----
-
-## 📚 **REFERENCE DOCUMENTS**
-
-**Read BEFORE starting M7.2.1:**
-
-1. **Architecture Decision**
-   - `docs/learning-notes/25-m7-architecture-pivot-ckshare-vs-shared-zone.md`
-   - Why we chose shared zones over CKShare
-
-2. **Technical Framework**
-   - `docs/architecture/m7-shared-zone-architecture.md`
-   - Complete technical architecture
-   - Entity design, service patterns, edge cases
-
-3. **Implementation Guide**
-   - `docs/prds/m7.2-shared-household-zone.md`
-   - Detailed task breakdown
-   - Code examples
-   - Testing strategy
-
-4. **Session Checklist**
-   - `docs/session-startup-checklist.md` (updated)
-   - Now includes product validation checkpoint (#8)
-
----
-
-## 🔀 **GIT WORKFLOW FOR M7.2.1**
-
-**Before Starting Development:**
-
-1. **Complete Documentation PR First**
-   ```bash
-   # On docs/m7-architecture-pivot branch
-   git add docs/
-   git commit -m "M7.2 Architecture Pivot: Documentation complete
-   
-   - Learning note: CKShare vs Shared Zone decision
-   - Architecture doc: Shared Zone technical framework
-   - Updated M7 PRD with household sharing approach
-   - Detailed M7.2 PRD (implementation guide)
-   - M7.3-M7.6 outlines for future work
-   - Session checklist: Added product validation checkpoint
-   
-   This pivot ensures we build the right solution for household
-   collaboration. 3.5h invested in CKShare approach was valuable
-   learning that led to this better architecture."
-   
-   git push origin docs/m7-architecture-pivot
-   
-   gh pr create --title "M7.2 Architecture Pivot: Shared Zone Documentation" \
-     --body "Complete documentation for M7.2 architecture pivot from CKShare to Shared Zones."
-   
-   gh pr merge --squash --delete-branch
-   ```
-
-2. **Update Local Main**
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
-
-3. **Delete Abandoned Branch**
-   ```bash
-   git branch -D feature/M7.2.1-ckshare-implementation
-   git push origin --delete feature/M7.2.1-ckshare-implementation
-   ```
-
-4. **Create New Feature Branch for M7.2.1**
-   ```bash
-   git checkout -b feature/M7.2.1-household-setup
-   ```
-
-5. **Start Development**
-   - Begin with Task 1: Core Data Model
-   - Commit frequently (every 15-30 min)
-   - Push after each commit
-
----
-
-## ⚠️ **CRITICAL REMINDERS**
-
-**Before ANY Code:**
-1. ✅ Complete docs PR and merge
-2. ✅ Delete abandoned M7.2.1 branch
-3. ✅ Start fresh on `feature/M7.2.1-household-setup`
-4. ✅ Read architecture doc thoroughly
-
-**During Development:**
-1. ✅ Commit every 15-30 minutes
-2. ✅ Use M7.2.1 naming in all commits
-3. ✅ Build and test after each task
-4. ✅ Stop if more than 3 build errors
-
-**After M7.2.1 Complete:**
-1. ✅ Mark complete in current-story.md
-2. ✅ Update next-prompt.md for M7.2.2
-3. ✅ Create PR with squash merge
-4. ✅ Update main branch
-
----
-
-## 💡 **SUCCESS INDICATORS**
-
-**You'll know M7.2.1 is done when:**
-- ✅ You can create a household in Settings
-- ✅ Household appears with your email as owner
-- ✅ CloudKit Dashboard shows shared zone created
-- ✅ Member count shows 1 (you)
-- ✅ Zero crashes, zero errors
-- ✅ All existing features still work
-
----
-
-**Ready to Start**: Complete docs PR first, then begin M7.2.1  
-**Estimated Time**: 3-4 hours for M7.2.1  
-**Next After M7.2.1**: M7.2.2 - Member Invitation & Acceptance
+**Version**: December 23, 2025 - M7.2.1 Complete (Strategic Decision Point)  
+**Recommendation**: Option 2 (Testing Foundation) for solo development without multi-device requirements
