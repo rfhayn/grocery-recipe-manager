@@ -10,6 +10,7 @@
         <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="groceryItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryItem" inverseName="categoryEntity" inverseEntity="GroceryItem"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="categories" inverseEntity="Household"/>
         <fetchIndex name="byCategorySortOrder">
             <fetchIndexElement property="sortOrder" type="Binary" order="ascending"/>
             <fetchIndexElement property="name" type="Binary" order="ascending"/>
@@ -25,6 +26,7 @@
         <attribute name="lastPurchased" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="categoryEntity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="groceryItems" inverseEntity="Category"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="groceryItems" inverseEntity="Household"/>
         <relationship name="ingredientTemplate" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IngredientTemplate" inverseName="stapleItems" inverseEntity="IngredientTemplate"/>
         <fetchIndex name="byStaplesCategoryOrder">
             <fetchIndexElement property="isStaple" type="Binary" order="ascending"/>
@@ -47,6 +49,7 @@
         <attribute name="sortOrder" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="source" optional="YES" attributeType="String"/>
         <attribute name="standardUnit" optional="YES" attributeType="String"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="groceryListItems" inverseEntity="Household"/>
         <relationship name="sourceRecipes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Recipe" inverseName="groceryListItems" inverseEntity="Recipe"/>
         <relationship name="weeklyList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WeeklyList" inverseName="items" inverseEntity="WeeklyList"/>
         <fetchIndex name="byQuantityFields">
@@ -54,6 +57,31 @@
             <fetchIndexElement property="standardUnit" type="Binary" order="ascending"/>
             <fetchIndexElement property="isFromRecipe" type="Binary" order="ascending"/>
         </fetchIndex>
+    </entity>
+    <entity name="Household" representedClassName="Household" syncable="YES" codeGenerationType="class">
+        <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String" defaultValueString="&quot;&quot;"/>
+        <attribute name="ownerEmail" attributeType="String" defaultValueString="&quot;&quot;"/>
+        <attribute name="shareRecord" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <relationship name="categories" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Category" inverseName="household" inverseEntity="Category"/>
+        <relationship name="groceryItems" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="GroceryItem" inverseName="household" inverseEntity="GroceryItem"/>
+        <relationship name="groceryListItems" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="GroceryListItem" inverseName="household" inverseEntity="GroceryListItem"/>
+        <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ingredient" inverseName="household" inverseEntity="Ingredient"/>
+        <relationship name="ingredientTemplates" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="IngredientTemplate" inverseName="household" inverseEntity="IngredientTemplate"/>
+        <relationship name="mealPlans" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MealPlan" inverseName="household" inverseEntity="MealPlan"/>
+        <relationship name="members" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="HouseholdMember" inverseName="household" inverseEntity="HouseholdMember"/>
+        <relationship name="preferences" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="UserPreferences" inverseName="household" inverseEntity="UserPreferences"/>
+        <relationship name="recipes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Recipe" inverseName="household" inverseEntity="Recipe"/>
+        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Tag" inverseName="household" inverseEntity="Tag"/>
+        <relationship name="weeklyLists" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WeeklyList" inverseName="household" inverseEntity="WeeklyList"/>
+    </entity>
+    <entity name="HouseholdMember" representedClassName="HouseholdMember" syncable="YES" codeGenerationType="class">
+        <attribute name="email" attributeType="String" defaultValueString="&quot;&quot;"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="joinedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="role" optional="YES" attributeType="String"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="members" inverseEntity="Household"/>
     </entity>
     <entity name="Ingredient" representedClassName="Ingredient" syncable="YES">
         <attribute name="displayText" attributeType="String" defaultValueString="&quot;&quot;"/>
@@ -65,6 +93,7 @@
         <attribute name="parseConfidence" attributeType="Float" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="standardUnit" optional="YES" attributeType="String"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="ingredients" inverseEntity="Household"/>
         <relationship name="ingredientTemplate" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="IngredientTemplate" inverseName="ingredients" inverseEntity="IngredientTemplate"/>
         <relationship name="recipe" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recipe" inverseName="ingredients" inverseEntity="Recipe"/>
         <fetchIndex name="byQuantityFields">
@@ -82,6 +111,7 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="usageCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="ingredientTemplates" inverseEntity="Household"/>
         <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Ingredient" inverseName="ingredientTemplate" inverseEntity="Ingredient"/>
         <relationship name="stapleItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryItem" inverseName="ingredientTemplate" inverseEntity="GroceryItem"/>
         <fetchIndex name="byTemplateSearch">
@@ -108,6 +138,7 @@
         <attribute name="isCompleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="mealPlans" inverseEntity="Household"/>
         <relationship name="plannedMeals" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PlannedMeal" inverseName="mealPlan" inverseEntity="PlannedMeal"/>
         <fetchIndex name="byisActiveandstateDate">
             <fetchIndexElement property="isActive" type="Binary" order="ascending"/>
@@ -125,6 +156,7 @@
         <attribute name="scaleFactor" attributeType="Double" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="servings" attributeType="Integer 16" defaultValueString="4" usesScalarValueType="YES"/>
         <attribute name="slotKey" optional="YES" attributeType="String"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PlannedMeal" inverseName="household" inverseEntity="PlannedMeal"/>
         <relationship name="mealPlan" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MealPlan" inverseName="plannedMeals" inverseEntity="MealPlan"/>
         <relationship name="recipe" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recipe" inverseName="plannedMeals" inverseEntity="Recipe"/>
         <fetchIndex name="bydateandisCompleted">
@@ -149,6 +181,7 @@
         <attribute name="titleKey" optional="YES" attributeType="String"/>
         <attribute name="usageCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="groceryListItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GroceryListItem" inverseName="sourceRecipes" inverseEntity="GroceryListItem"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="recipes" inverseEntity="Household"/>
         <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ingredient" inverseName="recipe" inverseEntity="Ingredient"/>
         <relationship name="plannedMeals" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PlannedMeal" inverseName="recipe" inverseEntity="PlannedMeal"/>
         <fetchIndex name="byPropertyIndex">
@@ -165,6 +198,7 @@
         <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="tags" inverseEntity="Household"/>
     </entity>
     <entity name="UserPreferences" representedClassName="UserPreferences" syncable="YES" codeGenerationType="class">
         <attribute name="autoNameMealPlans" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
@@ -174,6 +208,7 @@
         <attribute name="mealPlanStartDay" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="modifiedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="showRecipeSources" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="preferences" inverseEntity="Household"/>
         <fetchIndex name="byUserPreferencesId">
             <fetchIndexElement property="id" type="Binary" order="ascending"/>
         </fetchIndex>
@@ -184,6 +219,7 @@
         <attribute name="isCompleted" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="notes" optional="YES" attributeType="String"/>
+        <relationship name="household" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Household" inverseName="weeklyLists" inverseEntity="Household"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="GroceryListItem" inverseName="weeklyList" inverseEntity="GroceryListItem"/>
     </entity>
 </model>
