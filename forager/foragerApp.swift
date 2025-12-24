@@ -74,7 +74,8 @@ struct foragerApp: App {
                 .tag(Tab.categories)
                 
                 // M3 Phase 3: Settings Tab (replaces DEBUG-only Migration tab)
-                SettingsView()
+                // M7.2.1: Pass context for HouseholdService
+                SettingsView(context: persistenceController.container.viewContext)
                     .tabItem {
                         Label("Settings", systemImage: "gear")
                     }

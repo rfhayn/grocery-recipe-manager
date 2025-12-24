@@ -283,7 +283,6 @@
 		9B731C202E535C3100CE26F0 = {
 			isa = PBXGroup;
 			children = (
-				9B1B396C2EF4E48C001E1876 /* MigrationTestHelper.swift */,
 				9BF1F8C92E566BC100E79B3F /* Category+CoreDataClass.swift */,
 				9BF1F8CB2E566BF200E79B3F /* Category+CoreDataProperties.swift */,
 				9B1B39642EF4BA71001E1876 /* Category+Extensions.swift */,
@@ -303,6 +302,7 @@
 				85ADBDB82EA90D3D00E3B1B5 /* IngredientTemplate+Validation.swift */,
 				85ADBDBA2EA90D6D00E3B1B5 /* IngredientTemplateValidationTests.swift */,
 				85ADBDC72EA97DE600E3B1B5 /* M3ValidationTests.swift */,
+				9B1B396C2EF4E48C001E1876 /* MigrationTestHelper.swift */,
 				9B1B39682EF4E005001E1876 /* PlannedMeal+Extensions.swift */,
 				9B731C2A2E535C3100CE26F0 /* Products */,
 				85ADBDBC2EA91E9000E3B1B5 /* Recipe+ComputedProperties.swift */,
