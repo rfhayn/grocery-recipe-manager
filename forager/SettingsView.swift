@@ -90,12 +90,20 @@ struct SettingsView: View {
                             .fontWeight(.medium)
                     }
                     
-                    HStack {
-                        Text("Members")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text("\(household.members?.count ?? 0)")
-                            .fontWeight(.medium)
+                    // M7.2.2 Task 4: Link to members list
+                    NavigationLink {
+                        HouseholdMembersView(household: household, service: householdService)
+                    } label: {
+                        HStack {
+                            Text("Members")
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(household.members?.count ?? 0)")
+                                .fontWeight(.medium)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
                     }
                     
                     HStack {
@@ -233,6 +241,27 @@ struct SettingsView: View {
                     }
                 }
             }
+            
+            // M7.2.2: Household Debug link - TEMPORARILY DISABLED
+            // Shows all households in database for debugging sync issues
+            // TODO: Add HouseholdDebugView.swift to Xcode project
+            /*
+            NavigationLink {
+                HouseholdDebugView()
+            } label: {
+                HStack {
+                    Image(systemName: "house.circle")
+                        .foregroundColor(.orange)
+                    VStack(alignment: .leading) {
+                        Text("Household Debug")
+                            .font(.headline)
+                        Text("View all households in database")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            */
             
             #if DEBUG
             // M7.1.3 Part 4: Migration reset button (TEMPORARY - testing only)
