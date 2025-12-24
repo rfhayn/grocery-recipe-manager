@@ -90,9 +90,11 @@ class HouseholdService: ObservableObject {
     }
     
     /// Creates a new household with CloudKit shared zone
-    /// - Parameter name: Name of the household (e.g., "Smith Family")
+    /// - Parameters:
+    ///   - name: Name of the household (e.g., "Smith Family")
+    ///   - ownerName: Display name for the owner (e.g., "Sarah")
     /// - Returns: The newly created Household
-    func createHousehold(name: String) async throws -> Household {
+    func createHousehold(name: String, ownerName: String) async throws -> Household {
         isLoading = true
         defer { isLoading = false }
         
@@ -111,7 +113,9 @@ class HouseholdService: ObservableObject {
             let ownerMember = HouseholdMember(context: viewContext)
             ownerMember.id = UUID()
             ownerMember.email = ownerEmail
+            ownerMember.displayName = ownerName  // Use provided display name
             ownerMember.role = "owner"
+            ownerMember.status = "active"  // Owner is immediately active
             ownerMember.joinedDate = Date()
             ownerMember.household = household
             
@@ -172,6 +176,7 @@ class HouseholdService: ObservableObject {
     }
     
     /// Gets the current user's email from CloudKit
+    /// Falls back to userRecordID if email is not available
     private func getCurrentUserEmail() async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
             // TODO: M7.2.2 - Update to modern CloudKit API (iOS 17+)
@@ -188,16 +193,20 @@ class HouseholdService: ObservableObject {
                 
                 self.container.discoverUserIdentity(withUserRecordID: recordID) { identity, error in
                     if let error = error {
-                        continuation.resume(throwing: error)
+                        print("⚠️ Failed to discover identity: \(error)")
+                        // Fallback to userRecordID as identifier
+                        continuation.resume(returning: recordID.recordName)
                         return
                     }
                     
-                    guard let email = identity?.lookupInfo?.emailAddress else {
-                        continuation.resume(throwing: HouseholdError.emailNotFound)
-                        return
+                    // Try to get email, fallback to recordName if not available
+                    if let email = identity?.lookupInfo?.emailAddress {
+                        print("✅ Retrieved email: \(email)")
+                        continuation.resume(returning: email)
+                    } else {
+                        print("⚠️ Email not available, using userRecordID as fallback")
+                        continuation.resume(returning: recordID.recordName)
                     }
-                    
-                    continuation.resume(returning: email)
                 }
             }
         }

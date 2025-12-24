@@ -28,6 +28,9 @@ struct SettingsView: View {
     // M7.2.1: Household creation sheet state
     @State private var showCreateHouseholdSheet = false
     
+    // M7.2.2: Invitation sheet state
+    @State private var showInviteMemberSheet = false
+    
     // M7.2.1: Initializer to inject HouseholdService
     init(context: NSManagedObjectContext) {
         _householdService = StateObject(wrappedValue: HouseholdService(context: context))
@@ -62,6 +65,11 @@ struct SettingsView: View {
             .sheet(isPresented: $showCreateHouseholdSheet) {
                 CreateHouseholdSheet(householdService: householdService)
             }
+            .sheet(isPresented: $showInviteMemberSheet) {
+                if let household = householdService.currentHousehold {
+                    InviteMemberSheet(service: householdService, household: household)
+                }
+            }
         }
     }
     
@@ -94,12 +102,27 @@ struct SettingsView: View {
                         Text("Owner")
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(household.ownerEmail ?? "Unknown")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Text(household.memberArray.first(where: { $0.isOwner })?.displayName ?? "Unknown")
+                            .fontWeight(.medium)
                     }
                 }
                 .padding(.vertical, 4)
+                
+                // M7.2.2: Invite Member button
+                Button(action: {
+                    showInviteMemberSheet = true
+                }) {
+                    HStack {
+                        Image(systemName: "person.badge.plus")
+                        Text("Invite Member")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding(.top, 8)
                 
             } else {
                 // No household - show create button
@@ -316,6 +339,7 @@ struct CreateHouseholdSheet: View {
     @ObservedObject var householdService: HouseholdService
     
     @State private var householdName: String = ""
+    @State private var ownerDisplayName: String = "" // NEW: User's display name
     @State private var isCreating: Bool = false
     @State private var showError: Bool = false
     @State private var errorMessage: String = ""
@@ -325,6 +349,9 @@ struct CreateHouseholdSheet: View {
             Form {
                 Section(header: Text("Household Details")) {
                     TextField("Household Name", text: $householdName)
+                        .autocapitalization(.words)
+                    
+                    TextField("Your Name", text: $ownerDisplayName)
                         .autocapitalization(.words)
                 }
                 
@@ -348,7 +375,7 @@ struct CreateHouseholdSheet: View {
                     Button("Create") {
                         createHousehold()
                     }
-                    .disabled(householdName.isEmpty || isCreating)
+                    .disabled(householdName.isEmpty || ownerDisplayName.isEmpty || isCreating)
                 }
             }
             .overlay {
@@ -375,7 +402,10 @@ struct CreateHouseholdSheet: View {
         
         Task {
             do {
-                _ = try await householdService.createHousehold(name: householdName)
+                _ = try await householdService.createHousehold(
+                    name: householdName,
+                    ownerName: ownerDisplayName
+                )
                 dismiss()
             } catch {
                 errorMessage = error.localizedDescription
